@@ -3,10 +3,10 @@ fetch('./a-day-in-the-life-of-americans.tsv')
     .then(text => d3.csv.parse(text))
     .then(data => {
         console.log(data);
-        const fdg = forceDirectedDiagram(data, '#chart');
+        const fdg = forceDirectedGraph(data, '#chart');
     });
 //fetch('./a-day-in-the-life-of-americans.json')
 //    .then(response => response.json())
 //    .then(data => {
-//        const fdg = forceDirectedDiagram(data, '#chart');
+//        const fdg = forceDirectedGraph(data, '#chart');
 //    });

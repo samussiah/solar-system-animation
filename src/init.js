@@ -14,4 +14,5 @@ export default function init() {
     this.timepoint = 0;
     this.notes_index = 0;
     setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+    console.log(this.nodes);
 }

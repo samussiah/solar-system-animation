@@ -14,20 +14,17 @@ export default function tick(e) {
         } else {
             var damper = 1;
         }
-        o.color = fdg.settings.color(curr_act);
+        //o.color = fdg.settings.color(curr_act);
+        o.color = fdg.settings.colorScale(o.eventCounts['1'] + o.eventCounts['2'] + o.eventCounts['3']);
         o.y += (fdg.settings.foci[curr_act].y - o.y) * k * damper;
         o.x += (fdg.settings.foci[curr_act].x - o.x) * k * damper;
     });
 
     fdg.circles
         .each(collide.call(this, 0.5))
-        .style('fill', function (d) {
-            return d.color;
-        })
-        .attr('cx', function (d) {
-            return d.x;
-        })
-        .attr('cy', function (d) {
-            return d.y;
-        });
+        .style('fill', d => d.color)
+        .style('stroke', d => d.color)
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .attr('r', d => d.radius);
 }

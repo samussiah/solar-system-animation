@@ -1,6 +1,7 @@
 import foci from './settings/foci';
 import eventCounts from './settings/eventCounts';
 import color from './settings/color';
+import colorScale from './settings/colorScale';
 
 const settings = {
     speed: 'slow',
@@ -19,93 +20,32 @@ const settings = {
     padding: 1,
     maxRadius: 3,
     color,
+    colorScale,
     eventTypes: [
         { index: '0', short: 'Home', desc: 'Home' },
         { index: '1', short: 'Hosp.', desc: 'Hospitalization' },
         { index: '2', short: 'ICU', desc: 'Intensive Care Unit' },
         { index: '3', short: 'Death', desc: 'Death' },
-
-        //{'index': '0', 'short': 'Sleeping', 'desc': 'Sleeping'},
-        //{'index': '1', 'short': 'Personal Care', 'desc': 'Personal Care'},
-        //{'index': '2', 'short': 'Eating & Drinking', 'desc': 'Eating and Drinking'},
-        //{'index': '3', 'short': 'Education', 'desc': 'Education'},
-        //{'index': '4', 'short': 'Work', 'desc': 'Work and Work-Related Activities'},
-        //{'index': '5', 'short': 'Housework', 'desc': 'Household Activities'},
-        //{'index': '6', 'short': 'Household Care', 'desc': 'Caring for and Helping Household Members'},
-        //{'index': '7', 'short': 'Non-Household Care', 'desc': 'Caring for and Helping Non-Household Members'},
-        //{'index': '8', 'short': 'Shopping', 'desc': 'Consumer Purchases'},
-        //{'index': '9', 'short': 'Pro. Care Services', 'desc': 'Professional and Personal Care Services'},
-        //{'index': '10', 'short': 'Leisure', 'desc': 'Socializing, Relaxing, and Leisure'},
-        //{'index': '11', 'short': 'Sports', 'desc': 'Sports, Exercise, and Recreation'},
-        //{'index': '12', 'short': 'Religion', 'desc': 'Religious and Spiritual Activities'},
-        //{'index': '13', 'short': 'Volunteering', 'desc': 'Volunteer Activities'},
-        //{'index': '14', 'short': 'Phone Calls', 'desc': 'Telephone Calls'},
-        //{'index': '15', 'short': 'Misc.', 'desc': 'Other'},
-        //{'index': '16', 'short': 'Traveling', 'desc': 'Traveling'},
     ],
     annotations: [
-        {
-            start_minute: 1,
-            stop_minute: 40,
-            note: 'The simulation kicks in, based on data from the American Time Use Survey.',
-        },
-        {
-            start_minute: 70,
-            stop_minute: 120,
-            note:
-                'Most people are still sleeping this early in the morning, but some are already at work or preparing for the day.',
-        },
-        {
-            start_minute: 180,
-            stop_minute: 300,
-            note:
-                "It's wake up time for most. Time to start the day with morning rituals, breakfast and a wonderful commute.",
-        },
-        {
-            start_minute: 360,
-            stop_minute: 440,
-            note:
-                'The day is in full swing with work or housework. Stores and services are open so people can run errands, and they take various forms of transportation to get there.',
-        },
-        {
-            start_minute: 480,
-            stop_minute: 540,
-            note:
-                "Lunch hour. Many go eat, but there's still activity throughout. You see a small shift at the end of the hour.",
-        },
-        {
-            start_minute: 660,
-            stop_minute: 720,
-            note: 'Coffee break? Again, at the top of the hour, you see a shift in activity.',
-        },
-        {
-            start_minute: 780,
-            stop_minute: 830,
-            note:
-                "With the work day done, it's time to commute home and fix dinner or go out for a while.",
-        },
-        { start_minute: 870, stop_minute: 890, note: 'Dinner time!' },
-        {
-            start_minute: 930,
-            stop_minute: 1010,
-            note: "Dinner's done. Time for relaxation, TV, games, hobbies and socializing.",
-        },
-        {
-            start_minute: 1080,
-            stop_minute: 1140,
-            note:
-                'Winding down for the day. From leisure time, people shift to personal care and sleep.',
-        },
-        {
-            start_minute: 1210,
-            stop_minute: 1300,
-            note:
-                'Goodnight. More than 80% of people are asleep and it peaks at 96% around 3:00am.',
-        },
+        {start_minute:    1, stop_minute:   75, note: 'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.'},
+        {start_minute:   90, stop_minute:  165, note: 'One person dies every 37 seconds in the United States from cardiovascular disease.'},
+        {start_minute:  180, stop_minute:  255, note: 'About 647,000 Americans die from heart disease each year—that’s 1 in every 4 deaths.'},
+        {start_minute:  270, stop_minute:  345, note: 'Heart disease costs the United States about $219 billion each year from 2014 to 2015.'},
+        {start_minute:  360, stop_minute:  435, note: 'This includes the cost of health care services, medicines, and lost productivity due to death.'},
+        {start_minute:  450, stop_minute:  525, note: 'Coronary heart disease is the most common type of heart disease, killing 365,914 people in 2017.'},
+        {start_minute:  540, stop_minute:  615, note: 'About 18.2 million adults age 20 and older have CAD (about 6.7%).'},
+        {start_minute:  630, stop_minute:  705, note: 'About 2 in 10 deaths from CAD happen in adults less than 65 years old.'},
+        {start_minute:  720, stop_minute:  795, note: 'In the United States, someone has a heart attack every 40 seconds.'},
+        {start_minute:  810, stop_minute:  885, note: 'Every year, about 805,000 Americans have a heart attack.'},
+        {start_minute:  900, stop_minute:  975, note: '75% experience their first heart attack'},
+        {start_minute:  990, stop_minute: 1065, note: '25% have already had a heart attack.'},
+        {start_minute: 1080, stop_minute: 1155, note: 'About 1 in 5 heart attacks is silent—the damage is done, but the person is not aware of it.'},
     ],
 };
 
 settings.foci = foci(settings);
 settings.eventCounts = eventCounts(settings);
+d3.range(5).forEach(n => { console.log(settings.colorScale(n)); });
 
 export default settings;

@@ -21,6 +21,7 @@ export default function addTimer() {
 
             // Move on to next activity
             curr_node.act = curr_node.sched[curr_moves].act;
+            curr_node.eventCounts[curr_node.act] += 1;
 
             // Add to new activity count
             fdg.settings.eventCounts[curr_node.act] += 1;
@@ -28,6 +29,8 @@ export default function addTimer() {
             curr_node.moves = curr_moves;
             curr_node.cx = fdg.settings.foci[curr_node.act].x;
             curr_node.cy = fdg.settings.foci[curr_node.act].y;
+            curr_node.radius = 2 + curr_node.eventCounts['1'] + curr_node.eventCounts['2'] + curr_node.eventCounts['3'];
+            curr_node.color = fdg.settings.colorScale(curr_node.eventCounts['1'] + curr_node.eventCounts['2'] + curr_node.eventCounts['3']);
 
             fdg.nodes[i].next_move_time += fdg.nodes[i].sched[curr_node.moves].duration;
         }

@@ -1,7 +1,7 @@
 export default function addOrbits() {
-    // Annotate concentric circles.
+    // Draw concentric circles.
     this.svg
-        .selectAll('circle')
+        .selectAll('circle.orbit')
         .data(
             this.settings.eventTypes.slice(1).map((d, i) => {
                 return { cx: 380, cy: 365, r: (i + 1) * 100 + 50 };
@@ -9,10 +9,26 @@ export default function addOrbits() {
         )
         .enter()
         .append('circle')
-        .attr('cx', (d) => d.cx)
-        .attr('cy', (d) => d.cy)
-        .attr('r', (d) => d.r)
+        .classed('orbit', true)
+        .attr('cx', d => d.cx)
+        .attr('cy', d => d.cy)
+        .attr('r', d => d.r)
         .attr('fill', 'none')
         .attr('stroke', 'black')
         .attr('stroke-width', '1');
+
+    // Annotate concentric circles.
+    //this.svg
+    //    .selectAll('text.orbit')
+    //    .data(
+    //        this.settings.eventTypes.slice(1).map((d, i) => {
+    //            return { cx: 380, cy: 365, r: (i + 1) * 100 + 50 };
+    //        })
+    //    )
+    //    .enter()
+    //    .append('text')
+    //    .classed('orbit', true)
+    //    .attr('x', d => d.cx)
+    //    .attr('y', d => d.cy - d.r)
+    //    .text('asdf')
 }

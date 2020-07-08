@@ -53,6 +53,17 @@
       return eventColors[eventTypeIndex];
     }
 
+    function colorScale(n) {
+      var colors = ['#a50026', //'#d73027',
+      '#f46d43', //'#fdae61',
+      '#fee08b', //'#ffffbf',
+      '#d9ef8b', //'#a6d96a',
+      '#66bd63', //'#1a9850',
+      '#006837'].reverse();
+      var colorScale = d3.scale.linear().domain(d3.range(colors.length)).range(colors);
+      return colorScale(Math.min(n, colors.length));
+    }
+
     var settings = {
       speed: 'slow',
       speeds: {
@@ -70,6 +81,7 @@
       padding: 1,
       maxRadius: 3,
       color: color,
+      colorScale: colorScale,
       eventTypes: [{
         index: '0',
         "short": 'Home',
@@ -86,72 +98,66 @@
         index: '3',
         "short": 'Death',
         desc: 'Death'
-      } //{'index': '0', 'short': 'Sleeping', 'desc': 'Sleeping'},
-      //{'index': '1', 'short': 'Personal Care', 'desc': 'Personal Care'},
-      //{'index': '2', 'short': 'Eating & Drinking', 'desc': 'Eating and Drinking'},
-      //{'index': '3', 'short': 'Education', 'desc': 'Education'},
-      //{'index': '4', 'short': 'Work', 'desc': 'Work and Work-Related Activities'},
-      //{'index': '5', 'short': 'Housework', 'desc': 'Household Activities'},
-      //{'index': '6', 'short': 'Household Care', 'desc': 'Caring for and Helping Household Members'},
-      //{'index': '7', 'short': 'Non-Household Care', 'desc': 'Caring for and Helping Non-Household Members'},
-      //{'index': '8', 'short': 'Shopping', 'desc': 'Consumer Purchases'},
-      //{'index': '9', 'short': 'Pro. Care Services', 'desc': 'Professional and Personal Care Services'},
-      //{'index': '10', 'short': 'Leisure', 'desc': 'Socializing, Relaxing, and Leisure'},
-      //{'index': '11', 'short': 'Sports', 'desc': 'Sports, Exercise, and Recreation'},
-      //{'index': '12', 'short': 'Religion', 'desc': 'Religious and Spiritual Activities'},
-      //{'index': '13', 'short': 'Volunteering', 'desc': 'Volunteer Activities'},
-      //{'index': '14', 'short': 'Phone Calls', 'desc': 'Telephone Calls'},
-      //{'index': '15', 'short': 'Misc.', 'desc': 'Other'},
-      //{'index': '16', 'short': 'Traveling', 'desc': 'Traveling'},
-      ],
+      }],
       annotations: [{
         start_minute: 1,
-        stop_minute: 40,
-        note: 'The simulation kicks in, based on data from the American Time Use Survey.'
+        stop_minute: 75,
+        note: 'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.'
       }, {
-        start_minute: 70,
-        stop_minute: 120,
-        note: 'Most people are still sleeping this early in the morning, but some are already at work or preparing for the day.'
+        start_minute: 90,
+        stop_minute: 165,
+        note: 'One person dies every 37 seconds in the United States from cardiovascular disease.'
       }, {
         start_minute: 180,
-        stop_minute: 300,
-        note: "It's wake up time for most. Time to start the day with morning rituals, breakfast and a wonderful commute."
+        stop_minute: 255,
+        note: 'About 647,000 Americans die from heart disease each year—that’s 1 in every 4 deaths.'
+      }, {
+        start_minute: 270,
+        stop_minute: 345,
+        note: 'Heart disease costs the United States about $219 billion each year from 2014 to 2015.'
       }, {
         start_minute: 360,
-        stop_minute: 440,
-        note: 'The day is in full swing with work or housework. Stores and services are open so people can run errands, and they take various forms of transportation to get there.'
+        stop_minute: 435,
+        note: 'This includes the cost of health care services, medicines, and lost productivity due to death.'
       }, {
-        start_minute: 480,
-        stop_minute: 540,
-        note: "Lunch hour. Many go eat, but there's still activity throughout. You see a small shift at the end of the hour."
+        start_minute: 450,
+        stop_minute: 525,
+        note: 'Coronary heart disease is the most common type of heart disease, killing 365,914 people in 2017.'
       }, {
-        start_minute: 660,
-        stop_minute: 720,
-        note: 'Coffee break? Again, at the top of the hour, you see a shift in activity.'
+        start_minute: 540,
+        stop_minute: 615,
+        note: 'About 18.2 million adults age 20 and older have CAD (about 6.7%).'
       }, {
-        start_minute: 780,
-        stop_minute: 830,
-        note: "With the work day done, it's time to commute home and fix dinner or go out for a while."
+        start_minute: 630,
+        stop_minute: 705,
+        note: 'About 2 in 10 deaths from CAD happen in adults less than 65 years old.'
       }, {
-        start_minute: 870,
-        stop_minute: 890,
-        note: 'Dinner time!'
+        start_minute: 720,
+        stop_minute: 795,
+        note: 'In the United States, someone has a heart attack every 40 seconds.'
       }, {
-        start_minute: 930,
-        stop_minute: 1010,
-        note: "Dinner's done. Time for relaxation, TV, games, hobbies and socializing."
+        start_minute: 810,
+        stop_minute: 885,
+        note: 'Every year, about 805,000 Americans have a heart attack.'
+      }, {
+        start_minute: 900,
+        stop_minute: 975,
+        note: '75% experience their first heart attack'
+      }, {
+        start_minute: 990,
+        stop_minute: 1065,
+        note: '25% have already had a heart attack.'
       }, {
         start_minute: 1080,
-        stop_minute: 1140,
-        note: 'Winding down for the day. From leisure time, people shift to personal care and sleep.'
-      }, {
-        start_minute: 1210,
-        stop_minute: 1300,
-        note: 'Goodnight. More than 80% of people are asleep and it peaks at 96% around 3:00am.'
+        stop_minute: 1155,
+        note: 'About 1 in 5 heart attacks is silent—the damage is done, but the person is not aware of it.'
       }]
     };
     settings.foci = foci(settings);
     settings.eventCounts = eventCounts(settings);
+    d3.range(5).forEach(function (n) {
+      console.log(settings.colorScale(n));
+    });
 
     function addSpeedControl() {
       var fdg = this;
@@ -176,20 +182,33 @@
     }
 
     function addOrbits() {
-      // Annotate concentric circles.
-      this.svg.selectAll('circle').data(this.settings.eventTypes.slice(1).map(function (d, i) {
+      // Draw concentric circles.
+      this.svg.selectAll('circle.orbit').data(this.settings.eventTypes.slice(1).map(function (d, i) {
         return {
           cx: 380,
           cy: 365,
           r: (i + 1) * 100 + 50
         };
-      })).enter().append('circle').attr('cx', function (d) {
+      })).enter().append('circle').classed('orbit', true).attr('cx', function (d) {
         return d.cx;
       }).attr('cy', function (d) {
         return d.cy;
       }).attr('r', function (d) {
         return d.r;
-      }).attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', '1');
+      }).attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', '1'); // Annotate concentric circles.
+      //this.svg
+      //    .selectAll('text.orbit')
+      //    .data(
+      //        this.settings.eventTypes.slice(1).map((d, i) => {
+      //            return { cx: 380, cy: 365, r: (i + 1) * 100 + 50 };
+      //        })
+      //    )
+      //    .enter()
+      //    .append('text')
+      //    .classed('orbit', true)
+      //    .attr('x', d => d.cx)
+      //    .attr('y', d => d.cy - d.r)
+      //    .text('asdf')
     }
 
     function layout() {
@@ -208,12 +227,20 @@
         _this.settings.eventCounts[act] += 1;
         var init_x = _this.settings.foci[act].x + Math.random();
         var init_y = _this.settings.foci[act].y + Math.random();
+
+        var eventCounts = _this.settings.eventTypes.reduce(function (eventCounts, eventType) {
+          eventCounts[eventType.index] = 0;
+          return eventCounts;
+        }, {});
+
+        eventCounts[act] += 1;
         return {
           act: act,
-          radius: 3,
+          eventCounts: eventCounts,
           x: init_x,
           y: init_y,
-          color: _this.settings.color(act),
+          radius: 2 + eventCounts['1'] + eventCounts['2'] + eventCounts['3'],
+          color: _this.settings.colorScale(eventCounts['1'] + eventCounts['2'] + eventCounts['3']),
           moves: 0,
           next_move_time: d[0].duration,
           sched: d
@@ -264,18 +291,23 @@
           var damper = 0.6;
         } else {
           var damper = 1;
-        }
+        } //o.color = fdg.settings.color(curr_act);
 
-        o.color = fdg.settings.color(curr_act);
+
+        o.color = fdg.settings.colorScale(o.eventCounts['1'] + o.eventCounts['2'] + o.eventCounts['3']);
         o.y += (fdg.settings.foci[curr_act].y - o.y) * k * damper;
         o.x += (fdg.settings.foci[curr_act].x - o.x) * k * damper;
       });
       fdg.circles.each(collide.call(this, 0.5)).style('fill', function (d) {
         return d.color;
+      }).style('stroke', function (d) {
+        return d.color;
       }).attr('cx', function (d) {
         return d.x;
       }).attr('cy', function (d) {
         return d.y;
+      }).attr('r', function (d) {
+        return d.radius;
       });
     }
 
@@ -290,7 +322,9 @@
         return d.radius;
       }).style('fill', function (d) {
         return d.color;
-      }); //.call(force.drag);
+      }).style('fill-opacity', 0.5).style('stroke', function (d) {
+        return d.color;
+      }).style('stroke-opacity', 1); //.call(force.drag);
 
       return circles;
     }
@@ -342,9 +376,9 @@
 
     // Minutes to time of day. Data is minutes from 4am.
     function minutesToTime(m) {
-      var minutes = (m + 4 * 60) % 1440;
+      var minutes = m % 1440; //var minutes = (m + 4 * 60) % 1440;
 
-      return "".concat(minutes, " days since randomization"); //return hh + ":" + mm + ampm
+      return "".concat(minutes, " day").concat(m === 1 ? '' : 's', " since heart failure"); //return hh + ":" + mm + ampm
     }
 
     function addTimer() {
@@ -363,12 +397,15 @@
 
           fdg.settings.eventCounts[curr_node.act] -= 1; // Move on to next activity
 
-          curr_node.act = curr_node.sched[curr_moves].act; // Add to new activity count
+          curr_node.act = curr_node.sched[curr_moves].act;
+          curr_node.eventCounts[curr_node.act] += 1; // Add to new activity count
 
           fdg.settings.eventCounts[curr_node.act] += 1;
           curr_node.moves = curr_moves;
           curr_node.cx = fdg.settings.foci[curr_node.act].x;
           curr_node.cy = fdg.settings.foci[curr_node.act].y;
+          curr_node.radius = 2 + curr_node.eventCounts['1'] + curr_node.eventCounts['2'] + curr_node.eventCounts['3'];
+          curr_node.color = fdg.settings.colorScale(curr_node.eventCounts['1'] + curr_node.eventCounts['2'] + curr_node.eventCounts['3']);
           fdg.nodes[i].next_move_time += fdg.nodes[i].sched[curr_node.moves].duration;
         }
       });
@@ -406,6 +443,7 @@
       this.timepoint = 0;
       this.notes_index = 0;
       setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+      console.log(this.nodes);
     }
 
     function forceDirectedGraph(data) {

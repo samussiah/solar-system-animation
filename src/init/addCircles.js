@@ -5,7 +5,10 @@ export default function addCircles() {
         .enter()
         .append('circle')
         .attr('r', d => d.radius)
-        .style('fill', d => d.color);
+        .style('fill', d => d.color)
+        .style('fill-opacity', 0.5)
+        .style('stroke', d => d.color)
+        .style('stroke-opacity', 1);
         //.call(force.drag);
 
     return circles;

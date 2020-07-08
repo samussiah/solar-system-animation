@@ -1,6 +1,7 @@
 // Minutes to time of day. Data is minutes from 4am.
 export default function minutesToTime(m) {
-    var minutes = (m + 4 * 60) % 1440;
+    var minutes = m % 1440;
+    //var minutes = (m + 4 * 60) % 1440;
     var hh = Math.floor(minutes / 60);
     var ampm;
     if (hh > 12) {
@@ -19,6 +20,6 @@ export default function minutesToTime(m) {
         mm = '0' + mm;
     }
 
-    return `${minutes} days since randomization`;
+    return `${minutes} day${m === 1 ? '' : 's'} since heart failure`;
     //return hh + ":" + mm + ampm
 }

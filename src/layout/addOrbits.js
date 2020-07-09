@@ -11,9 +11,9 @@ export default function addOrbits() {
         .enter()
         .append('circle')
         .classed('orbit', true)
-        .attr('cx', d => d.cx)
-        .attr('cy', d => d.cy)
-        .attr('r', d => d.r)
+        .attr('cx', (d) => d.cx)
+        .attr('cy', (d) => d.cy)
+        .attr('r', (d) => d.r)
         .attr('fill', 'none')
         .attr('stroke', 'black')
         .attr('stroke-width', '1');

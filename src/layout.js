@@ -6,19 +6,11 @@ export default function layout() {
         .append('div')
         .classed('force-directed-graph', true)
         .datum(this);
-    this.controls = this.container
-        .append('div')
-        .classed('fdg-controls', true);
+    this.controls = this.container.append('div').classed('fdg-controls', true);
     addSpeedControl.call(this);
-    this.timer = this.container
-        .append('div')
-        .classed('fdg-timer', true);
-    this.annotations = this.container
-        .append('div')
-        .classed('fdg-annotations', true);
-    this.canvas = this.container
-        .append('div')
-        .classed('fdg-canvas', true);
+    this.timer = this.container.append('div').classed('fdg-timer', true);
+    this.annotations = this.container.append('div').classed('fdg-annotations', true);
+    this.canvas = this.container.append('div').classed('fdg-canvas', true);
     this.svg = this.canvas
         .append('svg')
         .classed('fdg-svg', true)

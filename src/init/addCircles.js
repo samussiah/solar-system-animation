@@ -4,12 +4,12 @@ export default function addCircles() {
         .data(this.data.nested)
         .enter()
         .append('circle')
-        .attr('r', d => d.r)
-        .style('fill', d => d.color)
+        .attr('r', (d) => d.r)
+        .style('fill', (d) => d.color)
         .style('fill-opacity', 0.5)
-        .style('stroke', d => d.color)
+        .style('stroke', (d) => d.color)
         .style('stroke-opacity', 1);
-        //.call(force.drag);
+    //.call(force.drag);
 
     return circles;
 }

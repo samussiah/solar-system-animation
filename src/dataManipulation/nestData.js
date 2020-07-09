@@ -1,29 +1,35 @@
 export default function nestData() {
-    const nestedData = d3.nest()
-        .key(d => d.id)
-        .rollup(d => {
+    const nestedData = d3
+        .nest()
+        .key((d) => d.id)
+        .rollup((d) => {
             // Initial event for the given individual.
             const currentEvent = d[0];
 
             // Define an event object for the individual.
-            const eventTypes = this.eventTypes.map(eventType => {
+            const eventTypes = this.eventTypes.map((eventType) => {
                 return {
                     label: eventType.label,
                     order: eventType.order,
                     count: 0,
                     duration: 0,
-                    totalDuration: d3.sum(d.filter(di => di.event === eventType.label), di => di.duration),
+                    totalDuration: d3.sum(
+                        d.filter((di) => di.event === eventType.label),
+                        (di) => di.duration
+                    ),
                 };
             });
-            eventTypes.find(eventType => eventType.label === currentEvent.event).count += 1;
+            eventTypes.find((eventType) => eventType.label === currentEvent.event).count += 1;
 
             // Update the event object of the population.
-            const eventType = this.eventTypes.find(eventType => eventType.label === currentEvent.event);
+            const eventType = this.eventTypes.find(
+                (eventType) => eventType.label === currentEvent.event
+            );
             eventType.count += 1;
 
             const stateChanges = d3.sum(
-                eventTypes.filter(eventType => eventType.label !== this.settings.centerEventType),
-                eventType => eventType.count
+                eventTypes.filter((eventType) => eventType.label !== this.settings.centerEventType),
+                (eventType) => eventType.count
             );
 
             return {
@@ -39,7 +45,7 @@ export default function nestData() {
             };
         })
         .entries(this.data)
-        .map(d => Object.assign(d, d.values));
+        .map((d) => Object.assign(d, d.values));
 
     return nestedData;
 }

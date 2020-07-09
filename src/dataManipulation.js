@@ -2,11 +2,11 @@ import defineEventTypes from './dataManipulation/defineEventTypes';
 import nestData from './dataManipulation/nestData';
 
 export default function dataManipulation() {
-    this.data.forEach(d => {
+    this.data.forEach((d) => {
         d.duration = parseFloat(d.duration);
     });
     // TODO: sort ID alphanumerically - don't assume it's going to be numeric
-    this.data.sort((a,b) => {
+    this.data.sort((a, b) => {
         const id_diff = a.id - b.id;
         const seq_diff = a.seq - b.seq;
 

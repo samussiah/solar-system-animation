@@ -4,8 +4,8 @@ import minutesToTime from './addTimer/minutesToTime';
 export default function addTimer() {
     const fdg = this;
 
-    this.data.nested.forEach(d => {
-        const currentEvent = d.currentEvent.event;
+    this.data.nested.forEach((d) => {
+        const currEvent = d.currentEvent.event;
         let curr_moves = d.moves;
 
         // Time to go to next activity
@@ -16,25 +16,30 @@ export default function addTimer() {
                 curr_moves += 1;
             }
 
-            // Subtract from current activity count
-            this.eventTypes.find(eventType => eventType.label === currentEvent).count -= 1;
-
-            // Move on to next activity
+            // Update individual to next event.
             d.currentEvent = d.sched[curr_moves];
-            const eventType = d.eventTypes.find(eventType => eventType.label === d.currentEvent.event);
-            eventType.count += 1;
+            const nextEvent = d.currentEvent.event;
+            const eventIndividual = d.eventTypes.find((eventType) => eventType.label === nextEvent);
+            eventIndividual.count += 1;
+
+            // Update population count at previous and next events.
+            this.eventTypes.find((eventType) => eventType.label === currEvent).count -= 1;
+            const eventPopulation = this.eventTypes.find(
+                (eventType) => eventType.label === nextEvent
+            );
+            eventPopulation.count += 1;
 
             // Add to new activity count
-            this.eventTypes.find(eventType => eventType.label === d.currentEvent.event).count += 1;
-
             const stateChanges = d3.sum(
-                d.eventTypes.filter(eventType => eventType.label !== this.settings.centerEventType),
-                eventType => eventType.count
+                d.eventTypes.filter(
+                    (eventType) => eventType.label !== this.settings.centerEventType
+                ),
+                (eventType) => eventType.count
             );
 
             d.moves = curr_moves;
-            d.x = eventType.x;
-            d.y = eventType.y;
+            d.x = eventPopulation.x;
+            d.y = eventPopulation.y;
             d.r = 2 + stateChanges;
             d.color = this.settings.colorScale(stateChanges);
 
@@ -46,7 +51,7 @@ export default function addTimer() {
     this.settings.timepoint += 1;
 
     // Update percentages
-    this.fociLabels.selectAll('tspan.actpct').text(d => readablePercent(d.count));
+    this.fociLabels.selectAll('tspan.actpct').text((d) => readablePercent(d.count));
 
     // Update time
     const true_minute = this.settings.timepoint % 1440;

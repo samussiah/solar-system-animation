@@ -1,9 +1,10 @@
 export default function addOrbits() {
+    console.log(this);
     // Draw concentric circles.
-    this.svg
+    const orbits = this.svg
         .selectAll('circle.orbit')
         .data(
-            this.settings.eventTypes.slice(1).map((d, i) => {
+            this.eventTypes.slice(1).map((d, i) => {
                 return { cx: 380, cy: 365, r: (i + 1) * 100 + 50 };
             })
         )

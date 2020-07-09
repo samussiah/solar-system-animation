@@ -12,6 +12,9 @@ export default function addTimer() {
         if (curr_node.next_move_time == fdg.timepoint) {
             if (curr_node.moves == curr_node.sched.length - 1) {
                 curr_moves = 0;
+                fdg.settings.eventTypes.forEach(eventType => {
+                    curr_node.eventCounts[eventType.index] = 0;
+                });
             } else {
                 curr_moves += 1;
             }

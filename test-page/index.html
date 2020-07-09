@@ -1,34 +1,20 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <title>Time Use Simulation</title>
+        <title>Force-directed Graph: Test Page</title>
+        <meta http-equiv = 'Content-Type' content = 'text/html; charset = utf-8'>
 
-        <script type = 'text/javascript' src="https://d3js.org/d3.v3.js"></script>
+        <script type = 'text/javascript' src = 'https://d3js.org/d3.v3.js'></script>
         <script type = 'text/javascript' src = '../index.js'></script>
 
-        <link rel="stylesheet" href="./index.css" type="text/css" media="screen" />
-        <link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
+        <link type = 'text/css' rel = 'stylesheet' href = './index.css'>
     </head>
 
     <body>
-        <div id="main-wrapper">
-            <div id="sidebar">
-                <div id="current_time">0 days since heart failure</div>
-                    <div id="speed">
-                        <div class="togglebutton slow current" data-val="slow">Slow</div>
-                        <div class="togglebutton medium" data-val="medium">Medium</div>
-                        <div class="togglebutton fast" data-val="fast">Fast</div>
-                        <div class="clr"></div>
-                    </div>
-                    <div id="note"></div>
-                    <div id="cite">
-                        This is an animation of actual data collected in the PARADIGM-HF trial..
-                    </div>
-                </div>
-                <div id="chart"></div>
-            <div class="clr"></div>
-        </div>
+        <div id = 'title'>Force-directed Graph</div>
+        <div id = 'subtitle'>Test Page</div>
+        <div id = 'description'>This is an animation of patients with heart failure as they progress through life.</div>
+        <div id = 'container'></div>
     </body>
 
     <script type = 'text/javascript' src = './index.js'></script>

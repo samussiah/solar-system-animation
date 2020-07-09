@@ -1,8 +1,6 @@
-fetch('./a-day-in-the-life-of-americans.json')
-    .then(response => response.json())
+fetch('./flattened.csv')
+    .then(response => response.text())
+    .then(text => d3.csv.parse(text))
     .then(data => {
-        data.forEach(d => {
-            d[0].act = '0';
-        });
-        const fdg = forceDirectedGraph(data, '#chart');
+        const fdg = forceDirectedGraph(data, '#container');
     });

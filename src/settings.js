@@ -1,5 +1,3 @@
-import foci from './settings/foci';
-import eventCounts from './settings/eventCounts';
 import color from './settings/color';
 import colorScale from './settings/colorScale';
 
@@ -21,12 +19,7 @@ const settings = {
     maxRadius: 3,
     color,
     colorScale,
-    eventTypes: [
-        { index: '0', short: 'Home', desc: 'Home' },
-        { index: '1', short: 'Hosp.', desc: 'Hospitalization' },
-        { index: '2', short: 'ICU', desc: 'Intensive Care Unit' },
-        { index: '3', short: 'Death', desc: 'Death' },
-    ],
+    eventTypes: null, // data-driven by default
     annotations: [
         {start_minute:    1, stop_minute:   75, note: 'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.'},
         {start_minute:   90, stop_minute:  165, note: 'One person dies every 37 seconds in the United States from cardiovascular disease.'},
@@ -43,9 +36,5 @@ const settings = {
         {start_minute: 1080, stop_minute: 1155, note: 'About 1 in 5 heart attacks is silent—the damage is done, but the person is not aware of it.'},
     ],
 };
-
-settings.foci = foci(settings);
-settings.eventCounts = eventCounts(settings);
-d3.range(5).forEach(n => { console.log(settings.colorScale(n)); });
 
 export default settings;

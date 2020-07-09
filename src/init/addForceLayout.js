@@ -3,7 +3,7 @@ import tick from './addForceLayout/tick';
 export default function addForceLayout() {
     const force = d3.layout
         .force()
-        .nodes(this.nodes)
+        .nodes(this.data.nested)
         // .links([])
         .size([this.settings.width, this.settings.height])
         .gravity(0)

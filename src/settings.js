@@ -13,6 +13,8 @@ const settings = {
         x: 380,
         y: 365,
     },
+    timepoint: 0,
+    timeFrame: null,
     width: 780,
     height: 800,
     padding: 1,

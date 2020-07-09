@@ -10,6 +10,12 @@ export default function layout() {
         .append('div')
         .classed('fdg-controls', true);
     addSpeedControl.call(this);
+    this.timer = this.container
+        .append('div')
+        .classed('fdg-timer', true);
+    this.annotations = this.container
+        .append('div')
+        .classed('fdg-annotations', true);
     this.canvas = this.container
         .append('div')
         .classed('fdg-canvas', true);

@@ -1,10 +1,10 @@
 export default function addCircles() {
     const circles = this.svg
         .selectAll('circle')
-        .data(this.nodes)
+        .data(this.data.nested)
         .enter()
         .append('circle')
-        .attr('r', d => d.radius)
+        .attr('r', d => d.r)
         .style('fill', d => d.color)
         .style('fill-opacity', 0.5)
         .style('stroke', d => d.color)

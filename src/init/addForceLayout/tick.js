@@ -9,18 +9,23 @@ export default function tick(e) {
         const currentEvent = this.eventTypes.find(
             (eventType) => eventType.label === d.currentEvent.event
         );
+
+        // Take the point's current coordinates and add to it the difference between the coordinates of the
+        // corresponding focus and the coordinates of the point, multiplied by some tiny fraction.
+        if (d.key === '23') console.log('---');
+        if (d.key === '23') console.log(currentEvent.label);
+        if (d.key === '23') console.log(d.next_move_time);
+        if (d.key === '23') console.log(d.x);
         d.x += (currentEvent.x - d.x) * k * 0.5;
+        if (d.key === '23') console.log(d.x);
         d.y += (currentEvent.y - d.y) * k * 0.5;
-        //d.color = this.settings.colorScale(
-        //    d3.sum(d.eventTypes.filter(eventType => eventType.label !== this.settings.centerEventType), eventType => eventType.count)
-        //);
     });
 
     this.circles
         .each(collide.call(this, 0.5))
-        .style('fill', (d) => d.color)
-        .style('stroke', (d) => d.color)
         .attr('cx', (d) => d.x)
         .attr('cy', (d) => d.y)
-        .attr('r', (d) => d.r);
+        .attr('r', (d) => d.r)
+        .style('fill', (d) => d.color)
+        .style('stroke', (d) => d.color);
 }

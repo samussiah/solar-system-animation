@@ -19,7 +19,6 @@ export default function defineEventTypes() {
         eventType.x = i === 0 ? centerX : (i * 100 + 50) * Math.cos(i * theta) + centerX;
         eventType.y = i === 0 ? centerY : (i * 100 + 50) * Math.sin(i * theta) + centerY;
     });
-    console.table(eventTypes);
 
     return eventTypes;
 }

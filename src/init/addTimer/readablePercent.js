@@ -8,5 +8,5 @@ export default function readablePercent(n) {
         pct = Math.round(pct) + '%';
     }
 
-    return pct;
+    return `${n} (${pct})`;
 }

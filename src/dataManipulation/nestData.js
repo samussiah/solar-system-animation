@@ -35,6 +35,7 @@ export default function nestData() {
             return {
                 currentEvent,
                 eventTypes,
+                duration: d3.sum(d, di => di.duration),
                 x: eventType.x + Math.random(),
                 y: eventType.y + Math.random(),
                 r: 2 + stateChanges,

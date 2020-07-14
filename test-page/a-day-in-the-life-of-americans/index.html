@@ -1,0 +1,33 @@
+<head>
+    <meta charset="utf-8">
+    <title>Time Use Simulation</title>
+    <!--script src="js/d3-3-5-5.min.js"></script-->
+    <script type = 'text/javascript' src = 'https://d3js.org/d3.v3.js'></script>
+
+    <link rel="stylesheet" href="style.css" type="text/css" media="screen">
+    <link rel="stylesheet" type="text/css" href="fonts.css">
+    <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div id="main-wrapper">
+        <div id="sidebar">
+            <div id="current_time">4:00am</div>
+            <div id="speed">
+                <div class="togglebutton slow current" data-val="slow">Slow</div>
+                <div class="togglebutton medium" data-val="medium">Medium</div>
+                <div class="togglebutton fast" data-val="fast">Fast</div>
+                <div class="clr"></div>
+            </div>
+
+            <div id="note" style="top: 20px; color: rgb(0, 0, 0);"></div>
+            <div id="cite">
+                This is a simulation of 1,000 people's average day. It's based on 2014 data from the <a href="http://www.bls.gov/tus/">American Time Use Survey</a>, made way more accessible by the <a href="https://www.atusdata.org/">ATUS Extract Builder</a>.
+            </div>
+        </div>
+        <div id="chart"></div>
+        <div class="clr"></div>
+    </div>
+
+    <script src = './index.js'></script>
+</body>

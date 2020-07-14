@@ -1,7 +1,7 @@
 export default function addSpeedControl() {
     const fdg = this;
 
-    const container = this.controls.append('div').classed('fdg-controls__speed', true);
+    const container = this.controls.append('div').classed('fdg-control fdg-control--speed', true);
     const inputs = container
         .selectAll('div')
         .data(

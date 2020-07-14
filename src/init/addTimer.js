@@ -1,8 +1,19 @@
 import readablePercent from './addTimer/readablePercent';
 import minutesToTime from './addTimer/minutesToTime';
 
+/**
+ * Order of operations:
+ *
+ * 1. Update data for each individual.
+ * 2. Resume force simulation.
+ * 3. Increment timepoint.
+ * 4. Update timer text, percentage annotations, and information annotation.
+ * 5. Recursively call addTimer().
+ */
+
 export default function addTimer() {
-    const fdg = this;
+    this.settings.timepoint += 1;
+    this.force.resume();
 
     this.data.nested.forEach((d) => {
         const currEvent = d.currentEvent.event;
@@ -47,15 +58,50 @@ export default function addTimer() {
         }
     });
 
-    this.force.resume();
-    this.settings.timepoint += 1;
+    if (this.settings.timepoint === this.settings.reset) {
+        this.settings.timepoint = 0;
+
+        // Update the event object of the population.
+        this.eventTypes.forEach(eventType => {
+            eventType.count = 0;
+        });
+
+        this.data.nested.forEach(d => {
+            // Initial event for the given individual.
+            const currentEvent = d.sched[0];
+
+            // Define an event object for the individual.
+            d.eventTypes.forEach(eventType => {
+                eventType.count = 0;
+                eventType.duration = 0;
+            });
+            d.eventTypes.find(eventType => eventType.label === currentEvent.event).count += 1;
+
+            const eventType = this.eventTypes.find(
+                eventType => eventType.label === currentEvent.event
+            );
+            eventType.count += 1;
+
+            const stateChanges = d3.sum(
+                d.eventTypes.filter(eventType => eventType.label !== this.settings.centerEventType),
+                eventType => eventType.count
+            );
+
+            d.x = eventType.x + Math.random();
+            d.y = eventType.y + Math.random();
+            d.r = 2 + stateChanges;
+            d.color = this.settings.colorScale(stateChanges);
+            d.moves = 0;
+            d.next_move_time = currentEvent.duration;
+        });
+    }
 
     // Update percentages
     this.fociLabels.selectAll('tspan.actpct').text((d) => readablePercent(d.count));
 
     // Update time
     const true_minute = this.settings.timepoint % 1440;
-    this.timer.text(minutesToTime(true_minute));
+    this.timer.text(minutesToTime.call(this, true_minute));
 
     // Update notes
     if (true_minute === this.settings.annotations[this.notes_index].start_minute) {
@@ -83,5 +129,5 @@ export default function addTimer() {
         }
     }
 
-    setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+    this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
 }

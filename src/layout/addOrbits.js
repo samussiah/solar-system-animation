@@ -1,5 +1,4 @@
 export default function addOrbits() {
-    console.log(this);
     // Draw concentric circles.
     const orbits = this.svg
         .selectAll('circle.orbit')

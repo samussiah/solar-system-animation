@@ -1,4 +1,5 @@
 import addSpeedControl from './layout/addSpeedControl';
+import addPlayPauseControl from './layout/addPlayPauseControl';
 
 export default function layout() {
     this.container = d3
@@ -8,7 +9,8 @@ export default function layout() {
         .datum(this);
     this.controls = this.container.append('div').classed('fdg-controls', true);
     addSpeedControl.call(this);
-    this.timer = this.container.append('div').classed('fdg-timer', true);
+    addPlayPauseControl.call(this);
+    this.timer = this.container.append('div').classed('fdg-timer', true).text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
     this.annotations = this.container.append('div').classed('fdg-annotations', true);
     this.canvas = this.container.append('div').classed('fdg-canvas', true);
     this.svg = this.canvas

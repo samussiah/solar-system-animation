@@ -2,6 +2,7 @@ import color from './settings/color';
 import colorScale from './settings/colorScale';
 
 const settings = {
+    playPause: 'play',
     speed: 'slow',
     speeds: {
         slow: 1000,
@@ -14,6 +15,8 @@ const settings = {
         y: 365,
     },
     timepoint: 0,
+    timeUnit: 'days since randomization',
+    reset: null,
     timeFrame: null,
     width: 780,
     height: 800,

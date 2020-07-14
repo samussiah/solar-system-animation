@@ -20,6 +20,6 @@ export default function minutesToTime(m) {
         mm = '0' + mm;
     }
 
-    return `${minutes} day${m === 1 ? '' : 's'} since heart failure`;
+    return `${minutes} ${this.settings.timeUnit}`;
     //return hh + ":" + mm + ampm
 }

@@ -9,7 +9,7 @@ export default function addFociLabels() {
         .append('text')
         .attr('class', 'actlabel')
         .attr('x', (d) => d.x)
-        .attr('y', (d) => d.y);
+        .attr('y', (d) => d.y + (d.order ? 35 : 0));
 
     const label = text
         .append('tspan')

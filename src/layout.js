@@ -1,5 +1,5 @@
-import addSpeedControl from './layout/addSpeedControl';
-import addPlayPauseControl from './layout/addPlayPauseControl';
+import addControls from './layout/addControls';
+import addLegends from './layout/addLegends';
 
 export default function layout() {
     this.container = d3
@@ -7,9 +7,7 @@ export default function layout() {
         .append('div')
         .classed('force-directed-graph', true)
         .datum(this);
-    this.controls = this.container.append('div').classed('fdg-controls', true);
-    addSpeedControl.call(this);
-    addPlayPauseControl.call(this);
+    addControls.call(this);
     this.timer = this.container.append('div').classed('fdg-timer', true).text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
     this.annotations = this.container.append('div').classed('fdg-annotations', true);
     this.canvas = this.container.append('div').classed('fdg-canvas', true);
@@ -18,4 +16,5 @@ export default function layout() {
         .classed('fdg-svg', true)
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
+    addLegends.call(this);
 }

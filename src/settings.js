@@ -1,5 +1,6 @@
-import color from './settings/color';
+import colors from './settings/colors';
 import colorScale from './settings/colorScale';
+import color from './settings/color';
 
 const settings = {
     playPause: 'play',
@@ -21,9 +22,11 @@ const settings = {
     width: 780,
     height: 800,
     padding: 1,
+    minRadius: 3,
     maxRadius: 3,
-    color,
+    colors,
     colorScale,
+    color,
     eventTypes: null, // data-driven by default
     annotations: [
         {

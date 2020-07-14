@@ -61,6 +61,10 @@ body > * {
     float: right;
     width: calc(100% - var(--left-margin));
 }
+.fdg-legends {
+    display: inline-block;
+    vertical-align: top;
+}
 
 /* #Reset & Basics (Inspired by E. Meyers)
 ================================================== */

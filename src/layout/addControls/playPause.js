@@ -1,6 +1,7 @@
-import addTimer from '../init/addTimer';
+import addTimer from '../../init/addTimer';
+import collide from '../../init/addForceLayout/tick/collide';
 
-export default function addPlayPauseControl() {
+export default function playPause() {
     const fdg = this;
 
     const container = this.controls.append('div').classed('fdg-control fdg-control--play-pause', true);
@@ -23,7 +24,7 @@ export default function addPlayPauseControl() {
             fdg.timeout = setTimeout(addTimer.bind(fdg), fdg.settings.speeds[fdg.settings.speed]);
         } else if (fdg.settings.playPause === 'pause') {
             clearTimeout(fdg.timeout);
-            console.log(fdg);
+            fdg.force.resume();
         }
     });
 

@@ -1,4 +1,4 @@
-export default function addSpeedControl() {
+export default function speed() {
     const fdg = this;
 
     const container = this.controls.append('div').classed('fdg-control fdg-control--speed', true);

@@ -13,8 +13,7 @@ export default function dataManipulation() {
         return id_diff || seq_diff;
     });
     this.eventTypes = defineEventTypes.call(this);
-    this.data.nested = nestData.call(this)
-        //.filter(d => ['18', '21', '23', '29', '56'].includes(d.key));
+    this.data.nested = nestData.call(this);
 
     // TODO: move to settings.js
     this.settings.reset = this.settings.reset || d3.max(this.data.nested, d => d.duration);

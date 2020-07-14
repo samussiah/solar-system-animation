@@ -14,8 +14,8 @@ export default function addOrbits() {
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r)
         .attr('fill', 'none')
-        .attr('stroke', 'black')
-        .attr('stroke-width', '1');
+        .attr('stroke', '#aaa')
+        .attr('stroke-width', '.5');
 
     // Annotate concentric circles.
     //this.svg

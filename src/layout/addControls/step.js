@@ -1,6 +1,6 @@
 import addTimer from '../init/addTimer';
 
-export default function addStepControl() {
+export default function step() {
     const fdg = this;
 
     const container = this.controls.append('div').classed('fdg-control fdg-control--step', true);

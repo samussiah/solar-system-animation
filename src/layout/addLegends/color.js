@@ -1,5 +1,7 @@
 export default function color() {
-    this.colorLegend = this.legends.append('div').classed('fdg-legend fdg-legend__color', true);
+    this.colorLegend = this.legends.append('div').classed('fdg-legend fdg-legend__color', true)
+        .classed('fdg-legend', true)
+        .classed('fdg-hidden', this.settings.quantifyEvents === 'size');
     const legendDimensions = [200,100];
     this.colorLegend
         .append('div')

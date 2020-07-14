@@ -31,8 +31,12 @@ export default function reset() {
 
         d.x = eventType.x + Math.random();
         d.y = eventType.y + Math.random();
-        d.r = this.settings.minRadius;// + stateChanges;
-        d.color = this.settings.color(stateChanges);
+        d.r = this.settings.quantifyEvents !== 'color'
+            ? this.settings.minRadius
+            : this.settings.minRadius + stateChanges;
+        d.color = this.settings.quantifyEvents !== 'size'
+            ? this.settings.color(stateChanges)
+            : '#aaa';
         d.moves = 0;
         d.next_move_time = d.currentEvent.duration;
     });

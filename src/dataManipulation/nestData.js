@@ -38,8 +38,12 @@ export default function nestData() {
                 duration: d3.sum(d, di => di.duration),
                 x: eventType.x + Math.random(),
                 y: eventType.y + Math.random(),
-                r: this.settings.minRadius,// + stateChanges,
-                color: this.settings.color(stateChanges),
+                r: this.settings.quantifyEvents !== 'color'
+                    ? this.settings.minRadius
+                    : this.settings.minRadius + stateChanges,
+                color: this.settings.quantifyEvents !== 'size'
+                    ? this.settings.color(stateChanges)
+                    : '#aaa',
                 moves: 0,
                 next_move_time: currentEvent.duration,
                 sched: d,

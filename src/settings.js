@@ -4,6 +4,7 @@ import color from './settings/color';
 
 const settings = {
     playPause: 'play',
+    quantifyEvents: 'color',
     speed: 'slow',
     speeds: {
         slow: 1000,

@@ -3,6 +3,20 @@ export default function updateData() {
         const currEvent = d.currentEvent.event;
         let curr_moves = d.moves;
 
+        // Add to new activity count
+        const stateChanges = d3.sum(
+            d.eventTypes.filter(
+                (eventType) => eventType.label !== this.settings.centerEventType
+            ),
+            (eventType) => eventType.count
+        );
+        d.r = this.settings.quantifyEvents !== 'color'
+            ? this.settings.minRadius + stateChanges
+            : this.settings.minRadius;
+        d.color = this.settings.quantifyEvents !== 'size'
+            ? this.settings.color(stateChanges)
+            : '#aaa';
+
         // Time to go to next activity
         if (d.next_move_time === this.settings.timepoint) {
             if (d.moves === d.sched.length - 1) {
@@ -24,20 +38,7 @@ export default function updateData() {
             );
             eventPopulation.count += 1;
 
-            // Add to new activity count
-            const stateChanges = d3.sum(
-                d.eventTypes.filter(
-                    (eventType) => eventType.label !== this.settings.centerEventType
-                ),
-                (eventType) => eventType.count
-            );
-
             d.moves = curr_moves;
-            //d.x = eventPopulation.x;
-            //d.y = eventPopulation.y;
-            d.r = this.settings.minRadius;// + stateChanges;
-            d.color = this.settings.color(stateChanges);
-
             d.next_move_time += d.sched[d.moves].duration;
         }
     });

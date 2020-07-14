@@ -26,6 +26,7 @@
 
     var settings = {
       playPause: 'play',
+      quantifyEvents: 'color',
       speed: 'slow',
       speeds: {
         slow: 1000,
@@ -138,7 +139,15 @@
 
       this.data.nested.forEach(function (d) {
         var currEvent = d.currentEvent.event;
-        var curr_moves = d.moves; // Time to go to next activity
+        var curr_moves = d.moves; // Add to new activity count
+
+        var stateChanges = d3.sum(d.eventTypes.filter(function (eventType) {
+          return eventType.label !== _this.settings.centerEventType;
+        }), function (eventType) {
+          return eventType.count;
+        });
+        d.r = _this.settings.quantifyEvents !== 'color' ? _this.settings.minRadius + stateChanges : _this.settings.minRadius;
+        d.color = _this.settings.quantifyEvents !== 'size' ? _this.settings.color(stateChanges) : '#aaa'; // Time to go to next activity
 
         if (d.next_move_time === _this.settings.timepoint) {
           if (d.moves === d.sched.length - 1) {
@@ -163,19 +172,8 @@
             return eventType.label === nextEvent;
           });
 
-          eventPopulation.count += 1; // Add to new activity count
-
-          var stateChanges = d3.sum(d.eventTypes.filter(function (eventType) {
-            return eventType.label !== _this.settings.centerEventType;
-          }), function (eventType) {
-            return eventType.count;
-          });
-          d.moves = curr_moves; //d.x = eventPopulation.x;
-          //d.y = eventPopulation.y;
-
-          d.r = _this.settings.minRadius; // + stateChanges;
-
-          d.color = _this.settings.color(stateChanges);
+          eventPopulation.count += 1;
+          d.moves = curr_moves;
           d.next_move_time += d.sched[d.moves].duration;
         }
       });
@@ -214,9 +212,8 @@
         });
         d.x = eventType.x + Math.random();
         d.y = eventType.y + Math.random();
-        d.r = _this.settings.minRadius; // + stateChanges;
-
-        d.color = _this.settings.color(stateChanges);
+        d.r = _this.settings.quantifyEvents !== 'color' ? _this.settings.minRadius : _this.settings.minRadius + stateChanges;
+        d.color = _this.settings.quantifyEvents !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
         d.moves = 0;
         d.next_move_time = d.currentEvent.duration;
       }); //if (this.settings.playPause === 'play')
@@ -365,16 +362,41 @@
       };
     }
 
+    function colorSizeToggle() {
+      var _this = this;
+
+      var fdg = this;
+      var container = this.controls.append('div').classed('fdg-control fdg-control--color-size', true);
+      var inputs = container.selectAll('div').data(['color', 'size', 'both']).enter().append('div').attr('class', function (d) {
+        return "togglebutton ".concat(d, " ").concat(d === _this.settings.quantifyEvents ? 'current' : '');
+      }).text(function (d) {
+        return d;
+      });
+      inputs.on('click', function (d) {
+        inputs.classed('current', function (di) {
+          return di === d;
+        });
+        fdg.settings.quantifyEvents = d;
+        fdg.colorLegend.classed('fdg-hidden', d === 'size');
+        fdg.sizeLegend.classed('fdg-hidden', d === 'color');
+      });
+      return {
+        container: container,
+        inputs: inputs
+      };
+    }
+
     function addControls() {
       this.controls = this.container.append('div').classed('fdg-controls', true);
       speed.call(this);
       playPause.call(this);
+      colorSizeToggle.call(this);
     }
 
     function color$1() {
       var _this = this;
 
-      this.colorLegend = this.legends.append('div').classed('fdg-legend fdg-legend__color', true);
+      this.colorLegend = this.legends.append('div').classed('fdg-legend fdg-legend__color', true).classed('fdg-legend', true).classed('fdg-hidden', this.settings.quantifyEvents === 'size');
       var legendDimensions = [200, 100];
       this.colorLegend.append('div').html('Number of <span class = "fdg-measure">hospitalization</span> events');
       var colorLegendSvg = this.colorLegend.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g');
@@ -392,7 +414,7 @@
     function size() {
       var _this = this;
 
-      this.sizeLegend = this.legends.append('div').classed('fdg-legend fdg-legend__size', true);
+      this.sizeLegend = this.legends.append('div').classed('fdg-legend fdg-legend__size', true).classed('fdg-legend', true).classed('fdg-hidden', this.settings.quantifyEvents === 'color');
       var legendDimensions = [200, 100];
       this.sizeLegend.append('div').html('Number of <span class = "fdg-measure">hospitalization</span> events');
       var sizeLegendSvg = this.sizeLegend.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g');
@@ -491,9 +513,8 @@
           }),
           x: eventType.x + Math.random(),
           y: eventType.y + Math.random(),
-          r: _this.settings.minRadius,
-          // + stateChanges,
-          color: _this.settings.color(stateChanges),
+          r: _this.settings.quantifyEvents !== 'color' ? _this.settings.minRadius : _this.settings.minRadius + stateChanges,
+          color: _this.settings.quantifyEvents !== 'size' ? _this.settings.color(stateChanges) : '#aaa',
           moves: 0,
           next_move_time: currentEvent.duration,
           sched: d
@@ -506,11 +527,14 @@
 
     function dataManipulation() {
       this.data.forEach(function (d) {
+        d.seq = parseInt(d.seq);
         d.duration = parseFloat(d.duration);
-      }); // TODO: sort ID alphanumerically - don't assume it's going to be numeric
-
+      });
+      var numericId = this.data.every(function (d) {
+        return /^-?\d+\.?\d*$/.test(d.id) || /^-?\d*\.?\d+$/.test(d.id);
+      });
       this.data.sort(function (a, b) {
-        var id_diff = a.id - b.id;
+        var id_diff = numericId ? +a.id - +b.id : a.id < b.id ? -1 : b.id < a.id ? 1 : 0;
         var seq_diff = a.seq - b.seq;
         return id_diff || seq_diff;
       });

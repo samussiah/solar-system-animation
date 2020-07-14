@@ -105,13 +105,10 @@ body > * {
 		float: left;
 		width: 60px;
     }
-    .fdg-control--speed .togglebutton.slow {
+    .togglebutton:not(:last-child) {
         border-right: none;
     }
-	.fdg-control--speed .togglebutton.fast {
-		border-left: none;
-	}
-    .fdg-control--speed .togglebutton.current {
+    .togglebutton.current {
         color: #fff;
         background: #000;
 		border: 1px solid #000;

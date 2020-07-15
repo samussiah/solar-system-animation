@@ -13,7 +13,7 @@ export default function forceDirectedGraph(data, element = 'body', settings = {}
 
     layout.call(fdg);
     dataManipulation.call(fdg);
-    addOrbits.call(fdg);
+    fdg.orbits = addOrbits.call(fdg); // TODO: move out of layout?
     init.call(fdg);
 
     return fdg;

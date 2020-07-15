@@ -32,8 +32,8 @@ export default function reset() {
         d.x = eventType.x + Math.random();
         d.y = eventType.y + Math.random();
         d.r = this.settings.quantifyEvents !== 'color'
-            ? this.settings.minRadius
-            : this.settings.minRadius + stateChanges;
+            ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
+            : this.settings.minRadius;
         d.color = this.settings.quantifyEvents !== 'size'
             ? this.settings.color(stateChanges)
             : '#aaa';

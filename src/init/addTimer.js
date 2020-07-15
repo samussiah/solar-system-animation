@@ -1,3 +1,4 @@
+import pulseOrbits from './addTimer/pulseOrbits';
 import updateData from './addTimer/updateData';
 import reset from './addTimer/reset';
 import readablePercent from './addTimer/readablePercent';
@@ -28,15 +29,18 @@ export default function addTimer() {
         // Update the node data.
         updateData.call(this);
 
+        // Accentuate the orbits when an event occurs.
+        pulseOrbits.call(this);
+
         // Update percentages
-        this.fociLabels.selectAll('tspan.actpct').text((d) => readablePercent(d.count));
+        if (this.settings.eventCount)
+            this.fociLabels.selectAll('tspan.actpct').text((d) => readablePercent(d.count));
 
         // Update time
-        const true_minute = this.settings.timepoint % 1440;
-        this.timer.text(minutesToTime.call(this, true_minute));
+        this.timer.text(minutesToTime.call(this, this.settings.timepoint));
 
         // Update notes
-        if (true_minute === this.settings.annotations[this.notes_index].start_minute) {
+        if (this.settings.timepoint === this.settings.annotations[this.notes_index].start_minute) {
             this.annotations
                 .style('top', '0px')
                 .transition()
@@ -47,7 +51,7 @@ export default function addTimer() {
         }
 
         // Make note disappear at the end.
-        else if (true_minute === this.settings.annotations[this.notes_index].stop_minute) {
+        else if (this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute) {
             this.annotations
                 .transition()
                 .duration(1000)

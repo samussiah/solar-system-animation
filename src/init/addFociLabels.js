@@ -15,15 +15,19 @@ export default function addFociLabels() {
         .append('tspan')
         .attr('x', (d) => d.x)
         .attr('text-anchor', 'middle')
+        .style('font-weight', 'bold')
+        .style('font-size', '20px')
         .text((d) => d.label);
 
     const pct = text
         .append('tspan')
         .classed('actpct', true)
+        .classed('fdg-hidden', this.settings.eventCount === false)
         .attr('x', (d) => d.x)
         .attr('text-anchor', 'middle')
         .attr('dy', '1.3em')
-        .text((d) => d3.format('%')(d.count / this.data.nested.length));
+        .style('font-weight', 'bold')
+        .text((d) => `${d.count} (${d3.format('%')(d.count / this.data.nested.length)})`);
 
     return text;
 }

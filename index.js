@@ -25,6 +25,7 @@
     }
 
     var settings = {
+      eventCount: true,
       playPause: 'play',
       quantifyEvents: 'color',
       speed: 'slow',
@@ -46,7 +47,6 @@
       height: 800,
       padding: 1,
       minRadius: 3,
-      maxRadius: 3,
       colors: colors,
       colorScale: colorScale,
       color: color,
@@ -106,6 +106,7 @@
         note: 'About 1 in 5 heart attacks is silent—the damage is done, but the person is not aware of it.'
       }]
     };
+    settings.maxRadius = settings.minRadius + colors().length;
 
     function speed() {
       var _this = this;
@@ -134,9 +135,21 @@
       };
     }
 
+    function pulseOrbits() {
+      var fdg = this;
+      this.orbits.each(function (d) {
+        if (d.change > 0) {
+          d3.select(this).transition().duration(fdg.settings.speeds[fdg.settings.speed] / 2).attr('stroke-width', .5 * d.change).transition().duration(fdg.settings.speeds[fdg.settings.speed] / 2).attr('stroke-width', .5);
+        }
+      });
+    }
+
     function updateData() {
       var _this = this;
 
+      this.eventTypes.forEach(function (eventType) {
+        eventType.prevCount = eventType.count;
+      });
       this.data.nested.forEach(function (d) {
         var currEvent = d.currentEvent.event;
         var curr_moves = d.moves; // Add to new activity count
@@ -146,7 +159,7 @@
         }), function (eventType) {
           return eventType.count;
         });
-        d.r = _this.settings.quantifyEvents !== 'color' ? _this.settings.minRadius + stateChanges : _this.settings.minRadius;
+        d.r = _this.settings.quantifyEvents !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
         d.color = _this.settings.quantifyEvents !== 'size' ? _this.settings.color(stateChanges) : '#aaa'; // Time to go to next activity
 
         if (d.next_move_time === _this.settings.timepoint) {
@@ -176,6 +189,9 @@
           d.moves = curr_moves;
           d.next_move_time += d.sched[d.moves].duration;
         }
+      });
+      this.eventTypes.forEach(function (eventType) {
+        eventType.change = eventType.count - eventType.prevCount;
       });
     }
 
@@ -212,7 +228,7 @@
         });
         d.x = eventType.x + Math.random();
         d.y = eventType.y + Math.random();
-        d.r = _this.settings.quantifyEvents !== 'color' ? _this.settings.minRadius : _this.settings.minRadius + stateChanges;
+        d.r = _this.settings.quantifyEvents !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
         d.color = _this.settings.quantifyEvents !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
         d.moves = 0;
         d.next_move_time = d.currentEvent.duration;
@@ -262,19 +278,20 @@
         //setTimeout(() => reset.call(this), 1000);
       } else {
         // Update the node data.
-        updateData.call(this); // Update percentages
+        updateData.call(this); // Accentuate the orbits when an event occurs.
 
-        this.fociLabels.selectAll('tspan.actpct').text(function (d) {
+        pulseOrbits.call(this); // Update percentages
+
+        if (this.settings.eventCount) this.fociLabels.selectAll('tspan.actpct').text(function (d) {
           return readablePercent(d.count);
         }); // Update time
 
-        var true_minute = this.settings.timepoint % 1440;
-        this.timer.text(minutesToTime.call(this, true_minute)); // Update notes
+        this.timer.text(minutesToTime.call(this, this.settings.timepoint)); // Update notes
 
-        if (true_minute === this.settings.annotations[this.notes_index].start_minute) {
+        if (this.settings.timepoint === this.settings.annotations[this.notes_index].start_minute) {
           this.annotations.style('top', '0px').transition().duration(600).style('top', '20px').style('color', '#000000').text(this.settings.annotations[this.notes_index].note);
         } // Make note disappear at the end.
-        else if (true_minute === this.settings.annotations[this.notes_index].stop_minute) {
+        else if (this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute) {
             this.annotations.transition().duration(1000).style('top', '300px').style('color', '#ffffff');
             this.notes_index += 1;
 
@@ -292,7 +309,7 @@
 
       var quadtree = d3.geom.quadtree(this.data.nested);
       return function (d) {
-        var r = d.r + fdg.settings.maxRadius + fdg.settings.padding;
+        var r = fdg.settings.quantifyEvents !== 'color' ? d.r + fdg.settings.maxRadius + fdg.settings.padding : d.r + fdg.settings.minRadius + fdg.settings.padding;
         var nx1 = d.x - r;
         var nx2 = d.x + r;
         var ny1 = d.y - r;
@@ -377,8 +394,11 @@
           return di === d;
         });
         fdg.settings.quantifyEvents = d;
-        fdg.colorLegend.classed('fdg-hidden', d === 'size');
-        fdg.sizeLegend.classed('fdg-hidden', d === 'color');
+        fdg.legends.selectAll('.fdg-legend').classed('fdg-hidden', function () {
+          return !Array.from(this.classList).some(function (value) {
+            return value.includes(d);
+          });
+        });
       });
       return {
         container: container,
@@ -396,7 +416,7 @@
     function color$1() {
       var _this = this;
 
-      this.colorLegend = this.legends.append('div').classed('fdg-legend fdg-legend__color', true).classed('fdg-legend', true).classed('fdg-hidden', this.settings.quantifyEvents === 'size');
+      this.colorLegend = this.legends.append('div').classed('fdg-legend fdg-legend__color', true).classed('fdg-hidden', this.settings.quantifyEvents !== 'color');
       var legendDimensions = [200, 100];
       this.colorLegend.append('div').html('Number of <span class = "fdg-measure">hospitalization</span> events');
       var colorLegendSvg = this.colorLegend.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g');
@@ -414,7 +434,7 @@
     function size() {
       var _this = this;
 
-      this.sizeLegend = this.legends.append('div').classed('fdg-legend fdg-legend__size', true).classed('fdg-legend', true).classed('fdg-hidden', this.settings.quantifyEvents === 'color');
+      this.sizeLegend = this.legends.append('div').classed('fdg-legend fdg-legend__size', true).classed('fdg-hidden', this.settings.quantifyEvents !== 'size');
       var legendDimensions = [200, 100];
       this.sizeLegend.append('div').html('Number of <span class = "fdg-measure">hospitalization</span> events');
       var sizeLegendSvg = this.sizeLegend.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g');
@@ -427,10 +447,31 @@
       sizeLegendSvg.append('text').attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colors().length / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').text("".concat(this.settings.colors().length, "+"));
     }
 
+    function both() {
+      var _this = this;
+
+      this.bothLegend = this.legends.append('div').classed('fdg-legend fdg-legend__both', true).classed('fdg-hidden', this.settings.quantifyEvents !== 'both');
+      var legendDimensions = [200, 100];
+      this.bothLegend.append('div').html('Number of <span class = "fdg-measure">hospitalization</span> events');
+      var bothLegendSvg = this.bothLegend.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g');
+      bothLegendSvg.selectAll('circle.legend-mark').data(this.settings.colors()).enter().append('circle').classed('legend-mark', true).attr('cx', function (d, i) {
+        return i * (legendDimensions[0] / _this.settings.colors().length) + legendDimensions[0] / _this.settings.colors().length / 2;
+      }).attr('cy', legendDimensions[0] / this.settings.colors().length / 2).attr('r', function (d, i) {
+        return i + _this.settings.minRadius;
+      }).attr('fill', function (d) {
+        return d;
+      }).attr('fill-opacity', 0.5).attr('stroke', function (d) {
+        return d;
+      }).attr('stroke-opacity', 1);
+      bothLegendSvg.append('text').attr('x', legendDimensions[0] / this.settings.colors().length / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').text('0');
+      bothLegendSvg.append('text').attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colors().length / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').text("".concat(this.settings.colors().length, "+"));
+    }
+
     function addLegends() {
       this.legends = this.canvas.append('div').classed('fdg-legends', true);
       color$1.call(this);
       size.call(this);
+      both.call(this);
     }
 
     function layout() {
@@ -451,7 +492,8 @@
         return {
           order: parseInt(split[0]),
           label: split[1],
-          count: 0
+          count: 0,
+          prevCount: 0
         };
       }).sort(function (a, b) {
         return a.order - b.order ? a.order - b.order : a.label < b.label ? -1 : 1;
@@ -473,9 +515,20 @@
 
       var nestedData = d3.nest().key(function (d) {
         return d.id;
-      }).rollup(function (d) {
-        // Initial event for the given individual.
-        var currentEvent = d[0]; // Define an event object for the individual.
+      }).rollup(function (nest) {
+        nest.forEach(function (d, i) {
+          d.timepoint = i === 0 ? d.duration : d.duration + nest[i - 1].timepoint;
+
+          if (i === 0) {
+            d.start_timepoint = 1;
+            d.end_timepoint = d.duration;
+          } else {
+            d.start_timepoint = nest[i - 1].end_timepoint + 1;
+            d.end_timepoint = d.start_timepoint + d.duration;
+          }
+        }); // Initial event for the given individual.
+
+        var currentEvent = nest[0]; // Define an event object for the individual.
 
         var eventTypes = _this.eventTypes.map(function (eventType) {
           return {
@@ -483,10 +536,10 @@
             order: eventType.order,
             count: 0,
             duration: 0,
-            totalDuration: d3.sum(d.filter(function (di) {
-              return di.event === eventType.label;
-            }), function (di) {
-              return di.duration;
+            totalDuration: d3.sum(nest.filter(function (d) {
+              return d.event === eventType.label;
+            }), function (d) {
+              return d.duration;
             })
           };
         });
@@ -508,20 +561,21 @@
         return {
           currentEvent: currentEvent,
           eventTypes: eventTypes,
-          duration: d3.sum(d, function (di) {
-            return di.duration;
+          duration: d3.sum(nest, function (d) {
+            return d.duration;
           }),
           x: eventType.x + Math.random(),
           y: eventType.y + Math.random(),
-          r: _this.settings.quantifyEvents !== 'color' ? _this.settings.minRadius : _this.settings.minRadius + stateChanges,
+          r: _this.settings.quantifyEvents !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius,
           color: _this.settings.quantifyEvents !== 'size' ? _this.settings.color(stateChanges) : '#aaa',
           moves: 0,
           next_move_time: currentEvent.duration,
-          sched: d
+          sched: nest
         };
       }).entries(this.data).map(function (d) {
         return Object.assign(d, d.values);
       });
+      console.table(nestedData[0].sched);
       return nestedData;
     }
 
@@ -548,12 +602,12 @@
 
     function addOrbits() {
       // Draw concentric circles.
-      var orbits = this.svg.selectAll('circle.orbit').data(this.eventTypes.slice(1).map(function (d, i) {
-        return {
+      var orbits = this.svg.selectAll('circle.orbit').data(this.eventTypes.slice(1).map(function (eventType, i) {
+        return Object.assign(eventType, {
           cx: 380,
           cy: 365,
           r: (i + 1) * 100 + 50
-        };
+        });
       })).enter().append('circle').classed('orbit', true).attr('cx', function (d) {
         return d.cx;
       }).attr('cy', function (d) {
@@ -574,6 +628,8 @@
       //    .attr('x', d => d.cx)
       //    .attr('y', d => d.cy - d.r)
       //    .text('asdf')
+
+      return orbits;
     }
 
     function tick(e) {
@@ -640,13 +696,13 @@
       });
       var label = text.append('tspan').attr('x', function (d) {
         return d.x;
-      }).attr('text-anchor', 'middle').text(function (d) {
+      }).attr('text-anchor', 'middle').style('font-weight', 'bold').style('font-size', '20px').text(function (d) {
         return d.label;
       });
-      var pct = text.append('tspan').classed('actpct', true).attr('x', function (d) {
+      var pct = text.append('tspan').classed('actpct', true).classed('fdg-hidden', this.settings.eventCount === false).attr('x', function (d) {
         return d.x;
-      }).attr('text-anchor', 'middle').attr('dy', '1.3em').text(function (d) {
-        return d3.format('%')(d.count / _this.data.nested.length);
+      }).attr('text-anchor', 'middle').attr('dy', '1.3em').style('font-weight', 'bold').text(function (d) {
+        return "".concat(d.count, " (").concat(d3.format('%')(d.count / _this.data.nested.length), ")");
       });
       return text;
     }
@@ -669,7 +725,8 @@
       };
       layout.call(fdg);
       dataManipulation.call(fdg);
-      addOrbits.call(fdg);
+      fdg.orbits = addOrbits.call(fdg); // TODO: move out of layout?
+
       init.call(fdg);
       return fdg;
     }

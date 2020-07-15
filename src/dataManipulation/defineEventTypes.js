@@ -6,6 +6,7 @@ export default function defineEventTypes() {
                 order: parseInt(split[0]),
                 label: split[1],
                 count: 0,
+                prevCount: 0,
             };
         })
         .sort((a, b) => (a.order - b.order ? a.order - b.order : a.label < b.label ? -1 : 1));

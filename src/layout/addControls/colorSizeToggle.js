@@ -15,8 +15,11 @@ export default function colorSizeToggle() {
     inputs.on('click', function (d) {
         inputs.classed('current', (di) => di === d);
         fdg.settings.quantifyEvents = d;
-        fdg.colorLegend.classed('fdg-hidden', d === 'size');
-        fdg.sizeLegend.classed('fdg-hidden', d === 'color');
+        fdg.legends
+            .selectAll('.fdg-legend')
+            .classed('fdg-hidden', function() {
+                return !Array.from(this.classList).some(value => value.includes(d));
+            });
     });
 
     return {

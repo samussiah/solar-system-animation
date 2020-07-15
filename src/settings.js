@@ -3,6 +3,7 @@ import colorScale from './settings/colorScale';
 import color from './settings/color';
 
 const settings = {
+    eventCount: true,
     playPause: 'play',
     quantifyEvents: 'color',
     speed: 'slow',
@@ -24,7 +25,6 @@ const settings = {
     height: 800,
     padding: 1,
     minRadius: 3,
-    maxRadius: 3,
     colors,
     colorScale,
     color,
@@ -96,5 +96,7 @@ const settings = {
         },
     ],
 };
+
+settings.maxRadius = settings.minRadius + colors().length;
 
 export default settings;

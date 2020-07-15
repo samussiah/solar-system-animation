@@ -1,4 +1,8 @@
 export default function updateData() {
+    this.eventTypes.forEach(eventType => {
+        eventType.prevCount = eventType.count;
+    });
+
     this.data.nested.forEach((d) => {
         const currEvent = d.currentEvent.event;
         let curr_moves = d.moves;
@@ -11,7 +15,7 @@ export default function updateData() {
             (eventType) => eventType.count
         );
         d.r = this.settings.quantifyEvents !== 'color'
-            ? this.settings.minRadius + stateChanges
+            ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
             : this.settings.minRadius;
         d.color = this.settings.quantifyEvents !== 'size'
             ? this.settings.color(stateChanges)
@@ -41,5 +45,9 @@ export default function updateData() {
             d.moves = curr_moves;
             d.next_move_time += d.sched[d.moves].duration;
         }
+    });
+
+    this.eventTypes.forEach(eventType => {
+        eventType.change = eventType.count - eventType.prevCount;
     });
 }

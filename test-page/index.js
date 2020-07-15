@@ -18,5 +18,10 @@ fetch('./flattened.csv')
             })
             .entries(data);
 
-        const fdg = forceDirectedGraph(data, '#container', {});//, {reset: 100, playPause: 'play'});
+        const fdg = forceDirectedGraph(
+            data,
+            '#container',
+            {
+            }
+        );
     });

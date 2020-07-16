@@ -51,7 +51,9 @@ export default function addTimer() {
         }
 
         // Make note disappear at the end.
-        else if (this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute) {
+        else if (
+            this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute
+        ) {
             this.annotations
                 .transition()
                 .duration(1000)

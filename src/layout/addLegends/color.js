@@ -1,8 +1,9 @@
 export default function color() {
-    this.colorLegend = this.legends.append('div')
+    this.colorLegend = this.legends
+        .append('div')
         .classed('fdg-legend fdg-legend__color', true)
         .classed('fdg-hidden', this.settings.quantifyEvents !== 'color');
-    const legendDimensions = [200,100];
+    const legendDimensions = [200, 100];
     this.colorLegend
         .append('div')
         .html('Number of <span class = "fdg-measure">hospitalization</span> events');
@@ -17,24 +18,24 @@ export default function color() {
         .enter()
         .append('rect')
         .classed('legend-mark', true)
-        .attr('x', (d,i) => i*(legendDimensions[0]/this.settings.colors().length))
+        .attr('x', (d, i) => i * (legendDimensions[0] / this.settings.colors().length))
         .attr('y', 0)
-        .attr('width', legendDimensions[0]/this.settings.colors().length)
-        .attr('height', legendDimensions[1]/2)
-        .attr('fill', d => d)
+        .attr('width', legendDimensions[0] / this.settings.colors().length)
+        .attr('height', legendDimensions[1] / 2)
+        .attr('fill', (d) => d)
         .attr('fill-opacity', 0.5)
-        .attr('stroke', d => d)
+        .attr('stroke', (d) => d)
         .attr('stroke-opacity', 1);
     colorLegendSvg
         .append('text')
-        .attr('x', legendDimensions[0]/this.settings.colors().length/2)
-        .attr('y', legendDimensions[1]/2 + 16)
+        .attr('x', legendDimensions[0] / this.settings.colors().length / 2)
+        .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
         .text('0');
     colorLegendSvg
         .append('text')
-        .attr('x', legendDimensions[0] - legendDimensions[0]/this.settings.colors().length/2)
-        .attr('y', legendDimensions[1]/2 + 16)
+        .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colors().length / 2)
+        .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
         .text(`${this.settings.colors().length}+`);
 }

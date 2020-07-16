@@ -4,6 +4,8 @@ import collide from './tick/collide';
 export default function tick(e) {
     const k = 0.02 * e.alpha;
 
+    if (this.ticks !== undefined) this.ticks++;
+
     // Push nodes toward their designated focus.
     this.data.nested.forEach((d, i) => {
         // Find the datum of the destination focus.

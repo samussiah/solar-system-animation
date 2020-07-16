@@ -9,7 +9,7 @@ export default function addForceLayout() {
         //.linkStrength(0.1) // default: 0.1
         .friction(0.9) // default: 0.9
         //.linkDistance(20) // default: 20
-        .charge(-.25) // default: -30
+        .charge(-0.25) // default: -30
         .gravity(0) // default: 0.1
         //.theta(0.8) // default: 0.8
         //.alpha(0.1) // default: 0.1

@@ -11,16 +11,17 @@ import addTimer from '../../init/addTimer';
 export default function step() {
     const fdg = this;
 
-    const container = this.controls.container.append('div').classed('fdg-control fdg-control--step', true);
+    const container = this.controls.container
+        .append('div')
+        .classed('fdg-control fdg-control--step', true);
     const inputs = container
         .append('button')
         .classed(`togglebutton fdg-input`, true)
         .attr('title', `Advance animation by one time unit`)
         .text('Step');
 
-    inputs.on('click', () =>  {
-        if (this.settings.playPause !== 'pause')
-            toggle.call(this);
+    inputs.on('click', () => {
+        if (this.settings.playPause !== 'pause') toggle.call(this);
 
         // Update time
         this.timer.text(`${this.settings.timepoint + 1} ${this.settings.timeUnit}`);

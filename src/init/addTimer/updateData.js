@@ -1,5 +1,5 @@
 export default function updateData() {
-    this.eventTypes.forEach(eventType => {
+    this.eventTypes.forEach((eventType) => {
         eventType.prevCount = eventType.count;
     });
 
@@ -9,17 +9,15 @@ export default function updateData() {
 
         // Add to new activity count
         const stateChanges = d3.sum(
-            d.eventTypes.filter(
-                (eventType) => eventType.label !== this.settings.centerEventType
-            ),
+            d.eventTypes.filter((eventType) => eventType.label !== this.settings.centerEventType),
             (eventType) => eventType.count
         );
-        d.r = this.settings.quantifyEvents !== 'color'
-            ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
-            : this.settings.minRadius;
-        d.color = this.settings.quantifyEvents !== 'size'
-            ? this.settings.color(stateChanges)
-            : '#aaa';
+        d.r =
+            this.settings.quantifyEvents !== 'color'
+                ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
+                : this.settings.minRadius;
+        d.color =
+            this.settings.quantifyEvents !== 'size' ? this.settings.color(stateChanges) : '#aaa';
 
         // Time to go to next activity
         if (d.next_move_time === this.settings.timepoint) {
@@ -47,7 +45,7 @@ export default function updateData() {
         }
     });
 
-    this.eventTypes.forEach(eventType => {
+    this.eventTypes.forEach((eventType) => {
         eventType.change = eventType.count - eventType.prevCount;
     });
 }

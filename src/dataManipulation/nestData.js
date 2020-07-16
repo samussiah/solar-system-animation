@@ -3,13 +3,13 @@ export default function nestData() {
         .nest()
         .key((d) => d.id)
         .rollup((nest) => {
-            nest.forEach((d,i) => {
-                d.timepoint = i === 0 ? d.duration : d.duration + nest[i-1].timepoint;
+            nest.forEach((d, i) => {
+                d.timepoint = i === 0 ? d.duration : d.duration + nest[i - 1].timepoint;
                 if (i === 0) {
                     d.start_timepoint = 1;
                     d.end_timepoint = d.duration;
                 } else {
-                    d.start_timepoint = nest[i-1].end_timepoint + 1;
+                    d.start_timepoint = nest[i - 1].end_timepoint + 1;
                     d.end_timepoint = d.start_timepoint + d.duration;
                 }
             });
@@ -46,15 +46,17 @@ export default function nestData() {
             return {
                 currentEvent,
                 eventTypes,
-                duration: d3.sum(nest, d => d.duration),
+                duration: d3.sum(nest, (d) => d.duration),
                 x: eventType.x + Math.random(),
                 y: eventType.y + Math.random(),
-                r: this.settings.quantifyEvents !== 'color'
-                    ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
-                    : this.settings.minRadius,
-                color: this.settings.quantifyEvents !== 'size'
-                    ? this.settings.color(stateChanges)
-                    : '#aaa',
+                r:
+                    this.settings.quantifyEvents !== 'color'
+                        ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
+                        : this.settings.minRadius,
+                color:
+                    this.settings.quantifyEvents !== 'size'
+                        ? this.settings.color(stateChanges)
+                        : '#aaa',
                 moves: 0,
                 next_move_time: currentEvent.duration,
                 sched: nest,

@@ -1,7 +1,9 @@
 export default function colorSizeToggle() {
     const fdg = this;
 
-    const container = this.controls.container.append('div').classed('fdg-control fdg-control--color-size', true);
+    const container = this.controls.container
+        .append('div')
+        .classed('fdg-control fdg-control--color-size', true);
     const inputs = container
         .selectAll('div')
         .data(['color', 'size', 'both'])
@@ -15,11 +17,9 @@ export default function colorSizeToggle() {
     inputs.on('click', function (d) {
         inputs.classed('current', (di) => di === d);
         fdg.settings.quantifyEvents = d;
-        fdg.legends
-            .selectAll('.fdg-legend')
-            .classed('fdg-hidden', function() {
-                return !Array.from(this.classList).some(value => value.includes(d));
-            });
+        fdg.legends.selectAll('.fdg-legend').classed('fdg-hidden', function () {
+            return !Array.from(this.classList).some((value) => value.includes(d));
+        });
     });
 
     return {

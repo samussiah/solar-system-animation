@@ -8,7 +8,10 @@ export default function layout() {
         .classed('force-directed-graph', true)
         .datum(this);
     addControls.call(this);
-    this.timer = this.container.append('div').classed('fdg-timer', true).text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
+    this.timer = this.container
+        .append('div')
+        .classed('fdg-timer', true)
+        .text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
     this.annotations = this.container.append('div').classed('fdg-annotations', true);
     this.canvas = this.container.append('div').classed('fdg-canvas', true);
     this.svg = this.canvas

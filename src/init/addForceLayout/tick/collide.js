@@ -6,7 +6,7 @@ export default function collide(alpha) {
 
     return function (d) {
         const r =
-            fdg.settings.quantifyEvents !== 'color'
+            fdg.settings.eventChangeCountAesthetic !== 'color'
                 ? d.r + fdg.settings.maxRadius + fdg.settings.padding
                 : d.r + fdg.settings.minRadius + fdg.settings.padding;
         const nx1 = d.x - r;

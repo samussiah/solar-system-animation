@@ -103,7 +103,10 @@ body > * {
         border: 1px solid #ccc;
         cursor: pointer;
 		float: left;
-		width: 60px;
+		width: 75px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
     }
     .togglebutton:not(:last-child) {
         border-right: none;
@@ -113,13 +116,15 @@ body > * {
         background: #000;
 		border: 1px solid #000;
     }
+    .togglebutton.clicked {
+        background: #aaa;
+    }
 	
 
 #note { 
 	position: relative;
 	color: #fff;
 	padding-left: 5px;
-	
     font-family: "Mercury SSm A", "Mercury SSm B";
     font-style: italic;
     font-weight: 400;

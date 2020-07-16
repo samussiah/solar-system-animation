@@ -19,7 +19,11 @@ fetch('./flattened.csv')
             .entries(data);
 
         const fdg = forceDirectedGraph(
-            data,
+            [
+                ...data,
+                //...data.map(d => {const di = Object.assign({}, d); di.id = di.id + data.length*1; return di; }),
+                //...data.map(d => {const di = Object.assign({}, d); di.id = di.id + data.length*2; return di; }),
+            ],
             '#container',
             {
             }

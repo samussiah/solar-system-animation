@@ -3,32 +3,45 @@ import colorScale from './settings/colorScale';
 import color from './settings/color';
 
 const settings = {
-    eventCount: true,
-    playPause: 'play',
-    quantifyEvents: 'color',
+    // time settings
+    timepoint: 0,
+    timeUnit: 'days since randomization',
+    reset: null, // defined in ../defineMetadata/dataDrivenSettings
+    timeFrame: null,
+
+    // event settings
+    events: null, // defined in ../defineMetadata
+    eventCentral: null, // defined in ../defineMetadata/dataDrivenSettings
+    eventCount: true, // display count (percentage) beneath focus labels?
+    eventChangeCount: null, // defined in ../defineMetadata/dataDrivenSettings
+    eventChangeCountAesthetic: 'color',
+
+    // animation settings
     speed: 'slow',
     speeds: {
         slow: 1000,
         medium: 200,
         fast: 50,
     },
-    centerEventType: 'Home',
+    playPause: 'play',
+
+    // dimensions
+    width: 780,
+    height: 800,
     centerCoordinates: {
         x: 380,
         y: 365,
     },
-    timepoint: 0,
-    timeUnit: 'days since randomization',
-    reset: null,
-    timeFrame: null,
-    width: 780,
-    height: 800,
     padding: 1,
-    minRadius: 3,
+
+    // color and size settings
     colors,
     colorScale,
     color,
-    eventTypes: null, // data-driven by default
+    minRadius: null, // defined in ../defineMetadata/dataDrivenSettings
+    maxRadius: null, // defined in ../defineMetadata/dataDrivenSettings
+
+    // miscellaneous
     annotations: [
         {
             start_minute: 1,
@@ -96,7 +109,5 @@ const settings = {
         },
     ],
 };
-
-settings.maxRadius = settings.minRadius + colors().length;
 
 export default settings;

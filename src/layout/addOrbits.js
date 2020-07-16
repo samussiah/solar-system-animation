@@ -3,10 +3,10 @@ export default function addOrbits() {
     const orbits = this.svg
         .selectAll('circle.orbit')
         .data(
-            this.eventTypes
-                .slice(1)
-                .map((eventType, i) =>
-                    Object.assign(eventType, { cx: 380, cy: 365, r: (i + 1) * 100 + 50 })
+            this.metadata.event
+                .filter(event => event.value !== this.settings.eventCentral)
+                .map((event, i) =>
+                    Object.assign(event, { cx: 380, cy: 365, r: (i + 1) * 100 + 50 })
                 )
         )
         .enter()
@@ -23,7 +23,7 @@ export default function addOrbits() {
     //this.svg
     //    .selectAll('text.orbit')
     //    .data(
-    //        this.settings.eventTypes.slice(1).map((d, i) => {
+    //        this.settings.metadata.event.slice(1).map((d, i) => {
     //            return { cx: 380, cy: 365, r: (i + 1) * 100 + 50 };
     //        })
     //    )
@@ -33,5 +33,6 @@ export default function addOrbits() {
     //    .attr('x', d => d.cx)
     //    .attr('y', d => d.cy - d.r)
     //    .text('asdf')
+
     return orbits;
 }

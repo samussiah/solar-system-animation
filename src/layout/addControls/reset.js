@@ -6,7 +6,7 @@ export default function reset() {
         .append('div')
         .classed('fdg-control fdg-control--reset', true);
     const inputs = container
-        .append('button')
+        .append('div')
         .classed(`togglebutton fdg-input`, true)
         .attr('title', `Reset animation`)
         .html('&#x21ba;');

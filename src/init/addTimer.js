@@ -1,8 +1,7 @@
-import pulseOrbits from './addTimer/pulseOrbits';
 import updateData from './addTimer/updateData';
+import pulseOrbits from './addTimer/pulseOrbits';
+import updateText from './addTimer/updateText';
 import reset from './addTimer/reset';
-import readablePercent from './addTimer/readablePercent';
-import minutesToTime from './addTimer/minutesToTime';
 
 /**
  * Order of operations:
@@ -18,54 +17,20 @@ export default function addTimer() {
     // Increment the timepoint.
     this.settings.timepoint += 1;
 
-    // Update time
-    this.timer.text(minutesToTime.call(this, this.settings.timepoint));
-
     // Resume the force simulation.
     this.force.resume();
 
-    if (this.settings.timepoint > this.settings.reset) {
-        reset.call(this);
-        //clearTimeout(this.timeout);
-        //setTimeout(() => reset.call(this), 1000);
-    } else {
+    if (this.settings.timepoint <= this.settings.reset) {
         // Update the node data.
         updateData.call(this);
 
         // Accentuate the orbits when an event occurs.
         pulseOrbits.call(this);
 
-        // Update percentages
-        if (this.settings.eventCount)
-            this.fociLabels.selectAll('tspan.actpct').text((d) => readablePercent(d.count));
-
-        // Update notes
-        if (this.settings.timepoint === this.settings.annotations[this.notes_index].start_minute) {
-            this.annotations
-                .style('top', '0px')
-                .transition()
-                .duration(600)
-                .style('top', '20px')
-                .style('color', '#000000')
-                .text(this.settings.annotations[this.notes_index].note);
-        }
-
-        // Make note disappear at the end.
-        else if (
-            this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute
-        ) {
-            this.annotations
-                .transition()
-                .duration(1000)
-                .style('top', '300px')
-                .style('color', '#ffffff');
-
-            this.notes_index += 1;
-
-            if (this.notes_index === this.settings.annotations.length) {
-                this.notes_index = 0;
-            }
-        }
+        // Update timer, focus labels, and annotations.
+        updateText.call(this);
+    } else {
+        reset.call(this);
     }
 
     this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);

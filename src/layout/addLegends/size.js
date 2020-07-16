@@ -2,7 +2,7 @@ export default function size() {
     this.sizeLegend = this.legends
         .append('div')
         .classed('fdg-legend fdg-legend__size', true)
-        .classed('fdg-hidden', this.settings.quantifyEvents !== 'size');
+        .classed('fdg-hidden', this.settings.eventChangeCountAesthetic !== 'size');
     const legendDimensions = [200, 100];
     this.sizeLegend
         .append('div')

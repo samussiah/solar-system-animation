@@ -4,8 +4,8 @@ export default function reset() {
     this.settings.timepoint = 0;
 
     // Update the event object of the population.
-    this.eventTypes.forEach((eventType) => {
-        eventType.count = 0;
+    this.metadata.event.forEach((event) => {
+        event.count = 0;
     });
 
     this.data.nested.forEach((d) => {
@@ -13,30 +13,30 @@ export default function reset() {
         d.currentEvent = d.sched[0];
 
         // Define an event object for the individual.
-        d.eventTypes.forEach((eventType) => {
-            eventType.count = 0;
-            eventType.duration = 0;
+        d.events.forEach((event) => {
+            event.count = 0;
+            event.duration = 0;
         });
-        d.eventTypes.find((eventType) => eventType.label === d.currentEvent.event).count += 1;
+        d.events.find((event) => event.value === d.currentEvent.event).count += 1;
 
-        const eventType = this.eventTypes.find(
-            (eventType) => eventType.label === d.currentEvent.event
+        const event = this.metadata.event.find(
+            (event) => event.value === d.currentEvent.event
         );
-        eventType.count += 1;
+        event.count += 1;
 
         const stateChanges = d3.sum(
-            d.eventTypes.filter((eventType) => eventType.label !== this.settings.centerEventType),
-            (eventType) => eventType.count
+            d.events.filter((event) => this.settings.eventChangeCount.includes(event.value)),
+            (event) => event.count
         );
 
-        d.x = eventType.x + Math.random();
-        d.y = eventType.y + Math.random();
+        d.x = event.x + Math.random();
+        d.y = event.y + Math.random();
         d.r =
-            this.settings.quantifyEvents !== 'color'
+            this.settings.eventChangeCountAesthetic !== 'color'
                 ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
                 : this.settings.minRadius;
         d.color =
-            this.settings.quantifyEvents !== 'size' ? this.settings.color(stateChanges) : '#aaa';
+            this.settings.eventChangeCountAesthetic !== 'size' ? this.settings.color(stateChanges) : '#aaa';
         d.moves = 0;
         d.next_move_time = d.currentEvent.duration;
     });

@@ -4,7 +4,7 @@ export default function addFociLabels() {
     // Event labels
     const text = this.svg
         .selectAll('text.actlabel')
-        .data(this.eventTypes)
+        .data(this.metadata.event)
         .enter()
         .append('text')
         .attr('class', 'actlabel')
@@ -17,7 +17,7 @@ export default function addFociLabels() {
         .attr('text-anchor', 'middle')
         .style('font-weight', 'bold')
         .style('font-size', '20px')
-        .text((d) => d.label);
+        .text((d) => d.value);
 
     const pct = text
         .append('tspan')

@@ -9,8 +9,8 @@ export default function tick(e) {
     // Push nodes toward their designated focus.
     this.data.nested.forEach((d, i) => {
         // Find the datum of the destination focus.
-        const currentEvent = this.eventTypes.find(
-            (eventType) => eventType.label === d.currentEvent.event
+        const currentEvent = this.metadata.event.find(
+            (event) => event.value === d.currentEvent.event
         );
 
         // Take the point's current coordinates and add to it the difference between the coordinates of the

@@ -18,43 +18,43 @@ export default function nestData() {
             const currentEvent = nest[0];
 
             // Define an event object for the individual.
-            const eventTypes = this.eventTypes.map((eventType) => {
+            const events = this.metadata.event.map((event) => {
                 return {
-                    label: eventType.label,
-                    order: eventType.order,
+                    value: event.value,
+                    order: event.order,
                     count: 0,
                     duration: 0,
                     totalDuration: d3.sum(
-                        nest.filter((d) => d.event === eventType.label),
+                        nest.filter((d) => d.event === event.value),
                         (d) => d.duration
                     ),
                 };
             });
-            eventTypes.find((eventType) => eventType.label === currentEvent.event).count += 1;
+            events.find((event) => event.value === currentEvent.event).count += 1;
 
             // Update the event object of the population.
-            const eventType = this.eventTypes.find(
-                (eventType) => eventType.label === currentEvent.event
+            const event = this.metadata.event.find(
+                (event) => event.value === currentEvent.event
             );
-            eventType.count += 1;
+            event.count += 1;
 
             const stateChanges = d3.sum(
-                eventTypes.filter((eventType) => eventType.label !== this.settings.centerEventType),
-                (eventType) => eventType.count
+                events.filter((event) => this.settings.eventChangeCount.includes(event.label)),
+                (event) => event.count
             );
 
             return {
                 currentEvent,
-                eventTypes,
+                events,
                 duration: d3.sum(nest, (d) => d.duration),
-                x: eventType.x + Math.random(),
-                y: eventType.y + Math.random(),
+                x: event.x + Math.random(),
+                y: event.y + Math.random(),
                 r:
-                    this.settings.quantifyEvents !== 'color'
+                    this.settings.eventChangeCountAesthetic !== 'color'
                         ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
                         : this.settings.minRadius,
                 color:
-                    this.settings.quantifyEvents !== 'size'
+                    this.settings.eventChangeCountAesthetic !== 'size'
                         ? this.settings.color(stateChanges)
                         : '#aaa',
                 moves: 0,
@@ -64,7 +64,6 @@ export default function nestData() {
         })
         .entries(this.data)
         .map((d) => Object.assign(d, d.values));
-    console.table(nestedData[0].sched);
 
     return nestedData;
 }

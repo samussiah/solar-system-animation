@@ -1,4 +1,5 @@
 import addControls from './layout/addControls';
+import addOrbits from './layout/addOrbits';
 import addLegends from './layout/addLegends';
 
 export default function layout() {
@@ -19,5 +20,6 @@ export default function layout() {
         .classed('fdg-svg', true)
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
+    this.orbits = addOrbits.call(this);
     addLegends.call(this);
 }

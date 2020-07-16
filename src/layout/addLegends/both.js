@@ -2,7 +2,7 @@ export default function both() {
     this.bothLegend = this.legends
         .append('div')
         .classed('fdg-legend fdg-legend__both', true)
-        .classed('fdg-hidden', this.settings.quantifyEvents !== 'both');
+        .classed('fdg-hidden', this.settings.eventChangeCountAesthetic !== 'both');
     const legendDimensions = [200, 100];
     this.bothLegend
         .append('div')

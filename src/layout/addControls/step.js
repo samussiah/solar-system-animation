@@ -1,5 +1,7 @@
 import toggle from './playPause/toggle';
-import addTimer from '../../init/addTimer';
+import updateData from '../../init/addTimer/updateData';
+import pulseOrbits from '../../init/addTimer/pulseOrbits';
+import updateText from '../../init/addTimer/updateText';
 
 /**
  * function:
@@ -15,21 +17,40 @@ export default function step() {
         .append('div')
         .classed('fdg-control fdg-control--step', true);
     const inputs = container
-        .append('button')
+        .append('div')
         .classed(`togglebutton fdg-input`, true)
         .attr('title', `Advance animation by one time unit`)
         .text('Step');
 
     inputs.on('click', () => {
+        // Pause simulation.
         if (this.settings.playPause !== 'pause') toggle.call(this);
 
-        // Update time
-        this.timer.text(`${this.settings.timepoint + 1} ${this.settings.timeUnit}`);
+        // Update timepoint.
+        // Increment the timepoint.
+        this.settings.timepoint++;
 
-        this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
-        setTimeout(() => {
-            clearTimeout(this.timeout);
-        }, this.settings.speeds[this.settings.speed]);
+        // Update the node data.
+        updateData.call(this);
+
+        // Accentuate the orbits when an event occurs.
+        pulseOrbits.call(this);
+
+        // Update timer, focus labels, and annotations.
+        updateText.call(this);
+
+        // Continue running the simulation, at the current timepoint only.
+        const resume_for_a_while = function () {
+            this.force.resume();
+            this.pause_timeout = setTimeout(
+                resume_for_a_while.bind(this),
+                this.settings.speeds[this.settings.speed]
+            );
+        };
+        this.pause_timeout = setTimeout(
+            resume_for_a_while.bind(this),
+            this.settings.speeds[this.settings.speed]
+        );
     });
 
     return {

@@ -1,7 +1,7 @@
 export default function colorSizeToggle() {
     const fdg = this;
 
-    const container = this.controls.append('div').classed('fdg-control fdg-control--color-size', true);
+    const container = this.controls.container.append('div').classed('fdg-control fdg-control--color-size', true);
     const inputs = container
         .selectAll('div')
         .data(['color', 'size', 'both'])

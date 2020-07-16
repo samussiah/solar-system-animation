@@ -18,6 +18,9 @@ export default function addTimer() {
     // Increment the timepoint.
     this.settings.timepoint += 1;
 
+    // Update time
+    this.timer.text(minutesToTime.call(this, this.settings.timepoint));
+
     // Resume the force simulation.
     this.force.resume();
 
@@ -35,9 +38,6 @@ export default function addTimer() {
         // Update percentages
         if (this.settings.eventCount)
             this.fociLabels.selectAll('tspan.actpct').text((d) => readablePercent(d.count));
-
-        // Update time
-        this.timer.text(minutesToTime.call(this, this.settings.timepoint));
 
         // Update notes
         if (this.settings.timepoint === this.settings.annotations[this.notes_index].start_minute) {

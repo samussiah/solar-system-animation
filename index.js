@@ -112,7 +112,7 @@
       var _this = this;
 
       var fdg = this;
-      var container = this.controls.append('div').classed('fdg-control fdg-control--speed', true);
+      var container = this.controls.container.append('div').classed('fdg-control fdg-control--speed', true);
       var inputs = container.selectAll('div').data(Object.keys(this.settings.speeds).map(function (key) {
         return {
           label: key,
@@ -120,6 +120,8 @@
         };
       })).enter().append('div').attr('class', function (d) {
         return "togglebutton ".concat(d.label, " ").concat(d.label === _this.settings.speed ? 'current' : '');
+      }).attr('title', function (d) {
+        return "Advance the animation every ".concat(_this.settings.speeds[d.label] / 1000, " second(s).");
       }).text(function (d) {
         return d.label;
       });
@@ -269,7 +271,9 @@
 
     function addTimer() {
       // Increment the timepoint.
-      this.settings.timepoint += 1; // Resume the force simulation.
+      this.settings.timepoint += 1; // Update time
+
+      this.timer.text(minutesToTime.call(this, this.settings.timepoint)); // Resume the force simulation.
 
       this.force.resume();
 
@@ -284,9 +288,7 @@
 
         if (this.settings.eventCount) this.fociLabels.selectAll('tspan.actpct').text(function (d) {
           return readablePercent(d.count);
-        }); // Update time
-
-        this.timer.text(minutesToTime.call(this, this.settings.timepoint)); // Update notes
+        }); // Update notes
 
         if (this.settings.timepoint === this.settings.annotations[this.notes_index].start_minute) {
           this.annotations.style('top', '0px').transition().duration(600).style('top', '20px').style('color', '#000000').text(this.settings.annotations[this.notes_index].note);
@@ -304,74 +306,89 @@
       this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
     }
 
-    function collide(alpha) {
-      var fdg = this; // Resolve collisions between nodes.
-
-      var quadtree = d3.geom.quadtree(this.data.nested);
-      return function (d) {
-        var r = fdg.settings.quantifyEvents !== 'color' ? d.r + fdg.settings.maxRadius + fdg.settings.padding : d.r + fdg.settings.minRadius + fdg.settings.padding;
-        var nx1 = d.x - r;
-        var nx2 = d.x + r;
-        var ny1 = d.y - r;
-        var ny2 = d.y + r;
-        quadtree.visit(function (quad, x1, y1, x2, y2) {
-          if (quad.point && quad.point !== d) {
-            var x = d.x - quad.point.x;
-            var y = d.y - quad.point.y;
-            var l = Math.sqrt(x * x + y * y);
-
-            var _r = d.r + quad.point.r + (d.currentEvent.event !== quad.point.currentEvent.event) * fdg.settings.padding;
-
-            if (l < _r) {
-              l = (l - _r) / l * alpha;
-              d.x -= x *= l;
-              d.y -= y *= l;
-              quad.point.x += x;
-              quad.point.y += y;
-            }
-          }
-
-          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-        });
-      };
-    }
-
-    function playPause() {
+    var playPause = [{
+      action: 'play',
+      label: 'Play',
+      html: '&#9658;'
+    }, {
+      action: 'pause',
+      label: 'Pause',
+      html: '&#10074;&#10074;'
+    }];
+    function toggle() {
       var _this = this;
 
-      var fdg = this;
-      var container = this.controls.append('div').classed('fdg-control fdg-control--play-pause', true);
-      var playPause = [{
-        action: 'play',
-        label: 'Play',
-        html: '&#x25B6;'
-      }, {
-        action: 'pause',
-        label: 'Pause',
-        html: '&#x23F8;'
-      }];
+      // Update setting.
+      this.settings.playPause = playPause.find(function (value) {
+        return value.action !== _this.settings.playPause;
+      }).action; // toggle playPause setting
+      // Update tooltip and display text.
+
+      this.controls.playPause.inputs.attr('title', "".concat(playPause.find(function (value) {
+        return value.action !== _this.settings.playPause;
+      }).label, " animation")).html(playPause.find(function (value) {
+        return value.action !== _this.settings.playPause;
+      }).html); // Pause or play animation.
+
+      if (this.settings.playPause === 'play') {
+        this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+      } else if (this.settings.playPause === 'pause') {
+        clearTimeout(this.timeout);
+      }
+    }
+
+    function playPause$1() {
+      var _this = this;
+      var container = this.controls.container.append('div').classed('fdg-control fdg-control--play-pause', true);
       var inputs = container.append('button').classed("togglebutton fdg-input", true).attr('title', "".concat(playPause.find(function (value) {
         return value.action !== _this.settings.playPause;
       }).label, " animation")).html(playPause.find(function (value) {
         return value.action !== _this.settings.playPause;
       }).html);
       inputs.on('click', function () {
-        fdg.settings.playPause = playPause.find(function (value) {
-          return value.action !== fdg.settings.playPause;
-        }).action; // toggle playPause setting
+        toggle.call(_this);
+      });
+      return {
+        container: container,
+        inputs: inputs
+      };
+    }
 
-        d3.select(this).attr('title', "".concat(playPause.find(function (value) {
-          return value.action !== fdg.settings.playPause;
-        }).label, " animation")).html(playPause.find(function (value) {
-          return value.action !== fdg.settings.playPause;
-        }).html);
+    /**
+     * function:
+     * 1. Pause the animation.
+     * 2. Increment the timepoint by 1.
+     * 3. Allow the points to reach their destination at the new timepoint.
+     */
 
-        if (fdg.settings.playPause === 'play') {
-          fdg.timeout = setTimeout(addTimer.bind(fdg), fdg.settings.speeds[fdg.settings.speed]);
-        } else if (fdg.settings.playPause === 'pause') {
-          clearTimeout(fdg.timeout);
-          fdg.force.resume();
-        }
+    function step() {
+      var _this = this;
+      var container = this.controls.container.append('div').classed('fdg-control fdg-control--step', true);
+      var inputs = container.append('button').classed("togglebutton fdg-input", true).attr('title', "Advance animation by one time unit").text('Step');
+      inputs.on('click', function () {
+        if (_this.settings.playPause !== 'pause') toggle.call(_this); // Update time
+
+        _this.timer.text("".concat(_this.settings.timepoint + 1, " ").concat(_this.settings.timeUnit));
+
+        _this.timeout = setTimeout(addTimer.bind(_this), _this.settings.speeds[_this.settings.speed]);
+        setTimeout(function () {
+          clearTimeout(_this.timeout);
+        }, _this.settings.speeds[_this.settings.speed]);
+      });
+      return {
+        container: container,
+        inputs: inputs
+      };
+    }
+
+    function reset$1() {
+      var _this = this;
+
+      var container = this.controls.container.append('div').classed('fdg-control fdg-control--reset', true);
+      var inputs = container.append('button').classed("togglebutton fdg-input", true).attr('title', "Reset animation").html('&#x21ba;');
+      inputs.on('click', function () {
+        reset.call(_this);
+        if (_this.settings.playPause !== 'play') toggle.call(_this);
       });
       return {
         container: container,
@@ -383,7 +400,7 @@
       var _this = this;
 
       var fdg = this;
-      var container = this.controls.append('div').classed('fdg-control fdg-control--color-size', true);
+      var container = this.controls.container.append('div').classed('fdg-control fdg-control--color-size', true);
       var inputs = container.selectAll('div').data(['color', 'size', 'both']).enter().append('div').attr('class', function (d) {
         return "togglebutton ".concat(d, " ").concat(d === _this.settings.quantifyEvents ? 'current' : '');
       }).text(function (d) {
@@ -407,10 +424,14 @@
     }
 
     function addControls() {
-      this.controls = this.container.append('div').classed('fdg-controls', true);
-      speed.call(this);
-      playPause.call(this);
-      colorSizeToggle.call(this);
+      this.controls = {
+        container: this.container.append('div').classed('fdg-controls', true)
+      };
+      this.controls.speed = speed.call(this);
+      this.controls.playPause = playPause$1.call(this);
+      this.controls.step = step.call(this);
+      this.controls.reset = reset$1.call(this);
+      this.controls.colorSizeToggle = colorSizeToggle.call(this);
     }
 
     function color$1() {
@@ -440,7 +461,7 @@
       var sizeLegendSvg = this.sizeLegend.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g');
       sizeLegendSvg.selectAll('circle.legend-mark').data(this.settings.colors()).enter().append('circle').classed('legend-mark', true).attr('cx', function (d, i) {
         return i * (legendDimensions[0] / _this.settings.colors().length) + legendDimensions[0] / _this.settings.colors().length / 2;
-      }).attr('cy', legendDimensions[0] / this.settings.colors().length / 2).attr('r', function (d, i) {
+      }).attr('cy', legendDimensions[1] / 4).attr('r', function (d, i) {
         return i + _this.settings.minRadius;
       }).attr('fill', '#aaa').attr('fill-opacity', 0.5).attr('stroke', '#aaa').attr('stroke-opacity', 1);
       sizeLegendSvg.append('text').attr('x', legendDimensions[0] / this.settings.colors().length / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').text('0');
@@ -456,7 +477,7 @@
       var bothLegendSvg = this.bothLegend.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g');
       bothLegendSvg.selectAll('circle.legend-mark').data(this.settings.colors()).enter().append('circle').classed('legend-mark', true).attr('cx', function (d, i) {
         return i * (legendDimensions[0] / _this.settings.colors().length) + legendDimensions[0] / _this.settings.colors().length / 2;
-      }).attr('cy', legendDimensions[0] / this.settings.colors().length / 2).attr('r', function (d, i) {
+      }).attr('cy', legendDimensions[1] / 4).attr('r', function (d, i) {
         return i + _this.settings.minRadius;
       }).attr('fill', function (d) {
         return d;
@@ -630,6 +651,38 @@
       //    .text('asdf')
 
       return orbits;
+    }
+
+    function collide(alpha) {
+      var fdg = this; // Resolve collisions between nodes.
+
+      var quadtree = d3.geom.quadtree(this.data.nested);
+      return function (d) {
+        var r = fdg.settings.quantifyEvents !== 'color' ? d.r + fdg.settings.maxRadius + fdg.settings.padding : d.r + fdg.settings.minRadius + fdg.settings.padding;
+        var nx1 = d.x - r;
+        var nx2 = d.x + r;
+        var ny1 = d.y - r;
+        var ny2 = d.y + r;
+        quadtree.visit(function (quad, x1, y1, x2, y2) {
+          if (quad.point && quad.point !== d) {
+            var x = d.x - quad.point.x;
+            var y = d.y - quad.point.y;
+            var l = Math.sqrt(x * x + y * y);
+
+            var _r = d.r + quad.point.r + (d.currentEvent.event !== quad.point.currentEvent.event) * fdg.settings.padding;
+
+            if (l < _r) {
+              l = (l - _r) / l * alpha;
+              d.x -= x *= l;
+              d.y -= y *= l;
+              quad.point.x += x;
+              quad.point.y += y;
+            }
+          }
+
+          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+        });
+      };
     }
 
     function tick(e) {

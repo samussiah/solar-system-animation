@@ -1,7 +1,7 @@
 export default function speed() {
     const fdg = this;
 
-    const container = this.controls.append('div').classed('fdg-control fdg-control--speed', true);
+    const container = this.controls.container.append('div').classed('fdg-control fdg-control--speed', true);
     const inputs = container
         .selectAll('div')
         .data(
@@ -15,6 +15,7 @@ export default function speed() {
             'class',
             (d) => `togglebutton ${d.label} ${d.label === this.settings.speed ? 'current' : ''}`
         )
+        .attr('title', d => `Advance the animation every ${this.settings.speeds[d.label]/1000} second(s).`)
         .text((d) => d.label);
     inputs.on('click', function (d) {
         inputs.classed('current', (di) => di.label === d.label);

@@ -1,12 +1,22 @@
 export default function color() {
     this.colorLegend = this.legends
         .append('div')
-        .classed('fdg-legend fdg-legend__color', true)
-        .classed('fdg-hidden', this.settings.eventChangeCountAesthetic !== 'color');
-    const legendDimensions = [200, 100];
+        .classed('fdg-legend fdg-legend--color', true)
+        .classed(
+            'fdg-hidden',
+            this.settings.eventChangeCountAesthetic !== 'color' ||
+                this.settings.eventChangeCount.length === 0
+        );
+    const legendDimensions = [200, 50];
     this.colorLegend
         .append('div')
-        .html('Number of <span class = "fdg-measure">hospitalization</span> events');
+        .classed('fdg-legend__label', true)
+        .style('width', legendDimensions[0] + 'px')
+        .html(
+            `Number of <span class = "fdg-measure">${this.settings.eventChangeCount
+                .join(', ')
+                .replace(/, ([^,]*)$/, ', and $1')}</span> events`
+        );
     const colorLegendSvg = this.colorLegend
         .append('svg')
         .attr('width', legendDimensions[0])

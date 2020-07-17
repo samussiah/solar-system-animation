@@ -39,31 +39,58 @@ body > * {
 }
 .fdg-controls {
     width: 100%;
+    border-bottom: 1px solid #aaa;
 }
 .fdg-controls > * {
     display: inline-block;
 }
 :root {
-    --left-margin: 15%;
+    --left-margin: 20%;
 }
+
+/* side panel */
+.fdg-timer,
+.fdg-legends,
+.fdg-annotations {
+    width: calc(var(--left-margin) - 10px);
+    padding-right: 10px;
+    display: inline-block;
+    float: left;
+    clear: left;
+    text-align: center;
+    margin: 10px 0px;
+}
+
 .fdg-timer {
-    width: calc(100% - var(--left-margin));
-    margin-left: var(--left-margin);
     font-weight: bold;
     font-size: 20px;
 }
-.fdg-annotations {
-    width: calc(var(--left-margin));
-    font-weight: lighter;
-    font-size: 16px;
-}
-.fdg-canvas {
-    float: right;
-    width: calc(100% - var(--left-margin));
-}
+
 .fdg-legends {
+}
+.fdg-legend {
+    text-align: center;
+}
+.fdg-legend > * {
     display: inline-block;
-    vertical-align: top;
+}
+.fdg-legend__label {
+    font-size: .75em;
+    text-align: center;
+}
+
+.fdg-annotations {
+    font-weight: lighter;
+    font-size: 1em;
+    text-align: center;
+}
+
+/* main panel */
+
+.fdg-canvas {
+    width: calc(100% - var(--left-margin) - 1px);
+    display: inline-block;
+    border-left: 1px solid #aaa;
 }
 
 /* #Reset & Basics (Inspired by E. Meyers)

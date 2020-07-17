@@ -4,6 +4,7 @@ import layout from './layout';
 import dataManipulation from './dataManipulation';
 import init from './init';
 
+// TODO: make legend label dynamic
 export default function forceDirectedGraph(data, element = 'body', settings = {}) {
     const fdg = {
         data,

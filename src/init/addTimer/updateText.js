@@ -4,7 +4,9 @@ export default function updateText() {
 
     // Update percentages
     if (this.settings.eventCount)
-        this.fociLabels.selectAll('tspan.actpct').text((d) => `${d.count} (${d3.format('%')(d.count/this.data.nested.length)})`);
+        this.fociLabels
+            .selectAll('tspan.actpct')
+            .text((d) => `${d.count} (${d3.format('%')(d.count / this.data.nested.length)})`);
 
     // Update notes
     if (this.settings.timepoint === this.settings.annotations[this.notes_index].start_minute) {
@@ -18,9 +20,7 @@ export default function updateText() {
     }
 
     // Make note disappear at the end.
-    else if (
-        this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute
-    ) {
+    else if (this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute) {
         this.annotations
             .transition()
             .duration(1000)

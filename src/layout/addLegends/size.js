@@ -1,12 +1,22 @@
 export default function size() {
     this.sizeLegend = this.legends
         .append('div')
-        .classed('fdg-legend fdg-legend__size', true)
-        .classed('fdg-hidden', this.settings.eventChangeCountAesthetic !== 'size');
-    const legendDimensions = [200, 100];
+        .classed('fdg-legend fdg-legend--size', true)
+        .classed(
+            'fdg-hidden',
+            this.settings.eventChangeCountAesthetic !== 'size' ||
+                this.settings.eventChangeCount.length === 0
+        );
+    const legendDimensions = [200, 500];
     this.sizeLegend
         .append('div')
-        .html('Number of <span class = "fdg-measure">hospitalization</span> events');
+        .classed('fdg-legend__label', true)
+        .style('width', legendDimensions[0] + 'px')
+        .html(
+            `Number of <span class = "fdg-measure">${this.settings.eventChangeCount
+                .join(', ')
+                .replace(/, ([^,]*)$/, ', and $1')}</span> events`
+        );
     const sizeLegendSvg = this.sizeLegend
         .append('svg')
         .attr('width', legendDimensions[0])

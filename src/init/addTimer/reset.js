@@ -19,9 +19,7 @@ export default function reset() {
         });
         d.events.find((event) => event.value === d.currentEvent.event).count += 1;
 
-        const event = this.metadata.event.find(
-            (event) => event.value === d.currentEvent.event
-        );
+        const event = this.metadata.event.find((event) => event.value === d.currentEvent.event);
         event.count += 1;
 
         const stateChanges = d3.sum(
@@ -36,11 +34,10 @@ export default function reset() {
                 ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
                 : this.settings.minRadius;
         d.color =
-            this.settings.eventChangeCountAesthetic !== 'size' ? this.settings.color(stateChanges) : '#aaa';
+            this.settings.eventChangeCountAesthetic !== 'size'
+                ? this.settings.color(stateChanges)
+                : '#aaa';
         d.moves = 0;
         d.next_move_time = d.currentEvent.duration;
     });
-
-    //if (this.settings.playPause === 'play')
-    //    this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
 }

@@ -15,11 +15,12 @@ export default function addControls() {
     this.controls.reset = reset.call(this);
     this.controls.eventList = eventList.call(this);
     this.controls.colorSizeToggle = colorSizeToggle.call(this);
-    this.controls.container.selectAll('.togglebutton')
-        .on('mousedown', function() {
+    this.controls.container
+        .selectAll('.togglebutton')
+        .on('mousedown', function () {
             this.classList.toggle('clicked');
         })
-        .on('mouseup', function() {
+        .on('mouseup', function () {
             this.classList.toggle('clicked');
         });
 }

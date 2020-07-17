@@ -26,7 +26,7 @@ const settings = {
     playPause: 'play',
 
     // dimensions
-    width: 780,
+    width: 1000,
     height: 800,
     centerCoordinates: {
         x: 380,

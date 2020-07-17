@@ -1,4 +1,5 @@
 export default function updateData() {
+    // Record number of IDs at each focus at previous timepoint.
     this.metadata.event.forEach((event) => {
         event.prevCount = event.count;
     });
@@ -8,12 +9,8 @@ export default function updateData() {
         let curr_moves = d.moves;
 
         // Time to go to next activity
-        if (d.next_move_time === this.settings.timepoint) {
-            if (d.moves === d.sched.length - 1) {
-                curr_moves = 0;
-            } else {
-                curr_moves += 1;
-            }
+        if (d.next_move_time === this.settings.timepoint && this.settings.timepoint < d.duration) {
+            curr_moves += 1;
 
             // Update individual to next event.
             d.currentEvent = d.sched[curr_moves];
@@ -23,9 +20,7 @@ export default function updateData() {
 
             // Update population count at previous and next events.
             this.metadata.event.find((event) => event.value === currEvent).count -= 1;
-            const eventPopulation = this.metadata.event.find(
-                (event) => event.value === nextEvent
-            );
+            const eventPopulation = this.metadata.event.find((event) => event.value === nextEvent);
             eventPopulation.count += 1;
 
             d.moves = curr_moves;
@@ -42,9 +37,12 @@ export default function updateData() {
                 ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
                 : this.settings.minRadius;
         d.color =
-            this.settings.eventChangeCountAesthetic !== 'size' ? this.settings.color(stateChanges) : '#aaa';
+            this.settings.eventChangeCountAesthetic !== 'size'
+                ? this.settings.color(stateChanges)
+                : '#aaa';
     });
 
+    // Record change in number of IDs at each focus at current timepoint.
     this.metadata.event.forEach((event) => {
         event.change = event.count - event.prevCount;
     });

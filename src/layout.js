@@ -8,12 +8,19 @@ export default function layout() {
         .append('div')
         .classed('force-directed-graph', true)
         .datum(this);
+
+    // controls
     addControls.call(this);
+
+    // side panel
     this.timer = this.container
         .append('div')
         .classed('fdg-timer', true)
         .text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
+    addLegends.call(this);
     this.annotations = this.container.append('div').classed('fdg-annotations', true);
+
+    // main panel
     this.canvas = this.container.append('div').classed('fdg-canvas', true);
     this.svg = this.canvas
         .append('svg')
@@ -21,5 +28,4 @@ export default function layout() {
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
     this.orbits = addOrbits.call(this);
-    addLegends.call(this);
 }

@@ -1,12 +1,22 @@
 export default function both() {
     this.bothLegend = this.legends
         .append('div')
-        .classed('fdg-legend fdg-legend__both', true)
-        .classed('fdg-hidden', this.settings.eventChangeCountAesthetic !== 'both');
-    const legendDimensions = [200, 100];
+        .classed('fdg-legend fdg-legend--both', true)
+        .classed(
+            'fdg-hidden',
+            this.settings.eventChangeCountAesthetic !== 'both' ||
+                this.settings.eventChangeCount.length === 0
+        );
+    const legendDimensions = [200, 50];
     this.bothLegend
         .append('div')
-        .html('Number of <span class = "fdg-measure">hospitalization</span> events');
+        .classed('fdg-legend__label', true)
+        .style('width', legendDimensions[0] + 'px')
+        .html(
+            `Number of <span class = "fdg-measure">${this.settings.eventChangeCount
+                .join(', ')
+                .replace(/, ([^,]*)$/, ', and $1')}</span> events`
+        );
     const bothLegendSvg = this.bothLegend
         .append('svg')
         .attr('width', legendDimensions[0])

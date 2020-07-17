@@ -26,18 +26,21 @@ export default function step() {
         // Pause simulation.
         if (this.settings.playPause !== 'pause') toggle.call(this);
 
-        // Update timepoint.
         // Increment the timepoint.
         this.settings.timepoint++;
 
-        // Update the node data.
-        updateData.call(this);
+        if (this.settings.timepoint <= this.settings.reset) {
+            // Update the node data.
+            updateData.call(this);
 
-        // Accentuate the orbits when an event occurs.
-        pulseOrbits.call(this);
+            // Accentuate the orbits when an event occurs.
+            pulseOrbits.call(this);
 
-        // Update timer, focus labels, and annotations.
-        updateText.call(this);
+            // Update timer, focus labels, and annotations.
+            updateText.call(this);
+        } else {
+            reset.call(this);
+        }
 
         // Continue running the simulation, at the current timepoint only.
         const resume_for_a_while = function () {

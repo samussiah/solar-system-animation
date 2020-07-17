@@ -33,9 +33,7 @@ export default function nestData() {
             events.find((event) => event.value === currentEvent.event).count += 1;
 
             // Update the event object of the population.
-            const event = this.metadata.event.find(
-                (event) => event.value === currentEvent.event
-            );
+            const event = this.metadata.event.find((event) => event.value === currentEvent.event);
             event.count += 1;
 
             const stateChanges = d3.sum(

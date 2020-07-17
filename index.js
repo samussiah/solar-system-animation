@@ -700,7 +700,7 @@
             fdg.legends
                 .classed('fdg-hidden', fdg.settings.eventChangeCount.length === 0)
                 .selectAll('span.fdg-measure')
-                .text(fdg.settings.eventChangeCount.join(', ')); // Recalculate radius and fill/stroke of points.
+                .text(fdg.settings.eventChangeCount.join(', ').replace(/, ([^,]*)$/, ', and $1')); // Recalculate radius and fill/stroke of points.
 
             fdg.data.nested.forEach(function (d) {
                 // Add to new activity count

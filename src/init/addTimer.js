@@ -33,5 +33,11 @@ export default function addTimer() {
         reset.call(this);
     }
 
+    // Update radius and fill attributes of circles.
+    this.circles
+        .attr('r', (d) => d.r)
+        .style('fill', (d) => d.color)
+        .style('stroke', (d) => d.color);
+
     this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
 }

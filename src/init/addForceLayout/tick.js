@@ -2,6 +2,7 @@ import collide from './tick/collide';
 
 // TODO: figure out what k does
 export default function tick(e) {
+    // k controls the speed at which the nodes reach the appropriate focus
     const k = 0.04 * e.alpha;
 
     if (this.ticks !== undefined) this.ticks++;
@@ -19,11 +20,9 @@ export default function tick(e) {
         d.y += (currentEvent.y - d.y) * k;
     });
 
+    // Update the coordinates, radius, fill, and stroke of the each node.
     this.circles
-        .each(collide.call(this, 0.8))
+        .each(collide.call(this, 0.2))
         .attr('cx', (d) => d.x)
-        .attr('cy', (d) => d.y)
-        .attr('r', (d) => d.r)
-        .style('fill', (d) => d.color)
-        .style('stroke', (d) => d.color);
+        .attr('cy', (d) => d.y);
 }

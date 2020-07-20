@@ -13,20 +13,21 @@ export default function defineMetadata() {
     // Add additional metadata to ID set.
     id.call(this);
 
-    // Add additional metadata to event set.
-    event.call(this);
-
     // Update settings that depend on data.
     dataDrivenSettings.call(this);
 
+    // Add additional metadata to event set.
+    event.call(this);
+
     // Define orbits.
-    this.metadata.orbits = d3.nest()
-        .key(d => d.order)
-        .entries(this.metadata.event.filter(event => event.value !== this.settings.eventCentral))
-        .map((d,i) => {
+    this.metadata.orbits = d3
+        .nest()
+        .key((d) => d.order)
+        .entries(this.metadata.event.filter((event) => event.value !== this.settings.eventCentral))
+        .map((d, i) => {
             d.cx = 380;
             d.cy = 365;
-            d.r = (i+1) * 100 + 50;
+            d.r = (i + 1) * 100 + 50;
             return d;
         });
 }

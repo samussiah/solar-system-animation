@@ -2,7 +2,7 @@ import collide from './tick/collide';
 
 // TODO: figure out what k does
 export default function tick(e) {
-    const k = 0.02 * e.alpha;
+    const k = 0.04 * e.alpha;
 
     if (this.ticks !== undefined) this.ticks++;
 
@@ -20,7 +20,7 @@ export default function tick(e) {
     });
 
     this.circles
-        .each(collide.call(this, 0.5))
+        .each(collide.call(this, 0.8))
         .attr('cx', (d) => d.x)
         .attr('cy', (d) => d.y)
         .attr('r', (d) => d.r)

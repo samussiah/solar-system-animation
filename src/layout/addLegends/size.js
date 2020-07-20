@@ -7,7 +7,7 @@ export default function size() {
             this.settings.eventChangeCountAesthetic !== 'size' ||
                 this.settings.eventChangeCount.length === 0
         );
-    const legendDimensions = [200, 500];
+    const legendDimensions = [200, 50];
     this.sizeLegend
         .append('div')
         .classed('fdg-legend__label', true)

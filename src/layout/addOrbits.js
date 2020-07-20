@@ -2,13 +2,7 @@ export default function addOrbits() {
     // Draw concentric circles.
     const orbits = this.svg
         .selectAll('circle.orbit')
-        .data(
-            this.metadata.event
-                .filter((event) => event.value !== this.settings.eventCentral)
-                .map((event, i) =>
-                    Object.assign(event, { cx: 380, cy: 365, r: (i + 1) * 100 + 50 })
-                )
-        )
+        .data(this.metadata.orbits)
         .enter()
         .append('circle')
         .classed('orbit', true)

@@ -1,5 +1,5 @@
 export default function dataDrivenSettings() {
-    this.settings.minRadius = this.settings.minRadius || 3000 / this.metadata.id.length;
+    this.settings.minRadius = this.settings.minRadius || Math.min(3000 / this.metadata.id.length, 3);
     this.settings.maxRadius =
         this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
     this.settings.reset = this.settings.reset || d3.max(this.metadata.id, (id) => id.duration);

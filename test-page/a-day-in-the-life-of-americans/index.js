@@ -64,8 +64,6 @@ act_codes.forEach(function(code, i) {
 		foci[code.index] = {x: 250 * Math.cos(i * theta)+380, y: 250 * Math.sin(i * theta)+365 };
 	}
 });
-console.table(foci);
-
 
 // Start the SVG
 var svg = d3.select("#chart").append("svg")
@@ -263,12 +261,7 @@ d3.tsv("days-simulated-v2.tsv", function(error, data) {
 		o.color = color(curr_act);
 
 	    o.y += (foci[curr_act].y - o.y) * k * damper;
-        //if (o.id === 23) console.log('---');
-        //if (o.id === 23) console.log(curr_act);
-        //if (o.id === 23) console.log(o.next_move_time);
-        //if (o.id === 23) console.log(o.x);
 	    o.x += (foci[curr_act].x - o.x) * k * damper;
-        //if (o.id === 23) console.log(o.x);
 	  });
 
 	  circle

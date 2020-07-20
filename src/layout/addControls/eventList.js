@@ -51,11 +51,17 @@ export default function eventList() {
                 : fdg.settings.eventChangeCountAesthetic
         }.`;
 
+        // Update color-size toggle.
+        fdg.controls.colorSizeToggle.inputs
+            .attr('title', di => `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
+                di !== 'both' ? di : 'color and size'
+            }.`);
+
         // Update legend label.
-        fdg.legends
+        fdg.legends.container
             .classed('fdg-hidden', fdg.settings.eventChangeCount.length === 0)
             .selectAll('span.fdg-measure')
-            .text(fdg.settings.eventChangeCount.join(', ').replace(/, ([^,]*)$/, ', and $1'));
+            .text(fdg.util.csv(fdg.settings.eventChangeCount));
 
         // Recalculate radius and fill/stroke of points.
         fdg.data.nested.forEach((d) => {

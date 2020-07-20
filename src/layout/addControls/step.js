@@ -19,7 +19,7 @@ export default function step() {
     const inputs = container
         .append('div')
         .classed(`togglebutton fdg-input`, true)
-        .attr('title', `Advance animation by one time unit`)
+        .attr('title', `Advance animation by one time unit.`)
         .text('Step');
 
     inputs.on('click', () => {

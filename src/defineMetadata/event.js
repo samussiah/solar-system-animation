@@ -1,7 +1,7 @@
 export default function event() {
     this.settings.nFoci =
         this.settings.nFoci || this.metadata.event.length - !!this.settings.eventCentral; // number of event types minus one for
-    console.log(this.settings.nFoci);
+
     const theta = (2 * Math.PI) / this.settings.nFoci;
     const centerX = this.settings.centerCoordinates.x;
     const centerY = this.settings.centerCoordinates.y;
@@ -15,4 +15,7 @@ export default function event() {
         event.y =
             event.order === 0 ? centerY : (event.order * 100 + 50) * Math.sin(i * theta) + centerY;
     });
+
+    // Ensure events plot in order.
+    this.metadata.event.sort((a,b) => a.order - b.order);
 }

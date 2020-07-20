@@ -13,7 +13,7 @@ export default function playPause() {
             'title',
             `${
                 playPauseData.find((value) => value.action !== this.settings.playPause).label
-            } animation`
+            } animation.`
         )
         .html(playPauseData.find((value) => value.action !== this.settings.playPause).html);
 

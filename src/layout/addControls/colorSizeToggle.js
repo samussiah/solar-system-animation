@@ -19,7 +19,7 @@ export default function colorSizeToggle() {
         .attr(
             'title',
             (d) =>
-                `Quantify the number of times ${'this.settings.eventsToCount'} have occured by ${
+                `Quantify the number of ${fdg.util.csv(this.settings.eventChangeCount)} events by ${
                     d !== 'both' ? d : 'color and size'
                 }`
         )
@@ -43,7 +43,7 @@ export default function colorSizeToggle() {
         );
 
         // Update legends.
-        fdg.legends.selectAll('.fdg-legend').classed('fdg-hidden', function () {
+        fdg.legends.container.selectAll('.fdg-legend').classed('fdg-hidden', function () {
             return !Array.from(this.classList).some((value) => value.includes(d));
         });
 

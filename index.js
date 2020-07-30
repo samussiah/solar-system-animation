@@ -68,6 +68,10 @@
         y: 365
       },
       padding: 1,
+      nOrbits: null,
+      // defined in ../defineMetadata/dataDrivenSettings/orbits
+      nFoci: null,
+      // defined in ../defineMetadata/dataDrivenSettings/event
       // color and size settings
       colors: colors,
       colorScale: colorScale,
@@ -492,7 +496,16 @@
           updateText.call(_this);
         } else {
           reset.call(_this);
-        } // Continue running the simulation, at the current timepoint only.
+        } // Update radius and fill attributes of circles.
+
+
+        _this.circles.attr('r', function (d) {
+          return d.r;
+        }).style('fill', function (d) {
+          return d.color;
+        }).style('stroke', function (d) {
+          return d.color;
+        }); // Continue running the simulation, at the current timepoint only.
 
 
         var resume_for_a_while = function resume_for_a_while() {

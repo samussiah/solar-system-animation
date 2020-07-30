@@ -33,6 +33,8 @@ const settings = {
         y: 365,
     },
     padding: 1,
+    nOrbits: null, // defined in ../defineMetadata/dataDrivenSettings/orbits
+    nFoci: null, // defined in ../defineMetadata/dataDrivenSettings/event
 
     // color and size settings
     colors,

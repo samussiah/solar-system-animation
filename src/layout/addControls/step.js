@@ -42,6 +42,12 @@ export default function step() {
             reset.call(this);
         }
 
+        // Update radius and fill attributes of circles.
+        this.circles
+            .attr('r', (d) => d.r)
+            .style('fill', (d) => d.color)
+            .style('stroke', (d) => d.color);
+
         // Continue running the simulation, at the current timepoint only.
         const resume_for_a_while = function () {
             this.force.resume();

@@ -2,7 +2,7 @@ export default function pulseOrbits() {
     const fdg = this;
 
     this.orbits.each(function (d) {
-        d.change = d3.sum(d.values, di => di.change);
+        d.change = d3.sum(d.values, (di) => di.change);
         if (d.change > 0) {
             d3.select(this)
                 .transition()

@@ -9,7 +9,10 @@ export default function updateData() {
         let curr_moves = d.value.moves;
 
         // Time to go to next activity
-        if (d.value.nextStateChange === this.settings.timepoint && this.settings.timepoint < d.value.duration) {
+        if (
+            d.value.nextStateChange === this.settings.timepoint &&
+            this.settings.timepoint < d.value.duration
+        ) {
             curr_moves += 1;
 
             // Update individual to next event.

@@ -6,7 +6,6 @@ import dataManipulation from './dataManipulation';
 import init from './init';
 
 export default function forceDirectedGraph(data, element = 'body', settings = {}) {
-
     const fdg = {
         data,
         element,

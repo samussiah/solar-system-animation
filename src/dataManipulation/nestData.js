@@ -1,5 +1,5 @@
 export default function nestData() {
-    const R = this.settings.width/this.metadata.event.length/2;
+    const R = this.settings.width / this.metadata.event.length / 2;
 
     const nestedData = d3
         .nest()
@@ -45,15 +45,15 @@ export default function nestData() {
             );
 
             const theta = Math.random() * 2 * Math.PI;
-            const r =  Math.sqrt(~~(Math.random() * R * R));
+            const r = Math.sqrt(~~(Math.random() * R * R));
 
             return {
                 state,
                 events,
                 stateChanges,
                 duration: d3.sum(group, (d) => d.duration),
-                sx: event.x + r*Math.cos(theta),//Math.random()*this.settings.width/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
-                sy: event.y + r*Math.sin(theta),//Math.random()*this.settings.height/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
+                sx: event.x + r * Math.cos(theta), //Math.random()*this.settings.width/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
+                sy: event.y + r * Math.sin(theta), //Math.random()*this.settings.height/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
                 tx: event.x,
                 ty: event.y,
                 r:

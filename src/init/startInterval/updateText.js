@@ -20,12 +20,10 @@ export default function updateText() {
     }
 
     // Make note disappear at the end.
-    else if (this.settings.timepoint === this.settings.notes[this.settings.notesIndex].stopTimepoint) {
-        this.notes
-            .transition()
-            .duration(1000)
-            .style('top', '300px')
-            .style('color', '#ffffff');
+    else if (
+        this.settings.timepoint === this.settings.notes[this.settings.notesIndex].stopTimepoint
+    ) {
+        this.notes.transition().duration(1000).style('top', '300px').style('color', '#ffffff');
 
         this.settings.notesIndex += 1;
 

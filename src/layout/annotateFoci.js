@@ -24,27 +24,29 @@ export default function annotateFoci() {
 
     // text
 
-    const isCenterX = d => Math.round(d.x) === Math.round(this.settings.width/2);
-    const isLessThanCenterX = d => Math.round(d.x) < Math.round(this.settings.width/2);
-    const getX = d => isCenterX(d) ? d.x : d.x - (-1)**isLessThanCenterX(d)*10;
-    const getTextAnchor = d => isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end';
+    const isCenterX = (d) => Math.round(d.x) === Math.round(this.settings.width / 2);
+    const isLessThanCenterX = (d) => Math.round(d.x) < Math.round(this.settings.width / 2);
+    const getX = (d) => (isCenterX(d) ? d.x : d.x - (-1) ** isLessThanCenterX(d) * 10);
+    const getTextAnchor = (d) => (isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end');
 
-    const isCenterY = d => Math.round(d.y) === Math.round(this.settings.height/2);
-    const isLessThanCenterY = d => Math.round(d.y) < Math.round(this.settings.height/2);
-    const getY = d => isCenterY(d) ? d.y : d.y + (-1)**isLessThanCenterY(d)*35;
-    const getAlignmentBaseline = d => isCenterY(d) ? 'center' : isLessThanCenterY(d) ? 'bottom' : 'top';
+    const isCenterY = (d) => Math.round(d.y) === Math.round(this.settings.height / 2);
+    const isLessThanCenterY = (d) => Math.round(d.y) < Math.round(this.settings.height / 2);
+    const getY = (d) => (isCenterY(d) ? d.y : d.y + (-1) ** isLessThanCenterY(d) * 35);
+    const getAlignmentBaseline = (d) =>
+        isCenterY(d) ? 'center' : isLessThanCenterY(d) ? 'bottom' : 'top';
 
     const textBackground = fociLabels
         .append('text')
         .classed('fdg-focus-annotation__text', true)
         .attr('x', (d) => getX(d))
-        .attr('y', (d) => getY(d))
-        //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
+        .attr('y', (d) => getY(d));
+    //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
 
-    textBackground.append('tspan')
+    textBackground
+        .append('tspan')
         .classed('fdg-focus-annotation__label', true)
         .attr('x', (d) => getX(d))
-        .attr('text-anchor', d => getTextAnchor(d))
+        .attr('text-anchor', (d) => getTextAnchor(d))
         //.attr('alignment-baseline', d => getAlignmentBaseline(d))
         .style('font-weight', 'bold')
         .style('font-size', '20px')
@@ -52,45 +54,48 @@ export default function annotateFoci() {
         .attr('stroke-width', '4px')
         .text((d) => d.value);
 
-    textBackground.append('tspan')
+    textBackground
+        .append('tspan')
         .classed('fdg-focus-annotation__event-count', true)
         .classed('fdg-hidden', this.settings.eventCount === false)
         .attr('x', (d) => getX(d))
-        .attr('text-anchor', d => getTextAnchor(d))
+        .attr('text-anchor', (d) => getTextAnchor(d))
         //.attr('alignment-baseline', d => getAlignmentBaseline(d))
         .attr('dy', '1.3em')
         .style('font-weight', 'bold')
         .attr('stroke', 'white')
-        .attr('stroke-width', '4px')
-        //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
+        .attr('stroke-width', '4px');
+    //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
 
     const textForeground = fociLabels
         .append('text')
         .classed('fdg-focus-annotation__text', true)
         .attr('x', (d) => getX(d))
-        .attr('y', (d) => getY(d))
-        //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
+        .attr('y', (d) => getY(d));
+    //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
 
-    textForeground.append('tspan')
+    textForeground
+        .append('tspan')
         .classed('fdg-focus-annotation__label', true)
         .attr('x', (d) => getX(d))
-        .attr('text-anchor', d => getTextAnchor(d))
+        .attr('text-anchor', (d) => getTextAnchor(d))
         //.attr('alignment-baseline', d => getAlignmentBaseline(d))
         .style('font-weight', 'bold')
         .style('font-size', '20px')
         .attr('fill', 'black')
         .text((d) => d.value);
 
-    textForeground.append('tspan')
+    textForeground
+        .append('tspan')
         .classed('fdg-focus-annotation__event-count', true)
         .classed('fdg-hidden', this.settings.eventCount === false)
         .attr('x', (d) => getX(d))
-        .attr('text-anchor', d => getTextAnchor(d))
+        .attr('text-anchor', (d) => getTextAnchor(d))
         //.attr('alignment-baseline', d => getAlignmentBaseline(d))
         .attr('dy', '1.3em')
         .style('font-weight', 'bold')
-        .attr('fill', 'black')
-        //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
+        .attr('fill', 'black');
+    //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
 
     return fociLabels;
 }

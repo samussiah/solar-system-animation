@@ -97,7 +97,11 @@ const settings = {
             stopTimepoint: 885,
             text: 'Every year, about 805,000 Americans have a heart attack.',
         },
-        { startTimepoint: 900, stopTimepoint: 975, text: '75% experience their first heart attack' },
+        {
+            startTimepoint: 900,
+            stopTimepoint: 975,
+            text: '75% experience their first heart attack',
+        },
         { startTimepoint: 990, stopTimepoint: 1065, text: '25% have already had a heart attack.' },
         {
             startTimepoint: 1080,
@@ -108,9 +112,12 @@ const settings = {
     ],
 };
 
-settings.notesIndex = settings.notes.some(note => note.startTimepoint === settings.timepoint)
-    ? settings.notes
-        .findIndex(annotation => annotation.startTimepoint <= settings.timepoint && settings.timepoint <= annotations.stopTimepoint)
+settings.notesIndex = settings.notes.some((note) => note.startTimepoint === settings.timepoint)
+    ? settings.notes.findIndex(
+          (annotation) =>
+              annotation.startTimepoint <= settings.timepoint &&
+              settings.timepoint <= annotations.stopTimepoint
+      )
     : 0;
 
 export default settings;

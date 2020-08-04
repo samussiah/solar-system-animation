@@ -22,9 +22,7 @@ export default function layout() {
     this.notes = this.container.append('div').classed('fdg-notes', true);
 
     // main panel
-    this.container = this.container
-        .append('div')
-        .classed('fdg-container', true)
+    this.container = this.container.append('div').classed('fdg-container', true);
 
     // canvas underlay
     this.canvas = this.container
@@ -32,8 +30,7 @@ export default function layout() {
         .classed('fdg-canvas', true)
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
-    this.context = this.canvas.node()
-        .getContext('2d');
+    this.context = this.canvas.node().getContext('2d');
 
     // SVG overlay
     this.svg = this.container

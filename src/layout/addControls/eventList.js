@@ -52,10 +52,13 @@ export default function eventList() {
         }.`;
 
         // Update color-size toggle.
-        fdg.controls.colorSizeToggle.inputs
-            .attr('title', di => `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
-                di !== 'both' ? di : 'color and size'
-            }.`);
+        fdg.controls.colorSizeToggle.inputs.attr(
+            'title',
+            (di) =>
+                `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
+                    di !== 'both' ? di : 'color and size'
+                }.`
+        );
 
         // Update legend label.
         fdg.legends.container

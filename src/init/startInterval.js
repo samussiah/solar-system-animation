@@ -22,8 +22,10 @@ export default function startInterval() {
         }
 
         // Resume the force simulation.
-        this.forceSimulation.nodes(this.data.nested);
-        this.forceSimulation.alpha(1).restart();
+        this.metadata.event.forEach(event => {
+            event.forceSimulation.nodes(event.data);
+            event.forceSimulation.alpha(1).restart();
+        });
 
         //this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
     }, this.settings.speeds[this.settings.speed]);

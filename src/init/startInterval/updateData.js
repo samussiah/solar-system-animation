@@ -43,10 +43,14 @@ export default function updateData() {
             this.settings.eventChangeCountAesthetic !== 'size'
                 ? this.settings.color(stateChanges)
                 : '#aaa';
+
+        d.value.fill = d.value.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+        d.value.stroke = d.value.color.replace('rgb', 'rgba').replace(')', ', 1)');
     });
 
     // Record change in number of IDs at each focus at current timepoint.
     this.metadata.event.forEach((event) => {
         event.change = event.count - event.prevCount;
+        event.data = this.data.nested.filter(d => d.value.state.event === event.value);
     });
 }

@@ -296,10 +296,15 @@
         });
         d.value.r = _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
         d.value.color = _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
+        d.value.fill = d.value.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+        d.value.stroke = d.value.color.replace('rgb', 'rgba').replace(')', ', 1)');
       }); // Record change in number of IDs at each focus at current timepoint.
 
       this.metadata.event.forEach(function (event) {
         event.change = event.count - event.prevCount;
+        event.data = _this.data.nested.filter(function (d) {
+          return d.value.state.event === event.value;
+        });
       });
     }
 
@@ -397,9 +402,10 @@
         } // Resume the force simulation.
 
 
-        _this.forceSimulation.nodes(_this.data.nested);
-
-        _this.forceSimulation.alpha(1).restart(); //this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+        _this.metadata.event.forEach(function (event) {
+          event.forceSimulation.nodes(event.data);
+          event.forceSimulation.alpha(1).restart();
+        }); //this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
 
       }, this.settings.speeds[this.settings.speed]);
       return interval;
@@ -905,7 +911,7 @@
         });
         var theta = Math.random() * 2 * Math.PI;
         var r = Math.sqrt(~~(Math.random() * R * R));
-        return {
+        var datum = {
           state: state,
           events: events,
           stateChanges: stateChanges,
@@ -924,13 +930,23 @@
           nextStateChange: state.duration,
           sched: group
         };
+        datum.fill = datum.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+        datum.stroke = datum.color.replace('rgb', 'rgba').replace(')', ', 1)');
+        return datum;
       }).entries(this.data);
       return nestedData;
     }
 
     function dataManipulation() {
+      var _this = this;
+
       mutateData.call(this);
       this.data.nested = nestData.call(this);
+      this.metadata.event.forEach(function (event) {
+        event.data = _this.data.nested.filter(function (d) {
+          return d.value.state.event === event.value;
+        });
+      });
     }
 
     function tick() {
@@ -948,39 +964,58 @@
 
         _this.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
 
-        _this.context.fillStyle = d.value.color;
+        _this.context.fillStyle = d.value.color; //fill;
 
-        _this.context.fill();
-      }); //this.context.fillStyle = '#ddd';
-      //this.context.fill();
-      //this.context.strokeStyle = '#333';
-      //this.context.stroke();
+        _this.context.fill(); //this.context.strokeStyle = d.value.stroke;
+        //this.context.stroke();
 
+      });
       this.context.restore();
     }
 
-    function addForceSimulation() {
-      var _this = this;
-
-      var forceSimulation = d3.forceSimulation().nodes(this.data.nested).alphaDecay(.005) //.alphaTarget(1)
-      .velocityDecay(0.9).force('center', d3.forceCenter(this.settings.width / 2, this.settings.height / 2)).force('x', d3.forceX().x(function (d) {
-        return _this.metadata.event.find(function (event) {
-          return event.value === d.value.state.event;
-        }).x;
-      }).strength(0.3)) //Math.pow(this.data.nested.length, -.6)))
-      .force('y', d3.forceY().y(function (d) {
-        return _this.metadata.event.find(function (event) {
-          return event.value === d.value.state.event;
-        }).y;
-      }).strength(0.3)) //Math.pow(this.data.nested.length, -.6)))
-      .force('charge', d3.forceManyBodyReuse().strength(-2)) //.force('manyBody', d3.forceManyBody().strength(-1))
-      //.force('collide', d3.forceCollide().radius(d => d.value.r).strength(-.5))
-      .on('tick', tick.bind(this));
+    function addForceSimulation(event) {
+      //const forceSimulation = d3
+      //    .forceSimulation()
+      //    .nodes(this.data.nested)
+      //    .alphaDecay(0.005)
+      //    //.alphaTarget(1)
+      //    .velocityDecay(0.9)
+      //    .force('center', d3.forceCenter(this.settings.width / 2, this.settings.height / 2))
+      //    .force(
+      //        'x',
+      //        d3
+      //            .forceX()
+      //            .x(
+      //                (d) =>
+      //                    this.metadata.event.find((event) => event.value === d.value.state.event).x
+      //            )
+      //            .strength(0.3)
+      //    ) //Math.pow(this.data.nested.length, -.6)))
+      //    .force(
+      //        'y',
+      //        d3
+      //            .forceY()
+      //            .y(
+      //                (d) =>
+      //                    this.metadata.event.find((event) => event.value === d.value.state.event).y
+      //            )
+      //            .strength(0.3)
+      //    ) //Math.pow(this.data.nested.length, -.6)))
+      //    .force('charge', d3.forceManyBodyReuse().strength(-2))
+      //    //.force('manyBody', d3.forceManyBody().strength(-1))
+      //    //.force('collide', d3.forceCollide().radius(d => d.value.r).strength(-.5))
+      //    .on('tick', tick.bind(this));
+      var forceSimulation = d3.forceSimulation().nodes(event.data).alphaDecay(0.005).velocityDecay(0.9).force('center', d3.forceCenter(event.x, event.y)).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', d3.forceManyBodyReuse().strength(-2)).on('tick', tick.bind(this));
+      if (event.value !== this.settings.eventCentral) forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + .5));
       return forceSimulation;
     }
 
     function init() {
-      this.forceSimulation = addForceSimulation.call(this);
+      var _this = this;
+
+      this.metadata.event.forEach(function (event) {
+        event.forceSimulation = addForceSimulation.call(_this, event);
+      });
       if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
     }
 

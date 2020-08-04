@@ -9,13 +9,11 @@ export default function tick() {
             this.context.beginPath();
             //this.context.moveTo(d.x + d.r, d.y);
             this.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
-            this.context.fillStyle = d.value.color;
+            this.context.fillStyle = d.value.color;//fill;
             this.context.fill();
+            //this.context.strokeStyle = d.value.stroke;
+            //this.context.stroke();
         });
-    //this.context.fillStyle = '#ddd';
-    //this.context.fill();
-    //this.context.strokeStyle = '#333';
-    //this.context.stroke();
 
     this.context.restore();
 }

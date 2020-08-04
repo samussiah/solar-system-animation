@@ -47,7 +47,7 @@ export default function nestData() {
             const theta = Math.random() * 2 * Math.PI;
             const r = Math.sqrt(~~(Math.random() * R * R));
 
-            return {
+            const datum = {
                 state,
                 events,
                 stateChanges,
@@ -68,6 +68,11 @@ export default function nestData() {
                 nextStateChange: state.duration,
                 sched: group,
             };
+
+            datum.fill = datum.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+            datum.stroke = datum.color.replace('rgb', 'rgba').replace(')', ', 1)');
+
+            return datum;
         })
         .entries(this.data);
 

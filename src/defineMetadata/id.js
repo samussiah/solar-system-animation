@@ -1,8 +1,14 @@
 export default function id() {
-    this.metadata.id.forEach((id) => {
-        id.duration = d3.sum(
-            this.data.filter((d) => d.id === id.value),
-            (d) => +d.duration
-        );
+    const nest = d3.nest()
+        .key(d => d.id)
+        .rollup(group => d3.sum(group, d => +d.duration))
+        .entries(this.data);
+
+    nest.forEach(d => {
+        d.duration = d.value;
+        d.value = d.key;
+        delete d.key;
     });
+
+    return nest;
 }

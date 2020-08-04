@@ -1,7 +1,7 @@
 import toggle from './playPause/toggle';
-import updateData from '../../init/addTimer/updateData';
-import pulseOrbits from '../../init/addTimer/pulseOrbits';
-import updateText from '../../init/addTimer/updateText';
+import updateData from '../../init/startInterval/updateData';
+import pulseOrbits from '../../init/startInterval/pulseOrbits';
+import updateText from '../../init/startInterval/updateText';
 
 /**
  * function:
@@ -50,7 +50,7 @@ export default function step() {
 
         // Continue running the simulation, at the current timepoint only.
         const resume_for_a_while = function () {
-            this.force.resume();
+            this.force.alpha(1);
             this.pause_timeout = setTimeout(
                 resume_for_a_while.bind(this),
                 this.settings.speeds[this.settings.speed]

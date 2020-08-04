@@ -1,5 +1,5 @@
-import addTimer from '../../../init/addTimer';
-import updateData from '../../../init/addTimer/updateData';
+import startInterval from '../../../init/startInterval';
+import updateData from '../../../init/startInterval/updateData';
 
 export const playPause = [
     { action: 'play', label: 'Play', html: '&#9658;' },
@@ -28,7 +28,7 @@ export default function toggle() {
         clearTimeout(this.timeout);
         updateData.call(this);
         const resume_for_a_while = function () {
-            this.force.resume();
+            this.force.alpha(1);
             this.pause_timeout = setTimeout(
                 resume_for_a_while.bind(this),
                 this.settings.speeds[this.settings.speed]

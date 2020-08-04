@@ -27,7 +27,7 @@
 
     function colorScale() {
       var colors$1 = colors();
-      var colorScale = d3.scale.linear().domain(d3.range(colors$1.length)).range(colors$1).clamp(true);
+      var colorScale = d3.scaleLinear().domain(d3.range(colors$1.length)).range(colors$1).clamp(true);
       return colorScale;
     }
 
@@ -61,12 +61,8 @@
       },
       playPause: 'play',
       // dimensions
-      width: 1000,
+      width: 800,
       height: 800,
-      centerCoordinates: {
-        x: 380,
-        y: 365
-      },
       padding: 1,
       nOrbits: null,
       // defined in ../defineMetadata/dataDrivenSettings/orbits
@@ -81,144 +77,152 @@
       maxRadius: null,
       // defined in ../defineMetadata/dataDrivenSettings
       // miscellaneous
-      annotations: [{
-        start_minute: 1,
-        stop_minute: 75,
-        note: 'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.'
+      notes: [{
+        startTimepoint: 1,
+        stopTimepoint: 75,
+        text: 'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.'
       }, {
-        start_minute: 90,
-        stop_minute: 165,
-        note: 'One person dies every 37 seconds in the United States from cardiovascular disease.'
+        startTimepoint: 90,
+        stopTimepoint: 165,
+        text: 'One person dies every 37 seconds in the United States from cardiovascular disease.'
       }, {
-        start_minute: 180,
-        stop_minute: 255,
-        note: 'About 647,000 Americans die from heart disease each year—that’s 1 in every 4 deaths.'
+        startTimepoint: 180,
+        stopTimepoint: 255,
+        text: 'About 647,000 Americans die from heart disease each year—that’s 1 in every 4 deaths.'
       }, {
-        start_minute: 270,
-        stop_minute: 345,
-        note: 'Heart disease costs the United States about $219 billion each year from 2014 to 2015.'
+        startTimepoint: 270,
+        stopTimepoint: 345,
+        text: 'Heart disease costs the United States about $219 billion each year from 2014 to 2015.'
       }, {
-        start_minute: 360,
-        stop_minute: 435,
-        note: 'This includes the cost of health care services, medicines, and lost productivity due to death.'
+        startTimepoint: 360,
+        stopTimepoint: 435,
+        text: 'This includes the cost of health care services, medicines, and lost productivity due to death.'
       }, {
-        start_minute: 450,
-        stop_minute: 525,
-        note: 'Coronary heart disease is the most common type of heart disease, killing 365,914 people in 2017.'
+        startTimepoint: 450,
+        stopTimepoint: 525,
+        text: 'Coronary heart disease is the most common type of heart disease, killing 365,914 people in 2017.'
       }, {
-        start_minute: 540,
-        stop_minute: 615,
-        note: 'About 18.2 million adults age 20 and older have CAD (about 6.7%).'
+        startTimepoint: 540,
+        stopTimepoint: 615,
+        text: 'About 18.2 million adults age 20 and older have CAD (about 6.7%).'
       }, {
-        start_minute: 630,
-        stop_minute: 705,
-        note: 'About 2 in 10 deaths from CAD happen in adults less than 65 years old.'
+        startTimepoint: 630,
+        stopTimepoint: 705,
+        text: 'About 2 in 10 deaths from CAD happen in adults less than 65 years old.'
       }, {
-        start_minute: 720,
-        stop_minute: 795,
-        note: 'In the United States, someone has a heart attack every 40 seconds.'
+        startTimepoint: 720,
+        stopTimepoint: 795,
+        text: 'In the United States, someone has a heart attack every 40 seconds.'
       }, {
-        start_minute: 810,
-        stop_minute: 885,
-        note: 'Every year, about 805,000 Americans have a heart attack.'
+        startTimepoint: 810,
+        stopTimepoint: 885,
+        text: 'Every year, about 805,000 Americans have a heart attack.'
       }, {
-        start_minute: 900,
-        stop_minute: 975,
-        note: '75% experience their first heart attack'
+        startTimepoint: 900,
+        stopTimepoint: 975,
+        text: '75% experience their first heart attack'
       }, {
-        start_minute: 990,
-        stop_minute: 1065,
-        note: '25% have already had a heart attack.'
+        startTimepoint: 990,
+        stopTimepoint: 1065,
+        text: '25% have already had a heart attack.'
       }, {
-        start_minute: 1080,
-        stop_minute: 1155,
-        note: 'About 1 in 5 heart attacks is silent—the damage is done, but the person is not aware of it.'
+        startTimepoint: 1080,
+        stopTimepoint: 1155,
+        text: 'About 1 in 5 heart attacks is silent—the damage is done, but the person is not aware of it.'
       }]
     };
-
-    function set(variable) {
-      var set = Array.from(new Set(this.data.map(function (d) {
-        return d[variable];
-      }))).map(function (value) {
-        return {
-          value: value
-        };
-      });
-      return set;
-    }
+    settings.notesIndex = settings.notes.some(function (note) {
+      return note.startTimepoint === settings.timepoint;
+    }) ? settings.notes.findIndex(function (annotation) {
+      return annotation.startTimepoint <= settings.timepoint && settings.timepoint <= annotations.stopTimepoint;
+    }) : 0;
 
     function id() {
-      var _this = this;
-
-      this.metadata.id.forEach(function (id) {
-        id.duration = d3.sum(_this.data.filter(function (d) {
-          return d.id === id.value;
-        }), function (d) {
+      var nest = d3.nest().key(function (d) {
+        return d.id;
+      }).rollup(function (group) {
+        return d3.sum(group, function (d) {
           return +d.duration;
         });
+      }).entries(this.data);
+      nest.forEach(function (d) {
+        d.duration = d.value;
+        d.value = d.key;
+        delete d.key;
       });
+      return nest;
     }
 
     function event() {
-      var _this = this;
+      var nest = d3.nest().key(function (d) {
+        return d.event;
+      }).rollup(function (group) {
+        var event = group[0];
+        var order = parseInt(event.event_order);
+        return {
+          order: order,
+          count: 0,
+          prevCount: 0
+        };
+      }).entries(this.data); // Calculate coordinates of event focus.
 
-      this.settings.nFoci = this.settings.nFoci || this.metadata.event.length - !!this.settings.eventCentral; // number of event types minus one for
-
-      var theta = 2 * Math.PI / this.settings.nFoci;
-      var centerX = this.settings.centerCoordinates.x;
-      var centerY = this.settings.centerCoordinates.y;
-      this.metadata.event.forEach(function (event, i) {
-        event.order = parseInt(_this.data.find(function (d) {
-          return d.event === event.value;
-        }).event_order);
-        event.count = 0;
-        event.prevCount = 0;
+      var centerX = this.settings.width / 2;
+      var centerY = this.settings.height / 2;
+      var theta = 2 * Math.PI / (nest.length - 1);
+      nest.forEach(function (event, i) {
+        Object.assign(event, event.value);
+        event.value = event.key;
+        delete event.key;
         event.x = event.order === 0 ? centerX : (event.order * 100 + 50) * Math.cos(i * theta) + centerX;
         event.y = event.order === 0 ? centerY : (event.order * 100 + 50) * Math.sin(i * theta) + centerY;
       }); // Ensure events plot in order.
 
-      this.metadata.event.sort(function (a, b) {
+      nest.sort(function (a, b) {
         return a.order - b.order;
       });
+      return nest;
     }
 
-    function dataDrivenSettings() {
-      this.settings.minRadius = this.settings.minRadius || Math.min(3000 / this.metadata.id.length, 3);
-      this.settings.maxRadius = this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
-      this.settings.reset = this.settings.reset || d3.max(this.metadata.id, function (id) {
-        return id.duration;
-      });
-      this.settings.eventCentral = this.settings.eventCentral || this.metadata.event[0].value;
-      this.settings.eventChangeCount = this.settings.eventChangeCount || this.metadata.event.slice(1).map(function (event) {
-        return event.value;
-      });
-    }
-
-    function defineMetadata() {
+    function orbits(event) {
       var _this = this;
 
-      // Define sets.
-      this.metadata = {
-        id: set.call(this, 'id'),
-        event: set.call(this, 'event')
-      }; // Add additional metadata to ID set.
-
-      id.call(this); // Update settings that depend on data.
-
-      dataDrivenSettings.call(this); // Add additional metadata to event set.
-
-      event.call(this); // Define orbits.
-
-      this.metadata.orbits = d3.nest().key(function (d) {
+      var nest = d3.nest().key(function (d) {
         return d.order;
-      }).entries(this.metadata.event.filter(function (event) {
+      }).entries(event.filter(function (event) {
         return event.value !== _this.settings.eventCentral;
       })).map(function (d, i) {
-        d.cx = 380;
-        d.cy = 365;
+        d.cx = _this.settings.width / 2;
+        d.cy = _this.settings.height / 2;
         d.r = (i + 1) * 100 + 50;
         return d;
       });
+      return nest;
+    }
+
+    function defineMetadata() {
+      // Define sets.
+      var metadata = {}; // Add additional metadata to ID set.
+
+      metadata.id = id.call(this); // Settings dependent on the ID set.
+
+      this.settings.minRadius = this.settings.minRadius || 3; //Math.min(3000 / metadata.id.length, 3);
+
+      this.settings.maxRadius = this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
+      this.settings.reset = this.settings.reset || d3.max(metadata.id, function (id) {
+        return id.duration;
+      }); // Add additional metadata to event set.
+
+      metadata.event = event.call(this); // Update settings that depend on event set.
+
+      this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
+      this.settings.nFoci = this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
+
+      this.settings.eventChangeCount = this.settings.eventChangeCount || metadata.event.slice(1).map(function (event) {
+        return event.value;
+      }); // Define orbits.
+
+      metadata.orbit = orbits.call(this, metadata.event);
+      return metadata;
     }
 
     function speed() {
@@ -258,15 +262,15 @@
         event.prevCount = event.count;
       });
       this.data.nested.forEach(function (d) {
-        var currEvent = d.currentEvent.event;
-        var curr_moves = d.moves; // Time to go to next activity
+        var currEvent = d.value.state.event;
+        var curr_moves = d.value.moves; // Time to go to next activity
 
-        if (d.next_move_time === _this.settings.timepoint && _this.settings.timepoint < d.duration) {
+        if (d.value.nextStateChange === _this.settings.timepoint && _this.settings.timepoint < d.value.duration) {
           curr_moves += 1; // Update individual to next event.
 
-          d.currentEvent = d.sched[curr_moves];
-          var nextEvent = d.currentEvent.event;
-          var eventIndividual = d.events.find(function (event) {
+          d.value.state = d.value.sched[curr_moves];
+          var nextEvent = d.value.state.event;
+          var eventIndividual = d.value.events.find(function (event) {
             return event.value === nextEvent;
           });
           eventIndividual.count += 1; // Update population count at previous and next events.
@@ -280,18 +284,18 @@
           });
 
           eventPopulation.count += 1;
-          d.moves = curr_moves;
-          d.next_move_time += d.sched[d.moves].duration;
+          d.value.moves = curr_moves;
+          d.value.nextStateChange += d.value.sched[d.value.moves].duration;
         } // Add to new activity count
 
 
-        var stateChanges = d3.sum(d.events.filter(function (event) {
+        var stateChanges = d3.sum(d.value.events.filter(function (event) {
           return _this.settings.eventChangeCount.includes(event.value);
         }), function (event) {
           return event.count;
         });
-        d.r = _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
-        d.color = _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
+        d.value.r = _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
+        d.value.color = _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
       }); // Record change in number of IDs at each focus at current timepoint.
 
       this.metadata.event.forEach(function (event) {
@@ -318,25 +322,24 @@
       // Update time
       this.timer.text("".concat(this.settings.timepoint, " ").concat(this.settings.timeUnit)); // Update percentages
 
-      if (this.settings.eventCount) this.fociLabels.selectAll('tspan.actpct').text(function (d) {
-        return "".concat(d.count, " (").concat(d3.format('%')(d.count / _this.data.nested.length), ")");
+      if (this.settings.eventCount) this.focusAnnotations.selectAll('tspan.fdg-focus-annotation__event-count').text(function (d) {
+        return "".concat(d.count, " (").concat(d3.format('.1%')(d.count / _this.data.nested.length), ")");
       }); // Update notes
 
-      if (this.settings.timepoint === this.settings.annotations[this.notes_index].start_minute) {
-        this.annotations.style('top', '0px').transition().duration(600).style('top', '20px').style('color', '#000000').text(this.settings.annotations[this.notes_index].note);
+      if (this.settings.timepoint === this.settings.notes[this.settings.notesIndex].startTimepoint) {
+        this.notes.style('top', '0px').transition().duration(600).style('top', '20px').style('color', '#000000').text(this.settings.notes[this.settings.notesIndex].text);
       } // Make note disappear at the end.
-      else if (this.settings.timepoint === this.settings.annotations[this.notes_index].stop_minute) {
-          this.annotations.transition().duration(1000).style('top', '300px').style('color', '#ffffff');
-          this.notes_index += 1;
+      else if (this.settings.timepoint === this.settings.notes[this.settings.notesIndex].stopTimepoint) {
+          this.notes.transition().duration(1000).style('top', '300px').style('color', '#ffffff');
+          this.settings.notesIndex += 1;
 
-          if (this.notes_index === this.settings.annotations.length) {
-            this.notes_index = 0;
+          if (this.settings.notesIndex === this.settings.notes.length) {
+            this.settings.notesIndex = 0;
           }
         }
     }
 
-    //import addTimer from '../addTimer';
-    function reset$1() {
+    function resetAnimation() {
       var _this = this;
 
       this.settings.timepoint = 0; // Update the event object of the population.
@@ -346,71 +349,60 @@
       });
       this.data.nested.forEach(function (d) {
         // Initial event for the given individual.
-        d.currentEvent = d.sched[0]; // Define an event object for the individual.
+        d.value.state = d.value.sched[0]; // Define an event object for the individual.
 
-        d.events.forEach(function (event) {
+        d.value.events.forEach(function (event) {
           event.count = 0;
           event.duration = 0;
         });
-        d.events.find(function (event) {
-          return event.value === d.currentEvent.event;
+        d.value.events.find(function (event) {
+          return event.value === d.value.state.event;
         }).count += 1;
 
         var event = _this.metadata.event.find(function (event) {
-          return event.value === d.currentEvent.event;
+          return event.value === d.value.state.event;
         });
 
         event.count += 1;
-        var stateChanges = d3.sum(d.events.filter(function (event) {
+        var stateChanges = d3.sum(d.value.events.filter(function (event) {
           return _this.settings.eventChangeCount.includes(event.value);
         }), function (event) {
           return event.count;
         });
-        d.x = event.x + Math.random();
-        d.y = event.y + Math.random();
-        d.r = _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
-        d.color = _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
-        d.moves = 0;
-        d.next_move_time = d.currentEvent.duration;
+        d.value.x = event.x + Math.random();
+        d.value.y = event.y + Math.random();
+        d.value.r = _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
+        d.value.color = _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
+        d.value.moves = 0;
+        d.value.next_move_time = d.value.state.duration;
       });
     }
 
-    /**
-     * Order of operations:
-     *
-     * 1. Update data for each individual.
-     * 2. Resume force simulation.
-     * 3. Increment timepoint.
-     * 4. Update timer text, percentage annotations, and information annotation.
-     * 5. Recursively call addTimer().
-     */
+    function startInterval() {
+      var _this = this;
 
-    function addTimer() {
-      // Increment the timepoint.
-      this.settings.timepoint += 1; // Resume the force simulation.
+      var interval = d3.interval(function () {
+        // Increment the timepoint.
+        _this.settings.timepoint++;
 
-      this.force.resume();
+        if (_this.settings.timepoint <= _this.settings.reset) {
+          // Update the node data.
+          updateData.call(_this); // Accentuate the orbits when an event occurs.
 
-      if (this.settings.timepoint <= this.settings.reset) {
-        // Update the node data.
-        updateData.call(this); // Accentuate the orbits when an event occurs.
+          pulseOrbits.call(_this); // Update timer, focus labels, and annotations.
 
-        pulseOrbits.call(this); // Update timer, focus labels, and annotations.
-
-        updateText.call(this);
-      } else {
-        reset$1.call(this);
-      } // Update radius and fill attributes of circles.
+          updateText.call(_this);
+        } else {
+          resetAnimation.call(_this);
+        } // Resume the force simulation.
 
 
-      this.circles.attr('r', function (d) {
-        return d.r;
-      }).style('fill', function (d) {
-        return d.color;
-      }).style('stroke', function (d) {
-        return d.color;
-      });
-      this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+        _this.forceSimulation.nodes(_this.data.nested);
+
+        _this.forceSimulation.alpha(1).restart(); //this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+
+      }, this.settings.speeds[this.settings.speed]);
+      return interval;
     }
 
     var playPause = [{
@@ -445,7 +437,7 @@
         updateData.call(this);
 
         var resume_for_a_while = function resume_for_a_while() {
-          this.force.resume();
+          this.force.alpha(1);
           this.pause_timeout = setTimeout(resume_for_a_while.bind(this), this.settings.speeds[this.settings.speed]);
         };
 
@@ -509,7 +501,7 @@
 
 
         var resume_for_a_while = function resume_for_a_while() {
-          this.force.resume();
+          this.force.alpha(1);
           this.pause_timeout = setTimeout(resume_for_a_while.bind(this), this.settings.speeds[this.settings.speed]);
         };
 
@@ -521,13 +513,13 @@
       };
     }
 
-    function reset$2() {
+    function reset$1() {
       var _this = this;
 
       var container = this.controls.container.append('div').classed('fdg-control fdg-control--reset', true);
       var inputs = container.append('div').classed("togglebutton fdg-input", true).attr('title', "Reset animation.").html('&#x21ba;');
       inputs.on('click', function () {
-        reset$1.call(_this);
+        resetAnimation.call(_this);
         if (_this.settings.playPause !== 'play') toggle.call(_this);
       });
       return {
@@ -634,7 +626,7 @@
       this.controls.speed = speed.call(this);
       this.controls.playPause = playPause$1.call(this);
       this.controls.step = step.call(this);
-      this.controls.reset = reset$2.call(this);
+      this.controls.reset = reset$1.call(this);
       this.controls.eventList = eventList.call(this);
       this.controls.colorSizeToggle = colorSizeToggle.call(this);
       this.controls.container.selectAll('.togglebutton').on('mousedown', function () {
@@ -642,32 +634,6 @@
       }).on('mouseup', function () {
         this.classList.toggle('clicked');
       });
-    }
-
-    function addOrbits() {
-      // Draw concentric circles.
-      var orbits = this.svg.selectAll('circle.orbit').data(this.metadata.orbits).enter().append('circle').classed('orbit', true).attr('cx', function (d) {
-        return d.cx;
-      }).attr('cy', function (d) {
-        return d.cy;
-      }).attr('r', function (d) {
-        return d.r;
-      }).attr('fill', 'none').attr('stroke', '#aaa').attr('stroke-width', '.5'); // Annotate concentric circles.
-      //this.svg
-      //    .selectAll('text.orbit')
-      //    .data(
-      //        this.settings.metadata.event.slice(1).map((d, i) => {
-      //            return { cx: 380, cy: 365, r: (i + 1) * 100 + 50 };
-      //        })
-      //    )
-      //    .enter()
-      //    .append('text')
-      //    .classed('orbit', true)
-      //    .attr('x', d => d.cx)
-      //    .attr('y', d => d.cy - d.r)
-      //    .text('asdf')
-
-      return orbits;
     }
 
     function color$1(svg, legendDimensions) {
@@ -751,6 +717,107 @@
       this.legends.both = makeLegend.call(this, 'both');
     }
 
+    function addOrbits() {
+      var orbits = this.svg.selectAll('circle.orbit').data(this.metadata.orbit).enter().append('circle').classed('orbit', true).attr('cx', function (d) {
+        return d.cx;
+      }).attr('cy', function (d) {
+        return d.cy;
+      }).attr('r', function (d) {
+        return d.r;
+      }).attr('fill', 'none').attr('stroke', '#aaa').attr('stroke-width', '.5');
+      return orbits;
+    }
+
+    function annotateFoci() {
+      var _this = this;
+      var fociLabels = this.svg.selectAll('g.fdg-focus-annotation').data(this.metadata.event).join('g').classed('fdg-focus-annotation', true); // defs - give the text a background
+      //const filters = fociLabels
+      //    .append('defs')
+      //    .classed('fdg-focus-annotation__defs', true)
+      //        .append('filter')
+      //        .classed('fdg-focus-annotation__filter', true)
+      //        .attr('id', d => `fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')}`)
+      //        .attr('x', 0)
+      //        .attr('y', 0)
+      //        .attr('width', 1)
+      //        .attr('height', 1);
+      //filters.append('feFlood').attr('flood-color', '#aaaaaaaa');
+      //filters.append('feComposite').attr('in', 'SourceGraphic').attr('operator', 'xor');
+      // text
+
+      var isCenterX = function isCenterX(d) {
+        return Math.round(d.x) === Math.round(_this.settings.width / 2);
+      };
+
+      var isLessThanCenterX = function isLessThanCenterX(d) {
+        return Math.round(d.x) < Math.round(_this.settings.width / 2);
+      };
+
+      var getX = function getX(d) {
+        return isCenterX(d) ? d.x : d.x - Math.pow(-1, isLessThanCenterX(d)) * 10;
+      };
+
+      var getTextAnchor = function getTextAnchor(d) {
+        return isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end';
+      };
+
+      var isCenterY = function isCenterY(d) {
+        return Math.round(d.y) === Math.round(_this.settings.height / 2);
+      };
+
+      var isLessThanCenterY = function isLessThanCenterY(d) {
+        return Math.round(d.y) < Math.round(_this.settings.height / 2);
+      };
+
+      var getY = function getY(d) {
+        return isCenterY(d) ? d.y : d.y + Math.pow(-1, isLessThanCenterY(d)) * 35;
+      };
+
+      var textBackground = fociLabels.append('text').classed('fdg-focus-annotation__text', true).attr('x', function (d) {
+        return getX(d);
+      }).attr('y', function (d) {
+        return getY(d);
+      }); //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
+
+      textBackground.append('tspan').classed('fdg-focus-annotation__label', true).attr('x', function (d) {
+        return getX(d);
+      }).attr('text-anchor', function (d) {
+        return getTextAnchor(d);
+      }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
+      .style('font-weight', 'bold').style('font-size', '20px').attr('stroke', 'white').attr('stroke-width', '4px').text(function (d) {
+        return d.value;
+      });
+      textBackground.append('tspan').classed('fdg-focus-annotation__event-count', true).classed('fdg-hidden', this.settings.eventCount === false).attr('x', function (d) {
+        return getX(d);
+      }).attr('text-anchor', function (d) {
+        return getTextAnchor(d);
+      }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
+      .attr('dy', '1.3em').style('font-weight', 'bold').attr('stroke', 'white').attr('stroke-width', '4px'); //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
+
+      var textForeground = fociLabels.append('text').classed('fdg-focus-annotation__text', true).attr('x', function (d) {
+        return getX(d);
+      }).attr('y', function (d) {
+        return getY(d);
+      }); //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
+
+      textForeground.append('tspan').classed('fdg-focus-annotation__label', true).attr('x', function (d) {
+        return getX(d);
+      }).attr('text-anchor', function (d) {
+        return getTextAnchor(d);
+      }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
+      .style('font-weight', 'bold').style('font-size', '20px').attr('fill', 'black').text(function (d) {
+        return d.value;
+      });
+      textForeground.append('tspan').classed('fdg-focus-annotation__event-count', true).classed('fdg-hidden', this.settings.eventCount === false).attr('x', function (d) {
+        return getX(d);
+      }).attr('text-anchor', function (d) {
+        return getTextAnchor(d);
+      }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
+      .attr('dy', '1.3em').style('font-weight', 'bold').attr('fill', 'black'); //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
+
+      return fociLabels;
+    }
+
     function layout() {
       this.container = d3.select(this.element).append('div').classed('force-directed-graph', true).datum(this); // controls
 
@@ -758,11 +825,18 @@
 
       this.timer = this.container.append('div').classed('fdg-timer', true).text("".concat(this.settings.timepoint, " ").concat(this.settings.timeUnit));
       addLegends.call(this);
-      this.annotations = this.container.append('div').classed('fdg-annotations', true); // main panel
+      this.notes = this.container.append('div').classed('fdg-notes', true); // main panel
 
-      this.canvas = this.container.append('div').classed('fdg-canvas', true);
-      this.svg = this.canvas.append('svg').classed('fdg-svg', true).attr('width', this.settings.width).attr('height', this.settings.height);
-      this.orbits = addOrbits.call(this);
+      this.container = this.container.append('div').classed('fdg-container', true); // canvas underlay
+
+      this.canvas = this.container.append('canvas').classed('fdg-canvas', true).attr('width', this.settings.width).attr('height', this.settings.height);
+      this.context = this.canvas.node().getContext('2d'); // SVG overlay
+
+      this.svg = this.container.append('svg').classed('fdg-svg', true).attr('width', this.settings.width + 200).attr('height', this.settings.height + 200); // Draw concentric circles.
+
+      this.orbits = addOrbits.call(this); // Annotate foci.
+
+      this.focusAnnotations = annotateFoci.call(this);
     }
 
     function mutateData() {
@@ -782,22 +856,24 @@
     function nestData() {
       var _this = this;
 
+      var R = this.settings.width / this.metadata.event.length / 2;
       var nestedData = d3.nest().key(function (d) {
         return d.id;
-      }).rollup(function (nest) {
-        nest.forEach(function (d, i) {
-          d.timepoint = i === 0 ? d.duration : d.duration + nest[i - 1].timepoint;
+      }).rollup(function (group) {
+        // Establish start and end timepoints for each state.
+        group.forEach(function (d, i) {
+          d.timepoint = i === 0 ? d.duration : d.duration + group[i - 1].timepoint;
 
           if (i === 0) {
             d.start_timepoint = 1;
             d.end_timepoint = d.duration;
           } else {
-            d.start_timepoint = nest[i - 1].end_timepoint + 1;
+            d.start_timepoint = group[i - 1].end_timepoint + 1;
             d.end_timepoint = d.start_timepoint + d.duration;
           }
-        }); // Initial event for the given individual.
+        }); // Initial state for the given individual.
 
-        var currentEvent = nest[0]; // Define an event object for the individual.
+        var state = group[0]; // Define an event object for the individual.
 
         var events = _this.metadata.event.map(function (event) {
           return {
@@ -805,7 +881,7 @@
             order: event.order,
             count: 0,
             duration: 0,
-            totalDuration: d3.sum(nest.filter(function (d) {
+            totalDuration: d3.sum(group.filter(function (d) {
               return d.event === event.value;
             }), function (d) {
               return d.duration;
@@ -814,11 +890,11 @@
         });
 
         events.find(function (event) {
-          return event.value === currentEvent.event;
+          return event.value === state.event;
         }).count += 1; // Update the event object of the population.
 
         var event = _this.metadata.event.find(function (event) {
-          return event.value === currentEvent.event;
+          return event.value === state.event;
         });
 
         event.count += 1;
@@ -827,23 +903,28 @@
         }), function (event) {
           return event.count;
         });
+        var theta = Math.random() * 2 * Math.PI;
+        var r = Math.sqrt(~~(Math.random() * R * R));
         return {
-          currentEvent: currentEvent,
+          state: state,
           events: events,
-          duration: d3.sum(nest, function (d) {
+          stateChanges: stateChanges,
+          duration: d3.sum(group, function (d) {
             return d.duration;
           }),
-          x: event.x + Math.random(),
-          y: event.y + Math.random(),
+          sx: event.x + r * Math.cos(theta),
+          //Math.random()*this.settings.width/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
+          sy: event.y + r * Math.sin(theta),
+          //Math.random()*this.settings.height/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
+          tx: event.x,
+          ty: event.y,
           r: _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius,
           color: _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa',
           moves: 0,
-          next_move_time: currentEvent.duration,
-          sched: nest
+          nextStateChange: state.duration,
+          sched: group
         };
-      }).entries(this.data).map(function (d) {
-        return Object.assign(d, d.values);
-      });
+      }).entries(this.data);
       return nestedData;
     }
 
@@ -852,129 +933,55 @@
       this.data.nested = nestData.call(this);
     }
 
-    function collide(alpha) {
-      var fdg = this; // Resolve collisions between nodes.
-
-      var quadtree = d3.geom.quadtree(this.data.nested);
-      return function (d) {
-        // position of current node
-        var r = fdg.settings.eventChangeCountAesthetic !== 'color' ? d.r + fdg.settings.maxRadius + fdg.settings.padding : d.r + fdg.settings.minRadius + fdg.settings.padding; // dimensions of current node expressed as the coordinates of the corners of a square
-
-        var nx1 = d.x - r;
-        var nx2 = d.x + r;
-        var ny1 = d.y - r;
-        var ny2 = d.y + r;
-        quadtree.visit(function (quad, x1, y1, x2, y2) {
-          // position and dimensions of other nodes in quad tree
-          if (quad.point && quad.point !== d) {
-            var xDiff = d.x - quad.point.x; // difference in x coordinate between current node and nearby node (horizontal difference)
-
-            var yDiff = d.y - quad.point.y; // difference in y coordinate between current node and nearby node (vertical difference)
-
-            var distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff); // Euclidean distance between current node and nearby node (absolute difference)
-            // minimum distance allowed between current node and nearby node in the quadtree:
-            // radius of current node + radius of nearby node + (padding if nodes are at the same focus)
-
-            var minDistance = d.r + quad.point.r + (d.currentEvent.event !== quad.point.currentEvent.event) * fdg.settings.padding; // If the Euclidean distance is less than the minimum distance allowed:
-
-            if (distance < minDistance) {
-              // update Euclidean distance
-              distance = (distance - minDistance) / distance * alpha; // update horizontal difference (xDiff *= distance)
-              // subtract updated horizontal difference from current node
-
-              d.x -= xDiff *= distance; // update vertical difference (yDiff *= distance)
-              // subtract updated vertical difference from current node
-
-              d.y -= yDiff *= distance; // add updated horizontal and vertical difference to nearby node
-
-              quad.point.x += xDiff;
-              quad.point.y += yDiff;
-            }
-          }
-
-          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-        });
-      };
-    }
-
-    function tick(e) {
+    function tick() {
       var _this = this;
 
-      // k controls the speed at which the nodes reach the appropriate focus
-      var k = 0.04 * e.alpha;
-      if (this.ticks !== undefined) this.ticks++; // Push nodes toward their designated focus.
+      this.context.clearRect(0, 0, this.settings.width, this.settings.height);
+      this.context.save(); //this.context.translate(this.settings.width/2,this.settings.height/2);
 
-      this.data.nested.forEach(function (d, i) {
-        // Find the datum of the destination focus.
-        var currentEvent = _this.metadata.event.find(function (event) {
-          return event.value === d.currentEvent.event;
-        }); // Take the point's current coordinates and add to it the difference between the coordinates of the
-        // destination focus and the coordinates of the point, multiplied by some tiny fraction.
+      this.data.nested.sort(function (a, b) {
+        return a.value.stateChanges - b.value.stateChanges;
+      }) // draw bubbles with more state changes last
+      .forEach(function (d, i) {
+        _this.context.beginPath(); //this.context.moveTo(d.x + d.r, d.y);
 
 
-        d.x += (currentEvent.x - d.x) * k;
-        d.y += (currentEvent.y - d.y) * k;
-      }); // Update the coordinates, radius, fill, and stroke of the each node.
+        _this.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
 
-      this.circles.each(collide.call(this, 0.2)).attr('cx', function (d) {
-        return d.x;
-      }).attr('cy', function (d) {
-        return d.y;
-      });
+        _this.context.fillStyle = d.value.color;
+
+        _this.context.fill();
+      }); //this.context.fillStyle = '#ddd';
+      //this.context.fill();
+      //this.context.strokeStyle = '#333';
+      //this.context.stroke();
+
+      this.context.restore();
     }
 
-    function addForceLayout() {
-      var force = d3.layout.force().nodes(this.data.nested) // default: []
-      // .links([]) default: []
-      .size([this.settings.width, this.settings.height]) //.linkStrength(0.1) // default: 0.1
-      .friction(0.9) // default: 0.9
-      //.linkDistance(20) // default: 20
-      //.charge(-(250/this.data.nested.length)) // default: -30
-      .charge(0).gravity(0) // default: 0.1
-      //.theta(0.8) // default: 0.8
-      //.alpha(0.1) // default: 0.1
-      .on('tick', tick.bind(this)).start();
-      return force;
-    }
-
-    function addCircles() {
-      var circles = this.svg.selectAll('circle.fdg-bubble').data(this.data.nested).enter().append('circle').classed('fdg-bubble', true).attr('r', function (d) {
-        return d.r;
-      }).style('fill', function (d) {
-        return d.color;
-      }).style('fill-opacity', 0.5).style('stroke', function (d) {
-        return d.color;
-      }).style('stroke-opacity', 1);
-      return circles;
-    }
-
-    function addFociLabels() {
+    function addForceSimulation() {
       var _this = this;
 
-      var text = this.svg.selectAll('text.actlabel').data(this.metadata.event).enter().append('text').attr('class', 'actlabel').attr('x', function (d) {
-        return d.x;
-      }).attr('y', function (d) {
-        return d.y + 35;
-      });
-      var label = text.append('tspan').attr('x', function (d) {
-        return d.x;
-      }).attr('text-anchor', 'middle').style('font-weight', 'bold').style('font-size', '20px').text(function (d) {
-        return d.value;
-      });
-      var pct = text.append('tspan').classed('actpct', true).classed('fdg-hidden', this.settings.eventCount === false).attr('x', function (d) {
-        return d.x;
-      }).attr('text-anchor', 'middle').attr('dy', '1.3em').style('font-weight', 'bold').text(function (d) {
-        return "".concat(d.count, " (").concat(d3.format('%')(d.count / _this.data.nested.length), ")");
-      });
-      return text;
+      var forceSimulation = d3.forceSimulation().nodes(this.data.nested).alphaDecay(.005) //.alphaTarget(1)
+      .velocityDecay(0.9).force('center', d3.forceCenter(this.settings.width / 2, this.settings.height / 2)).force('x', d3.forceX().x(function (d) {
+        return _this.metadata.event.find(function (event) {
+          return event.value === d.value.state.event;
+        }).x;
+      }).strength(0.3)) //Math.pow(this.data.nested.length, -.6)))
+      .force('y', d3.forceY().y(function (d) {
+        return _this.metadata.event.find(function (event) {
+          return event.value === d.value.state.event;
+        }).y;
+      }).strength(0.3)) //Math.pow(this.data.nested.length, -.6)))
+      .force('charge', d3.forceManyBodyReuse().strength(-2)) //.force('manyBody', d3.forceManyBody().strength(-1))
+      //.force('collide', d3.forceCollide().radius(d => d.value.r).strength(-.5))
+      .on('tick', tick.bind(this));
+      return forceSimulation;
     }
 
     function init() {
-      this.force = addForceLayout.call(this);
-      this.circles = addCircles.call(this);
-      this.fociLabels = addFociLabels.call(this);
-      this.notes_index = 0;
-      if (this.settings.playPause === 'play') this.timeout = setTimeout(addTimer.bind(this), this.settings.speeds[this.settings.speed]);
+      this.forceSimulation = addForceSimulation.call(this);
+      if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
     }
 
     function forceDirectedGraph(data) {
@@ -986,7 +993,7 @@
         settings: Object.assign(settings, settings$1),
         util: util
       };
-      defineMetadata.call(fdg); // calculate characteristics of variables in data
+      fdg.metadata = defineMetadata.call(fdg); // calculate characteristics of variables in data
 
       layout.call(fdg); // update the DOM
 
@@ -994,11 +1001,6 @@
 
       init.call(fdg); // run the simulation
 
-      d3.range(10).forEach(function (i) {
-        return console.log(fdg.settings.color(i));
-      });
-      console.log(fdg.settings.colorScale().domain());
-      console.log(fdg.settings.colorScale().range());
       return fdg;
     }
 

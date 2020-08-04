@@ -1,6 +1,6 @@
-fetch('./flattened.csv')
+fetch('./data_1e3.csv')
     .then(response => response.text())
-    .then(text => d3.csv.parse(text))
+    .then(text => d3.csvParse(text))
     .then(data => {
         // Remove events after first instance of death.
         const nest = d3.nest()
@@ -19,13 +19,10 @@ fetch('./flattened.csv')
             .entries(data);
 
         const fdg = forceDirectedGraph(
-            [
-                ...data,
-                //...data.map(d => {const di = Object.assign({}, d); di.id = di.id + data.length*1; return di; }),
-                //...data.map(d => {const di = Object.assign({}, d); di.id = di.id + data.length*2; return di; }),
-            ],
+            data,
             '#container',
             {
+                //speed: 'fast',
             }
         );
     });

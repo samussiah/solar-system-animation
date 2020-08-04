@@ -1,33 +1,33 @@
-import set from './defineMetadata/set';
 import id from './defineMetadata/id';
 import event from './defineMetadata/event';
-import dataDrivenSettings from './defineMetadata/dataDrivenSettings';
+import orbit from './defineMetadata/orbit';
 
 export default function defineMetadata() {
     // Define sets.
-    this.metadata = {
-        id: set.call(this, 'id'),
-        event: set.call(this, 'event'),
-    };
+    const metadata = {};
 
     // Add additional metadata to ID set.
-    id.call(this);
+    metadata.id = id.call(this);
 
-    // Update settings that depend on data.
-    dataDrivenSettings.call(this);
+    // Settings dependent on the ID set.
+    this.settings.minRadius =
+        this.settings.minRadius || 3;//Math.min(3000 / metadata.id.length, 3);
+    this.settings.maxRadius =
+        this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
+    this.settings.reset = this.settings.reset || d3.max(metadata.id, (id) => id.duration);
 
     // Add additional metadata to event set.
-    event.call(this);
+    metadata.event = event.call(this);
+
+    // Update settings that depend on event set.
+    this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
+    this.settings.nFoci =
+        this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
+    this.settings.eventChangeCount =
+        this.settings.eventChangeCount || metadata.event.slice(1).map((event) => event.value);
 
     // Define orbits.
-    this.metadata.orbits = d3
-        .nest()
-        .key((d) => d.order)
-        .entries(this.metadata.event.filter((event) => event.value !== this.settings.eventCentral))
-        .map((d, i) => {
-            d.cx = 380;
-            d.cy = 365;
-            d.r = (i + 1) * 100 + 50;
-            return d;
-        });
+    metadata.orbit = orbit.call(this, metadata.event);
+
+    return metadata;
 }

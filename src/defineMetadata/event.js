@@ -1,21 +1,34 @@
 export default function event() {
-    this.settings.nFoci =
-        this.settings.nFoci || this.metadata.event.length - !!this.settings.eventCentral; // number of event types minus one for
+    const nest = d3.nest()
+        .key(d => d.event)
+        .rollup(group => {
+            const event = group[0];
+            const order = parseInt(event.event_order);
 
-    const theta = (2 * Math.PI) / this.settings.nFoci;
-    const centerX = this.settings.centerCoordinates.x;
-    const centerY = this.settings.centerCoordinates.y;
+            return {
+                order,
+                count: 0,
+                prevCount: 0,
+            };
+        })
+        .entries(this.data);
 
-    this.metadata.event.forEach((event, i) => {
-        event.order = parseInt(this.data.find((d) => d.event === event.value).event_order);
-        event.count = 0;
-        event.prevCount = 0;
-        event.x =
-            event.order === 0 ? centerX : (event.order * 100 + 50) * Math.cos(i * theta) + centerX;
-        event.y =
-            event.order === 0 ? centerY : (event.order * 100 + 50) * Math.sin(i * theta) + centerY;
+
+    // Calculate coordinates of event focus.
+    const centerX = this.settings.width/2;
+    const centerY = this.settings.height/2;
+    const theta = (2 * Math.PI) / (nest.length - 1);
+
+    nest.forEach((event,i) => {
+        Object.assign(event, event.value);
+        event.value = event.key;
+        delete event.key;
+        event.x = event.order === 0 ? centerX : (event.order * 100 + 50) * Math.cos(i * theta) + centerX;
+        event.y = event.order === 0 ? centerY : (event.order * 100 + 50) * Math.sin(i * theta) + centerY;
     });
 
     // Ensure events plot in order.
-    this.metadata.event.sort((a,b) => a.order - b.order);
+    nest.sort((a,b) => a.order - b.order);
+
+    return nest;
 }

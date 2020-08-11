@@ -1,3 +1,10 @@
+import getState from '../../dataManipulation/nestData/getState';
+import updateEventCount from './updateData/updateEventCount';
+//import countStateChanges from './nestData/countStateChanges';
+//import calculateInitialPointCoordinates from './nestData/calculateInitialPointCoordinates';
+import defineRadius from '../../dataManipulation/nestData/defineRadius';
+import defineColor from '../../dataManipulation/nestData/defineColor';
+
 export default function updateData() {
     // Record number of IDs at each focus at previous timepoint.
     this.metadata.event.forEach((event) => {
@@ -6,28 +13,38 @@ export default function updateData() {
 
     this.data.nested.forEach((d) => {
         const currEvent = d.value.state.event;
-        let curr_moves = d.value.moves;
+        d.value.currEvent = currEvent;
+        d.movesSinceChange++;
+        //if (d.movesSinceChange === 3) {
+        //    d.fx = d.x;
+        //    d.fy = d.y;
+        //}
 
-        // Time to go to next activity
+        // Move individual to next state when timepoint reaches cumulative duration of current state.
         if (
             d.value.nextStateChange === this.settings.timepoint &&
             this.settings.timepoint < d.value.duration
         ) {
-            curr_moves += 1;
+            d.value.prevEvent = currEvent;
+            d.movesSinceChange = 0;
+            //delete d.fx;
+            //delete d.fy;
+
+            // Increment number of moves
+            d.value.moves += 1;
 
             // Update individual to next event.
-            d.value.state = d.value.sched[curr_moves];
-            const nextEvent = d.value.state.event;
-            const eventIndividual = d.value.events.find((event) => event.value === nextEvent);
-            eventIndividual.count += 1;
+            d.value.state = getState.call(this, d.value.group, d.value.moves);
 
-            // Update population count at previous and next events.
-            this.metadata.event.find((event) => event.value === currEvent).count -= 1;
-            const eventPopulation = this.metadata.event.find((event) => event.value === nextEvent);
-            eventPopulation.count += 1;
+            // Update individual event count at current event.
+            updateEventCount.call(this, d.value.events, d.value.state.event);
 
-            d.value.moves = curr_moves;
-            d.value.nextStateChange += d.value.sched[d.value.moves].duration;
+            // Update population count at previous and current events.
+            updateEventCount.call(this, this.metadata.event, d.value.state.event);
+            updateEventCount.call(this, this.metadata.event, currEvent, false);
+
+            // Update timepoint of next state change.
+            d.value.nextStateChange += d.value.group[d.value.moves].duration;
         }
 
         // Add to new activity count
@@ -35,17 +52,12 @@ export default function updateData() {
             d.value.events.filter((event) => this.settings.eventChangeCount.includes(event.value)),
             (event) => event.count
         );
-        d.value.r =
-            this.settings.eventChangeCountAesthetic !== 'color'
-                ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
-                : this.settings.minRadius;
-        d.value.color =
-            this.settings.eventChangeCountAesthetic !== 'size'
-                ? this.settings.color(stateChanges)
-                : '#aaa';
 
-        d.value.fill = d.value.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
-        d.value.stroke = d.value.color.replace('rgb', 'rgba').replace(')', ', 1)');
+        // Define radius.
+        d.value.r = defineRadius.call(this, stateChanges);
+
+        // Define color.
+        Object.assign(d.value, defineColor.call(this, stateChanges));
     });
 
     // Record change in number of IDs at each focus at current timepoint.

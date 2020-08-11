@@ -254,6 +254,35 @@
       };
     }
 
+    function getState(group, index) {
+      return group[index];
+    }
+
+    function updateEventCount(events, state) {
+      var increment = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+      var event = events.find(function (event) {
+        return event.value === state;
+      });
+      event.count = increment ? event.count + 1 : event.count - 1;
+      return event;
+    }
+
+    function defineRadius(stateChanges) {
+      var r = this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius) : this.settings.minRadius;
+      return r;
+    }
+
+    function defineColor(stateChanges) {
+      var color = this.settings.eventChangeCountAesthetic !== 'size' ? this.settings.color(stateChanges) : '#aaa';
+      var fill = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+      var stroke = color.replace('rgb', 'rgba').replace(')', ', 1)');
+      return {
+        color: color,
+        fill: fill,
+        stroke: stroke
+      };
+    }
+
     function updateData() {
       var _this = this;
 
@@ -263,29 +292,29 @@
       });
       this.data.nested.forEach(function (d) {
         var currEvent = d.value.state.event;
-        var curr_moves = d.value.moves; // Time to go to next activity
+        d.value.currEvent = currEvent;
+        d.movesSinceChange++; //if (d.movesSinceChange === 3) {
+        //    d.fx = d.x;
+        //    d.fy = d.y;
+        //}
+        // Move individual to next state when timepoint reaches cumulative duration of current state.
 
         if (d.value.nextStateChange === _this.settings.timepoint && _this.settings.timepoint < d.value.duration) {
-          curr_moves += 1; // Update individual to next event.
+          d.value.prevEvent = currEvent;
+          d.movesSinceChange = 0; //delete d.fx;
+          //delete d.fy;
+          // Increment number of moves
 
-          d.value.state = d.value.sched[curr_moves];
-          var nextEvent = d.value.state.event;
-          var eventIndividual = d.value.events.find(function (event) {
-            return event.value === nextEvent;
-          });
-          eventIndividual.count += 1; // Update population count at previous and next events.
+          d.value.moves += 1; // Update individual to next event.
 
-          _this.metadata.event.find(function (event) {
-            return event.value === currEvent;
-          }).count -= 1;
+          d.value.state = getState.call(_this, d.value.group, d.value.moves); // Update individual event count at current event.
 
-          var eventPopulation = _this.metadata.event.find(function (event) {
-            return event.value === nextEvent;
-          });
+          updateEventCount.call(_this, d.value.events, d.value.state.event); // Update population count at previous and current events.
 
-          eventPopulation.count += 1;
-          d.value.moves = curr_moves;
-          d.value.nextStateChange += d.value.sched[d.value.moves].duration;
+          updateEventCount.call(_this, _this.metadata.event, d.value.state.event);
+          updateEventCount.call(_this, _this.metadata.event, currEvent, false); // Update timepoint of next state change.
+
+          d.value.nextStateChange += d.value.group[d.value.moves].duration;
         } // Add to new activity count
 
 
@@ -293,11 +322,11 @@
           return _this.settings.eventChangeCount.includes(event.value);
         }), function (event) {
           return event.count;
-        });
-        d.value.r = _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
-        d.value.color = _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
-        d.value.fill = d.value.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
-        d.value.stroke = d.value.color.replace('rgb', 'rgba').replace(')', ', 1)');
+        }); // Define radius.
+
+        d.value.r = defineRadius.call(_this, stateChanges); // Define color.
+
+        Object.assign(d.value, defineColor.call(_this, stateChanges));
       }); // Record change in number of IDs at each focus at current timepoint.
 
       this.metadata.event.forEach(function (event) {
@@ -354,7 +383,7 @@
       });
       this.data.nested.forEach(function (d) {
         // Initial event for the given individual.
-        d.value.state = d.value.sched[0]; // Define an event object for the individual.
+        d.value.state = d.value.group[0]; // Define an event object for the individual.
 
         d.value.events.forEach(function (event) {
           event.count = 0;
@@ -378,6 +407,8 @@
         d.value.y = event.y + Math.random();
         d.value.r = _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius;
         d.value.color = _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa';
+        d.value.fill = d.value.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+        d.value.stroke = d.value.color.replace('rgb', 'rgba').replace(')', ', 1)');
         d.value.moves = 0;
         d.value.next_move_time = d.value.state.duration;
       });
@@ -859,6 +890,111 @@
       });
     }
 
+    function _defineProperty(obj, key, value) {
+      if (key in obj) {
+        Object.defineProperty(obj, key, {
+          value: value,
+          enumerable: true,
+          configurable: true,
+          writable: true
+        });
+      } else {
+        obj[key] = value;
+      }
+
+      return obj;
+    }
+
+    function ownKeys(object, enumerableOnly) {
+      var keys = Object.keys(object);
+
+      if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+        keys.push.apply(keys, symbols);
+      }
+
+      return keys;
+    }
+
+    function _objectSpread2(target) {
+      for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i] != null ? arguments[i] : {};
+
+        if (i % 2) {
+          ownKeys(Object(source), true).forEach(function (key) {
+            _defineProperty(target, key, source[key]);
+          });
+        } else if (Object.getOwnPropertyDescriptors) {
+          Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+        } else {
+          ownKeys(Object(source)).forEach(function (key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+          });
+        }
+      }
+
+      return target;
+    }
+
+    function defineTimepoints(group) {
+      group.forEach(function (d, i) {
+        d.timepoint = i === 0 ? d.duration : d.duration + group[i - 1].timepoint;
+
+        if (i === 0) {
+          d.start_timepoint = 1;
+          d.end_timepoint = d.duration;
+        } else {
+          d.start_timepoint = group[i - 1].end_timepoint + 1;
+          d.end_timepoint = d.start_timepoint + d.duration;
+        }
+      });
+    }
+
+    function defineIndividualEvents(group) {
+      var events = this.metadata.event.map(function (event) {
+        return {
+          value: event.value,
+          order: event.order,
+          count: 0,
+          duration: 0,
+          totalDuration: d3.sum(group.filter(function (d) {
+            return d.event === event.value;
+          }), function (d) {
+            return d.duration;
+          })
+        };
+      });
+      return events;
+    }
+
+    function countStateChanges(events) {
+      var _this = this;
+
+      var stateChanges = d3.sum(events.filter(function (event) {
+        return _this.settings.eventChangeCount.includes(event.label);
+      }), function (event) {
+        return event.count;
+      });
+      return stateChanges;
+    }
+
+    function calculateInitialPointCoordinates(R, populationEvent) {
+      // Define a random angle and a random radius with which to initialize point coordinates.
+      var r = Math.sqrt(~~(Math.random() * R * R));
+      var theta = Math.random() * 2 * Math.PI; // Calculate source and destination coordinates.
+
+      var pointCoordinates = {
+        sx: populationEvent.x + r * Math.cos(theta),
+        sy: populationEvent.y + r * Math.sin(theta),
+        tx: populationEvent.x,
+        ty: populationEvent.y
+      };
+      return pointCoordinates;
+    }
+
     function nestData() {
       var _this = this;
 
@@ -866,72 +1002,38 @@
       var nestedData = d3.nest().key(function (d) {
         return d.id;
       }).rollup(function (group) {
-        // Establish start and end timepoints for each state.
-        group.forEach(function (d, i) {
-          d.timepoint = i === 0 ? d.duration : d.duration + group[i - 1].timepoint;
+        // Establish start and end timepoints for each state (mutates data array).
+        defineTimepoints(group); // Initial state for the given individual.
 
-          if (i === 0) {
-            d.start_timepoint = 1;
-            d.end_timepoint = d.duration;
-          } else {
-            d.start_timepoint = group[i - 1].end_timepoint + 1;
-            d.end_timepoint = d.start_timepoint + d.duration;
-          }
-        }); // Initial state for the given individual.
+        var state = getState.call(_this, group, 0); // Define an event object for the individual.
 
-        var state = group[0]; // Define an event object for the individual.
+        var individualEvents = defineIndividualEvents.call(_this, group);
+        var individualEvent = updateEventCount.call(_this, individualEvents, state.event); // Update the event object of the population.
 
-        var events = _this.metadata.event.map(function (event) {
-          return {
-            value: event.value,
-            order: event.order,
-            count: 0,
-            duration: 0,
-            totalDuration: d3.sum(group.filter(function (d) {
-              return d.event === event.value;
-            }), function (d) {
-              return d.duration;
-            })
-          };
-        });
+        var populationEvent = updateEventCount.call(_this, _this.metadata.event, state.event); // Calculate initial point coordinates.
 
-        events.find(function (event) {
-          return event.value === state.event;
-        }).count += 1; // Update the event object of the population.
+        var initialPointCoordinates = calculateInitialPointCoordinates.call(_this, R, populationEvent); // Count state changes 
 
-        var event = _this.metadata.event.find(function (event) {
-          return event.value === state.event;
-        });
+        var stateChanges = countStateChanges.call(_this, individualEvents); // Define radius.
 
-        event.count += 1;
-        var stateChanges = d3.sum(events.filter(function (event) {
-          return _this.settings.eventChangeCount.includes(event.label);
-        }), function (event) {
-          return event.count;
-        });
-        var theta = Math.random() * 2 * Math.PI;
-        var r = Math.sqrt(~~(Math.random() * R * R));
-        var datum = {
+        var r = defineRadius.call(_this, stateChanges); // Define color.
+
+        var color = defineColor.call(_this, stateChanges);
+
+        var datum = _objectSpread2(_objectSpread2({
           state: state,
-          events: events,
-          stateChanges: stateChanges,
+          events: individualEvents,
           duration: d3.sum(group, function (d) {
             return d.duration;
           }),
-          sx: event.x + r * Math.cos(theta),
-          //Math.random()*this.settings.width/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
-          sy: event.y + r * Math.sin(theta),
-          //Math.random()*this.settings.height/this.metadata.event.length * (Math.random() < .5 ? -1 : 1),
-          tx: event.x,
-          ty: event.y,
-          r: _this.settings.eventChangeCountAesthetic !== 'color' ? Math.min(_this.settings.minRadius + stateChanges, _this.settings.maxRadius) : _this.settings.minRadius,
-          color: _this.settings.eventChangeCountAesthetic !== 'size' ? _this.settings.color(stateChanges) : '#aaa',
           moves: 0,
           nextStateChange: state.duration,
-          sched: group
-        };
-        datum.fill = datum.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
-        datum.stroke = datum.color.replace('rgb', 'rgba').replace(')', ', 1)');
+          movesSinceChange: 0,
+          group: group
+        }, initialPointCoordinates), {}, {
+          r: r
+        }, color);
+
         return datum;
       }).entries(this.data);
       return nestedData;
@@ -952,6 +1054,12 @@
     function tick() {
       var _this = this;
 
+      //this.data.nested.forEach(d => {
+      //    const event = this.metadata.event.find(event => event.value === d.value.state.event);
+      //    const k = 0.04*event.forceSimulation.alpha();
+      //    d.x += (event.x - d.x) * k;
+      //    d.y += (event.y - d.y) * k;
+      //});
       this.context.clearRect(0, 0, this.settings.width, this.settings.height);
       this.context.save(); //this.context.translate(this.settings.width/2,this.settings.height/2);
 
@@ -964,49 +1072,27 @@
 
         _this.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
 
-        _this.context.fillStyle = d.value.color; //fill;
+        _this.context.fillStyle = d.value.fill;
 
-        _this.context.fill(); //this.context.strokeStyle = d.value.stroke;
-        //this.context.stroke();
+        _this.context.fill();
 
+        _this.context.strokeStyle = d.value.stroke;
+
+        _this.context.stroke();
       });
       this.context.restore();
     }
 
     function addForceSimulation(event) {
-      //const forceSimulation = d3
-      //    .forceSimulation()
-      //    .nodes(this.data.nested)
-      //    .alphaDecay(0.005)
-      //    //.alphaTarget(1)
-      //    .velocityDecay(0.9)
-      //    .force('center', d3.forceCenter(this.settings.width / 2, this.settings.height / 2))
-      //    .force(
-      //        'x',
-      //        d3
-      //            .forceX()
-      //            .x(
-      //                (d) =>
-      //                    this.metadata.event.find((event) => event.value === d.value.state.event).x
-      //            )
-      //            .strength(0.3)
-      //    ) //Math.pow(this.data.nested.length, -.6)))
-      //    .force(
-      //        'y',
-      //        d3
-      //            .forceY()
-      //            .y(
-      //                (d) =>
-      //                    this.metadata.event.find((event) => event.value === d.value.state.event).y
-      //            )
-      //            .strength(0.3)
-      //    ) //Math.pow(this.data.nested.length, -.6)))
-      //    .force('charge', d3.forceManyBodyReuse().strength(-2))
-      //    //.force('manyBody', d3.forceManyBody().strength(-1))
-      //    //.force('collide', d3.forceCollide().radius(d => d.value.r).strength(-.5))
-      //    .on('tick', tick.bind(this));
-      var forceSimulation = d3.forceSimulation().nodes(event.data).alphaDecay(0.005).velocityDecay(0.9).force('center', d3.forceCenter(event.x, event.y)).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', d3.forceManyBodyReuse().strength(-2)).on('tick', tick.bind(this));
-      if (event.value !== this.settings.eventCentral) forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + .5));
+      // When using D3’s force layout with a disjoint graph, you typically want the positioning
+      // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
+      // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
+      // the viewport.
+      //
+      // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
+      var forceSimulation = d3.forceSimulation().nodes(event.data).alphaDecay(0.005).velocityDecay(0.9).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', d3.forceManyBodyReuse().strength(-2)).on('tick', tick.bind(this)); //if (event.value !== this.settings.eventCentral)
+
+      forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + .5));
       return forceSimulation;
     }
 

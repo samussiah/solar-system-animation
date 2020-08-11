@@ -8,7 +8,7 @@ export default function resetAnimation() {
 
     this.data.nested.forEach((d) => {
         // Initial event for the given individual.
-        d.value.state = d.value.sched[0];
+        d.value.state = d.value.group[0];
 
         // Define an event object for the individual.
         d.value.events.forEach((event) => {
@@ -35,6 +35,8 @@ export default function resetAnimation() {
             this.settings.eventChangeCountAesthetic !== 'size'
                 ? this.settings.color(stateChanges)
                 : '#aaa';
+        d.value.fill = d.value.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+        d.value.stroke = d.value.color.replace('rgb', 'rgba').replace(')', ', 1)');
         d.value.moves = 0;
         d.value.next_move_time = d.value.state.duration;
     });

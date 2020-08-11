@@ -1,4 +1,4 @@
-fetch('./data_.5e4.csv')
+fetch('./data_1e3.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {

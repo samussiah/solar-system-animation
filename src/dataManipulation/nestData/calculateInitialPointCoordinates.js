@@ -1,6 +1,6 @@
-export default function calculateInitialPointCoordinates(R, populationEvent) {
+export default function calculateInitialPointCoordinates(populationEvent) {
     // Define a random angle and a random radius with which to initialize point coordinates.
-    const r = Math.sqrt(~~(Math.random() * R * R));
+    const r = Math.sqrt(~~(Math.random() * this.settings.R * this.settings.R));
     const theta = Math.random() * 2 * Math.PI;
 
     // Calculate source and destination coordinates.

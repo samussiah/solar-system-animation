@@ -18,7 +18,7 @@ export default function addForceSimulation(event) {
         .on('tick', tick.bind(this));
 
     //if (event.value !== this.settings.eventCentral)
-        forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + .5));
+    forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5));
 
     return forceSimulation;
 }

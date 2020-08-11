@@ -8,8 +8,6 @@ import defineRadius from './nestData/defineRadius';
 import defineColor from './nestData/defineColor';
 
 export default function nestData() {
-    const R = this.settings.width / this.metadata.event.length / 2;
-
     const nestedData = d3
         .nest()
         .key((d) => d.id)
@@ -28,9 +26,12 @@ export default function nestData() {
             const populationEvent = updateEventCount.call(this, this.metadata.event, state.event);
 
             // Calculate initial point coordinates.
-            const initialPointCoordinates = calculateInitialPointCoordinates.call(this, R, populationEvent);
+            const initialPointCoordinates = calculateInitialPointCoordinates.call(
+                this,
+                populationEvent
+            );
 
-            // Count state changes 
+            // Count state changes
             const stateChanges = countStateChanges.call(this, individualEvents);
 
             // Define radius.

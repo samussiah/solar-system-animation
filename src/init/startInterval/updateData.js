@@ -1,7 +1,6 @@
 import getState from '../../dataManipulation/nestData/getState';
 import updateEventCount from './updateData/updateEventCount';
 //import countStateChanges from './nestData/countStateChanges';
-//import calculateInitialPointCoordinates from './nestData/calculateInitialPointCoordinates';
 import defineRadius from '../../dataManipulation/nestData/defineRadius';
 import defineColor from '../../dataManipulation/nestData/defineColor';
 
@@ -63,6 +62,6 @@ export default function updateData() {
     // Record change in number of IDs at each focus at current timepoint.
     this.metadata.event.forEach((event) => {
         event.change = event.count - event.prevCount;
-        event.data = this.data.nested.filter(d => d.value.state.event === event.value);
+        event.data = this.data.nested.filter((d) => d.value.state.event === event.value);
     });
 }

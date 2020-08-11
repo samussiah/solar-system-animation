@@ -1,3 +1,9 @@
+import getState from '../../dataManipulation/nestData/getState';
+import updateEventCount from './updateData/updateEventCount';
+import calculateInitialPointCoordinates from '../../dataManipulation/nestData/calculateInitialPointCoordinates';
+import defineRadius from '../../dataManipulation/nestData/defineRadius';
+import defineColor from '../../dataManipulation/nestData/defineColor';
+
 export default function resetAnimation() {
     this.settings.timepoint = 0;
 
@@ -8,36 +14,40 @@ export default function resetAnimation() {
 
     this.data.nested.forEach((d) => {
         // Initial event for the given individual.
-        d.value.state = d.value.group[0];
+        d.value.state = getState.call(this, d.value.group, 0);
 
-        // Define an event object for the individual.
+        // Reset individual event object.
         d.value.events.forEach((event) => {
             event.count = 0;
             event.duration = 0;
         });
-        d.value.events.find((event) => event.value === d.value.state.event).count += 1;
 
-        const event = this.metadata.event.find((event) => event.value === d.value.state.event);
-        event.count += 1;
+        // Update individual event count at initial event.
+        updateEventCount.call(this, d.value.events, d.value.state.event);
+
+        // Reset state index and timepoint of next state change.
+        d.value.moves = 0;
+        d.value.nextStateChange = d.value.state.duration;
+
+        // Update population count at previous and current events.
+        const populationEvent = updateEventCount.call(
+            this,
+            this.metadata.event,
+            d.value.state.event
+        );
 
         const stateChanges = d3.sum(
             d.value.events.filter((event) => this.settings.eventChangeCount.includes(event.value)),
             (event) => event.count
         );
 
-        d.value.x = event.x + Math.random();
-        d.value.y = event.y + Math.random();
-        d.value.r =
-            this.settings.eventChangeCountAesthetic !== 'color'
-                ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
-                : this.settings.minRadius;
-        d.value.color =
-            this.settings.eventChangeCountAesthetic !== 'size'
-                ? this.settings.color(stateChanges)
-                : '#aaa';
-        d.value.fill = d.value.color.replace('rgb', 'rgba').replace(')', ', 0.5)');
-        d.value.stroke = d.value.color.replace('rgb', 'rgba').replace(')', ', 1)');
-        d.value.moves = 0;
-        d.value.next_move_time = d.value.state.duration;
+        // Calculate initial point coordinates.
+        Object.assign(d.value, calculateInitialPointCoordinates.call(this, populationEvent));
+
+        // Define radius.
+        d.value.r = defineRadius.call(this, stateChanges);
+
+        // Define color.
+        Object.assign(d.value, defineColor.call(this, stateChanges));
     });
 }

@@ -51,7 +51,7 @@ body > * {
 /* side panel */
 .fdg-timer,
 .fdg-legends,
-.fdg-annotations {
+.fdg-notes {
     width: calc(var(--left-margin) - 10px);
     padding-right: 10px;
     display: inline-block;
@@ -78,18 +78,28 @@ body > * {
     font-size: 1rem;
 }
 
-.fdg-annotations {
+.fdg-notes {
     font-weight: lighter;
     font-size: 1em;
     text-align: center;
+    height: 300px;
 }
 
 /* main panel */
 
-.fdg-canvas {
+.fdg-container {
     width: calc(100% - var(--left-margin) - 1px);
     display: inline-block;
     border-left: 1px solid #aaa;
+    position: relative;
+}
+
+.fdg-canvas {
+}
+
+.fdg-svg {
+    position: absolute;
+    left: 0;
 }
 
 /* #Reset & Basics (Inspired by E. Meyers)

@@ -1,4 +1,4 @@
-import resetData from '../../init/addTimer/reset';
+import resetAnimation from '../../init/startInterval/resetAnimation';
 import toggle from './playPause/toggle';
 
 export default function reset() {
@@ -12,7 +12,7 @@ export default function reset() {
         .html('&#x21ba;');
 
     inputs.on('click', () => {
-        resetData.call(this);
+        resetAnimation.call(this);
         if (this.settings.playPause !== 'play') toggle.call(this);
     });
 

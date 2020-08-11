@@ -19,7 +19,9 @@ export default function makeLegend(type) {
         .classed('fdg-legend__label', true)
         .style('width', legendDimensions[0] + 'px')
         .html(
-            `Number of <span class = "fdg-measure">${this.util.csv(this.settings.eventChangeCount)}</span> events`
+            `Number of <span class = "fdg-measure">${this.util.csv(
+                this.settings.eventChangeCount
+            )}</span> events`
         );
 
     // svg
@@ -46,7 +48,7 @@ export default function makeLegend(type) {
         .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colors().length / 2)
         .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
-        .text(`${this.settings.colors().length-1}+`);
+        .text(`${this.settings.colors().length - 1}+`);
 
     return {
         container,
@@ -54,6 +56,6 @@ export default function makeLegend(type) {
         svg,
         marks,
         lower,
-        upper
+        upper,
     };
 }

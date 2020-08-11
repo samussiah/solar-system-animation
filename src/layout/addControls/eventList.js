@@ -1,3 +1,6 @@
+import defineRadius from '../../dataManipulation/nestData/defineRadius';
+import defineColor from '../../dataManipulation/nestData/defineColor';
+
 export default function eventList() {
     const fdg = this;
 
@@ -52,10 +55,13 @@ export default function eventList() {
         }.`;
 
         // Update color-size toggle.
-        fdg.controls.colorSizeToggle.inputs
-            .attr('title', di => `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
-                di !== 'both' ? di : 'color and size'
-            }.`);
+        fdg.controls.colorSizeToggle.inputs.attr(
+            'title',
+            (di) =>
+                `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
+                    di !== 'both' ? di : 'color and size'
+                }.`
+        );
 
         // Update legend label.
         fdg.legends.container
@@ -67,17 +73,13 @@ export default function eventList() {
         fdg.data.nested.forEach((d) => {
             // Add to new activity count
             const stateChanges = d3.sum(
-                d.events.filter((event) => fdg.settings.eventChangeCount.includes(event.value)),
+                d.value.events.filter((event) =>
+                    fdg.settings.eventChangeCount.includes(event.value)
+                ),
                 (event) => event.count
             );
-            d.r =
-                fdg.settings.eventChangeCountAesthetic !== 'color'
-                    ? Math.min(fdg.settings.minRadius + stateChanges, fdg.settings.maxRadius)
-                    : fdg.settings.minRadius;
-            d.color =
-                fdg.settings.eventChangeCountAesthetic !== 'size'
-                    ? fdg.settings.color(stateChanges)
-                    : '#aaa';
+            d.r = defineRadius.call(fdg, stateChanges);
+            Object.assign(d.value, defineColor.call(fdg, stateChanges));
         });
     });
 

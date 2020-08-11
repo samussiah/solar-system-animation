@@ -1,3 +1,5 @@
+import startInterval from '../../init/startInterval';
+
 export default function speed() {
     const fdg = this;
 
@@ -23,8 +25,10 @@ export default function speed() {
         )
         .text((d) => d.label);
     inputs.on('click', function (d) {
-        inputs.classed('current', (di) => di.label === d.label);
         fdg.settings.speed = d.label;
+        inputs.classed('current', (di) => di.label === d.label);
+        fdg.interval.stop();
+        fdg.interval = startInterval.call(fdg);
     });
 
     return {

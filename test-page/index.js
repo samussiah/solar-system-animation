@@ -39,6 +39,7 @@ fetch('./data_1e3.csv')
             '#container',
             {
                 //speed: 'fast',
+                //nFoci: 12,
             }
         );
     });

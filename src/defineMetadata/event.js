@@ -18,7 +18,7 @@ export default function event() {
     // Calculate coordinates of event focus.
     const centerX = this.settings.width / 2;
     const centerY = this.settings.height / 2;
-    const theta = (2 * Math.PI) / (nest.length - 1);
+    const theta = (2 * Math.PI) / (this.settings.nFoci || (nest.length - !!this.settings.eventCentral - 1));
 
     nest.forEach((event, i) => {
         Object.assign(event, event.value);

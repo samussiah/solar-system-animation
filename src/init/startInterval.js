@@ -20,6 +20,12 @@ export const increment = function () {
         resetAnimation.call(this);
     }
 
+    this.freqTable.tr
+        .selectAll('td')
+        .data(event => [event.value, event.cumulative])
+        .join('td')
+        .text(d => d);
+
     // Resume the force simulation.
     this.metadata.event.forEach((event) => {
         event.forceSimulation.nodes(event.data);

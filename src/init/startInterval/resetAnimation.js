@@ -10,6 +10,7 @@ export default function resetAnimation() {
     // Update the event object of the population.
     this.metadata.event.forEach((event) => {
         event.count = 0;
+        event.cumulative = 0;
     });
 
     this.data.nested.forEach((d) => {

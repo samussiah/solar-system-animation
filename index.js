@@ -236,6 +236,11 @@
       return group[index];
     }
 
+    // TODO: Pass the previous event to the function to add a condition to determine when to increment or not.
+    //
+    // The focus count should always update but the individual state changes and the cumulative event
+    // count should only increase if previous event is not the central event, don't increment the
+    // individual.
     function updateEventCount(events, state) {
       var increment = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
       var event = events.find(function (event) {

@@ -15,6 +15,8 @@ const settings = {
     eventCount: true, // display count (percentage) beneath focus labels?
     eventChangeCount: null, // defined in ../defineMetadata/dataDrivenSettings
     eventChangeCountAesthetic: 'color',
+    excludeFirst: true,
+    excludeLast: true,
 
     // animation settings
     speed: 'slow',

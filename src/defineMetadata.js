@@ -20,10 +20,16 @@ export default function defineMetadata() {
 
     // Update settings that depend on event set.
     this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
+    this.settings.eventFinal =
+        this.settings.eventFinal || metadata.event[metadata.event.length - 1].value;
     this.settings.nFoci =
         this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
     this.settings.eventChangeCount =
         this.settings.eventChangeCount || metadata.event.slice(1).map((event) => event.value);
+    this.settings.eventSequence = metadata.event
+        .filter((event, i) => (this.settings.excludeLast ? i !== metadata.event.length - 1 : false))
+        .filter((event, i) => (this.settings.excludeFirst ? i !== 0 : false))
+        .map((event) => event.value);
     this.settings.R = this.settings.width / metadata.event.length / 2;
 
     // Define orbits.

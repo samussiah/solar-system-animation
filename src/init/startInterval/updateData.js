@@ -1,5 +1,8 @@
 import getState from '../../dataManipulation/nestData/getState';
-import updateEventCount from './updateData/updateEventCount';
+//import updateEventCount from './updateData/updateEventCount';
+import updateIndividual from './updateData/updateIndividual';
+import updateFocus from './updateData/updateFocus';
+import updateCumulative from './updateData/updateCumulative';
 //import countStateChanges from './nestData/countStateChanges';
 import defineRadius from '../../dataManipulation/nestData/defineRadius';
 import defineColor from '../../dataManipulation/nestData/defineColor';
@@ -36,11 +39,17 @@ export default function updateData() {
             d.value.state = getState.call(this, d.value.group, d.value.moves);
 
             // Update individual event count at current event.
-            updateEventCount.call(this, d.value.events, d.value.state.event);
+            updateIndividual.call(this, d.value.events, d.value.state.event, d.value.prevEvent);
 
             // Update population count at previous and current events.
-            updateEventCount.call(this, this.metadata.event, d.value.state.event);
-            updateEventCount.call(this, this.metadata.event, currEvent, false);
+            updateFocus.call(this, this.metadata.event, d.value.state.event);
+            updateCumulative.call(
+                this,
+                this.metadata.event,
+                d.value.state.event,
+                d.value.prevEvent
+            );
+            updateFocus.call(this, this.metadata.event, currEvent, false);
 
             // Update timepoint of next state change.
             d.value.nextStateChange += d.value.group[d.value.moves].duration;

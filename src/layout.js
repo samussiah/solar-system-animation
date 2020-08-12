@@ -1,5 +1,7 @@
+import addExplanation from './layout/addExplanation';
 import addControls from './layout/addControls';
 import addLegends from './layout/addLegends';
+import addFreqTable from './layout/addFreqTable';
 import drawOrbits from './layout/drawOrbits';
 import annotateFoci from './layout/annotateFoci';
 
@@ -10,6 +12,9 @@ export default function layout() {
         .classed('force-directed-graph', true)
         .datum(this);
 
+    // explanation
+    addExplanation.call(this);
+
     // controls
     addControls.call(this);
 
@@ -19,6 +24,7 @@ export default function layout() {
         .classed('fdg-timer', true)
         .text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
     addLegends.call(this);
+    this.freqTable = addFreqTable.call(this);
     this.notes = this.container.append('div').classed('fdg-notes', true);
 
     // main panel

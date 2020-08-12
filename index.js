@@ -63,6 +63,8 @@
         eventChangeCount: null,
         // defined in ../defineMetadata/dataDrivenSettings
         eventChangeCountAesthetic: 'color',
+        excludeFirst: true,
+        excludeLast: true,
         // animation settings
         speed: 'slow',
         speeds: {
@@ -207,6 +209,7 @@
                     order: order,
                     count: 0,
                     prevCount: 0,
+                    cumulative: 0,
                 };
             })
             .entries(this.data); // Calculate coordinates of event focus.
@@ -257,6 +260,8 @@
     }
 
     function defineMetadata() {
+        var _this = this;
+
         // Define sets.
         var metadata = {}; // Add additional metadata to ID set.
 
@@ -275,6 +280,8 @@
         metadata.event = event.call(this); // Update settings that depend on event set.
 
         this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
+        this.settings.eventFinal =
+            this.settings.eventFinal || metadata.event[metadata.event.length - 1].value;
         this.settings.nFoci =
             this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
 
@@ -283,14 +290,57 @@
             metadata.event.slice(1).map(function (event) {
                 return event.value;
             });
+        this.settings.eventSequence = metadata.event
+            .filter(function (event, i) {
+                return _this.settings.excludeLast ? i !== metadata.event.length - 1 : false;
+            })
+            .filter(function (event, i) {
+                return _this.settings.excludeFirst ? i !== 0 : false;
+            })
+            .map(function (event) {
+                return event.value;
+            });
         this.settings.R = this.settings.width / metadata.event.length / 2; // Define orbits.
 
         metadata.orbit = orbits.call(this, metadata.event);
         return metadata;
     }
 
+    function addExplanation() {
+        this.explanation = this.container
+            .append('div')
+            .classed('fdg-explanation', true)
+            .style('text-align', 'left')
+            .style('font-size', '20px')
+            .style('font-weight', 'lighter')
+            .style('width', 'calc(98% - 2px)')
+            .style('border', '1px solid #333')
+            .style('background', '#eee')
+            .style('border-radius', '4px')
+            .style('padding', '4px 1% 8px 1%');
+        this.explanation
+            .append('p')
+            .text(
+                [
+                    'Each bubble in the animation below represents an individual.',
+                    'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
+                    'The number of state changes dictates the color and/or size of the bubbles.',
+                    'Use the controls below to interact with and alter the animation.',
+                ].join(' ')
+            );
+    }
+
     function getState(group, index) {
         return group[index];
+    }
+
+    function updateIndividual(events, state, previousState) {
+        var event = events.find(function (event) {
+            return event.value === state;
+        });
+        event.count +=
+            state === this.settings.eventFinal || previousState === this.settings.eventCentral;
+        return event;
     }
 
     function updateEventCount(events, state) {
@@ -299,6 +349,15 @@
             return event.value === state;
         });
         event.count = increment ? event.count + 1 : event.count - 1;
+        return event;
+    }
+
+    function updateCumulative(events, state, previousState) {
+        var event = events.find(function (event) {
+            return event.value === state;
+        });
+        event.cumulative +=
+            state === this.settings.eventFinal || previousState === this.settings.eventCentral;
         return event;
     }
 
@@ -353,9 +412,20 @@
 
                 d.value.state = getState.call(_this, d.value.group, d.value.moves); // Update individual event count at current event.
 
-                updateEventCount.call(_this, d.value.events, d.value.state.event); // Update population count at previous and current events.
+                updateIndividual.call(
+                    _this,
+                    d.value.events,
+                    d.value.state.event,
+                    d.value.prevEvent
+                ); // Update population count at previous and current events.
 
                 updateEventCount.call(_this, _this.metadata.event, d.value.state.event);
+                updateCumulative.call(
+                    _this,
+                    _this.metadata.event,
+                    d.value.state.event,
+                    d.value.prevEvent
+                );
                 updateEventCount.call(_this, _this.metadata.event, currEvent, false); // Update timepoint of next state change.
 
                 d.value.nextStateChange += d.value.group[d.value.moves].duration;
@@ -440,6 +510,34 @@
         }
     }
 
+    // TODO: Pass the previous event to the function to add a condition to determine when to increment or not.
+    //
+    // The focus count should always update but the individual state changes and the cumulative event
+    // count should only increase if previous event is not the central event, don't increment the
+    // individual.
+    function updateEventCount$1(events, state) {
+        var previousState =
+            arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var increment = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+        var event = events.find(function (event) {
+            return event.value === state;
+        }); // Increment only if previous state is the central event or if the current state is the final state.
+        // Decrement regardless, when an individual leaves a focus.
+
+        event.count = increment
+            ? event.count +
+              (previousState === null ||
+                  state === this.settings.eventFinal ||
+                  previousState === this.settings.eventCentral)
+            : event.count - 1; // Increment cumulative only if previous state is the central event or if the current state is the final state.
+
+        if (increment) {
+            event.cumulative += this.settings.eventSequence.includes(previousState) === false;
+        }
+
+        return event;
+    }
+
     function calculateInitialPointCoordinates(populationEvent) {
         // Define a random angle and a random radius with which to initialize point coordinates.
         var r = Math.sqrt(~~(Math.random() * this.settings.R * this.settings.R));
@@ -461,6 +559,7 @@
 
         this.metadata.event.forEach(function (event) {
             event.count = 0;
+            event.cumulative = 0;
         });
         this.data.nested.forEach(function (d) {
             // Initial event for the given individual.
@@ -471,12 +570,12 @@
                 event.duration = 0;
             }); // Update individual event count at initial event.
 
-            updateEventCount.call(_this, d.value.events, d.value.state.event); // Reset state index and timepoint of next state change.
+            updateEventCount$1.call(_this, d.value.events, d.value.state.event); // Reset state index and timepoint of next state change.
 
             d.value.moves = 0;
             d.value.nextStateChange = d.value.state.duration; // Update population count at previous and current events.
 
-            var populationEvent = updateEventCount.call(
+            var populationEvent = updateEventCount$1.call(
                 _this,
                 _this.metadata.event,
                 d.value.state.event
@@ -511,7 +610,17 @@
             updateText.call(this);
         } else {
             resetAnimation.call(this);
-        } // Resume the force simulation.
+        } // Update frequency table.
+
+        this.freqTable.tr
+            .selectAll('td')
+            .data(function (event) {
+                return [event.value, event.cumulative];
+            })
+            .join('td')
+            .text(function (d) {
+                return d;
+            }); // Resume the force simulation.
 
         this.metadata.event.forEach(function (event) {
             event.forceSimulation.nodes(event.data);
@@ -1038,6 +1147,33 @@
         this.legends.both = makeLegend.call(this, 'both');
     }
 
+    function addFreqTable() {
+        var freqTable = {
+            container: this.container.append('div').classed('fdg-freq-table', true),
+        };
+        freqTable.table = freqTable.container.append('table');
+        freqTable.thead = freqTable.table.append('thead');
+        freqTable.th = freqTable.thead
+            .append('th')
+            .attr('colspan', 2)
+            .text('Cumulative Number of Events');
+        freqTable.tbody = freqTable.table.append('tbody');
+        freqTable.tr = freqTable.tbody
+            .selectAll('tr')
+            .data(this.metadata.event.slice(1))
+            .join('tr');
+        freqTable.td = freqTable.tr
+            .selectAll('td')
+            .data(function (event) {
+                return [event.value, event.cumulative];
+            })
+            .join('td')
+            .text(function (d) {
+                return d;
+            });
+        return freqTable;
+    }
+
     function addOrbits() {
         var orbits = this.svg
             .selectAll('circle.orbit')
@@ -1197,7 +1333,9 @@
             .select(this.element)
             .append('div')
             .classed('force-directed-graph', true)
-            .datum(this); // controls
+            .datum(this); // explanation
+
+        addExplanation.call(this); // controls
 
         addControls.call(this); // side panel
 
@@ -1206,6 +1344,7 @@
             .classed('fdg-timer', true)
             .text(''.concat(this.settings.timepoint, ' ').concat(this.settings.timeUnit));
         addLegends.call(this);
+        this.freqTable = addFreqTable.call(this);
         this.notes = this.container.append('div').classed('fdg-notes', true); // main panel
 
         this.container = this.container.append('div').classed('fdg-container', true); // canvas underlay
@@ -1361,9 +1500,9 @@
                 var state = getState.call(_this, group, 0); // Define an event object for the individual.
 
                 var individualEvents = defineIndividualEvents.call(_this, group);
-                var individualEvent = updateEventCount.call(_this, individualEvents, state.event); // Update the event object of the population.
+                var individualEvent = updateEventCount$1.call(_this, individualEvents, state.event); // Update the event object of the population.
 
-                var populationEvent = updateEventCount.call(
+                var populationEvent = updateEventCount$1.call(
                     _this,
                     _this.metadata.event,
                     state.event

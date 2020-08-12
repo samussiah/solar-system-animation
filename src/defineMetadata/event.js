@@ -10,6 +10,7 @@ export default function event() {
                 order,
                 count: 0,
                 prevCount: 0,
+                cumulative: 0,
             };
         })
         .entries(this.data);

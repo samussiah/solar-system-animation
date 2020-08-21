@@ -455,6 +455,8 @@
     }
 
     var increment = function increment() {
+      var _this = this;
+
       // Increment the timepoint.
       this.settings.timepoint++;
 
@@ -477,6 +479,8 @@
       }); // Resume the force simulation.
 
       this.metadata.event.forEach(function (event) {
+        // Center points initially then remove centering force.
+        if (_this.settings.timepoint === 1) event.forceSimulation.force('center', null);
         event.forceSimulation.nodes(event.data);
         event.forceSimulation.alpha(1).restart();
       });
@@ -1060,6 +1064,8 @@
 
         var datum = _objectSpread2(_objectSpread2({
           state: state,
+          x: populationEvent.x,
+          y: populationEvent.y,
           events: individualEvents,
           duration: d3.sum(group, function (d) {
             return d.duration;
@@ -1074,6 +1080,7 @@
 
         return datum;
       }).entries(this.data);
+      console.log(nestedData);
       return nestedData;
     }
 
@@ -1099,14 +1106,14 @@
       //    d.y += (event.y - d.y) * k;
       //});
       this.context.clearRect(0, 0, this.settings.width, this.settings.height);
-      this.context.save(); //this.context.translate(this.settings.width/2,this.settings.height/2);
-
+      this.context.save();
       this.data.nested.sort(function (a, b) {
         return a.value.stateChanges - b.value.stateChanges;
       }) // draw bubbles with more state changes last
       .forEach(function (d, i) {
-        _this.context.beginPath(); //this.context.moveTo(d.x + d.r, d.y);
+        _this.context.beginPath();
 
+        _this.context.moveTo(d.x + d.r, d.y);
 
         _this.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
 
@@ -1128,7 +1135,7 @@
       // the viewport.
       //
       // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
-      var forceSimulation = d3.forceSimulation().nodes(event.data).alphaDecay(0.005).velocityDecay(0.9).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', d3.forceManyBodyReuse().strength(-2)).on('tick', tick.bind(this)); //if (event.value !== this.settings.eventCentral)
+      var forceSimulation = d3.forceSimulation().nodes(event.data).alphaDecay(0.005).velocityDecay(0.9).force('center', d3.forceCenter(this.settings.width / 2, this.settings.height / 2)).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', d3.forceManyBodyReuse().strength(-2)).on('tick', tick.bind(this)); //if (event.value !== this.settings.eventCentral)
 
       forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5));
       return forceSimulation;

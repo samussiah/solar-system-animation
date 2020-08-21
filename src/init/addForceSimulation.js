@@ -15,7 +15,7 @@ export default function addForceSimulation(event) {
         .force('center', d3.forceCenter(this.settings.width/2, this.settings.height/2))
         .force('x', d3.forceX(event.x).strength(0.3))
         .force('y', d3.forceY(event.y).strength(0.3))
-        .force('charge', d3.forceManyBodyReuse().strength(-2))
+        .force('charge', d3.forceManyBodyReuse().strength(-(2000/this.metadata.id.length)))
         .on('tick', tick.bind(this));
 
     //if (event.value !== this.settings.eventCentral)

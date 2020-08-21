@@ -60,7 +60,6 @@ export default function nestData() {
             return datum;
         })
         .entries(this.data);
-    console.log(nestedData);
 
     return nestedData;
 }

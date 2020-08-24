@@ -5,16 +5,18 @@ export default function addOrbits() {
         .enter()
         .append('circle')
         .classed('orbit', true)
-        .attr(
-            'transform',
-            `translate(-${this.settings.width / 2 - 100},-${this.settings.height / 2 - 100})`
-        )
         .attr('cx', (d) => d.cx)
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r)
         .attr('fill', 'none')
         .attr('stroke', '#aaa')
         .attr('stroke-width', '.5');
+
+    if (this.settings.translate)
+        orbits.attr(
+            'transform',
+            `translate(-${this.settings.width / 2 - 100},-${this.settings.height / 2 - 100})`
+        );
 
     return orbits;
 }

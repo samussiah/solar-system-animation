@@ -5,8 +5,11 @@ export default function annotateFoci() {
         .selectAll('g.fdg-focus-annotation')
         .data(this.metadata.event)
         .join('g')
-        .classed('fdg-focus-annotation', true)
-        .attr(
+        .classed('fdg-focus-annotation', true);
+    console.log(this.metadata.event);
+
+    if (this.settings.translate)
+        fociLabels.attr(
             'transform',
             `translate(-${this.settings.width / 2 - 100},-${this.settings.height / 2 - 100})`
         );
@@ -29,7 +32,7 @@ export default function annotateFoci() {
     // text
 
     const isCenterX = (d) => Math.round(d.x) === Math.round(this.settings.width / 2);
-    const isLessThanCenterX = (d) => Math.round(d.x) < Math.round(this.settings.width / 2);
+    const isLessThanCenterX = (d) => d.order === 1 || Math.round(d.x) < Math.round(this.settings.width / 2);
     const getX = (d) => (isCenterX(d) ? d.x : d.x - (-1) ** isLessThanCenterX(d) * 10);
     const getTextAnchor = (d) => (isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end');
 

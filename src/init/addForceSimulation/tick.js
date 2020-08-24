@@ -2,7 +2,8 @@ export default function tick() {
     this.context.clearRect(0, 0, this.settings.width, this.settings.height);
     this.context.save();
     //this.context.translate(this.settings.width/2,this.settings.height/2);
-    this.context.translate(-(this.settings.width / 2 - 100), -(this.settings.height / 2 - 100));
+    if (this.settings.translate)
+        this.context.translate(-(this.settings.width / 2 - 100), -(this.settings.height / 2 - 100));
 
     this.data.nested
         .sort((a, b) => a.value.stateChanges - b.value.stateChanges) // draw bubbles with more state changes last

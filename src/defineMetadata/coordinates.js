@@ -1,7 +1,7 @@
 export default function coordinates(metadata) {
     // Dimensions of canvas.
     this.settings.width =
-        (metadata.event.length - !!this.settings.eventCentral) * this.settings.orbitRadius * 2 +
+        metadata.orbit.length * this.settings.orbitRadius * 2 +
         this.settings.orbitRadius;
     this.settings.height = this.settings.width;
 
@@ -11,6 +11,7 @@ export default function coordinates(metadata) {
     const theta =
         (2 * Math.PI) /
         (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
+    const thetaFactor = (i) => i - 1;
 
     metadata.event.forEach((event, i) => {
         event.x =
@@ -18,14 +19,16 @@ export default function coordinates(metadata) {
                 ? centerX
                 : event.order *
                       this.settings.orbitRadius *
-                      Math.cos(((this.settings.nFoci - i + 3) % this.settings.nFoci) * theta) +
+                      Math.cos(thetaFactor(i) * theta) +
+                      //Math.cos((this.settings.nFoci - i) * theta) +
                   centerX;
         event.y =
             event.order === 0
                 ? centerY
                 : event.order *
                       this.settings.orbitRadius *
-                      Math.sin(((this.settings.nFoci - i + 3) % this.settings.nFoci) * theta) +
+                      Math.sin(thetaFactor(i) * theta) +
+                      //Math.sin((this.settings.nFoci - i) * theta) +
                   centerY;
     });
 

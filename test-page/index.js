@@ -18,13 +18,21 @@ fetch('./data_4000.csv')
             })
             .entries(data);
 
+        data.forEach((d,i) => {
+            if (d.event === 'Death')
+                d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
+        });
+
         const fdg = forceDirectedGraph(
             data,
             '#container',
             {
+                eventChangeCount: ['Hospitalization', 'ICU'],
+                eventChangeCountAesthetic: 'both',
+                translate: true,
                 //playPause: 'play',
                 //speed: 'fast',
-                nFoci: 8,
+                nFoci: 12,
             }
         );
     });

@@ -42,6 +42,8 @@ export default function nestData() {
 
             const datum = {
                 state,
+                x: populationEvent.x,
+                y: populationEvent.y,
                 events: individualEvents,
                 duration: d3.sum(group, (d) => d.duration),
                 moves: 0,

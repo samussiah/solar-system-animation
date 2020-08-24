@@ -1,6 +1,7 @@
 import id from './defineMetadata/id';
 import event from './defineMetadata/event';
 import orbit from './defineMetadata/orbit';
+import coordinates from './defineMetadata/coordinates';
 
 export default function defineMetadata() {
     // Define sets.
@@ -10,7 +11,7 @@ export default function defineMetadata() {
     metadata.id = id.call(this);
 
     // Settings dependent on the ID set.
-    this.settings.minRadius = this.settings.minRadius || 3; //Math.min(3000 / metadata.id.length, 3);
+    this.settings.minRadius = this.settings.minRadius || 3000 / metadata.id.length;
     this.settings.maxRadius =
         this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
     this.settings.reset = this.settings.reset || d3.max(metadata.id, (id) => id.duration);
@@ -19,6 +20,7 @@ export default function defineMetadata() {
     metadata.event = event.call(this);
 
     // Update settings that depend on event set.
+    this.settings.width = this.settings.width || metadata.event.length;
     this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
     this.settings.eventFinal =
         this.settings.eventFinal || metadata.event[metadata.event.length - 1].value;
@@ -34,6 +36,9 @@ export default function defineMetadata() {
 
     // Define orbits.
     metadata.orbit = orbit.call(this, metadata.event);
+
+    // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
+    coordinates.call(this, metadata);
 
     return metadata;
 }

@@ -1,6 +1,6 @@
 {
   "name": "force-directed-graph",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",
   "module": "./src/index.js",
   "main": "./index.js",

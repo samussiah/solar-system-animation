@@ -15,19 +15,10 @@ export default function event() {
         })
         .entries(this.data);
 
-    // Calculate coordinates of event focus.
-    const centerX = this.settings.width / 2;
-    const centerY = this.settings.height / 2;
-    const theta = (2 * Math.PI) / (this.settings.nFoci || (nest.length - !!this.settings.eventCentral - 1));
-
-    nest.forEach((event, i) => {
+    nest.forEach((event) => {
         Object.assign(event, event.value);
         event.value = event.key;
         delete event.key;
-        event.x =
-            event.order === 0 ? centerX : (event.order * 100 + 50) * Math.cos(i * theta) + centerX;
-        event.y =
-            event.order === 0 ? centerY : (event.order * 100 + 50) * Math.sin(i * theta) + centerY;
     });
 
     // Ensure events plot in order.

@@ -5,7 +5,11 @@ export default function annotateFoci() {
         .selectAll('g.fdg-focus-annotation')
         .data(this.metadata.event)
         .join('g')
-        .classed('fdg-focus-annotation', true);
+        .classed('fdg-focus-annotation', true)
+        .attr(
+            'transform',
+            `translate(-${this.settings.width / 2 - 100},-${this.settings.height / 2 - 100})`
+        );
 
     // defs - give the text a background
     //const filters = fociLabels

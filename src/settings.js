@@ -28,10 +28,11 @@ const settings = {
     playPause: 'play',
 
     // dimensions
-    width: 800,
-    height: 800,
+    width: 1000,
+    height: 1000,
     padding: 1,
     nOrbits: null, // defined in ../defineMetadata/dataDrivenSettings/orbits
+    orbitRadius: 150,
     nFoci: null, // defined in ../defineMetadata/dataDrivenSettings/event
 
     // color and size settings

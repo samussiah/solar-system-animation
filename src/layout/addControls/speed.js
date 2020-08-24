@@ -1,3 +1,4 @@
+import toggle from './playPause/toggle';
 import startInterval from '../../init/startInterval';
 
 export default function speed() {
@@ -27,8 +28,10 @@ export default function speed() {
     inputs.on('click', function (d) {
         fdg.settings.speed = d.label;
         inputs.classed('current', (di) => di.label === d.label);
-        fdg.interval.stop();
-        fdg.interval = startInterval.call(fdg);
+        if (fdg.settings.playPause === 'play') {
+            fdg.interval.stop();
+            fdg.interval = startInterval.call(fdg);
+        }
     });
 
     return {

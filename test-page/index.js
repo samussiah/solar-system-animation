@@ -1,4 +1,4 @@
-fetch('./data_1000.csv')
+fetch('./data_4000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -22,9 +22,9 @@ fetch('./data_1000.csv')
             data,
             '#container',
             {
-                playPause: 'play',
+                //playPause: 'play',
                 //speed: 'fast',
-                //nFoci: 12,
+                nFoci: 8,
             }
         );
     });

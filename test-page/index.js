@@ -23,6 +23,8 @@ fetch('./data_4000.csv')
                 d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
         });
 
+        console.log(JSON.stringify(data));
+
         const fdg = forceDirectedGraph(
             data,
             '#container',

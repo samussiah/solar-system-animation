@@ -3,9 +3,9 @@ import pulseOrbits from './startInterval/pulseOrbits';
 import updateText from './startInterval/updateText';
 import resetAnimation from './startInterval/resetAnimation';
 
-export const increment = function () {
+export const increment = function (arg) {
     // Increment the timepoint.
-    this.settings.timepoint++;
+    this.settings.timepoint+=!!arg;
 
     if (this.settings.timepoint <= this.settings.reset) {
         // Update the node data.
@@ -17,7 +17,18 @@ export const increment = function () {
         // Update timer, focus labels, and annotations.
         updateText.call(this);
     } else {
-        resetAnimation.call(this);
+        this.interval.stop();
+        // TODO: make visual countdown to reset
+        //let counter = 0;
+        //const interval = d3.interval(() => {
+        const timeout = window.setTimeout(
+            () => {
+                resetAnimation.call(this);
+                window.clearTimeout(timeout);
+                this.interval = startInterval.call(this)
+            },
+            this.settings.resetDelay
+        );
     }
 
     // Update frequency table.

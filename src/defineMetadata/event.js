@@ -11,6 +11,7 @@ export default function event() {
                 count: 0,
                 prevCount: 0,
                 cumulative: 0,
+                nEvents: group.length
             };
         })
         .entries(this.data);
@@ -22,7 +23,7 @@ export default function event() {
     });
 
     // Ensure events plot in order.
-    nest.sort((a, b) => a.order - b.order);
+    nest.sort((a, b) => a.order - b.order || b.nEvents - a.nEvents);
 
     return nest;
 }

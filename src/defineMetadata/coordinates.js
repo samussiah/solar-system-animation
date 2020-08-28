@@ -1,17 +1,14 @@
 export default function coordinates(metadata) {
     // Dimensions of canvas.
-    this.settings.width =
-        metadata.orbit.length * this.settings.orbitRadius * 2 +
-        this.settings.orbitRadius;
-    this.settings.height = this.settings.width;
+    this.settings.orbitRadius = this.settings.width / (metadata.orbit.length + 1);
 
     // Calculate coordinates of event focus.
-    const centerX = this.settings.width / 2;
+    const centerX = this.settings.orbitRadius / 2;
     const centerY = this.settings.height / 2;
     const theta =
         (2 * Math.PI) /
         (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
-    const thetaFactor = (i) => i - 1;
+    const thetaFactor = (i) => i === 0 ? 0 : i === 1 ? -1.75 : i === 2 ? .75 : i === 3 ? -.25 : i === 4 ? .25 : 0;
 
     metadata.event.forEach((event, i) => {
         event.x =

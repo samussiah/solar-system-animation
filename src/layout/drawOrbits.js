@@ -1,5 +1,5 @@
 export default function addOrbits() {
-    const orbits = this.svg
+    const orbits = this.containers.svg
         .selectAll('circle.orbit')
         .data(this.metadata.orbit)
         .enter()

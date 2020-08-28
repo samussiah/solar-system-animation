@@ -1,6 +1,6 @@
 export default function addFreqTable() {
     const freqTable = {
-        container: this.container.append('div').classed('fdg-freq-table', true),
+        container: this.containers.freqTable,
     };
 
     freqTable.table = freqTable.container.append('table');

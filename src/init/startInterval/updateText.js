@@ -1,6 +1,6 @@
 export default function updateText() {
     // Update time
-    this.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
+    this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
 
     // Update percentages
     if (this.settings.eventCount)
@@ -10,12 +10,11 @@ export default function updateText() {
 
     // Update notes
     if (this.settings.timepoint === this.settings.notes[this.settings.notesIndex].startTimepoint) {
-        this.notes
-            .style('top', '0px')
+        this.containers.info
+            .style('opacity', 0)
             .transition()
             .duration(600)
-            .style('top', '20px')
-            .style('color', '#000000')
+            .style('opacity', 1)
             .text(this.settings.notes[this.settings.notesIndex].text);
     }
 
@@ -23,7 +22,7 @@ export default function updateText() {
     else if (
         this.settings.timepoint === this.settings.notes[this.settings.notesIndex].stopTimepoint
     ) {
-        this.notes.transition().duration(1000).style('top', '300px').style('color', '#ffffff');
+        this.containers.info.transition().duration(1000).style('opacity', 0);
 
         this.settings.notesIndex += 1;
 

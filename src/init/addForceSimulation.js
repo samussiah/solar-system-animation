@@ -13,14 +13,15 @@ export default function addForceSimulation(event) {
         //.alphaMin(.1)
         .alphaDecay(0.005)
         .velocityDecay(0.9)
-        .force('center', d3.forceCenter(this.settings.width / 2, this.settings.height / 2))
+        .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
         .force('x', d3.forceX(event.x).strength(0.3))
         .force('y', d3.forceY(event.y).strength(0.3))
         .force('charge', d3.forceManyBodyReuse().strength(-(2000 / this.metadata.id.length)))
         .on('tick', tick.bind(this));
 
     //if (event.value !== this.settings.eventCentral)
-    forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5));
+    forceSimulation.force('collide', d3.forceCollide().radius(d => d.value.r + .5));
+    //forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5));
 
     return forceSimulation;
 }

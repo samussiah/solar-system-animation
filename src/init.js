@@ -6,5 +6,6 @@ export default function init() {
         event.forceSimulation = addForceSimulation.call(this, event);
     });
 
+    this.resetting = [];
     if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
 }

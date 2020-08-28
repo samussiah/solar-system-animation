@@ -1,53 +1,56 @@
-import addExplanation from './layout/addExplanation';
-import addControls from './layout/addControls';
-import addLegends from './layout/addLegends';
-import addFreqTable from './layout/addFreqTable';
-import drawOrbits from './layout/drawOrbits';
-import annotateFoci from './layout/annotateFoci';
+import addElement from './layout/addElement';
 
 export default function layout() {
-    this.container = d3
-        .select(this.element)
-        .append('div')
-        .classed('force-directed-graph', true)
-        .datum(this);
+    const main = addElement('main', d3.select(this.element));
 
-    // explanation
-    addExplanation.call(this);
+    // controls on top
+    const controls = addElement('controls', main);
 
-    // controls
-    addControls.call(this);
+    // sidebar to the left
+    const sidebar = addElement('sidebar', main);
+    const timer = addElement('timer', sidebar);
+    const timerDots = addElement('timer-dots', sidebar)
+        .style('width', '100%')
+        .style('text-align', 'center')
+        .selectAll('div')
+        .data(d3.range(this.settings.resetDelay/100))
+        .join('span')
+        .style('width', `${100/(this.settings.resetDelay/100)}%`)
+        .style('display', 'inline-block')
+        .text('.')
+        .classed('fdg-hidden', true);
+    const legends = addElement('legends', sidebar);
+    const freqTable = addElement('freq-table', sidebar);
+    const info = addElement('info', sidebar);
 
-    // side panel
-    this.timer = this.container
-        .append('div')
-        .classed('fdg-timer', true)
-        .text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
-    addLegends.call(this);
-    this.freqTable = addFreqTable.call(this);
-    this.notes = this.container.append('div').classed('fdg-notes', true);
-
-    // main panel
-    this.container = this.container.append('div').classed('fdg-container', true);
-
-    // canvas underlay
-    this.canvas = this.container
-        .append('canvas')
-        .classed('fdg-canvas', true)
+    // animation to the right
+    const animation = addElement('animation', main);
+    this.settings.width = animation.node().clientWidth;
+    this.settings.height = this.settings.width / 21 * 9;
+    const canvas = addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
-    this.context = this.canvas.node().getContext('2d');
+    canvas.context = canvas.node().getContext('2d');
+    const svg = addElement('svg', animation, 'svg')
+        .attr('width', this.settings.width)
+        .attr('height', this.settings.height);
 
-    // SVG overlay
-    this.svg = this.container
-        .append('svg')
-        .classed('fdg-svg', true)
-        .attr('width', this.settings.width + 200)
-        .attr('height', this.settings.height + 200);
+    sidebar.style('height', `${this.settings.height}px`);
 
-    // Draw concentric circles.
-    this.orbits = drawOrbits.call(this);
+    return {
+        main,
 
-    // Annotate foci.
-    this.focusAnnotations = annotateFoci.call(this);
+        controls,
+
+        sidebar,
+        timer,
+        timerDots,
+        legends,
+        freqTable,
+        info,
+
+        animation,
+        canvas,
+        svg,
+    };
 }

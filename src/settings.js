@@ -7,6 +7,7 @@ const settings = {
     timepoint: 0,
     timeUnit: 'days since randomization',
     reset: null, // defined in ./defineMetadata/dataDrivenSettings
+    resetDelay: 5000,
     timeFrame: null,
 
     // event settings
@@ -40,6 +41,7 @@ const settings = {
     colors,
     colorScale,
     color,
+    fill: null, // defined in ./defineMetadata/dataDrivenSettings
     minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
     maxRadius: null, // defined in ./defineMetadata/dataDrivenSettings
 

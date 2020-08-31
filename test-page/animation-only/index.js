@@ -1,4 +1,4 @@
-fetch('./data_1000.csv')
+fetch('../data_1000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -27,7 +27,7 @@ fetch('./data_1000.csv')
             data,
             '#container',
             {
-                //animationOnly: true,
+                animationOnly: true,
                 eventFinal: ['Death (CV-related)', 'Death (other)'],
                 eventChangeCount: ['Hospitalization', 'ICU'],
                 eventChangeCountAesthetic: 'both',

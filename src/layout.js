@@ -48,9 +48,20 @@ export default function layout() {
     const info = addElement('info', sidebar);
 
     // animation to the right
+    if (this.settings.animationOnly) {
+        main.selectAll('*').classed('fdg-hidden', true);
+        timer.classed('fdg-hidden', false);
+        timer.selectAll('*').classed('fdg-hidden', false);
+        timer.style('position', 'absolute').style('left', '5%').style('top', '25%').style('text-align', 'left');
+        main.style('position', 'relative').node().appendChild(timer.node());
+    }
     const animation = addElement('animation', main);
+    if (this.settings.animationOnly)
+        animation.style('width', '100%').style('height', '100vh').style('border-left', 'unset');
     this.settings.width = animation.node().clientWidth;
-    this.settings.height = (this.settings.width / 21) * 9;
+    this.settings.height = this.settings.animationOnly
+        ? animation.node().clientHeight//window.innerHeight
+        : (this.settings.width / 21) * 9;
     const canvas = addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);

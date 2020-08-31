@@ -52,6 +52,7 @@ export default function nestData() {
                 group,
 
                 // point attributes
+                stateChanges,
                 ...initialPointCoordinates,
                 r,
                 ...color,

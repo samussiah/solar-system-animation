@@ -1,4 +1,4 @@
-fetch('./data_4000.csv')
+fetch('./data_1000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -18,13 +18,22 @@ fetch('./data_4000.csv')
             })
             .entries(data);
 
+        data.forEach((d,i) => {
+            if (d.event === 'Death')
+                d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
+        });
+
         const fdg = forceDirectedGraph(
             data,
             '#container',
             {
+                eventChangeCount: ['Hospitalization', 'ICU'],
+                eventChangeCountAesthetic: 'both',
+                //translate: true,
                 //playPause: 'play',
                 //speed: 'fast',
-                nFoci: 8,
+                nFoci: 16,
+                //duration: 5,
             }
         );
     });

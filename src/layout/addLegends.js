@@ -5,7 +5,7 @@ import makeLegend from './addLegends/makeLegend';
 
 export default function addLegends() {
     this.legends = {
-        container: this.container.append('div').classed('fdg-legends', true),
+        container: this.containers.legends,
     };
 
     this.legends.color = makeLegend.call(this, 'color');

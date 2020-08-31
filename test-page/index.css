@@ -21,7 +21,14 @@ body > * {
     font-weight: lighter;
 }
 #description {
-    font-size: .75rem;
+    text-align: left;
+    font-size: 20px;
+    font-weight: lighter;
+    width: calc(94% - 2px);
+    border: 1px solid #333;
+    background: #eee;
+    border-radius: 4px;
+    padding: 4px 1% 8px 1%;
 }
 #container {
     display: inline-block;
@@ -29,12 +36,16 @@ body > * {
 
 /* force-directed-graph */
 
-.force-directed-graph {
+.fdg-main {
 }
+
 .fdg-hidden {
     display: none !important;
 }
-.force-directed-graph > * {
+.fdg-invisible {
+    visibility: hidden !important;
+}
+.fdg-main > * {
     display: inline-block;
 }
 .fdg-controls {
@@ -48,23 +59,68 @@ body > * {
     --left-margin: 20%;
 }
 
-/* side panel */
+/* sidebar */
+.fdg-sidebar {
+    display:inline-block;
+    width: calc(var(--left-margin) - 20px);
+    padding: 10px;
+    float: left;
+    clear: left;
+    background: #eee;
+}
 .fdg-timer,
 .fdg-legends,
 .fdg-freq-table,
-.fdg-notes {
-    width: calc(var(--left-margin) - 10px);
-    padding-right: 10px;
+.fdg-info {
+    width: 100%;
     display: inline-block;
-    float: left;
-    clear: left;
     text-align: center;
     margin: 10px 0px;
+}
+
+.fdg-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  background: #ddd;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.fdg-slider:hover {
+  opacity: 1;
+}
+
+.fdg-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 25px;
+  background: rgba(0, 104, 55, 0.75);
+}
+
+.fdg-slider::-moz-range-thumb {
+  width: 15px;
+  height: 25px;
+  background: rgba(0, 104, 55, 0.75);
 }
 
 .fdg-timer {
     font-weight: bold;
     font-size: 1.25rem;
+}
+.fdg-duration,
+.fdg-percent-complete {
+    top: 3rem;
+    position: absolute;
+}
+.fdg-duration {
+    top: 3.35rem;
+}
+.fdg-percent-complete {
+    margin-left: 4px;
 }
 
 .fdg-legends {
@@ -101,16 +157,21 @@ body > * {
     width: 25%;
 }
 
-.fdg-notes {
+.fdg-info {
     font-weight: lighter;
-    font-size: 1em;
-    text-align: center;
+    font-size: 1.5em;
+    color: black;
+    text-shadow:black 0px 0px 10px;
     height: 300px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
 }
 
-/* main panel */
+/* animation */
 
-.fdg-container {
+.fdg-animation {
     width: calc(100% - var(--left-margin) - 1px);
     display: inline-block;
     border-left: 1px solid #aaa;
@@ -118,6 +179,8 @@ body > * {
 }
 
 .fdg-canvas {
+    position: absolute;
+    left: 0;
 }
 
 .fdg-svg {
@@ -226,4 +289,3 @@ a:hover {
 .node {
   stroke-width: 1.5px;
 }
-

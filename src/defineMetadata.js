@@ -11,10 +11,11 @@ export default function defineMetadata() {
     metadata.id = id.call(this);
 
     // Settings dependent on the ID set.
+    this.settings.duration = this.settings.duration || d3.max(metadata.id, (id) => id.duration);
     this.settings.minRadius = this.settings.minRadius || 3000 / metadata.id.length;
     this.settings.maxRadius =
         this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
-    this.settings.reset = this.settings.reset || d3.max(metadata.id, (id) => id.duration);
+    this.settings.fill = this.settings.fill || metadata.id.length <= 2500;
 
     // Add additional metadata to event set.
     metadata.event = event.call(this);
@@ -23,7 +24,9 @@ export default function defineMetadata() {
     this.settings.width = this.settings.width || metadata.event.length;
     this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
     this.settings.eventFinal =
-        this.settings.eventFinal || metadata.event[metadata.event.length - 1].value;
+        Array.isArray(this.settings.eventFinal) && this.settings.eventFinal.length
+            ? this.settings.eventFinal
+            : [this.settings.eventFinal || metadata.event[metadata.event.length - 1].value];
     this.settings.nFoci =
         this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
     this.settings.eventChangeCount =

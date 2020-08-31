@@ -24,7 +24,7 @@ export default function step() {
         // Pause simulation.
         if (this.settings.playPause !== 'pause') toggle.call(this);
 
-        increment.call(this);
+        increment.call(this, true);
     });
 
     return {

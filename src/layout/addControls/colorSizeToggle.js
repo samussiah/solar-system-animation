@@ -1,5 +1,4 @@
-import defineRadius from '../../dataManipulation/nestData/defineRadius';
-import defineColor from '../../dataManipulation/nestData/defineColor';
+import { increment as redraw } from '../../init/startInterval';
 
 export default function colorSizeToggle() {
     const fdg = this;
@@ -50,18 +49,7 @@ export default function colorSizeToggle() {
             return !Array.from(this.classList).some((value) => value.includes(d));
         });
 
-        // Recalculate radius and fill/stroke of points.
-        fdg.data.nested.forEach((d) => {
-            // Add to new activity count
-            const stateChanges = d3.sum(
-                d.value.events.filter((event) =>
-                    fdg.settings.eventChangeCount.includes(event.value)
-                ),
-                (event) => event.count
-            );
-            d.r = defineRadius.call(fdg, stateChanges);
-            Object.assign(d.value, defineColor.call(fdg, stateChanges));
-        });
+        redraw.call(fdg, false);
     });
 
     return {

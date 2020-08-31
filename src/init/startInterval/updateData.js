@@ -56,16 +56,16 @@ export default function updateData() {
         }
 
         // Add to new activity count
-        const stateChanges = d3.sum(
+        d.value.stateChanges = d3.sum(
             d.value.events.filter((event) => this.settings.eventChangeCount.includes(event.value)),
             (event) => event.count
         );
 
         // Define radius.
-        d.value.r = defineRadius.call(this, stateChanges);
+        d.value.r = defineRadius.call(this, d.value.stateChanges);
 
         // Define color.
-        Object.assign(d.value, defineColor.call(this, stateChanges));
+        Object.assign(d.value, defineColor.call(this, d.value.stateChanges));
     });
 
     // Record change in number of IDs at each focus at current timepoint.

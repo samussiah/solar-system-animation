@@ -6,14 +6,14 @@ const settings = {
     // time settings
     timepoint: 0,
     timeUnit: 'days since randomization',
-    reset: null, // defined in ../defineMetadata/dataDrivenSettings
-    timeFrame: null,
+    duration: null, // defined in ./defineMetadata/dataDrivenSettings
+    resetDelay: 15000,
 
     // event settings
-    events: null, // defined in ../defineMetadata
-    eventCentral: null, // defined in ../defineMetadata/dataDrivenSettings
+    events: null, // defined in ./defineMetadata
+    eventCentral: null, // defined in ./defineMetadata/dataDrivenSettings
     eventCount: true, // display count (percentage) beneath focus labels?
-    eventChangeCount: null, // defined in ../defineMetadata/dataDrivenSettings
+    eventChangeCount: null, // defined in ./defineMetadata/dataDrivenSettings
     eventChangeCountAesthetic: 'color',
     excludeFirst: true,
     excludeLast: true,
@@ -28,19 +28,21 @@ const settings = {
     playPause: 'play',
 
     // dimensions
-    width: 1000,
-    height: 1000,
+    width: null, // defined in ./defineMetadata/coordinates
+    height: null, // defined in ./defineMetadata/coordinates
     padding: 1,
-    nOrbits: null, // defined in ../defineMetadata/dataDrivenSettings/orbits
+    nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
     orbitRadius: 150,
-    nFoci: null, // defined in ../defineMetadata/dataDrivenSettings/event
+    nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
+    translate: false,
 
     // color and size settings
     colors,
     colorScale,
     color,
-    minRadius: null, // defined in ../defineMetadata/dataDrivenSettings
-    maxRadius: null, // defined in ../defineMetadata/dataDrivenSettings
+    fill: null, // defined in ./defineMetadata/dataDrivenSettings
+    minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
+    maxRadius: null, // defined in ./defineMetadata/dataDrivenSettings
 
     // miscellaneous
     notes: [

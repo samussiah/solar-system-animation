@@ -1,53 +1,82 @@
-import addExplanation from './layout/addExplanation';
-import addControls from './layout/addControls';
-import addLegends from './layout/addLegends';
-import addFreqTable from './layout/addFreqTable';
-import drawOrbits from './layout/drawOrbits';
-import annotateFoci from './layout/annotateFoci';
+import addElement from './layout/addElement';
 
 export default function layout() {
-    this.container = d3
-        .select(this.element)
-        .append('div')
-        .classed('force-directed-graph', true)
-        .datum(this);
+    const fdg = this;
 
-    // explanation
-    addExplanation.call(this);
+    const main = addElement('main', d3.select(this.element));
 
-    // controls
-    addControls.call(this);
+    // controls on top
+    const controls = addElement('controls', main);
 
-    // side panel
-    this.timer = this.container
-        .append('div')
-        .classed('fdg-timer', true)
-        .text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
-    addLegends.call(this);
-    this.freqTable = addFreqTable.call(this);
-    this.notes = this.container.append('div').classed('fdg-notes', true);
+    // sidebar to the left
+    const sidebar = addElement('sidebar', main);
+    const timing = addElement('timing', sidebar).style('position', 'relative');
+    const timer = addElement('timer', timing);
+    const slider = addElement('slider', timing, 'input')
+        .attr('type', 'range')
+        .attr('min', 0)
+        .attr('value', 0)
+        .property('disabled', true)
+        .attr(
+            'title',
+            `The animation is ${d3.format('.1%')(
+                this.settings.timepoint / this.settings.duration
+            )} complete with ${this.settings.duration} ${
+                this.settings.timeUnit.split(' ')[0]
+            } to go.`
+        );
 
-    // main panel
-    this.container = this.container.append('div').classed('fdg-container', true);
+    // TODO: make slider into a control - need to figure out a new way to count up the state changes up to the selected timepoint
+    slider.on('change', function () {
+        console.log(this.value);
+        fdg.settings.timepoint = +this.value;
+    });
 
-    // canvas underlay
-    this.canvas = this.container
-        .append('canvas')
-        .classed('fdg-canvas', true)
+    const countdown = addElement('countdown', timing)
+        .style('height', '22px')
+        .style('width', '100%')
+        .style('text-align', 'center')
+        .selectAll('div')
+        .data(d3.range(-1, this.settings.resetDelay / 1000))
+        .join('div')
+        .style('width', '100%')
+        .style('display', 'inline-block')
+        .text((d) => `Looping in ${d + 1} second${d === 0 ? '' : 's'}`)
+        .classed('fdg-hidden', true);
+    const legends = addElement('legends', sidebar);
+    const freqTable = addElement('freq-table', sidebar);
+    const info = addElement('info', sidebar);
+
+    // animation to the right
+    const animation = addElement('animation', main);
+    this.settings.width = animation.node().clientWidth;
+    this.settings.height = (this.settings.width / 21) * 9;
+    const canvas = addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
-    this.context = this.canvas.node().getContext('2d');
+    canvas.context = canvas.node().getContext('2d');
+    const svg = addElement('svg', animation, 'svg')
+        .attr('width', this.settings.width)
+        .attr('height', this.settings.height);
 
-    // SVG overlay
-    this.svg = this.container
-        .append('svg')
-        .classed('fdg-svg', true)
-        .attr('width', this.settings.width + 200)
-        .attr('height', this.settings.height + 200);
+    sidebar.style('height', `${this.settings.height}px`);
 
-    // Draw concentric circles.
-    this.orbits = drawOrbits.call(this);
+    return {
+        main,
 
-    // Annotate foci.
-    this.focusAnnotations = annotateFoci.call(this);
+        controls,
+
+        sidebar,
+        timing,
+        timer,
+        slider,
+        countdown,
+        legends,
+        freqTable,
+        info,
+
+        animation,
+        canvas,
+        svg,
+    };
 }

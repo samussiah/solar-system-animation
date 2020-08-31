@@ -4,12 +4,19 @@
   "description": "a force-directed graph layout of participants with congestive heart failure over time",
   "module": "./src/index.js",
   "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samussiah/force-directed-graph.git"
+  },
   "scripts": {
     "build": "npm audit fix && npm run bundle && npm run format",
     "bundle": "rollup -c",
     "format": "npm run format-src && npm run format-bundle",
     "format-src": "prettier --print-width=100 --tab-width=4 --single-quote --write \"./src/**/*.js\"",
     "format-bundle": "prettier --print-width=100 --tab-width=4 --single-quote --write ./index.js",
+    "minify": "npm run minify-bundle && npm run minify-css",
+    "minify-bundle": "minify ./index.js > ./index.min.js",
+    "minify-css": "minify ./test-page/index.css > ./test-page/index.min.css",
     "local": "http-server .",
     "test-page": "start chrome ./test-page/index.html && start firefox ./test-page/index.html && start iexplore file://%CD%/test-page/index.html",
     "watch": "rollup -c -w"
@@ -23,9 +30,12 @@
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
+    "html-webpack-plugin": "^4.3.0",
     "http-server": "^0.12.3",
+    "minify": "^5.1.1",
     "prettier": "^2.0.5",
     "rollup": "^2.18.2",
-    "rollup-plugin-babel": "^4.4.0"
+    "rollup-plugin-babel": "^4.4.0",
+    "webpack": "^4.44.1"
   }
 }

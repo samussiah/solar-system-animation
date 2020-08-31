@@ -7,7 +7,7 @@ import colorSizeToggle from './addControls/colorSizeToggle';
 
 export default function addControls() {
     this.controls = {
-        container: this.container.append('div').classed('fdg-controls', true),
+        container: this.containers.controls,
     };
     this.controls.speed = speed.call(this);
     this.controls.playPause = playPause.call(this);

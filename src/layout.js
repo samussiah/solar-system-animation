@@ -1,6 +1,8 @@
 import addElement from './layout/addElement';
 
 export default function layout() {
+    const fdg = this;
+
     const main = addElement('main', d3.select(this.element));
 
     // controls on top
@@ -8,21 +10,38 @@ export default function layout() {
 
     // sidebar to the left
     const sidebar = addElement('sidebar', main);
-    const timing = addElement('timing', sidebar);
+    const timing = addElement('timing', sidebar).style('position', 'relative');
     const timer = addElement('timer', timing);
-    const duration = addElement('duration', timing)
-        .style('height', '8px')
-        .style('background', this.settings.colors()[0]);
+    const slider = addElement('slider', timing, 'input')
+        .attr('type', 'range')
+        .attr('min', 0)
+        .attr('value', 0)
+        .property('disabled', true)
+        .attr(
+            'title',
+            `The animation is ${d3.format('.1%')(
+                this.settings.timepoint / this.settings.duration
+            )} complete with ${this.settings.duration} ${
+                this.settings.timeUnit.split(' ')[0]
+            } to go.`
+        );
+
+    // TODO: make slider into a control - need to figure out a new way to count up the state changes up to the selected timepoint
+    slider.on('change', function () {
+        console.log(this.value);
+        fdg.settings.timepoint = +this.value;
+    });
+
     const countdown = addElement('countdown', timing)
         .style('height', '22px')
         .style('width', '100%')
         .style('text-align', 'center')
         .selectAll('div')
-        .data(d3.range(-1, this.settings.resetDelay/1000))
+        .data(d3.range(-1, this.settings.resetDelay / 1000))
         .join('div')
         .style('width', '100%')
         .style('display', 'inline-block')
-        .text(d => `Looping in ${d + 1} seconds`)
+        .text((d) => `Looping in ${d + 1} second${d === 0 ? '' : 's'}`)
         .classed('fdg-hidden', true);
     const legends = addElement('legends', sidebar);
     const freqTable = addElement('freq-table', sidebar);
@@ -31,7 +50,7 @@ export default function layout() {
     // animation to the right
     const animation = addElement('animation', main);
     this.settings.width = animation.node().clientWidth;
-    this.settings.height = this.settings.width / 21 * 9;
+    this.settings.height = (this.settings.width / 21) * 9;
     const canvas = addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
@@ -50,7 +69,7 @@ export default function layout() {
         sidebar,
         timing,
         timer,
-        duration,
+        slider,
         countdown,
         legends,
         freqTable,

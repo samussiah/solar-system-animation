@@ -78,9 +78,49 @@ body > * {
     margin: 10px 0px;
 }
 
+.fdg-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  background: #ddd;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.fdg-slider:hover {
+  opacity: 1;
+}
+
+.fdg-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 25px;
+  background: rgba(0, 104, 55, 0.75);
+}
+
+.fdg-slider::-moz-range-thumb {
+  width: 15px;
+  height: 25px;
+  background: rgba(0, 104, 55, 0.75);
+}
+
 .fdg-timer {
     font-weight: bold;
     font-size: 1.25rem;
+}
+.fdg-duration,
+.fdg-percent-complete {
+    top: 3rem;
+    position: absolute;
+}
+.fdg-duration {
+    top: 3.35rem;
+}
+.fdg-percent-complete {
+    margin-left: 4px;
 }
 
 .fdg-legends {

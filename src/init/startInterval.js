@@ -5,9 +5,20 @@ import resetAnimation from './startInterval/resetAnimation';
 
 export const increment = function (arg) {
     // Increment the timepoint.
-    this.settings.timepoint+=!!arg;
-    this.containers.duration
-        .style('width', `${Math.min(this.settings.timepoint/this.settings.duration*100, 100)}%`);
+    this.settings.timepoint += !!arg;
+
+    // Ensure the timepoint does not pass the total duration - off-by-one error?
+    const timepoint = Math.min(this.settings.timepoint, this.settings.duration);
+    this.containers.slider
+        .attr('value', timepoint)
+        .attr(
+            'title',
+            `The animation is ${d3.format('.1%')(
+                timepoint / this.settings.duration
+            )} complete with ${this.settings.duration - timepoint} ${
+                this.settings.timeUnit.split(' ')[0]
+            } to go.`
+        );
 
     if (this.settings.timepoint <= this.settings.duration) {
         // Update the node data.
@@ -22,27 +33,23 @@ export const increment = function (arg) {
         this.interval.stop();
 
         // Display a visual countdown to reset.
-        let counter = this.settings.resetDelay/1000 - 1;
-        this.containers.countdown.classed('fdg-hidden', d => d !== counter);
-        const interval = window.setInterval(
-            () => {
-                counter--;
-                this.containers.countdown.classed('fdg-hidden', d => d !== counter);
-            },
-            1000
-        );
+        let counter = this.settings.resetDelay / 1000 - 1;
+        this.containers.countdown.classed('fdg-hidden', (d) => d !== counter);
+        const interval = window.setInterval(() => {
+            counter--;
+            this.containers.countdown.classed('fdg-hidden', (d) => d !== counter);
+        }, 1000);
 
         // Set a timeout before resetting the animation.
-        const timeout = window.setTimeout(
-            () => {
-                resetAnimation.call(this);
-                window.clearInterval(interval);
-                window.clearTimeout(timeout);
-                this.containers.countdown.classed('fdg-hidden', true);
-                this.interval = startInterval.call(this)
-            },
-            this.settings.resetDelay
-        );
+        const timeout = window.setTimeout(() => {
+            resetAnimation.call(this);
+            this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
+            this.containers.slider.attr('value', this.settings.timepoint);
+            window.clearInterval(interval);
+            window.clearTimeout(timeout);
+            this.containers.countdown.classed('fdg-hidden', true);
+            this.interval = startInterval.call(this);
+        }, this.settings.resetDelay);
     }
 
     // Update frequency table.

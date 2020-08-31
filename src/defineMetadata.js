@@ -24,7 +24,9 @@ export default function defineMetadata() {
     this.settings.width = this.settings.width || metadata.event.length;
     this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
     this.settings.eventFinal =
-        this.settings.eventFinal || metadata.event[metadata.event.length - 1].value;
+        Array.isArray(this.settings.eventFinal) && this.settings.eventFinal.length
+            ? this.settings.eventFinal
+            : [this.settings.eventFinal || metadata.event[metadata.event.length - 1].value];
     this.settings.nFoci =
         this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
     this.settings.eventChangeCount =

@@ -8,24 +8,21 @@ export default function coordinates(metadata) {
     const theta =
         (2 * Math.PI) /
         (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
-    const thetaFactor = (i) => i === 0 ? 0 : i === 1 ? -1.75 : i === 2 ? .75 : i === 3 ? -.25 : i === 4 ? .25 : 0;
+    const thetaFactor = (i) =>
+        i === 0 ? 0 : i === 1 ? -1.75 : i === 2 ? 0.75 : i === 3 ? -0.25 : i === 4 ? 0.25 : 0;
 
     metadata.event.forEach((event, i) => {
         event.x =
             event.order === 0
                 ? centerX
-                : event.order *
-                      this.settings.orbitRadius *
-                      Math.cos(thetaFactor(i) * theta) +
-                      //Math.cos((this.settings.nFoci - i) * theta) +
+                : event.order * this.settings.orbitRadius * Math.cos(thetaFactor(i) * theta) +
+                  //Math.cos((this.settings.nFoci - i) * theta) +
                   centerX;
         event.y =
             event.order === 0
                 ? centerY
-                : event.order *
-                      this.settings.orbitRadius *
-                      Math.sin(thetaFactor(i) * theta) +
-                      //Math.sin((this.settings.nFoci - i) * theta) +
+                : event.order * this.settings.orbitRadius * Math.sin(thetaFactor(i) * theta) +
+                  //Math.sin((this.settings.nFoci - i) * theta) +
                   centerY;
     });
 

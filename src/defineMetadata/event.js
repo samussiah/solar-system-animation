@@ -11,7 +11,7 @@ export default function event() {
                 count: 0,
                 prevCount: 0,
                 cumulative: 0,
-                nEvents: group.length
+                nEvents: group.length,
             };
         })
         .entries(this.data);

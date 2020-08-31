@@ -7,7 +7,7 @@ const settings = {
     timepoint: 0,
     timeUnit: 'days since randomization',
     duration: null, // defined in ./defineMetadata/dataDrivenSettings
-    resetDelay: 5000,
+    resetDelay: 15000,
 
     // event settings
     events: null, // defined in ./defineMetadata

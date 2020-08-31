@@ -3,7 +3,10 @@ export default function tick() {
     this.containers.canvas.context.save();
     //this.context.translate(this.settings.width/2,this.settings.height/2);
     if (this.settings.translate)
-        this.containers.canvas.context.translate(-(this.settings.width / 2 - 100), -(this.settings.height / 2 - 100));
+        this.containers.canvas.context.translate(
+            -(this.settings.width / 2 - 100),
+            -(this.settings.height / 2 - 100)
+        );
 
     this.data.nested
         .sort((a, b) => a.value.stateChanges - b.value.stateChanges) // draw bubbles with more state changes last

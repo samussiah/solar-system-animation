@@ -39,10 +39,9 @@
       // time settings
       timepoint: 0,
       timeUnit: 'days since randomization',
-      reset: null,
+      duration: null,
       // defined in ./defineMetadata/dataDrivenSettings
       resetDelay: 5000,
-      timeFrame: null,
       // event settings
       events: null,
       // defined in ./defineMetadata
@@ -158,8 +157,12 @@
       var controls = addElement('controls', main); // sidebar to the left
 
       var sidebar = addElement('sidebar', main);
-      var timer = addElement('timer', sidebar);
-      var timerDots = addElement('timer-dots', sidebar).style('width', '100%').style('text-align', 'center').selectAll('div').data(d3.range(this.settings.resetDelay / 100)).join('span').style('width', "".concat(100 / (this.settings.resetDelay / 100), "%")).style('display', 'inline-block').text('.').classed('fdg-hidden', true);
+      var timing = addElement('timing', sidebar);
+      var timer = addElement('timer', timing);
+      var duration = addElement('duration', timing).style('height', '8px').style('background', this.settings.colors()[0]);
+      var countdown = addElement('countdown', timing).style('height', '22px').style('width', '100%').style('text-align', 'center').selectAll('div').data(d3.range(-1, this.settings.resetDelay / 1000)).join('div').style('width', '100%').style('display', 'inline-block').text(function (d) {
+        return "Looping in ".concat(d + 1, " seconds");
+      }).classed('fdg-hidden', true);
       var legends = addElement('legends', sidebar);
       var freqTable = addElement('freq-table', sidebar);
       var info = addElement('info', sidebar); // animation to the right
@@ -175,8 +178,10 @@
         main: main,
         controls: controls,
         sidebar: sidebar,
+        timing: timing,
         timer: timer,
-        timerDots: timerDots,
+        duration: duration,
+        countdown: countdown,
         legends: legends,
         freqTable: freqTable,
         info: info,
@@ -290,7 +295,7 @@
 
       metadata.id = id.call(this); // Settings dependent on the ID set.
 
-      this.settings.reset = this.settings.reset || d3.max(metadata.id, function (id) {
+      this.settings.duration = this.settings.duration || d3.max(metadata.id, function (id) {
         return id.duration;
       });
       this.settings.minRadius = this.settings.minRadius || 3000 / metadata.id.length;
@@ -537,8 +542,9 @@
 
       // Increment the timepoint.
       this.settings.timepoint += !!arg;
+      this.containers.duration.style('width', "".concat(Math.min(this.settings.timepoint / this.settings.duration * 100, 100), "%"));
 
-      if (this.settings.timepoint <= this.settings.reset) {
+      if (this.settings.timepoint <= this.settings.duration) {
         // Update the node data.
         updateData.call(this); // Accentuate the orbits when an event occurs.
 
@@ -546,13 +552,27 @@
 
         updateText.call(this);
       } else {
-        this.interval.stop(); // TODO: make visual countdown to reset
-        //let counter = 0;
-        //const interval = d3.interval(() => {
+        this.interval.stop(); // Display a visual countdown to reset.
+
+        var counter = this.settings.resetDelay / 1000 - 1;
+        this.containers.countdown.classed('fdg-hidden', function (d) {
+          return d !== counter;
+        });
+        var interval = window.setInterval(function () {
+          counter--;
+
+          _this.containers.countdown.classed('fdg-hidden', function (d) {
+            return d !== counter;
+          });
+        }, 1000); // Set a timeout before resetting the animation.
 
         var timeout = window.setTimeout(function () {
           resetAnimation.call(_this);
+          window.clearInterval(interval);
           window.clearTimeout(timeout);
+
+          _this.containers.countdown.classed('fdg-hidden', true);
+
           _this.interval = startInterval.call(_this);
         }, this.settings.resetDelay);
       } // Update frequency table.
@@ -992,6 +1012,7 @@
       this.orbits = addOrbits.call(this); // Annotate foci.
 
       this.focusAnnotations = annotateFoci.call(this);
+      this.containers.duration.attr('title', "Duration of animation: ".concat(this.settings.duration, " ").concat(this.settings.timeUnit));
     }
 
     function mutateData() {
@@ -1210,7 +1231,6 @@
       this.metadata.event.forEach(function (event) {
         event.forceSimulation = addForceSimulation.call(_this, event);
       });
-      this.resetting = [];
       if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
     }
 

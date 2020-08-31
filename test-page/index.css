@@ -42,6 +42,9 @@ body > * {
 .fdg-hidden {
     display: none !important;
 }
+.fdg-invisible {
+    visibility: hidden !important;
+}
 .fdg-main > * {
     display: inline-block;
 }
@@ -59,8 +62,8 @@ body > * {
 /* sidebar */
 .fdg-sidebar {
     display:inline-block;
-    width: calc(var(--left-margin) - 10px);
-    padding-right: 10px;
+    width: calc(var(--left-margin) - 20px);
+    padding: 10px;
     float: left;
     clear: left;
     background: #eee;

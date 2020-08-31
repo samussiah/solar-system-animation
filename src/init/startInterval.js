@@ -6,8 +6,10 @@ import resetAnimation from './startInterval/resetAnimation';
 export const increment = function (arg) {
     // Increment the timepoint.
     this.settings.timepoint+=!!arg;
+    this.containers.duration
+        .style('width', `${Math.min(this.settings.timepoint/this.settings.duration*100, 100)}%`);
 
-    if (this.settings.timepoint <= this.settings.reset) {
+    if (this.settings.timepoint <= this.settings.duration) {
         // Update the node data.
         updateData.call(this);
 
@@ -18,13 +20,25 @@ export const increment = function (arg) {
         updateText.call(this);
     } else {
         this.interval.stop();
-        // TODO: make visual countdown to reset
-        //let counter = 0;
-        //const interval = d3.interval(() => {
+
+        // Display a visual countdown to reset.
+        let counter = this.settings.resetDelay/1000 - 1;
+        this.containers.countdown.classed('fdg-hidden', d => d !== counter);
+        const interval = window.setInterval(
+            () => {
+                counter--;
+                this.containers.countdown.classed('fdg-hidden', d => d !== counter);
+            },
+            1000
+        );
+
+        // Set a timeout before resetting the animation.
         const timeout = window.setTimeout(
             () => {
                 resetAnimation.call(this);
+                window.clearInterval(interval);
                 window.clearTimeout(timeout);
+                this.containers.countdown.classed('fdg-hidden', true);
                 this.interval = startInterval.call(this)
             },
             this.settings.resetDelay

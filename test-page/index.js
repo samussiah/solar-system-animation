@@ -33,7 +33,7 @@ fetch('./data_1000.csv')
                 //playPause: 'play',
                 //speed: 'fast',
                 nFoci: 16,
-                reset: 5,
+                duration: 5,
             }
         );
     });

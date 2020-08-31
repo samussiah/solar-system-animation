@@ -11,7 +11,7 @@ export default function defineMetadata() {
     metadata.id = id.call(this);
 
     // Settings dependent on the ID set.
-    this.settings.reset = this.settings.reset || d3.max(metadata.id, (id) => id.duration);
+    this.settings.duration = this.settings.duration || d3.max(metadata.id, (id) => id.duration);
     this.settings.minRadius = this.settings.minRadius || 3000 / metadata.id.length;
     this.settings.maxRadius =
         this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;

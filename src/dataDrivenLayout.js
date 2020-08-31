@@ -19,4 +19,6 @@ export default function dataDrivenLayout() {
 
     // Annotate foci.
     this.focusAnnotations = annotateFoci.call(this);
+
+    this.containers.duration.attr('title', `Duration of animation: ${this.settings.duration} ${this.settings.timeUnit}`);
 }

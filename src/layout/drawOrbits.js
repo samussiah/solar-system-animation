@@ -1,6 +1,7 @@
 export default function addOrbits() {
-    console.log(this.metadata.orbit);
-    const shadows = this.containers.svg
+    const g = this.containers.svg.append('g').classed('fdg-g fdg-g--orbits', true);
+
+    const shadows = g
         .append('defs')
         .selectAll('filter')
         .data(this.metadata.orbit)
@@ -14,7 +15,7 @@ export default function addOrbits() {
         .attr('stdDeviation', 5)
         .attr('flood-color', 'black');
 
-    const orbits = this.containers.svg
+    const orbits = g
         .selectAll('circle.orbit')
         .data(this.metadata.orbit)
         .enter()

@@ -10,14 +10,16 @@ export default function addForceSimulation(event) {
     const forceSimulation = d3
         .forceSimulation()
         .nodes(event.data)
-        //.alphaMin(.1)
-        .alphaDecay(0.005)
+        .alphaDecay(0.01)
+        //.alphaMin(.75)
+        //.alphaTarget(.8)
         .velocityDecay(0.9)
         .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
         .force('x', d3.forceX(event.x).strength(0.3))
         .force('y', d3.forceY(event.y).strength(0.3))
         .force('charge', d3.forceManyBodyReuse().strength(-(2000 / this.metadata.id.length)))
-        .on('tick', tick.bind(this));
+        //.force('charge', d3.forceManyBodySampled().strength(-(2000 / this.metadata.id.length)))
+        .on('tick', tick.bind(this, event));
 
     //if (event.value !== this.settings.eventCentral)
     forceSimulation.force(

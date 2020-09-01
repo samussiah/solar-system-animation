@@ -55,6 +55,7 @@ export default function layout() {
         timer.style('position', 'absolute').style('left', '5%').style('top', '25%').style('text-align', 'left');
         main.style('position', 'relative').node().appendChild(timer.node());
     }
+
     const animation = addElement('animation', main);
     if (this.settings.animationOnly)
         animation.style('width', '100%').style('height', '100vh').style('border-left', 'unset');
@@ -62,10 +63,40 @@ export default function layout() {
     this.settings.height = this.settings.animationOnly
         ? animation.node().clientHeight//window.innerHeight
         : (this.settings.width / 21) * 9;
+
+    // offscreen canvas
+    //const n = this.settings.colors().length;
+    //console.log(n);
+    //const r = 3;
+    //console.log(r);
+    //const d = r * 2;
+    //console.log(d);
+    //const offscreenCanvas = addElement('canvas-offscreen', animation, 'canvas')
+    //    .attr('width', n * d)
+    //    .attr('height', d);
+    //console.log(offscreenCanvas.attr('width'));
+    //console.log(offscreenCanvas.attr('height'));
+    //console.log(offscreenCanvas);
+    //offscreenCanvas.context = offscreenCanvas.node().getContext('2d');
+
+    //for (var i = 0; i < n; ++i) {
+    //    offscreenCanvas.context.fillStyle = this.settings.colors()[i];
+    //    offscreenCanvas.context.beginPath();
+    //    offscreenCanvas.context.arc(i * d + r, r, r, 0, 2 * Math.PI);
+    //    offscreenCanvas.context.closePath();
+    //    offscreenCanvas.context.fill();
+    //}
+
+    // canvas
     const canvas = addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
+    console.log(canvas.attr('width'));
+    console.log(canvas.attr('height'));
+    console.log(canvas);
     canvas.context = canvas.node().getContext('2d');
+
+    // SVG
     const svg = addElement('svg', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
@@ -87,6 +118,7 @@ export default function layout() {
         info,
 
         animation,
+        //offscreenCanvas,
         canvas,
         svg,
     };

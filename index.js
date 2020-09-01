@@ -188,9 +188,35 @@
       if (this.settings.animationOnly) animation.style('width', '100%').style('height', '100vh').style('border-left', 'unset');
       this.settings.width = animation.node().clientWidth;
       this.settings.height = this.settings.animationOnly ? animation.node().clientHeight //window.innerHeight
-      : this.settings.width / 21 * 9;
+      : this.settings.width / 21 * 9; // offscreen canvas
+      //const n = this.settings.colors().length;
+      //console.log(n);
+      //const r = 3;
+      //console.log(r);
+      //const d = r * 2;
+      //console.log(d);
+      //const offscreenCanvas = addElement('canvas-offscreen', animation, 'canvas')
+      //    .attr('width', n * d)
+      //    .attr('height', d);
+      //console.log(offscreenCanvas.attr('width'));
+      //console.log(offscreenCanvas.attr('height'));
+      //console.log(offscreenCanvas);
+      //offscreenCanvas.context = offscreenCanvas.node().getContext('2d');
+      //for (var i = 0; i < n; ++i) {
+      //    offscreenCanvas.context.fillStyle = this.settings.colors()[i];
+      //    offscreenCanvas.context.beginPath();
+      //    offscreenCanvas.context.arc(i * d + r, r, r, 0, 2 * Math.PI);
+      //    offscreenCanvas.context.closePath();
+      //    offscreenCanvas.context.fill();
+      //}
+      // canvas
+
       var canvas = addElement('canvas', animation, 'canvas').attr('width', this.settings.width).attr('height', this.settings.height);
-      canvas.context = canvas.node().getContext('2d');
+      console.log(canvas.attr('width'));
+      console.log(canvas.attr('height'));
+      console.log(canvas);
+      canvas.context = canvas.node().getContext('2d'); // SVG
+
       var svg = addElement('svg', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height);
       sidebar.style('height', "".concat(this.settings.height, "px"));
       return {
@@ -205,6 +231,7 @@
         freqTable: freqTable,
         info: info,
         animation: animation,
+        //offscreenCanvas,
         canvas: canvas,
         svg: svg
       };
@@ -444,7 +471,7 @@
         event.change = event.count - event.prevCount;
         event.data = _this.data.nested.filter(function (d) {
           return d.value.state.event === event.value;
-        });
+        }); //.map(d => ({;
       });
     }
 
@@ -615,8 +642,10 @@
       this.metadata.event.forEach(function (event) {
         // Center points initially then remove centering force.
         if (_this.settings.timepoint === 1) event.forceSimulation.force('center', null);
+        event.tick = 0;
         event.forceSimulation.nodes(event.data);
-        event.forceSimulation.alpha(1).restart();
+        event.forceSimulation.alpha(1).restart(); //event.forceSimulation.alpha(1);
+        //for (let i = 0; i < 30; i++) event.forceSimulation.tick();
       });
     };
     function startInterval() {
@@ -926,12 +955,12 @@
     }
 
     function addOrbits() {
-      console.log(this.metadata.orbit);
-      var shadows = this.containers.svg.append('defs').selectAll('filter').data(this.metadata.orbit).join('filter').attr('id', function (d, i) {
+      var g = this.containers.svg.append('g').classed('fdg-g fdg-g--orbits', true);
+      var shadows = g.append('defs').selectAll('filter').data(this.metadata.orbit).join('filter').attr('id', function (d, i) {
         return "orbit--".concat(i);
       });
       shadows.append('feDropShadow').attr('dx', 0).attr('dy', 0).attr('stdDeviation', 5).attr('flood-color', 'black');
-      var orbits = this.containers.svg.selectAll('circle.orbit').data(this.metadata.orbit).enter().append('circle').classed('orbit', true).attr('cx', function (d) {
+      var orbits = g.selectAll('circle.orbit').data(this.metadata.orbit).enter().append('circle').classed('orbit', true).attr('cx', function (d) {
         return d.cx;
       }).attr('cy', function (d) {
         return d.cy;
@@ -946,7 +975,8 @@
 
     function annotateFoci() {
       var _this = this;
-      var fociLabels = this.containers.svg.selectAll('g.fdg-focus-annotation').data(this.metadata.event).join('g').classed('fdg-focus-annotation', true);
+      var g = this.containers.svg.append('g').classed('fdg-g fdg-g--focus-annotations', true);
+      var fociLabels = g.selectAll('g.fdg-focus-annotation').data(this.metadata.event).join('g').classed('fdg-focus-annotation', true);
       if (this.settings.translate) fociLabels.attr('transform', "translate(-".concat(this.settings.width / 2 - 100, ",-").concat(this.settings.height / 2 - 100, ")")); // defs - give the text a background
       //const filters = fociLabels
       //    .append('defs')
@@ -1180,6 +1210,7 @@
         var color = defineColor.call(_this, stateChanges);
 
         var datum = _objectSpread2(_objectSpread2({
+          noStateChange: group.length === 1 && state.event === _this.settings.eventCentral,
           state: state,
           x: populationEvent.x,
           y: populationEvent.y,
@@ -1214,7 +1245,7 @@
       });
     }
 
-    function tick() {
+    function tick(event) {
       var _this = this;
 
       this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
@@ -1225,6 +1256,18 @@
         return a.value.stateChanges - b.value.stateChanges;
       }) // draw bubbles with more state changes last
       .forEach(function (d, i) {
+        //this.containers.canvas.context
+        //    .drawImage(
+        //        this.containers.offscreenCanvas.node(),
+        //        this.settings.minRadius*2*0, // find the position of the appropriate colored circle in the offscreen canvas
+        //        0,
+        //        this.settings.minRadius*2,
+        //        this.settings.minRadius*2,
+        //        d.x - d.value.r,
+        //        d.y - d.value.r,
+        //        this.settings.minRadius*2,
+        //        this.settings.minRadius*2,
+        //    );
         _this.containers.canvas.context.beginPath(); //this.context.moveTo(d.x + d.r, d.y);
 
 
@@ -1250,8 +1293,10 @@
       // the viewport.
       //
       // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
-      var forceSimulation = d3.forceSimulation().nodes(event.data) //.alphaMin(.1)
-      .alphaDecay(0.005).velocityDecay(0.9).force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', d3.forceManyBodyReuse().strength(-(2000 / this.metadata.id.length))).on('tick', tick.bind(this)); //if (event.value !== this.settings.eventCentral)
+      var forceSimulation = d3.forceSimulation().nodes(event.data).alphaDecay(0.01) //.alphaMin(.75)
+      //.alphaTarget(.8)
+      .velocityDecay(0.9).force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', d3.forceManyBodyReuse().strength(-(2000 / this.metadata.id.length))) //.force('charge', d3.forceManyBodySampled().strength(-(2000 / this.metadata.id.length)))
+      .on('tick', tick.bind(this, event)); //if (event.value !== this.settings.eventCentral)
 
       forceSimulation.force('collide', d3.forceCollide().radius(function (d) {
         return d.value.r + 0.5;
@@ -1264,8 +1309,10 @@
       var _this = this;
 
       this.metadata.event.forEach(function (event) {
+        event.tick = 0;
         event.forceSimulation = addForceSimulation.call(_this, event);
-      });
+      }); //addStaticForceSimulation.call(this);
+
       if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
     }
 

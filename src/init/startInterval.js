@@ -63,8 +63,11 @@ export const increment = function (arg) {
     this.metadata.event.forEach((event) => {
         // Center points initially then remove centering force.
         if (this.settings.timepoint === 1) event.forceSimulation.force('center', null);
+        event.tick = 0;
         event.forceSimulation.nodes(event.data);
         event.forceSimulation.alpha(1).restart();
+        //event.forceSimulation.alpha(1);
+        //for (let i = 0; i < 30; i++) event.forceSimulation.tick();
     });
 };
 

@@ -27,24 +27,8 @@ fetch('./data_1000.csv')
                 d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
         });
 
-//        const fixed = data.filter(d => d.seq == 0)
-//            .map((d,i) => {
-//                const datum = Object.assign({}, d);
-//                datum.id = nest.length + +datum.id;
-//                datum.duration = datum.totalDuration;
-//                datum.any_state_change = 0;
-//                return datum;
-//            });
-//const array = {value: data.concat(fixed)}; // replace [ null ] with the name of the array
-//const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
-//const header = Object.keys(array.value[0]);
-//let csv = array.value
-//    .map(row => (
-//        header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(',')
-//    ));
-//csv.unshift(header.join(','));
-//csv = csv.join('\r\n');
-//console.log(csv);
+        console.log(JSON.stringify(data, null, 4));
+        console.log(JSON.stringify(data));
 
         const fdg = forceDirectedGraph(
             data,

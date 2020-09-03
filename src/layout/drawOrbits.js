@@ -1,5 +1,21 @@
 export default function addOrbits() {
-    const orbits = this.containers.svg
+    const g = this.containers.svg.append('g').classed('fdg-g fdg-g--orbits', true);
+
+    const shadows = g
+        .append('defs')
+        .selectAll('filter')
+        .data(this.metadata.orbit)
+        .join('filter')
+        .attr('id', (d, i) => `orbit--${i}`);
+
+    shadows
+        .append('feDropShadow')
+        .attr('dx', 0)
+        .attr('dy', 0)
+        .attr('stdDeviation', 5)
+        .attr('flood-color', 'black');
+
+    const orbits = g
         .selectAll('circle.orbit')
         .data(this.metadata.orbit)
         .enter()
@@ -10,7 +26,8 @@ export default function addOrbits() {
         .attr('r', (d) => d.r)
         .attr('fill', 'none')
         .attr('stroke', '#aaa')
-        .attr('stroke-width', '.5');
+        .attr('stroke-width', '.5')
+        .style('filter', (d, i) => `url(#orbit--${i})`);
 
     if (this.settings.translate)
         orbits.attr(

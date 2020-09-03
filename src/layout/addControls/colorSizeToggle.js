@@ -14,9 +14,7 @@ export default function colorSizeToggle() {
         .attr(
             'class',
             (d) =>
-                `togglebutton ${d} ${
-                    d === this.settings.eventChangeCountAesthetic ? 'current' : ''
-                }`
+                `fdg-button ${d} ${d === this.settings.eventChangeCountAesthetic ? 'current' : ''}`
         )
         .attr(
             'title',

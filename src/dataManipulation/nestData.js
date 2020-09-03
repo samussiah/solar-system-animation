@@ -41,6 +41,7 @@ export default function nestData() {
             const color = defineColor.call(this, stateChanges);
 
             const datum = {
+                noStateChange: group.length === 1 && state.event === this.settings.eventCentral,
                 state,
                 x: populationEvent.x,
                 y: populationEvent.y,

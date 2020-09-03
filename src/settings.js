@@ -15,6 +15,8 @@ const settings = {
     eventCount: true, // display count (percentage) beneath focus labels?
     eventChangeCount: null, // defined in ./defineMetadata/dataDrivenSettings
     eventChangeCountAesthetic: 'color',
+    individualCounts: null,
+    individualCountEvents: null,
     excludeFirst: true,
     excludeLast: true,
 
@@ -35,6 +37,7 @@ const settings = {
     orbitRadius: 150,
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
+    hideControls: false,
 
     // color and size settings
     colors,

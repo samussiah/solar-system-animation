@@ -1,5 +1,4 @@
-fetch('./data_1000.csv')
-//fetch('./data_2000_fixed.csv')
+fetch('../data_1000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -7,10 +6,7 @@ fetch('./data_1000.csv')
         const nest = d3.nest()
             .key(d => d.id)
             .rollup(nest => {
-                const totalDuration = d3.sum(nest, d => +d.duration);
                 for (const d of nest) {
-                    d.totalDuration = totalDuration;
-                    d.any_state_change = 1;
                     if (d.event === 'Death') {
                         nest.filter(di => +di.seq > +d.seq)
                             .forEach(di => {
@@ -27,14 +23,12 @@ fetch('./data_1000.csv')
                 d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
         });
 
-        console.log(JSON.stringify(data, null, 4));
-        console.log(JSON.stringify(data));
-
         const fdg = forceDirectedGraph(
             data,
-            '#container',
+            'body',
+            //'#container',
             {
-                //animationOnly: true,
+                hideControls: true,
                 eventFinal: ['Death (CV-related)', 'Death (other)'],
                 eventChangeCount: ['Hospitalization', 'ICU'],
                 eventChangeCountAesthetic: 'both',

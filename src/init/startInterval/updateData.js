@@ -72,5 +72,6 @@ export default function updateData() {
     this.metadata.event.forEach((event) => {
         event.change = event.count - event.prevCount;
         event.data = this.data.nested.filter((d) => d.value.state.event === event.value);
+        //.map(d => ({;
     });
 }

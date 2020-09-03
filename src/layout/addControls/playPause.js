@@ -8,7 +8,7 @@ export default function playPause() {
         .classed('fdg-control fdg-control--play-pause', true);
     const inputs = container
         .append('div')
-        .classed(`togglebutton fdg-input`, true)
+        .classed(`fdg-button fdg-input`, true)
         .attr(
             'title',
             `${

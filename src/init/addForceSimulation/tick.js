@@ -8,30 +8,40 @@ export default function tick(event) {
             -(this.settings.height / 2 - 100)
         );
 
+    const shape = 'circle';
+
     this.data.nested
         .sort((a, b) => a.value.stateChanges - b.value.stateChanges) // draw bubbles with more state changes last
         .forEach((d, i) => {
-            //this.containers.canvas.context
-            //    .drawImage(
-            //        this.containers.offscreenCanvas.node(),
-            //        this.settings.minRadius*2*0, // find the position of the appropriate colored circle in the offscreen canvas
-            //        0,
-            //        this.settings.minRadius*2,
-            //        this.settings.minRadius*2,
-            //        d.x - d.value.r,
-            //        d.y - d.value.r,
-            //        this.settings.minRadius*2,
-            //        this.settings.minRadius*2,
-            //    );
             this.containers.canvas.context.beginPath();
-            //this.context.moveTo(d.x + d.r, d.y);
-            this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
-            if (this.settings.fill) {
-                this.containers.canvas.context.fillStyle = d.value.fill;
-                this.containers.canvas.context.fill();
+
+            // circle
+            if (shape === 'circle') {
+                this.containers.canvas.context.moveTo(d.x + d.r, d.y);
+                this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
+                if (this.settings.fill) {
+                    this.containers.canvas.context.fillStyle = d.value.fill;
+                    this.containers.canvas.context.fill();
+                }
+                this.containers.canvas.context.strokeStyle = d.value.stroke;
+                this.containers.canvas.context.stroke();
             }
-            this.containers.canvas.context.strokeStyle = d.value.stroke;
-            this.containers.canvas.context.stroke();
+            // square
+            else {
+                //this.containers.canvas.context.moveTo(d.x + d.r, d.y);
+                this.containers.canvas.context.rect(
+                    d.x - d.value.r,
+                    d.y - d.value.r,
+                    d.value.r * 2,
+                    d.value.r * 2
+                );
+                if (this.settings.fill) {
+                    this.containers.canvas.context.fillStyle = d.value.fill;
+                    this.containers.canvas.context.fill();
+                }
+                this.containers.canvas.context.strokeStyle = d.value.stroke;
+                this.containers.canvas.context.stroke();
+            }
         });
 
     this.containers.canvas.context.restore();

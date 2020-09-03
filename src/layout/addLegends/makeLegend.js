@@ -17,7 +17,7 @@ export default function makeLegend(type) {
     const label = container
         .append('div')
         .classed('fdg-legend__label', true)
-        .style('width', legendDimensions[0] + 'px')
+        //.style('width', legendDimensions[0] + 'px')
         .html(
             `Number of <span class = "fdg-measure">${this.util.csv(
                 this.settings.eventChangeCount

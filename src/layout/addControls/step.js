@@ -16,7 +16,7 @@ export default function step() {
         .classed('fdg-control fdg-control--step', true);
     const inputs = container
         .append('div')
-        .classed(`togglebutton fdg-input`, true)
+        .classed(`fdg-button fdg-input`, true)
         .attr('title', `Advance animation by one time unit.`)
         .text('Step');
 

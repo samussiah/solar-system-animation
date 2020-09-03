@@ -13,8 +13,7 @@ export default function eventList() {
         .append('div')
         .attr(
             'class',
-            (d) =>
-                `togglebutton ${this.settings.eventChangeCount.includes(d.value) ? 'current' : ''}`
+            (d) => `fdg-button ${this.settings.eventChangeCount.includes(d.value) ? 'current' : ''}`
         )
         .attr(
             'title',

@@ -5,8 +5,9 @@ export default function layout() {
 
     const main = addElement('main', d3.select(this.element));
 
+    // TODO: fit sidebar and animation containers to height of containing element less the height of the controls.
     // controls on top
-    const controls = addElement('controls', main);
+    const controls = addElement('controls', main).classed('fdg-hidden', this.settings.hideControls);
 
     // sidebar to the left
     const sidebar = addElement('sidebar', main);
@@ -48,52 +49,20 @@ export default function layout() {
     const info = addElement('info', sidebar);
 
     // animation to the right
-    if (this.settings.animationOnly) {
-        main.selectAll('*').classed('fdg-hidden', true);
-        timer.classed('fdg-hidden', false);
-        timer.selectAll('*').classed('fdg-hidden', false);
-        timer.style('position', 'absolute').style('left', '5%').style('top', '25%').style('text-align', 'left');
-        main.style('position', 'relative').node().appendChild(timer.node());
-    }
-
     const animation = addElement('animation', main);
-    if (this.settings.animationOnly)
-        animation.style('width', '100%').style('height', '100vh').style('border-left', 'unset');
     this.settings.width = animation.node().clientWidth;
-    this.settings.height = this.settings.animationOnly
-        ? animation.node().clientHeight//window.innerHeight
-        : (this.settings.width / 21) * 9;
-
-    // offscreen canvas
-    //const n = this.settings.colors().length;
-    //console.log(n);
-    //const r = 3;
-    //console.log(r);
-    //const d = r * 2;
-    //console.log(d);
-    //const offscreenCanvas = addElement('canvas-offscreen', animation, 'canvas')
-    //    .attr('width', n * d)
-    //    .attr('height', d);
-    //console.log(offscreenCanvas.attr('width'));
-    //console.log(offscreenCanvas.attr('height'));
-    //console.log(offscreenCanvas);
-    //offscreenCanvas.context = offscreenCanvas.node().getContext('2d');
-
-    //for (var i = 0; i < n; ++i) {
-    //    offscreenCanvas.context.fillStyle = this.settings.colors()[i];
-    //    offscreenCanvas.context.beginPath();
-    //    offscreenCanvas.context.arc(i * d + r, r, r, 0, 2 * Math.PI);
-    //    offscreenCanvas.context.closePath();
-    //    offscreenCanvas.context.fill();
-    //}
+    this.settings.height = animation.node().clientHeight;
+    console.log(animation.node().clientHeight);
+    console.log(animation.node().offsetHeight);
+    console.log(animation.node().scrollHeight);
+    console.log(animation.node());
+    //? animation.node().clientHeight//window.innerHeight
+    //: (this.settings.width / 21) * 9;
 
     // canvas
     const canvas = addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
-    console.log(canvas.attr('width'));
-    console.log(canvas.attr('height'));
-    console.log(canvas);
     canvas.context = canvas.node().getContext('2d');
 
     // SVG
@@ -101,7 +70,7 @@ export default function layout() {
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
 
-    sidebar.style('height', `${this.settings.height}px`);
+    //sidebar.style('height', `${this.settings.height}px`);
 
     return {
         main,
@@ -118,7 +87,6 @@ export default function layout() {
         info,
 
         animation,
-        //offscreenCanvas,
         canvas,
         svg,
     };

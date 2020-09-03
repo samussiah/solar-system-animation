@@ -1,5 +1,5 @@
 {
-    "TODO": "package this pile of crap up and ship it",
+  "TODO": "package this pile of crap up and ship it",
   "name": "force-directed-graph",
   "version": "1.1.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",
@@ -10,14 +10,16 @@
     "url": "https://github.com/samussiah/force-directed-graph.git"
   },
   "scripts": {
-    "build": "npm audit fix && npm run bundle && npm run format",
+    "build": "npm audit fix && npm run bundle && npm run format && npm run minify",
     "bundle": "rollup -c",
-    "format": "npm run format-src && npm run format-bundle",
-    "format-src": "prettier --print-width=100 --tab-width=4 --single-quote --write \"./src/**/*.js\"",
+    "bundle-test-page": "html-inline ./test-page/index.html ./test-page/bundle.html",
+    "format": "npm run format-src && npm run format-bundle && npm run format-css",
     "format-bundle": "prettier --print-width=100 --tab-width=4 --single-quote --write ./index.js",
+    "format-css": "prettier --print-width=100 --tab-width=4 --single-quote --write ./index.css",
+    "format-src": "prettier --print-width=100 --tab-width=4 --single-quote --write \"./src/**/*.js\"",
     "minify": "npm run minify-bundle && npm run minify-css",
     "minify-bundle": "minify ./index.js > ./index.min.js",
-    "minify-css": "minify ./test-page/index.css > ./test-page/index.min.css",
+    "minify-css": "minify ./index.css > ./index.min.css",
     "local": "http-server .",
     "test-page": "start chrome ./test-page/index.html && start firefox ./test-page/index.html && start iexplore file://%CD%/test-page/index.html",
     "watch": "rollup -c -w"
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
+    "html-inline": "^1.2.0",
     "html-webpack-plugin": "^4.3.0",
     "http-server": "^0.12.3",
     "minify": "^5.1.1",

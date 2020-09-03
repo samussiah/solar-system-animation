@@ -37,7 +37,7 @@ const settings = {
     orbitRadius: 150,
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
-    animationOnly: false,
+    hideControls: false,
 
     // color and size settings
     colors,

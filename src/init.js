@@ -8,7 +8,7 @@ export default function init() {
         event.forceSimulation = addForceSimulation.call(this, event);
     });
 
-    //addStaticForceSimulation.call(this);
+    addStaticForceSimulation.call(this);
 
     if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
 }

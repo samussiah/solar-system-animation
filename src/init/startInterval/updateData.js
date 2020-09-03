@@ -71,8 +71,7 @@ export default function updateData() {
     // Record change in number of IDs at each focus at current timepoint.
     this.metadata.event.forEach((event) => {
         event.change = event.count - event.prevCount;
-        event.data = this.data.nested
-            .filter((d) => d.value.state.event === event.value)
-            //.map(d => ({;
+        event.data = this.data.nested.filter((d) => d.value.state.event === event.value);
+        //.map(d => ({;
     });
 }

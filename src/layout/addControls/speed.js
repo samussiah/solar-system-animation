@@ -18,7 +18,7 @@ export default function speed() {
         .append('div')
         .attr(
             'class',
-            (d) => `togglebutton ${d.label} ${d.label === this.settings.speed ? 'current' : ''}`
+            (d) => `fdg-button ${d.label} ${d.label === this.settings.speed ? 'current' : ''}`
         )
         .attr(
             'title',

@@ -6,7 +6,7 @@ export default function addOrbits() {
         .selectAll('filter')
         .data(this.metadata.orbit)
         .join('filter')
-        .attr('id', (d,i) => `orbit--${i}`);
+        .attr('id', (d, i) => `orbit--${i}`);
 
     shadows
         .append('feDropShadow')
@@ -27,7 +27,7 @@ export default function addOrbits() {
         .attr('fill', 'none')
         .attr('stroke', '#aaa')
         .attr('stroke-width', '.5')
-        .style('filter', (d,i) => `url(#orbit--${i})`);
+        .style('filter', (d, i) => `url(#orbit--${i})`);
 
     if (this.settings.translate)
         orbits.attr(

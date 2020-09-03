@@ -24,7 +24,8 @@ export default function addForceSimulation(event) {
     //if (event.value !== this.settings.eventCentral)
     forceSimulation.force(
         'collide',
-        d3.forceCollide().radius((d) => d.value.r + 0.5)
+        //d3.forceCollide().radius((d) => d.value.r + 0.5)
+        d3.forceCollide().radius(this.settings.minRadius + 0.5)
     );
     //forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5));
 

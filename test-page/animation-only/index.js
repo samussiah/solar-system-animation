@@ -25,9 +25,10 @@ fetch('../data_1000.csv')
 
         const fdg = forceDirectedGraph(
             data,
-            '#container',
+            'body',
+            //'#container',
             {
-                animationOnly: true,
+                hideControls: true,
                 eventFinal: ['Death (CV-related)', 'Death (other)'],
                 eventChangeCount: ['Hospitalization', 'ICU'],
                 eventChangeCountAesthetic: 'both',

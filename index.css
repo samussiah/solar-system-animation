@@ -5,6 +5,7 @@ body {
 /* force-directed-graph */
 
 .fdg-main {
+    width: 100%;
     height: calc(100vh - 16px);
 }
 .fdg-hidden {

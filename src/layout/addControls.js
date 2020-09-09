@@ -16,7 +16,7 @@ export default function addControls() {
     this.controls.eventList = eventList.call(this);
     this.controls.colorSizeToggle = colorSizeToggle.call(this);
     this.controls.container
-        .selectAll('.togglebutton')
+        .selectAll('.fdg-button')
         .on('mousedown', function () {
             this.classList.toggle('clicked');
         })

@@ -1,5 +1,6 @@
 export default function addOrbits() {
-    const g = this.containers.svg.append('g').classed('fdg-g fdg-g--orbits', true);
+    // TODO: replace instances of svg with svgForeground
+    const g = this.containers.svgBackground.append('g').classed('fdg-g fdg-g--orbits', true);
 
     const shadows = g
         .append('defs')

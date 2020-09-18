@@ -183,12 +183,9 @@ body {
     position: relative;
 }
 
-.fdg-canvas {
-    position: absolute;
-    left: 0;
-}
-
-.fdg-svg {
+.fdg-svg--background,
+.fdg-canvas,
+.fdg-svg--foreground {
     position: absolute;
     left: 0;
 }

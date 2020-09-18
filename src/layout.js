@@ -1,11 +1,11 @@
 import addElement from './layout/addElement';
 
+// TODO: fit sidebar and animation containers to height of containing element less the height of the controls.
 export default function layout() {
     const fdg = this;
 
     const main = addElement('main', d3.select(this.element));
 
-    // TODO: fit sidebar and animation containers to height of containing element less the height of the controls.
     // controls on top
     const controls = addElement('controls', main).classed('fdg-hidden', this.settings.hideControls);
 
@@ -52,12 +52,11 @@ export default function layout() {
     const animation = addElement('animation', main);
     this.settings.width = animation.node().clientWidth;
     this.settings.height = animation.node().clientHeight;
-    console.log(animation.node().clientHeight);
-    console.log(animation.node().offsetHeight);
-    console.log(animation.node().scrollHeight);
-    console.log(animation.node());
-    //? animation.node().clientHeight//window.innerHeight
-    //: (this.settings.width / 21) * 9;
+
+    // background SVG
+    const svgBackground = addElement('svg--background', animation, 'svg')
+        .attr('width', this.settings.width)
+        .attr('height', this.settings.height);
 
     // canvas
     const canvas = addElement('canvas', animation, 'canvas')
@@ -66,11 +65,9 @@ export default function layout() {
     canvas.context = canvas.node().getContext('2d');
 
     // SVG
-    const svg = addElement('svg', animation, 'svg')
+    const svgForeground = addElement('svg--foreground', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
-
-    //sidebar.style('height', `${this.settings.height}px`);
 
     return {
         main,
@@ -87,7 +84,8 @@ export default function layout() {
         info,
 
         animation,
+        svgBackground,
         canvas,
-        svg,
+        svgForeground,
     };
 }

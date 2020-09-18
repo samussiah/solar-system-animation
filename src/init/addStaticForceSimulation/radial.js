@@ -7,7 +7,7 @@ export default function radial(data) {
 
     for (let i = 0; i < 30; i++) simulation.tick();
 
-    const g = this.containers.svg
+    const g = this.containers.svgBackground
         .insert('g', ':first-child')
         .attr(
             'transform',
@@ -39,7 +39,7 @@ export default function radial(data) {
         .attr('r', this.settings.minRadius)
         .attr('fill', this.settings.color(0));
 
-    //const nodes = this.containers.svg
+    //const nodes = this.containers.svgBackground
     //    .append('g')
     //    .attr('transform', `translate(${this.settings.orbitRadius/2},${this.settings.height/2})`)
     //    .selectAll('circle')

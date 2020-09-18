@@ -1,7 +1,7 @@
 export default function annotateFoci() {
     const fdg = this;
 
-    const g = this.containers.svg.append('g').classed('fdg-g fdg-g--focus-annotations', true);
+    const g = this.containers.svgForeground.append('g').classed('fdg-g fdg-g--focus-annotations', true);
 
     const fociLabels = g
         .selectAll('g.fdg-focus-annotation')

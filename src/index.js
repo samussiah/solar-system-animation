@@ -14,6 +14,15 @@ export default function forceDirectedGraph(data, element = 'body', settings = {}
         util,
     };
 
+    if (Array.isArray(fdg.settings.notes))
+        fdg.settings.notesIndex = settings.notes.some((note) => note.startTimepoint === fdg.settings.timepoint)
+            ? fdg.settings.notes.findIndex(
+                (note) =>
+                    note.startTimepoint <= settings.timepoint &&
+                    fdg.settings.timepoint <= note.stopTimepoint
+            )
+            : 0;
+
     fdg.containers = layout.call(fdg); // add elements to DOM
     fdg.metadata = defineMetadata.call(fdg); // calculate characteristics of variables in data
     dataDrivenLayout.call(fdg); // update the DOM

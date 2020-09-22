@@ -164,7 +164,7 @@ body {
 
 .fdg-info {
     font-weight: lighter;
-    font-size: 1.5em;
+    font-size: 2rem;
     color: black;
     text-shadow: black 0px 0px 10px;
     height: 50%;
@@ -188,4 +188,21 @@ body {
 .fdg-svg--foreground {
     position: absolute;
     left: 0;
+}
+
+/* modal */
+.fdg-modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 2%;
+    border-radius: 5px;
+    font-size: 2rem;
+    /*
+    font-weight: lighter;
+    color: black;
+    */
+    text-shadow: black 0px 0px 10px;
 }

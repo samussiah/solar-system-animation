@@ -1,5 +1,6 @@
+import runModal from '../runModal';
 import getState from '../../dataManipulation/nestData/getState';
-import calculateInitialPointCoordinates from '../../dataManipulation/nestData/calculateInitialPointCoordinates';
+import countStateChanges from '../../dataManipulation/nestData/countStateChanges';
 import defineRadius from '../../dataManipulation/nestData/defineRadius';
 import defineColor from '../../dataManipulation/nestData/defineColor';
 
@@ -9,6 +10,7 @@ export default function resetAnimation() {
 
     // Update the event object of the population.
     this.metadata.event.forEach((event) => {
+        event.prevCount = 0;
         event.count = 0;
         event.cumulative = 0;
     });
@@ -17,36 +19,16 @@ export default function resetAnimation() {
         // Initial event for the given individual.
         d.value.state = getState.call(this, d.value.group, 0);
 
-        // Reset individual event object.
-        d.value.events.forEach((event) => {
-            event.count = 0;
-            event.duration = 0;
-        });
-
-        // Update individual event count at initial event.
-        //updateEventCount.call(this, d.value.events, d.value.state.event);
-
-        // Reset state index and timepoint of next state change.
-        d.value.moves = 0;
-        d.value.nextStateChange = d.value.state.duration;
-
-        // Update population count at previous and current events.
-        const populationEvent = this.metadata.event.find(
-            (event) => event.value === d.value.state.event
-        );
-
-        const stateChanges = d3.sum(
-            d.value.events.filter((event) => this.settings.eventChangeCount.includes(event.value)),
-            (event) => event.count
-        );
-
-        // Calculate initial point coordinates.
-        Object.assign(d.value, calculateInitialPointCoordinates.call(this, populationEvent));
+        // Count state changes.
+        d.value.nStateChanges = countStateChanges.call(this, d.value.group);
 
         // Define radius.
-        d.value.r = defineRadius.call(this, stateChanges);
+        d.value.r = defineRadius.call(this, d.value.nStateChanges);
 
         // Define color.
-        Object.assign(d.value, defineColor.call(this, stateChanges));
+        Object.assign(d.value, defineColor.call(this, d.value.nStateChanges));
     });
+
+    if (this.modal) this.modal.stop();
+    runModal.call(this);
 }

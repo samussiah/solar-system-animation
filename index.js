@@ -180,7 +180,10 @@
 
         var svgForeground = addElement('svg--foreground', animation, 'svg')
             .attr('width', this.settings.width)
-            .attr('height', this.settings.height);
+            .attr('height', this.settings.height); // modal
+
+        var modal = addElement('modal', animation); //.text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec erat orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus ut pretium augue, vitae aliquam arcu. Etiam consequat, lectus sit amet volutpat auctor, dui libero consectetur magna, eu ultricies elit ex non dui. Maecenas quis lacus non enim gravida ultrices. Phasellus vitae orci eget libero tempor scelerisque. Nunc auctor ut mi in fringilla. Praesent blandit id est ut aliquet.');
+
         return {
             main: main,
             controls: controls,
@@ -196,6 +199,7 @@
             svgBackground: svgBackground,
             canvas: canvas,
             svgForeground: svgForeground,
+            modal: modal,
         };
     }
 
@@ -520,18 +524,47 @@
         }
     }
 
-    function calculateInitialPointCoordinates(populationEvent) {
-        // Define a random angle and a random radius with which to initialize point coordinates.
-        var r = Math.sqrt(~~(Math.random() * this.settings.R * this.settings.R));
-        var theta = Math.random() * 2 * Math.PI; // Calculate source and destination coordinates.
+    function text() {
+        var text = [
+            'Each bubble in this animation represents an individual.',
+            'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
+            'The number of state changes dictates the color and/or size of the bubbles.',
+            'Use the controls above to interact with and alter the animation.',
+        ];
+        return this.settings.hideControls ? text.slice(0, 3) : text;
+    }
 
-        var pointCoordinates = {
-            sx: populationEvent.x + r * Math.cos(theta),
-            sy: populationEvent.y + r * Math.sin(theta),
-            tx: populationEvent.x,
-            ty: populationEvent.y,
-        };
-        return pointCoordinates;
+    function fadeOut(transition) {
+        d3.select(this).transition().duration(1000).delay(3000).style('opacity', 0);
+    }
+
+    function fadeIn(selection) {
+        selection
+            .style('opacity', 0)
+            .transition()
+            .duration(1000)
+            .style('opacity', 1)
+            .on('end', fadeOut);
+    }
+
+    function runModal() {
+        var _this = this;
+
+        var text$1 = text.call(this);
+        var index = 0; // index of item in text array
+
+        this.containers.modal.text(text$1[index]).call(fadeIn);
+        this.modal = d3.interval(function () {
+            index++;
+
+            _this.containers.modal.text(text$1[index]).call(fadeIn);
+
+            if (index === text$1.length - 1) {
+                d3.timeout(function () {
+                    _this.modal.stop(); //this.containers.modal.classed('fdg-hidden', true);
+                }, 3000);
+            }
+        }, 5000);
     }
 
     function resetAnimation() {
@@ -541,42 +574,22 @@
         this.controls.timepoint.inputs.attr('value', 0); // Update the event object of the population.
 
         this.metadata.event.forEach(function (event) {
+            event.prevCount = 0;
             event.count = 0;
             event.cumulative = 0;
         });
         this.data.nested.forEach(function (d) {
             // Initial event for the given individual.
-            d.value.state = getState.call(_this, d.value.group, 0); // Reset individual event object.
+            d.value.state = getState.call(_this, d.value.group, 0); // Count state changes.
 
-            d.value.events.forEach(function (event) {
-                event.count = 0;
-                event.duration = 0;
-            }); // Update individual event count at initial event.
-            //updateEventCount.call(this, d.value.events, d.value.state.event);
-            // Reset state index and timepoint of next state change.
+            d.value.nStateChanges = countStateChanges.call(_this, d.value.group); // Define radius.
 
-            d.value.moves = 0;
-            d.value.nextStateChange = d.value.state.duration; // Update population count at previous and current events.
+            d.value.r = defineRadius.call(_this, d.value.nStateChanges); // Define color.
 
-            var populationEvent = _this.metadata.event.find(function (event) {
-                return event.value === d.value.state.event;
-            });
-
-            var stateChanges = d3.sum(
-                d.value.events.filter(function (event) {
-                    return _this.settings.eventChangeCount.includes(event.value);
-                }),
-                function (event) {
-                    return event.count;
-                }
-            ); // Calculate initial point coordinates.
-
-            Object.assign(d.value, calculateInitialPointCoordinates.call(_this, populationEvent)); // Define radius.
-
-            d.value.r = defineRadius.call(_this, stateChanges); // Define color.
-
-            Object.assign(d.value, defineColor.call(_this, stateChanges));
+            Object.assign(d.value, defineColor.call(_this, d.value.nStateChanges));
         });
+        if (this.modal) this.modal.stop();
+        runModal.call(this);
     }
 
     var increment = function increment(arg) {
@@ -1882,11 +1895,12 @@
     function init() {
         var _this = this;
 
+        runModal.call(this);
+        addStaticForceSimulation.call(this);
         this.metadata.event.forEach(function (event) {
             event.tick = 0;
             event.forceSimulation = addForceSimulation.call(_this, event);
         });
-        addStaticForceSimulation.call(this);
         if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
     }
 

@@ -112,6 +112,9 @@ body {
     background: rgba(0, 104, 55, 0.75);
 }
 
+.fdg-timing {
+    width: 100%;
+}
 .fdg-timer {
     font-weight: bold;
     font-size: 1.25rem;
@@ -137,6 +140,7 @@ body {
     display: inline-block;
 }
 .fdg-legend__label {
+    width: 100%;
     font-size: 1.25rem;
 }
 

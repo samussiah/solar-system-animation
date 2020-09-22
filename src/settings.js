@@ -49,6 +49,11 @@ const settings = {
     hideControls: false,
 
     // color and size settings
+    colorBy: {
+        type: 'frequency', // ['frequency', 'continuous', 'categorical']
+        variable: null,
+        label: null,
+    },
     colors,
     colorScale,
     color,

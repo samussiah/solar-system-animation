@@ -8,7 +8,6 @@ fetch('./data_1000.csv')
             .key(d => d.id)
             .rollup(nest => {
                 for (const d of nest) {
-                    d.any_state_change = 1;
                     if (d.event === 'Death') {
                         nest.filter(di => +di.seq > +d.seq)
                             .forEach(di => {
@@ -38,7 +37,7 @@ fetch('./data_1000.csv')
                 //duration: 5,
                 notes: [
                     {
-                        startTimepoint: 1,
+                        startTimepoint: 40,
                         stopTimepoint: 75,
                         text:
                             'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.',

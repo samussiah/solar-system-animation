@@ -17,8 +17,9 @@ export default function timepoint() {
     const inputs = container
         .append('input')
         .classed(`fdg-button fdg-input`, true)
+        .attr('type', 'number')
         .attr('title', `Choose a timepoint.`)
-        .attr('value', this.settings.timepoint)
+        .attr('value', +this.settings.timepoint)
         .attr('min', 1)
         .attr('max', this.settings.duration);
 
@@ -30,7 +31,7 @@ export default function timepoint() {
     inputs.on('change', function () {
         // Pause simulation.
         if (fdg.settings.playPause !== 'pause') toggle.call(fdg);
-        fdg.settings.timepoint = this.value - 1;
+        fdg.settings.timepoint = +this.value - 1;
 
         increment.call(fdg, true);
     });

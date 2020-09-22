@@ -16,7 +16,7 @@ export default function runModal() {
             d3.timeout(() => {
                 this.modal.stop();
                 //this.containers.modal.classed('fdg-hidden', true);
-            }, 3000);
+            }, 8000);
         }
-    }, 5000);
+    }, 10000);
 }

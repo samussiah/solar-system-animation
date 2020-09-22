@@ -21,17 +21,35 @@ fetch('../data_1000.csv')
         data.forEach((d,i) => {
             if (d.event === 'Death')
                 d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
+            d.outcome = Math.random();
+            d.category = i%3;
+            d.event_position = d.event === 'Home'
+                ? 0
+                : d.event === 'Hospitalization'
+                ? -45
+                : d.event === 'ICU'
+                ? 30
+                : d.event === 'Death (CV-related)'
+                ? -10
+                : d.event === 'Death (other)'
+                ? 10
+                : 0;
         });
 
         const fdg = forceDirectedGraph(
             data,
-            'body',
-            //'#container',
+            '#container',
             {
-                hideControls: true,
-                eventChangeCount: ['Hospitalization', 'ICU'],
-                eventChangeCountAesthetic: 'both',
-                nFoci: 16,
+                //colorBy: {
+                //    type: 'continuous',
+                //    variable: 'outcome',
+                //    label: 'Random number',
+                //},
+                colorBy: {
+                    type: 'categorical',
+                    variable: 'category',
+                    label: 'Random category',
+                },
             }
         );
     });

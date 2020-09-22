@@ -3,6 +3,15 @@ import colorScale from './settings/colorScale';
 import color from './settings/color';
 
 const settings = {
+    // data mappings
+    id_var: 'id',
+    event_var: 'event',
+    event_order_var: 'event_order',
+    start_timepoint_var: 'stdy',
+    end_timepoint_var: 'endy',
+    duration_var: 'duration',
+    sequence_var: 'seq',
+
     // time settings
     timepoint: 0,
     timeUnit: 'days since randomization',

@@ -1,5 +1,5 @@
-//fetch('./data_1000.csv')
-fetch('./data_2000_fixed.csv')
+fetch('./data_1000.csv')
+//fetch('./data_2000_fixed.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -7,9 +7,7 @@ fetch('./data_2000_fixed.csv')
         const nest = d3.nest()
             .key(d => d.id)
             .rollup(nest => {
-                const totalDuration = d3.sum(nest, d => +d.duration);
                 for (const d of nest) {
-                    d.totalDuration = totalDuration;
                     d.any_state_change = 1;
                     if (d.event === 'Death') {
                         nest.filter(di => +di.seq > +d.seq)

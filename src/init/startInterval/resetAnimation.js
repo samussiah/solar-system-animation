@@ -1,11 +1,11 @@
 import getState from '../../dataManipulation/nestData/getState';
-import updateEventCount from './updateData/updateEventCount';
 import calculateInitialPointCoordinates from '../../dataManipulation/nestData/calculateInitialPointCoordinates';
 import defineRadius from '../../dataManipulation/nestData/defineRadius';
 import defineColor from '../../dataManipulation/nestData/defineColor';
 
 export default function resetAnimation() {
     this.settings.timepoint = 0;
+    this.controls.timepoint.inputs.attr('value', 0);
 
     // Update the event object of the population.
     this.metadata.event.forEach((event) => {
@@ -24,17 +24,15 @@ export default function resetAnimation() {
         });
 
         // Update individual event count at initial event.
-        updateEventCount.call(this, d.value.events, d.value.state.event);
+        //updateEventCount.call(this, d.value.events, d.value.state.event);
 
         // Reset state index and timepoint of next state change.
         d.value.moves = 0;
         d.value.nextStateChange = d.value.state.duration;
 
         // Update population count at previous and current events.
-        const populationEvent = updateEventCount.call(
-            this,
-            this.metadata.event,
-            d.value.state.event
+        const populationEvent = this.metadata.event.find(
+            (event) => event.value === d.value.state.event
         );
 
         const stateChanges = d3.sum(

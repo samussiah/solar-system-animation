@@ -1,9 +1,5 @@
-import defineTimepoints from './nestData/defineTimepoints';
 import getState from './nestData/getState';
-import defineIndividualEvents from './nestData/defineIndividualEvents';
-import updateEventCount from '../init/startInterval/updateData/updateEventCount';
 import countStateChanges from './nestData/countStateChanges';
-import calculateInitialPointCoordinates from './nestData/calculateInitialPointCoordinates';
 import defineRadius from './nestData/defineRadius';
 import defineColor from './nestData/defineColor';
 
@@ -12,54 +8,30 @@ export default function nestData() {
         .nest()
         .key((d) => d.id)
         .rollup((group) => {
-            // Establish start and end timepoints for each state (mutates data array).
-            defineTimepoints(group);
+            const noStateChange = group.length === 1 && state.event === this.settings.eventCentral;
+            const duration = d3.sum(group, (d) => d.duration);
 
             // Initial state for the given individual.
             const state = getState.call(this, group, 0);
 
-            // Define an event object for the individual.
-            const individualEvents = defineIndividualEvents.call(this, group);
-            const individualEvent = updateEventCount.call(this, individualEvents, state.event);
-
-            // Update the event object of the population.
-            const populationEvent = updateEventCount.call(this, this.metadata.event, state.event);
-
-            // Calculate initial point coordinates.
-            const initialPointCoordinates = calculateInitialPointCoordinates.call(
-                this,
-                populationEvent
-            );
-
-            // Count state changes
-            const stateChanges = countStateChanges.call(this, individualEvents);
+            // Count state changes.
+            const nStateChanges = countStateChanges.call(this, group);
 
             // Define radius.
-            const r = defineRadius.call(this, stateChanges);
+            const r = defineRadius.call(this, nStateChanges);
 
             // Define color.
-            const color = defineColor.call(this, stateChanges);
+            const color = defineColor.call(this, nStateChanges);
 
-            const datum = {
-                noStateChange: group.length === 1 && state.event === this.settings.eventCentral,
-                state,
-                x: populationEvent.x,
-                y: populationEvent.y,
-                events: individualEvents,
-                duration: d3.sum(group, (d) => d.duration),
-                moves: 0,
-                nextStateChange: state.duration,
-                movesSinceChange: 0,
-                group,
-
-                // point attributes
-                stateChanges,
-                ...initialPointCoordinates,
-                r,
-                ...color,
+            return {
+                group, // array of data representing all records for an individual
+                noStateChange, // boolean - did individual have any events? used to present those individuals in a static force layout
+                duration: d3.sum(group, (d) => d.duration), // full duration of individual in data
+                state, // object representing a single record of an individual
+                nStateChanges, // number of state changes the indivdual has experienceda thus far
+                r, // radius of bubble
+                ...color, // color/fill/stroke of bubble
             };
-
-            return datum;
         })
         .entries(this.data);
 

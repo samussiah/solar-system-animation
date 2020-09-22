@@ -19,6 +19,7 @@ export const increment = function (arg) {
                 this.settings.timeUnit.split(' ')[0]
             } to go.`
         );
+    this.controls.timepoint.inputs.attr('value', timepoint);
 
     if (this.settings.timepoint <= this.settings.duration) {
         // Update the node data.

@@ -10,7 +10,9 @@ export default function updateText() {
 
     // Update notes
     if (Array.isArray(this.settings.notes)) {
-        if (this.settings.timepoint === this.settings.notes[this.settings.notesIndex].startTimepoint) {
+        if (
+            this.settings.timepoint === this.settings.notes[this.settings.notesIndex].startTimepoint
+        ) {
             this.containers.info
                 .style('opacity', 0)
                 .transition()

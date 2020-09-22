@@ -15,12 +15,16 @@ export default function forceDirectedGraph(data, element = 'body', settings = {}
     };
 
     if (Array.isArray(fdg.settings.notes))
-        fdg.settings.notesIndex = settings.notes.some((note) => note.startTimepoint === fdg.settings.timepoint)
+        fdg.settings.notesIndex = settings.notes.some(
+            (note) =>
+                note.startTimepoint <= fdg.settings.timepoint &&
+                fdg.settings.timepoint <= note.endTimepoint
+        )
             ? fdg.settings.notes.findIndex(
-                (note) =>
-                    note.startTimepoint <= settings.timepoint &&
-                    fdg.settings.timepoint <= note.stopTimepoint
-            )
+                  (note) =>
+                      note.startTimepoint <= settings.timepoint &&
+                      fdg.settings.timepoint <= note.stopTimepoint
+              )
             : 0;
 
     fdg.containers = layout.call(fdg); // add elements to DOM

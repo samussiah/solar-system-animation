@@ -1,8 +1,7 @@
-export default function countStateChanges(events) {
-    const stateChanges = d3.sum(
-        events.filter((event) => this.settings.eventChangeCount.includes(event.label)),
-        (event) => event.count
-    );
+export default function countStateChanges(group) {
+    const nStateChanges = group
+        .filter((d) => d.start_timepoint <= this.settings.timepoint)
+        .filter((d) => this.settings.eventChangeCount.includes(d.event)).length;
 
-    return stateChanges;
+    return nStateChanges;
 }

@@ -1,10 +1,12 @@
 import fadeOut from './fadeOut';
 
-export default function fadeIn(selection) {
+export default function fadeIn(selection, modalSpeed) {
     selection
         .style('opacity', 0)
         .transition()
-        .duration(1000)
+        .duration(modalSpeed / 15)
         .style('opacity', 1)
-        .on('end', fadeOut);
+        .on('end', function () {
+            fadeOut.call(this, modalSpeed);
+        });
 }

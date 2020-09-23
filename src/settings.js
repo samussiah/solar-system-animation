@@ -60,9 +60,18 @@ const settings = {
     fill: null, // defined in ./defineMetadata/dataDrivenSettings
     minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
     maxRadius: null, // defined in ./defineMetadata/dataDrivenSettings
+    shape: 'circle',
 
-    // miscellaneous
-    notes: null, // array of objects with startTimepoint, stopTimepoint, and text properties
+    // modals
+    modal: true, // display modals?
+    modalSpeed: 15000, // amount of time for which each modal appears
+    explanation: [
+        'Each bubble in this animation represents an individual.',
+        'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
+        'The number of state changes dictates the color and/or size of the bubbles.',
+        'Use the controls above to interact with and alter the animation.',
+    ], // array of strings
+    information: null, // array of strings
 };
 
 export default settings;

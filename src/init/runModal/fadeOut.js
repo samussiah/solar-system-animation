@@ -1,3 +1,7 @@
-export default function fadeOut(transition) {
-    d3.select(this).transition().duration(1000).delay(8000).style('opacity', 0);
+export default function fadeOut(modalSpeed) {
+    d3.select(this)
+        .transition()
+        .duration(modalSpeed / 15)
+        .delay(modalSpeed - (modalSpeed / 15) * 2)
+        .style('opacity', 0);
 }

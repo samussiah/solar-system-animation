@@ -1,9 +1,9 @@
-import getState from '../../dataManipulation/nestData/getState';
-import countStateChanges from '../../dataManipulation/nestData/countStateChanges';
-import defineRadius from '../../dataManipulation/nestData/defineRadius';
-import defineColor from '../../dataManipulation/nestData/defineColor';
+import getState from '../../../dataManipulation/nestData/getState';
+import countStateChanges from '../../../dataManipulation/nestData/countStateChanges';
+import defineRadius from '../../../dataManipulation/nestData/defineRadius';
+import defineColor from '../../../dataManipulation/nestData/defineColor';
 
-export default function updateData() {
+export default function data() {
     // Count the number of individuals at each focus at previous timepoint.
     this.metadata.event.forEach((event) => {
         event.prevCount = event.count;

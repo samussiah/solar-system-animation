@@ -1,22 +1,23 @@
-import getText from './runModal/text';
 import fadeIn from './runModal/fadeIn';
 import fadeOut from './runModal/fadeOut';
 
 export default function runModal() {
-    const text = getText.call(this);
     let index = 0; // index of item in text array
 
-    this.containers.modal.text(text[index]).call(fadeIn);
+    this.containers.modal.text(this.settings.text[index]).call(fadeIn, this.settings.modalSpeed);
 
     this.modal = d3.interval(() => {
         index++;
-        this.containers.modal.text(text[index]).call(fadeIn);
+        if (index === this.settings.text.length - 1) index = 0;
+        this.containers.modal
+            .text(this.settings.text[index])
+            .call(fadeIn, this.settings.modalSpeed);
 
-        if (index === text.length - 1) {
-            d3.timeout(() => {
-                this.modal.stop();
-                //this.containers.modal.classed('fdg-hidden', true);
-            }, 8000);
-        }
-    }, 10000);
+        //if (index === text.length - 1) {
+        //    d3.timeout(() => {
+        //        this.modal.stop();
+        //        //this.containers.modal.classed('fdg-hidden', true);
+        //    }, 8000);
+        //}
+    }, this.settings.modalSpeed);
 }

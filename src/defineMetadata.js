@@ -46,19 +46,21 @@ export default function defineMetadata() {
     // Define color scale.
     const colors = this.settings.colors();
     if (this.settings.colorBy.type === 'frequency') {
-        this.colorScale = d3.scaleLinear()
+        this.colorScale = d3
+            .scaleLinear()
             .domain(d3.range(colors.length))
             .range(colors)
             .clamp(true);
     } else if (this.settings.colorBy.type === 'continuous') {
-        this.colorScale = d3.scaleSequential()
-            .domain(d3.extent(this.data, d => d[this.settings.colorBy.variable]).reverse())
+        this.colorScale = d3
+            .scaleSequential()
+            .domain(d3.extent(this.data, (d) => d[this.settings.colorBy.variable]).reverse())
             .interpolator(d3.interpolateRdYlGn)
             .clamp(true);
     } else if (this.settings.colorBy.type === 'categorical') {
-        console.log('here');
-        this.colorScale = d3.scaleOrdinal()
-            .domain([...new Set(this.data.map(d => d[this.settings.colorBy.variable])).values()])
+        this.colorScale = d3
+            .scaleOrdinal()
+            .domain([...new Set(this.data.map((d) => d[this.settings.colorBy.variable])).values()])
             .range(d3.schemeTableau10);
     }
     //console.log(this.data);

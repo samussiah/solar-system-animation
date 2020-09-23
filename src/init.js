@@ -9,7 +9,6 @@ export default function init() {
     addStaticForceSimulation.call(this);
 
     this.metadata.event.forEach((event) => {
-        event.tick = 0;
         event.forceSimulation = addForceSimulation.call(this, event);
     });
 

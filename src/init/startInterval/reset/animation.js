@@ -1,11 +1,12 @@
-import runModal from '../runModal';
-import getState from '../../dataManipulation/nestData/getState';
-import countStateChanges from '../../dataManipulation/nestData/countStateChanges';
-import defineRadius from '../../dataManipulation/nestData/defineRadius';
-import defineColor from '../../dataManipulation/nestData/defineColor';
+import runModal from '../../runModal';
+import getState from '../../../dataManipulation/nestData/getState';
+import countStateChanges from '../../../dataManipulation/nestData/countStateChanges';
+import defineRadius from '../../../dataManipulation/nestData/defineRadius';
+import defineColor from '../../../dataManipulation/nestData/defineColor';
 
 export default function resetAnimation() {
     this.settings.timepoint = 0;
+    this.settings.notesIndex = 0;
     this.controls.timepoint.inputs.attr('value', 0);
 
     // Update the event object of the population.

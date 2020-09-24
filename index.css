@@ -72,30 +72,40 @@ body {
     background: #eee;
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
-.fdg-timer,
 .fdg-legends,
-.fdg-freq-table,
-.fdg-info {
+.fdg-progress,
+.fdg-freq-table {
     width: 100%;
     display: inline-block;
     text-align: center;
     margin: 10px 0px;
 }
 
-.fdg-slider {
-    -webkit-appearance: none;
+/* legend */
+
+.fdg-legends {
+}
+.fdg-legend {
+    text-align: center;
+}
+.fdg-legend > * {
+    display: inline-block;
+}
+.fdg-legend__label {
     width: 100%;
-    height: 25px;
-    background: #ddd;
-    outline: none;
-    opacity: 0.7;
-    -webkit-transition: 0.2s;
-    transition: opacity 0.2s;
+    font-size: 1.25rem;
 }
 
-.fdg-slider:hover {
-    opacity: 1;
+/* progress */
+
+.fdg-progress {
+    position: relative;
+}
+.fdg-progress:hover .progressbar-text {
+    font-weight: bold;
 }
 
 .fdg-slider::-webkit-slider-thumb {
@@ -112,9 +122,16 @@ body {
     background: rgba(0, 104, 55, 0.75);
 }
 
-.fdg-timer {
+.fdg-timing {
+    width: 100%;
+}
+.fdg-timer,
+.fdg-countdown {
     font-weight: bold;
     font-size: 1.25rem;
+    height: 30px;
+    width: 100%;
+    text-align: center;
 }
 .fdg-duration,
 .fdg-percent-complete {
@@ -127,18 +144,12 @@ body {
 .fdg-percent-complete {
     margin-left: 4px;
 }
-
-.fdg-legends {
-}
-.fdg-legend {
-    text-align: center;
-}
-.fdg-legend > * {
+.fdg-countdown div {
+    width: 100%;
     display: inline-block;
 }
-.fdg-legend__label {
-    font-size: 1.25rem;
-}
+
+/* freq table */
 
 .fdg-freq-table {
 }
@@ -164,7 +175,7 @@ body {
 
 .fdg-info {
     font-weight: lighter;
-    font-size: 1.5em;
+    font-size: 2rem;
     color: black;
     text-shadow: black 0px 0px 10px;
     height: 50%;
@@ -183,12 +194,26 @@ body {
     position: relative;
 }
 
-.fdg-canvas {
+.fdg-svg--background,
+.fdg-canvas,
+.fdg-svg--foreground {
     position: absolute;
     left: 0;
 }
 
-.fdg-svg {
+/* modal */
+.fdg-modal {
     position: absolute;
-    left: 0;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 2%;
+    border-radius: 5px;
+    font-size: 2rem;
+    /*
+    font-weight: lighter;
+    color: black;
+    */
+    text-shadow: black 0px 0px 10px;
 }

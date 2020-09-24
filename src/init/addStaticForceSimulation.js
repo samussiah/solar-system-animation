@@ -12,6 +12,6 @@ export default function addStaticForceSimulation() {
 
     if (noStateChange.length) {
         //radial.call(this, noStateChange);
-        //circular.call(this, noStateChange);
+        circular.call(this, noStateChange);
     }
 }

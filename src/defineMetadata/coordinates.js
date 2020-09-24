@@ -12,18 +12,22 @@ export default function coordinates(metadata) {
         i === 0 ? 0 : i === 1 ? -1.75 : i === 2 ? 0.75 : i === 3 ? -0.25 : i === 4 ? 0.25 : 0;
 
     metadata.event.forEach((event, i) => {
+        event.radius = event.order * this.settings.orbitRadius;
+        //event.theta = thetaFactor(i) * theta
+        event.theta =
+            event.position !== 0 ? (2 * Math.PI * event.position) / 360 : thetaFactor(i) * theta;
         event.x =
             event.order === 0
                 ? centerX
-                : event.order * this.settings.orbitRadius * Math.cos(thetaFactor(i) * theta) +
-                  //Math.cos((this.settings.nFoci - i) * theta) +
-                  centerX;
+                : centerX +
+                  event.radius * // number of orbit radii from the center
+                      Math.cos(event.theta); // position along the circle at the given orbit along which
         event.y =
             event.order === 0
                 ? centerY
-                : event.order * this.settings.orbitRadius * Math.sin(thetaFactor(i) * theta) +
-                  //Math.sin((this.settings.nFoci - i) * theta) +
-                  centerY;
+                : centerY +
+                  event.radius * // number of orbit radii from the center
+                      Math.sin(event.theta); // y-position of the along the given orbit at which the focus circle at the
     });
 
     // Calculate dimensions of orbits.

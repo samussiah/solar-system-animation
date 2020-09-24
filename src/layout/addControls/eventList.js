@@ -63,7 +63,7 @@ export default function eventList() {
 
         // Update legend label.
         fdg.legends.container
-            .classed('fdg-hidden', fdg.settings.eventChangeCount.length === 0)
+            .classed('fdg-invisible', fdg.settings.eventChangeCount.length === 0)
             .selectAll('span.fdg-measure')
             .text(fdg.util.csv(fdg.settings.eventChangeCount));
 

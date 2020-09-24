@@ -1,4 +1,4 @@
-import resetAnimation from '../../init/startInterval/resetAnimation';
+import resetAnimation from '../../init/startInterval/reset/animation';
 import toggle from './playPause/toggle';
 
 export default function reset() {

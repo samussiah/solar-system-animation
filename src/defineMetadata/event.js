@@ -5,9 +5,13 @@ export default function event() {
         .rollup((group) => {
             const event = group[0];
             const order = parseInt(event.event_order);
+            const position = event.hasOwnProperty('event_position')
+                ? parseInt(event.event_position)
+                : 0;
 
             return {
                 order,
+                position,
                 count: 0,
                 prevCount: 0,
                 cumulative: 0,

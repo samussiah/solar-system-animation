@@ -11,7 +11,7 @@ export default function circular(data) {
 
     for (let i = 0; i < 300; i++) simulation.tick();
 
-    const g = this.containers.svg.insert('g', ':first-child');
+    const g = this.containers.svgBackground.insert('g', ':first-child');
     //.attr('transform', `translate(${this.settings.orbitRadius/2},${this.settings.height/2})`);
     g.append('text')
         .attr('x', 0)

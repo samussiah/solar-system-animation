@@ -1,4 +1,6 @@
 import babel from 'rollup-plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 
 const pkg = require('./package.json');
 
@@ -19,7 +21,7 @@ export default {
             d3: 'd3',
         },
     },
-    external: Object.keys(pkg.dependencies),
+    external: ['d3'],
     plugins: [
         babel({
             exclude: 'node_modules/**',
@@ -27,6 +29,8 @@ export default {
                 [ '@babel/preset-env' ]
             ],
             babelrc: false
-        })
+        }),
+        nodeResolve(),
+        commonjs(),
     ]
 };

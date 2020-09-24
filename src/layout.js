@@ -1,4 +1,5 @@
 import addElement from './layout/addElement';
+import ProgressBar from 'progressbar.js';
 
 // TODO: fit sidebar and animation containers to height of containing element less the height of the controls.
 export default function layout() {
@@ -11,6 +12,7 @@ export default function layout() {
 
     // sidebar to the left
     const sidebar = addElement('sidebar', main);
+    const legends = addElement('legends', sidebar);
     const timing = addElement('timing', sidebar).style('position', 'relative');
     const timer = addElement('timer', timing);
     const slider = addElement('slider', timing, 'input')
@@ -26,6 +28,38 @@ export default function layout() {
                 this.settings.timeUnit.split(' ')[0]
             } to go.`
         );
+    const progress = addElement('progress', sidebar);
+    progress.circle = new ProgressBar.Circle(progress.node(), {
+        color: '#aaa',
+        strokeWidth: 4,
+        trailWidth: 1,
+        easing: 'easeInOut',
+        duration: 1400,
+        text: {
+            autoStyleContainer: false,
+        },
+        from: {
+            color: '#aaa',
+            width: 1,
+        },
+        to: {
+            color: '#333',
+            width: 4,
+        },
+        step: function(state, circle) {
+            circle.path.setAttribute('stroke', state.color);
+            circle.path.setAttribute('stroke-width', state.width);
+
+            var value = Math.round(circle.value() * 100);
+            if (value === 0) {
+                circle.setText('');
+            } else {
+                circle.setText(value);
+            }
+        },
+    });
+    progress.circle.animate(.5);
+    console.log(progress.circle);
 
     // TODO: make slider into a control - need to figure out a new way to count up the state changes up to the selected timepoint
     slider.on('change', function () {
@@ -44,9 +78,7 @@ export default function layout() {
         .style('display', 'inline-block')
         .text((d) => `Looping in ${d + 1} second${d === 0 ? '' : 's'}`)
         .classed('fdg-hidden', true);
-    const legends = addElement('legends', sidebar);
     const freqTable = addElement('freq-table', sidebar);
-    const info = addElement('info', sidebar);
 
     // animation to the right
     const animation = addElement('animation', main);
@@ -85,7 +117,6 @@ export default function layout() {
         countdown,
         legends,
         freqTable,
-        info,
 
         animation,
         svgBackground,

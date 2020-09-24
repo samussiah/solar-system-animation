@@ -30,11 +30,11 @@ const settings = {
     excludeLast: true,
 
     // animation settings
-    speed: 'slow',
+    speed: 'medium',
     speeds: {
         slow: 1000,
-        medium: 200,
-        fast: 50,
+        medium: 500,
+        fast: 100,
     },
     playPause: 'play',
 

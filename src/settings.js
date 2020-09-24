@@ -65,6 +65,7 @@ const settings = {
     // modals
     modal: true, // display modals?
     modalSpeed: 15000, // amount of time for which each modal appears
+    modalIndex: 0,
     explanation: [
         'Each bubble in this animation represents an individual.',
         'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',

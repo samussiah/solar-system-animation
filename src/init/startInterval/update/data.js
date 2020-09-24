@@ -11,6 +11,7 @@ export default function data() {
 
     this.data.nested.forEach((d) => {
         // Update individual to next event.
+        d.value.statePrevious = d.value.state;
         d.value.state = getState.call(this, d.value.group);
 
         // Count state changes.

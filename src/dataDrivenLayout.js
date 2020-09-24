@@ -19,6 +19,4 @@ export default function dataDrivenLayout() {
 
     // Annotate foci.
     this.focusAnnotations = annotateFoci.call(this);
-
-    this.containers.slider.attr('max', this.settings.duration);
 }

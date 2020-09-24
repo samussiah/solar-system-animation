@@ -5,17 +5,16 @@ export default function text() {
     // Update timer.
     this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
 
-    // Update slider.
-    this.containers.slider
-        .attr('value', this.settings.timepoint)
-        .attr(
-            'title',
-            `The animation is ${d3.format('.1%')(
-                this.settings.timepoint / this.settings.duration
-            )} complete with ${this.settings.duration - this.settings.timepoint} ${
-                this.settings.timeUnit.split(' ')[0]
-            } to go.`
-        );
+    // Update progress bar.
+    this.containers.progress.attr(
+        'title',
+        `The animation is ${d3.format('.1%')(
+            this.settings.timepoint / this.settings.duration
+        )} complete with ${this.settings.duration - this.settings.timepoint} ${
+            this.settings.timeUnit.split(' ')[0]
+        } to go.`
+    );
+    this.containers.progress.circle.animate(this.settings.timepoint / this.settings.duration);
 
     // Update focus percentages
     if (this.settings.eventCount)

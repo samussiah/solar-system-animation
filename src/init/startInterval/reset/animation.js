@@ -18,6 +18,7 @@ export default function resetAnimation() {
 
     this.data.nested.forEach((d) => {
         // Initial event for the given individual.
+        d.value.statePrevious = null;
         d.value.state = getState.call(this, d.value.group, 0);
 
         // Count state changes.

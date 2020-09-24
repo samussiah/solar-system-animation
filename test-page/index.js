@@ -30,7 +30,7 @@ fetch('./data/data_1000.csv')
                     : d.event === 'Hospitalization'
                     ? -45
                     : d.event === 'ICU'
-                    ? 30
+                    ? 25
                     : d.event === 'Death (CV-related)'
                     ? -10
                     : d.event === 'Death (other)'

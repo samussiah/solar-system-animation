@@ -24,5 +24,9 @@ export default function addControls() {
         })
         .on('mouseup', function () {
             this.classList.toggle('clicked');
+        })
+        .on('mouseout', function () {
+            if (this.classList.contains('clicked'))
+                this.classList.toggle('clicked');
         });
 }

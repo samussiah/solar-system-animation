@@ -38,12 +38,14 @@ export default function sidebar(main) {
         },
     });
 
+    const resetDelay = this.settings.resetDelay / 1000;
     const countdown = addElement('countdown', progress)
         .selectAll('div')
-        .data(d3.range(-1, this.settings.resetDelay / 1000))
+        .data(d3.range(-1, resetDelay))
         .join('div')
         .text((d) => `Looping in ${d + 1} second${d === 0 ? '' : 's'}`)
-        .classed('fdg-hidden', true);
+        .classed('fdg-hidden', d => d !== resetDelay - 1)
+        .classed('fdg-invisible', d => d === resetDelay - 1);
     const freqTable = addElement('freq-table', sidebar);
 
     return {

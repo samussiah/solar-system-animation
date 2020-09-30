@@ -46,7 +46,6 @@ body {
     text-overflow: ellipsis;
 }
 .fdg-button:not(:last-child) {
-    border-right: none;
 }
 .fdg-button.current {
     color: #fff;
@@ -108,20 +107,6 @@ body {
     font-weight: bold;
 }
 
-.fdg-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 25px;
-    background: rgba(0, 104, 55, 0.75);
-}
-
-.fdg-slider::-moz-range-thumb {
-    width: 15px;
-    height: 25px;
-    background: rgba(0, 104, 55, 0.75);
-}
-
 .fdg-timing {
     width: 100%;
 }
@@ -129,7 +114,7 @@ body {
 .fdg-countdown {
     font-weight: bold;
     font-size: 1.25rem;
-    height: 30px;
+    /*height: 30px;*/
     width: 100%;
     text-align: center;
 }

@@ -18,7 +18,6 @@ export default function addForceSimulation(event) {
         .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
         .force('x', d3.forceX(event.x).strength(0.3))
         .force('y', d3.forceY(event.y).strength(0.3))
-        //.force('charge', d3.forceManyBodyReuse().strength(-(2000 / this.metadata.id.length)))
         .force('charge', forceManyBodyReuse().strength(-(2000 / this.metadata.id.length)))
         //.force('charge', d3.forceManyBodySampled().strength(-(2000 / this.metadata.id.length)))
         .on('tick', tick.bind(this, event));
@@ -27,9 +26,8 @@ export default function addForceSimulation(event) {
     forceSimulation.force(
         'collide',
         //d3.forceCollide().radius((d) => d.value.r + 0.5)
-        d3.forceCollide().radius(this.settings.minRadius + 0.5)
+        d3.forceCollide().radius(this.settings.minRadius + 1)
     );
-    //forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5));
 
     return forceSimulation;
 }

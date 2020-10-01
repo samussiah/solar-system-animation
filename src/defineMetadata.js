@@ -71,7 +71,7 @@ export default function defineMetadata() {
         console.log(this.colorScale.domain());
         console.log(
             JSON.stringify(
-                d3.range(10).map(d => d3.color(this.colorScale(d/10)).formatHex()),
+                d3.range(10).map((d) => d3.color(this.colorScale(d / 10)).formatHex()),
                 null,
                 4
             )

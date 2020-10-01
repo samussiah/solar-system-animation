@@ -9,7 +9,7 @@ export default function tick(event) {
 
             // circle
             //if (this.settings.shape === 'circle') {
-            if (i%2) {
+            if (i % 2) {
                 this.containers.canvas.context.moveTo(d.x + d.r, d.y);
                 this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
                 if (this.settings.fill) {

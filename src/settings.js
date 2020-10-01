@@ -70,7 +70,7 @@ const settings = {
         'Each bubble in this animation represents an individual.',
         'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
         'The number of state changes dictates the color and/or size of the bubbles.',
-        'Use the controls above to interact with and alter the animation.',
+        'Use the controls on the right to interact with and alter the animation.',
     ], // array of strings
     information: null, // array of strings
 };

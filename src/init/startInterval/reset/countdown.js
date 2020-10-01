@@ -5,8 +5,7 @@ export default function countdown() {
         .classed('fdg-hidden', (d) => d !== counter);
     const interval = window.setInterval(() => {
         counter--;
-        this.containers.countdown
-            .classed('fdg-hidden', (d) => d !== counter);
+        this.containers.countdown.classed('fdg-hidden', (d) => d !== counter);
     }, 1000);
 
     return interval;

@@ -16,7 +16,8 @@ export default function addControls() {
     this.controls.timepoint = timepoint.call(this);
     this.controls.reset = reset.call(this);
     this.controls.eventList = eventList.call(this);
-    this.controls.colorSizeToggle = colorSizeToggle.call(this);
+    if (this.settings.colorBy.type === 'frequency')
+        this.controls.colorSizeToggle = colorSizeToggle.call(this);
     this.controls.container
         .selectAll('.fdg-button')
         .on('mousedown', function () {

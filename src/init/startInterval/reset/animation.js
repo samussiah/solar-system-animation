@@ -1,8 +1,6 @@
 import runModal from '../../runModal';
 import getState from '../../../dataManipulation/nestData/getState';
-import countStateChanges from '../../../dataManipulation/nestData/countStateChanges';
-import defineRadius from '../../../dataManipulation/nestData/defineRadius';
-import defineColor from '../../../dataManipulation/nestData/defineColor';
+import defineDatum from '../../../dataManipulation/nestData/defineDatum';
 
 export default function resetAnimation() {
     this.settings.timepoint = 0;
@@ -21,14 +19,8 @@ export default function resetAnimation() {
         d.value.statePrevious = null;
         d.value.state = getState.call(this, d.value.group, 0);
 
-        // Count state changes.
-        d.value.nStateChanges = countStateChanges.call(this, d.value.group);
-
-        // Define radius.
-        d.value.r = defineRadius.call(this, d.value.nStateChanges);
-
-        // Define color.
-        Object.assign(d.value, defineColor.call(this, d.value.nStateChanges));
+        const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.statePrevious);
+        Object.assign(d.value, datum);
     });
 
     if (this.modal) this.modal.stop();

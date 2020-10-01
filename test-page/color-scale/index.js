@@ -40,16 +40,17 @@ fetch('../data/data_1000.csv')
             data,
             '#container',
             {
-                colorBy: {
-                    type: 'continuous',
-                    variable: 'outcome',
-                    label: 'Random number',
-                },
                 //colorBy: {
-                //    type: 'categorical',
-                //    variable: 'category',
-                //    label: 'Random category',
+                //    type: 'continuous',
+                //    variable: 'outcome',
+                //    label: 'Random number',
+                //    mirror: true,
                 //},
+                colorBy: {
+                    type: 'categorical',
+                    variable: 'category',
+                    label: 'Random category',
+                },
             }
         );
     });

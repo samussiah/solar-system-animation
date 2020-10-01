@@ -33,7 +33,7 @@ const settings = {
     speed: 'slow',
     speeds: {
         slow: 1000,
-        medium: 200,
+        medium: 500,
         fast: 50,
     },
     playPause: 'play',

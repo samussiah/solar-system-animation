@@ -13,10 +13,11 @@ export default function timepoint() {
 
     const container = this.controls.container
         .append('div')
-        .classed('fdg-control fdg-control--step', true);
+        .classed('fdg-control fdg-control--timepoint', true);
     const inputs = container
-        .append('input')
+        .append('div')
         .classed(`fdg-button fdg-input`, true)
+        .append('input')
         .attr('type', 'number')
         .attr('title', `Choose a timepoint.`)
         .attr('value', +this.settings.timepoint)

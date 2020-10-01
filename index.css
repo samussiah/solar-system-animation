@@ -7,6 +7,7 @@ body {
 .fdg-main {
     width: 100%;
     height: calc(100vh - 16px);
+    position: relative;
 }
 .fdg-hidden {
     display: none !important;
@@ -21,10 +22,15 @@ body {
 /* controls */
 
 .fdg-controls {
-    width: 100%;
-    border-bottom: 1px solid #aaa;
+    width: 10%;
+    position: absolute;
+    height: 100%;
+    right: 0;
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    z-index: 1;
 }
 .fdg-controls > * {
     display: inline-block;
@@ -32,21 +38,23 @@ body {
 .fdg-control {
     font-size: 0.75rem;
     text-transform: uppercase;
-    margin: 15px 0 20px 25px;
+    width: 100%;
+}
+.fdg-control:not(:last-child) {
+    margin-bottom: 25px;
 }
 .fdg-button {
     padding: 3px 3px;
+    float: right;
     text-align: center;
     border: 1px solid #ccc;
     cursor: pointer;
-    float: left;
-    width: 75px;
+    width: 60%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .fdg-button:not(:last-child) {
-    border-right: none;
 }
 .fdg-button.current {
     color: #fff;
@@ -129,7 +137,6 @@ body {
 .fdg-countdown {
     font-weight: bold;
     font-size: 1.25rem;
-    height: 30px;
     width: 100%;
     text-align: center;
 }

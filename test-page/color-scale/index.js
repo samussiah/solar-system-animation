@@ -22,7 +22,7 @@ fetch('../data/data_1000.csv')
             if (d.event === 'Death')
                 d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
             d.outcome = Math.random();
-            d.category = i%3;
+            d.category = `Group ${i%3 + 1}`;
             d.event_position = d.event === 'Home'
                 ? 0
                 : d.event === 'Hospitalization'

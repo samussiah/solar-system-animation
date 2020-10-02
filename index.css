@@ -104,7 +104,11 @@ body {
 }
 .fdg-legend__label {
     width: 100%;
-    font-size: 1.25rem;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 8px;
+    font-size: 1.5rem;
+    font-weight: normal;
 }
 
 /* progress */

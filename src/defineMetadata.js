@@ -56,9 +56,8 @@ export default function defineMetadata() {
             .scaleSequential(d3.interpolateRdYlGn)
             .domain(d3.extent(this.data, (d) => d[this.settings.colorBy.variable]));
         const interpolator = this.colorScale.interpolator(); // read the color scale's interpolator
-        const mirror = t => interpolator(1-t); // returns the mirror image of the interpolator
-        if (this.settings.colorBy.mirror)
-            this.colorScale.interpolator(mirror); // updates the scale's interpolator
+        const mirror = (t) => interpolator(1 - t); // returns the mirror image of the interpolator
+        if (this.settings.colorBy.mirror) this.colorScale.interpolator(mirror); // updates the scale's interpolator
     } else if (this.settings.colorBy.type === 'categorical') {
         this.colorScale = d3
             .scaleOrdinal()

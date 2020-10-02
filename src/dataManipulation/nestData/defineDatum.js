@@ -7,9 +7,10 @@ export default function defineDatum(group, state, statePrevious) {
     const nStateChanges = countStateChanges.call(this, group, statePrevious);
 
     // Count state changes.
-    const aesthetic = this.settings.colorBy.type === 'frequency'
-        ? nStateChanges
-        : state[this.settings.colorBy.variable];
+    const aesthetic =
+        this.settings.colorBy.type === 'frequency'
+            ? nStateChanges
+            : state[this.settings.colorBy.variable];
 
     // Define radius.
     const r = defineRadius.call(this, aesthetic);

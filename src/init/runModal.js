@@ -8,8 +8,8 @@ export default function runModal() {
 
     this.modal = d3.interval(() => {
         this.settings.modalIndex++;
-        if (this.settings.modalIndex === this.settings.text.length - 1)
-            this.settings.modalIndex = 0;
+        if (this.settings.modalIndex === this.settings.text.length - 1) this.modal.stop();
+        //this.settings.modalIndex = 0;
         this.containers.modal
             .html(this.settings.text[this.settings.modalIndex])
             .call(fadeIn, this.settings.modalSpeed);

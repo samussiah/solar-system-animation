@@ -19,8 +19,8 @@ export default function continuous({
         .attr('width', width)
         .attr('height', height)
         .attr('viewBox', [0, 0, width, height])
-        .style('overflow', 'visible')
-        //.style('display', 'block');
+        .style('overflow', 'visible');
+    //.style('display', 'block');
 
     let tickAdjust = (g) => g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height);
     let x;
@@ -147,11 +147,12 @@ export default function continuous({
         .call((g) =>
             g
                 .append('text')
+                .classed('fdg-legend__label', true)
                 .attr('x', marginLeft)
                 .attr('y', marginTop + marginBottom - height - 6)
                 .attr('fill', 'currentColor')
                 .attr('text-anchor', 'middle')
-                .attr('transform', `translate(${width/2},0)`)
+                .attr('transform', `translate(${width / 2},0)`)
                 .attr('font-weight', 'bold')
                 .attr('font-size', '1.25rem')
                 .text(title)

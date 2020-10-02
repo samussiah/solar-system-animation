@@ -27,32 +27,5 @@ export default function text() {
         .selectAll('td')
         .data((event) => [event.value, event.cumulative])
         .join('td')
-        .text((d) => d);
-
-    // Update notes
-    //if (Array.isArray(this.settings.notes)) {
-    //    if (
-    //        this.settings.timepoint === this.settings.notes[this.settings.notesIndex].startTimepoint
-    //    ) {
-    //        this.containers.info
-    //            .style('opacity', 0)
-    //            .transition()
-    //            .duration(600)
-    //            .style('opacity', 1)
-    //            .text(this.settings.notes[this.settings.notesIndex].text);
-    //    }
-
-    //    // Make note disappear at the end.
-    //    else if (
-    //        this.settings.timepoint === this.settings.notes[this.settings.notesIndex].stopTimepoint
-    //    ) {
-    //        this.containers.info.transition().duration(1000).style('opacity', 0);
-
-    //        this.settings.notesIndex += 1;
-
-    //        if (this.settings.notesIndex === this.settings.notes.length) {
-    //            this.settings.notesIndex = 0;
-    //        }
-    //    }
-    //}
+        .text((d) => (typeof d === 'number' ? d3.format(',d')(d) : d));
 }

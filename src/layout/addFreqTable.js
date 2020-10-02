@@ -15,7 +15,7 @@ export default function addFreqTable() {
         .selectAll('td')
         .data((event) => [event.value, event.cumulative])
         .join('td')
-        .text((d) => d);
+        .text((d) => (typeof d === 'number' ? d3.format(',d')(d) : d));
 
     return freqTable;
 }

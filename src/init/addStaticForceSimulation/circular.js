@@ -1,3 +1,5 @@
+import { forceManyBodyReuse } from 'd3-force-reuse';
+
 export default function circular(data) {
     const simulation = d3
         .forceSimulation()
@@ -5,7 +7,7 @@ export default function circular(data) {
         .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
         .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
         .force('y', d3.forceY(this.settings.height / 2).strength(0.3))
-        .force('charge', d3.forceManyBodyReuse().strength(-(2000 / data.length)))
+        .force('charge', forceManyBodyReuse().strength(-(2000 / data.length)))
         .force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5))
         .stop();
 

@@ -4523,30 +4523,8 @@
             })
             .join('td')
             .text(function (d) {
-                return d;
-            }); // Update notes
-        //if (Array.isArray(this.settings.notes)) {
-        //    if (
-        //        this.settings.timepoint === this.settings.notes[this.settings.notesIndex].startTimepoint
-        //    ) {
-        //        this.containers.info
-        //            .style('opacity', 0)
-        //            .transition()
-        //            .duration(600)
-        //            .style('opacity', 1)
-        //            .text(this.settings.notes[this.settings.notesIndex].text);
-        //    }
-        //    // Make note disappear at the end.
-        //    else if (
-        //        this.settings.timepoint === this.settings.notes[this.settings.notesIndex].stopTimepoint
-        //    ) {
-        //        this.containers.info.transition().duration(1000).style('opacity', 0);
-        //        this.settings.notesIndex += 1;
-        //        if (this.settings.notesIndex === this.settings.notes.length) {
-        //            this.settings.notesIndex = 0;
-        //        }
-        //    }
-        //}
+                return typeof d === 'number' ? d3.format(',d')(d) : d;
+            });
     }
 
     function update() {
@@ -5517,7 +5495,7 @@
             })
             .join('td')
             .text(function (d) {
-                return d;
+                return typeof d === 'number' ? d3.format(',d')(d) : d;
             });
         return freqTable;
     }
@@ -6648,7 +6626,7 @@
             )
             .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
             .force('y', d3.forceY(this.settings.height / 2).strength(0.3))
-            .force('charge', d3.forceManyBodyReuse().strength(-(2000 / data.length)))
+            .force('charge', forceManyBodyReuse().strength(-(2000 / data.length)))
             .force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5))
             .stop();
 

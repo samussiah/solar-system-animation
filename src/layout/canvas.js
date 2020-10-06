@@ -22,8 +22,20 @@ export default function canvas(main) {
         .attr('height', this.settings.height);
 
     // modal
-    const modal = addElement('modal', animation);
-    //.text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec erat orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus ut pretium augue, vitae aliquam arcu. Etiam consequat, lectus sit amet volutpat auctor, dui libero consectetur magna, eu ultricies elit ex non dui. Maecenas quis lacus non enim gravida ultrices. Phasellus vitae orci eget libero tempor scelerisque. Nunc auctor ut mi in fringilla. Praesent blandit id est ut aliquet.');
+    const modalContainer = addElement('modal', animation);
+    // TODO: add button to clear or hide modal
+    //const modalClear = addElement('modal__clear', modalContainer)
+    //    //.classed('fdg-hidden', true)
+    //    .text('x');
+    //modalClear
+    //    .on('mouseover', function() {
+    //        if (this.classList.includes('fdg-hidden'))
+    //            this.classList.toggle('fdg-hidden')
+    //    })
+    //    .on('click', () => {
+    //        this.modal.stop();
+    //    });
+    const modal = addElement('modal__text', modalContainer);
 
     return {
         animation,

@@ -7,14 +7,15 @@ export default function circular(data) {
         .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
         .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
         .force('y', d3.forceY(this.settings.height / 2).strength(0.3))
-        .force('charge', forceManyBodyReuse().strength(-(2000 / data.length)))
+        .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
         .force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5))
         .stop();
 
     for (let i = 0; i < 300; i++) simulation.tick();
 
-    const g = this.containers.svgBackground.insert('g', ':first-child');
-    //.attr('transform', `translate(${this.settings.orbitRadius/2},${this.settings.height/2})`);
+    const g = this.containers.svgBackground
+        .insert('g', ':first-child')
+        //.attr('transform', `translate(${this.settings.orbitRadius/2},${this.settings.height/2})`);
     g.append('text')
         .attr('x', 0)
         .attr('y', -this.settings.orbitRadius / 2)
@@ -39,5 +40,6 @@ export default function circular(data) {
             return d.y;
         })
         .attr('r', this.settings.minRadius)
-        .attr('fill', this.settings.color(0));
+        .attr('fill', this.settings.color(0))
+        .attr('fill-opacity', .25);
 }

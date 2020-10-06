@@ -10,7 +10,7 @@ export default function addForceSimulation(event) {
     // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
     const forceSimulation = d3
         .forceSimulation()
-        .nodes(event.data)
+        .nodes(event.data.filter(d => !d.value.noStateChange))
         .alphaDecay(0.01)
         //.alphaMin(.75)
         //.alphaTarget(.8)
@@ -18,8 +18,8 @@ export default function addForceSimulation(event) {
         .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
         .force('x', d3.forceX(event.x).strength(0.3))
         .force('y', d3.forceY(event.y).strength(0.3))
-        .force('charge', forceManyBodyReuse().strength(-(2000 / this.metadata.id.length)))
-        //.force('charge', d3.forceManyBodySampled().strength(-(2000 / this.metadata.id.length)))
+        .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
+        //.force('charge', d3.forceManyBodySampled().strength(this.settings.chargeStrength))
         .on('tick', tick.bind(this, event));
 
     //if (event.value !== this.settings.eventCentral)

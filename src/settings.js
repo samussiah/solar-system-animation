@@ -24,10 +24,7 @@ const settings = {
     eventCount: true, // display count (percentage) beneath focus labels?
     eventChangeCount: null, // defined in ./defineMetadata/dataDrivenSettings
     eventChangeCountAesthetic: 'color',
-    individualCounts: null,
-    individualCountEvents: null,
-    excludeFirst: true,
-    excludeLast: true,
+    drawStaticSeparately: true, // draw static bubbles in a static force simulation to improve performance
 
     // animation settings
     speed: 'medium',
@@ -44,6 +41,7 @@ const settings = {
     padding: 1,
     nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
     orbitRadius: 150,
+    chargeStrength: null, // defined in ./defineMetadata
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
     hideControls: false,

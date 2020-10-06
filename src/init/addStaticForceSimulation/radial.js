@@ -37,7 +37,8 @@ export default function radial(data) {
             return d.y;
         })
         .attr('r', this.settings.minRadius)
-        .attr('fill', this.settings.color(0));
+        .attr('fill', this.settings.color(0))
+        .attr('fill-opacity', .25);
 
     //const nodes = this.containers.svgBackground
     //    .append('g')

@@ -18,6 +18,22 @@
         csv: csv,
     };
 
+    function update() {
+        var _this = this;
+
+        // Define array of modal text.
+        this.settings.text = []
+            .concat(
+                this.settings.explanation.filter(function (el) {
+                    return !(_this.settings.hideControls && el.includes('controls'));
+                })
+            )
+            .concat(this.settings.information)
+            .filter(function (text) {
+                return typeof text === 'string';
+            });
+    }
+
     function colors() {
         var colors = [
             '#a50026', //'#d73027',
@@ -47,6 +63,7 @@
     }
 
     var settings = {
+        update: update,
         // data mappings
         id_var: 'id',
         event_var: 'event',
@@ -71,16 +88,14 @@
         eventChangeCount: null,
         // defined in ./defineMetadata/dataDrivenSettings
         eventChangeCountAesthetic: 'color',
-        individualCounts: null,
-        individualCountEvents: null,
-        excludeFirst: true,
-        excludeLast: true,
+        drawStaticSeparately: true,
+        // draw static bubbles in a static force simulation to improve performance
         // animation settings
-        speed: 'slow',
+        speed: 'medium',
         speeds: {
             slow: 1000,
             medium: 500,
-            fast: 50,
+            fast: 100,
         },
         playPause: 'play',
         // dimensions
@@ -92,6 +107,8 @@
         nOrbits: null,
         // defined in ./defineMetadata/dataDrivenSettings/orbits
         orbitRadius: 150,
+        chargeStrength: null,
+        // defined in ./defineMetadata
         nFoci: null,
         // defined in ./defineMetadata/dataDrivenSettings/event
         translate: false,
@@ -123,6 +140,7 @@
             'Each bubble in this animation represents an individual.',
             'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
             'The number of state changes dictates the color and/or size of the bubbles.',
+            'Static bubbles represent individuals whose state never changes.',
             'Use the controls on the right to interact with and alter the animation.',
         ],
         // array of strings
@@ -4011,28 +4029,22 @@
         utils: utils,
     };
 
-    function sidebar(main$1) {
-        var sidebar = addElement('sidebar', main$1);
-        var legends = addElement('legends', sidebar);
-        var progress = addElement('progress', sidebar);
-        var timer = addElement('timer', progress);
-        progress.circle = new main.Circle(progress.node(), {
-            color: '#555',
+    function addProgressCircle(progress) {
+        return new main.Circle(progress.node(), {
             trailColor: '#ccc',
-            strokeWidth: 4,
-            trailWidth: 1,
+            trailWidth: 5,
             easing: 'easeInOut',
             duration: 1,
             text: {
                 autoStyleContainer: false,
             },
             from: {
-                color: '#aaa',
-                width: 1,
+                color: '#66bd63',
+                width: 5,
             },
             to: {
-                color: '#333',
-                width: 4,
+                color: '#006837',
+                width: 5,
             },
             step: function step(state, circle) {
                 circle.path.setAttribute('stroke', state.color);
@@ -4047,14 +4059,33 @@
                 );
             },
         });
-        var countdown = addElement('countdown', progress)
+    }
+
+    function addCountdown(progress) {
+        var resetDelay = this.settings.resetDelay / 1000;
+        return addElement('countdown', progress)
+            .classed('fdg-sidebar__label', true)
             .selectAll('div')
-            .data(d3.range(-1, this.settings.resetDelay / 1000))
+            .data(d3.range(-1, resetDelay))
             .join('div')
             .text(function (d) {
                 return 'Looping in '.concat(d + 1, ' second').concat(d === 0 ? '' : 's');
             })
-            .classed('fdg-hidden', true);
+            .classed('fdg-hidden', function (d) {
+                return d !== resetDelay - 1;
+            })
+            .classed('fdg-invisible', function (d) {
+                return d === resetDelay - 1;
+            });
+    }
+
+    function sidebar(main) {
+        var sidebar = addElement('sidebar', main);
+        var legends = addElement('legends', sidebar);
+        var progress = addElement('progress', sidebar);
+        var timer = addElement('timer', progress).classed('fdg-sidebar__label', true);
+        progress.circle = addProgressCircle.call(this, progress);
+        var countdown = addCountdown.call(this, progress);
         var freqTable = addElement('freq-table', sidebar);
         return {
             sidebar: sidebar,
@@ -4084,8 +4115,20 @@
             .attr('width', this.settings.width)
             .attr('height', this.settings.height); // modal
 
-        var modal = addElement('modal', animation); //.text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec erat orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus ut pretium augue, vitae aliquam arcu. Etiam consequat, lectus sit amet volutpat auctor, dui libero consectetur magna, eu ultricies elit ex non dui. Maecenas quis lacus non enim gravida ultrices. Phasellus vitae orci eget libero tempor scelerisque. Nunc auctor ut mi in fringilla. Praesent blandit id est ut aliquet.');
+        var modalContainer = addElement('modal', animation); // TODO: add button to clear or hide modal
+        //const modalClear = addElement('modal__clear', modalContainer)
+        //    //.classed('fdg-hidden', true)
+        //    .text('x');
+        //modalClear
+        //    .on('mouseover', function() {
+        //        if (this.classList.includes('fdg-hidden'))
+        //            this.classList.toggle('fdg-hidden')
+        //    })
+        //    .on('click', () => {
+        //        this.modal.stop();
+        //    });
 
+        var modal = addElement('modal__text', modalContainer);
         return {
             animation: animation,
             svgBackground: svgBackground,
@@ -4093,113 +4136,6 @@
             svgForeground: svgForeground,
             modal: modal,
         };
-    }
-
-    function layout() {
-        var main = addElement('main', d3.select(this.element)); // controls on top
-
-        var controls$1 = controls.call(this, main); // sidebar to the left
-
-        var sidebar$1 = sidebar.call(this, main); // animation to the right
-
-        var canvas$1 = canvas.call(this, main);
-        return _objectSpread2(
-            _objectSpread2(
-                _objectSpread2(
-                    {
-                        main: main,
-                    },
-                    controls$1
-                ),
-                sidebar$1
-            ),
-            canvas$1
-        );
-    }
-
-    function id() {
-        var nest = d3
-            .nest()
-            .key(function (d) {
-                return d.id;
-            })
-            .rollup(function (group) {
-                return d3.sum(group, function (d) {
-                    return +d.duration;
-                });
-            })
-            .entries(this.data);
-        nest.forEach(function (d) {
-            d.duration = d.value;
-            d.value = d.key;
-            delete d.key;
-        });
-        return nest;
-    }
-
-    function event() {
-        var nest = d3
-            .nest()
-            .key(function (d) {
-                return d.event;
-            })
-            .rollup(function (group) {
-                var event = group[0];
-                var order = parseInt(event.event_order);
-                var position = event.hasOwnProperty('event_position')
-                    ? parseInt(event.event_position)
-                    : 0;
-                return {
-                    order: order,
-                    position: position,
-                    count: 0,
-                    prevCount: 0,
-                    cumulative: 0,
-                    nEvents: group.length,
-                };
-            })
-            .entries(this.data);
-        nest.forEach(function (event) {
-            Object.assign(event, event.value);
-            event.value = event.key;
-            delete event.key;
-        }); // Ensure events plot in order.
-
-        nest.sort(function (a, b) {
-            return a.order - b.order || b.nEvents - a.nEvents;
-        });
-        return nest;
-    }
-
-    function orbit(event) {
-        var _this = this;
-
-        var nest = d3
-            .nest()
-            .key(function (d) {
-                return d.order;
-            })
-            .entries(
-                event.filter(function (event) {
-                    return event.value !== _this.settings.eventCentral;
-                })
-            ); //export default function orbits(event) {
-        //    const nest = d3
-        //        .nest()
-        //        .key((d) => d.order)
-        //        .entries(event.filter((event) => event.value !== this.settings.eventCentral))
-        //        .map((d, i) => {
-        //            d.cx = this.settings.width / 2;
-        //            d.cy = this.settings.height / 2;
-        //            d.r = (i + 1) * 100 + 50;
-        //
-        //            return d;
-        //        });
-        //
-        //    return nest;
-        //}
-
-        return nest;
     }
 
     function coordinates(metadata) {
@@ -4257,6 +4193,164 @@
         });
     }
 
+    function resize() {
+        var node = this.containers.animation.node();
+        this.settings.width = node.clientWidth;
+        this.settings.height = this.containers.animation.node().clientHeight; // background SVG
+
+        this.containers.svgBackground
+            .attr('width', this.settings.width)
+            .attr('height', this.settings.height); // canvas
+
+        this.containers.canvas
+            .attr('width', this.settings.width)
+            .attr('height', this.settings.height); // SVG
+
+        this.containers.svgForeground
+            .attr('width', this.settings.width)
+            .attr('height', this.settings.height);
+        coordinates.call(this, this.metadata); // orbits
+
+        this.orbits
+            .attr('cx', function (d) {
+                return d.cx;
+            })
+            .attr('cy', function (d) {
+                return d.cy;
+            })
+            .attr('r', function (d) {
+                return d.r;
+            }); // static force simulation
+
+        this.staticForceSimulation.simulation
+            .force(
+                'center',
+                d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)
+            )
+            .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
+            .force('y', d3.forceY(this.settings.height / 2).strength(0.3));
+
+        for (var i = 0; i < 30; i++) {
+            this.staticForceSimulation.simulation.tick();
+        }
+
+        this.staticForceSimulation.nodes
+            .attr('cx', function (d) {
+                return d.x;
+            })
+            .attr('cy', function (d) {
+                return d.y;
+            }); // force simulations
+
+        this.metadata.event.forEach(function (event) {
+            event.forceSimulation
+                .force('x', d3.forceX(event.x).strength(0.3))
+                .force('y', d3.forceY(event.y).strength(0.3));
+        }); // focus annotations
+
+        this.focusAnnotations.attr('transform', function (d) {
+            return 'translate('.concat(d.x, ',').concat(d.y, ')');
+        });
+    }
+
+    function layout() {
+        var main = addElement('main', d3.select(this.element)); // controls on top
+
+        var controls$1 = controls.call(this, main); // sidebar to the left
+
+        var sidebar$1 = sidebar.call(this, main); // animation to the right
+
+        var canvas$1 = canvas.call(this, main); // add resize event
+
+        window.addEventListener('resize', resize.bind(this));
+        return _objectSpread2(
+            _objectSpread2(
+                _objectSpread2(
+                    {
+                        main: main,
+                    },
+                    controls$1
+                ),
+                sidebar$1
+            ),
+            canvas$1
+        );
+    }
+
+    function id() {
+        var nest = d3
+            .nest()
+            .key(function (d) {
+                return d.id;
+            })
+            .rollup(function (group) {
+                return {
+                    duration: d3.sum(group, function (d) {
+                        return +d.duration;
+                    }),
+                    static: group.length === 1,
+                };
+            })
+            .entries(this.data);
+        nest.forEach(function (d) {
+            Object.assign(d, d.value);
+            d.value = d.key;
+            d.duration = d.value;
+            delete d.key;
+        });
+        return nest;
+    }
+
+    function event() {
+        var nest = d3
+            .nest()
+            .key(function (d) {
+                return d.event;
+            })
+            .rollup(function (group) {
+                var event = group[0];
+                var order = parseInt(event.event_order);
+                var position = event.hasOwnProperty('event_position')
+                    ? parseInt(event.event_position)
+                    : 0;
+                return {
+                    order: order,
+                    position: position,
+                    count: 0,
+                    prevCount: 0,
+                    cumulative: 0,
+                    nEvents: group.length,
+                };
+            })
+            .entries(this.data);
+        nest.forEach(function (event) {
+            Object.assign(event, event.value);
+            event.value = event.key;
+            delete event.key;
+        }); // Ensure events plot in order.
+
+        nest.sort(function (a, b) {
+            return a.order - b.order || b.nEvents - a.nEvents;
+        });
+        return nest;
+    }
+
+    function orbit(event) {
+        var _this = this;
+
+        var nest = d3
+            .nest()
+            .key(function (d) {
+                return d.order;
+            })
+            .entries(
+                event.filter(function (event) {
+                    return event.value !== _this.settings.eventCentral;
+                })
+            );
+        return nest;
+    }
+
     function defineMetadata() {
         var _this = this;
 
@@ -4270,19 +4364,27 @@
             d3.max(metadata.id, function (id) {
                 return id.duration;
             });
-        this.settings.minRadius = this.settings.minRadius || 3000 / metadata.id.length;
+        this.settings.minRadius =
+            this.settings.minRadius ||
+            3000 /
+                metadata.id.filter(function (d) {
+                    return !(_this.settings.drawStaticSeparately && d['static']);
+                }).length;
+        this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
         this.settings.maxRadius =
             this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
+        this.settings.chargeStrength = -(
+            2000 /
+            metadata.id.filter(function (d) {
+                return !(_this.settings.drawStaticSeparately && d['static']);
+            }).length
+        );
+        this.settings.staticChargeStrength = -(2000 / metadata.id.length);
         this.settings.fill = this.settings.fill || metadata.id.length <= 2500; // Add additional metadata to event set.
 
         metadata.event = event.call(this); // Update settings that depend on event set.
 
-        this.settings.width = this.settings.width || metadata.event.length;
         this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
-        this.settings.eventFinal =
-            Array.isArray(this.settings.eventFinal) && this.settings.eventFinal.length
-                ? this.settings.eventFinal
-                : [this.settings.eventFinal || metadata.event[metadata.event.length - 1].value];
         this.settings.nFoci =
             this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
 
@@ -4290,18 +4392,7 @@
             this.settings.eventChangeCount ||
             metadata.event.slice(1).map(function (event) {
                 return event.value;
-            });
-        this.settings.eventSequence = metadata.event
-            .filter(function (event, i) {
-                return _this.settings.excludeLast ? i !== metadata.event.length - 1 : false;
-            })
-            .filter(function (event, i) {
-                return _this.settings.excludeFirst ? i !== 0 : false;
-            })
-            .map(function (event) {
-                return event.value;
-            });
-        this.settings.R = this.settings.width / metadata.event.length / 2; // Define orbits.
+            }); // Define orbits.
 
         metadata.orbit = orbit.call(this, metadata.event); // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
 
@@ -4316,17 +4407,18 @@
                 .range(colors)
                 .clamp(true);
         } else if (this.settings.colorBy.type === 'continuous') {
-            this.colorScale = d3
-                .scaleSequential()
-                .domain(
-                    d3
-                        .extent(this.data, function (d) {
-                            return d[_this.settings.colorBy.variable];
-                        })
-                        .reverse()
-                )
-                .interpolator(d3.interpolateRdYlGn)
-                .clamp(true);
+            this.colorScale = d3.scaleSequential(d3.interpolateRdYlGn).domain(
+                d3.extent(this.data, function (d) {
+                    return d[_this.settings.colorBy.variable];
+                })
+            );
+            var interpolator = this.colorScale.interpolator(); // read the color scale's interpolator
+
+            var mirror = function mirror(t) {
+                return interpolator(1 - t);
+            }; // returns the mirror image of the interpolator
+
+            if (this.settings.colorBy.mirror) this.colorScale.interpolator(mirror); // updates the scale's interpolator
         } else if (this.settings.colorBy.type === 'categorical') {
             this.colorScale = d3
                 .scaleOrdinal()
@@ -4340,16 +4432,7 @@
                     )
                 )
                 .range(d3.schemeTableau10);
-        } //console.log(this.data);
-        //console.log(this.colorScale.domain());
-        //console.log(this.colorScale.range());
-        //console.log(
-        //    JSON.stringify(
-        //        d3.range(3).map(d => d3.color(this.colorScale(d/100)).formatHex()),
-        //        null,
-        //        4
-        //    )
-        //);
+        }
 
         return metadata;
     }
@@ -4398,10 +4481,10 @@
         return r;
     }
 
-    function defineColor(stateChanges) {
+    function defineColor(value) {
         var color =
-            this.settings.eventChangeCountAesthetic !== 'size'
-                ? this.settings.color(stateChanges)
+            this.settings.eventChangeCountAesthetic !== 'size' //? this.settings.color(value)
+                ? this.colorScale(value)
                 : 'rgb(170,170,170)';
         var fill = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
         var stroke = color.replace('rgb', 'rgba').replace(')', ', 1)');
@@ -4410,6 +4493,30 @@
             fill: fill,
             stroke: stroke,
         };
+    }
+
+    function defineDatum(group, state, statePrevious) {
+        // Count state changes.
+        var nStateChanges = countStateChanges.call(this, group, statePrevious); // Count state changes.
+
+        var aesthetic =
+            this.settings.colorBy.type === 'frequency'
+                ? nStateChanges
+                : state[this.settings.colorBy.variable]; // Define radius.
+
+        var r = defineRadius.call(this, aesthetic); // Define color.
+
+        var color = defineColor.call(this, aesthetic);
+        return _objectSpread2(
+            {
+                nStateChanges: nStateChanges,
+                // number of state changes the indivdual has experienced a thus far
+                aesthetic: aesthetic,
+                // value that controls color
+                r: r,
+            },
+            color
+        );
     }
 
     function data() {
@@ -4422,13 +4529,14 @@
         this.data.nested.forEach(function (d) {
             // Update individual to next event.
             d.value.statePrevious = d.value.state;
-            d.value.state = getState.call(_this, d.value.group); // Count state changes.
-
-            d.value.nStateChanges = countStateChanges.call(_this, d.value.group); // Define radius.
-
-            d.value.r = defineRadius.call(_this, d.value.nStateChanges); // Define color.
-
-            Object.assign(d.value, defineColor.call(_this, d.value.nStateChanges));
+            d.value.state = getState.call(_this, d.value.group);
+            var datum = defineDatum.call(
+                _this,
+                d.value.group,
+                d.value.state,
+                d.value.statePrevious
+            );
+            Object.assign(d.value, datum);
         }); // Record change in number of IDs at each focus at current timepoint.
 
         this.metadata.event.forEach(function (event) {
@@ -4500,33 +4608,11 @@
             })
             .join('td')
             .text(function (d) {
-                return d;
-            }); // Update notes
-        //if (Array.isArray(this.settings.notes)) {
-        //    if (
-        //        this.settings.timepoint === this.settings.notes[this.settings.notesIndex].startTimepoint
-        //    ) {
-        //        this.containers.info
-        //            .style('opacity', 0)
-        //            .transition()
-        //            .duration(600)
-        //            .style('opacity', 1)
-        //            .text(this.settings.notes[this.settings.notesIndex].text);
-        //    }
-        //    // Make note disappear at the end.
-        //    else if (
-        //        this.settings.timepoint === this.settings.notes[this.settings.notesIndex].stopTimepoint
-        //    ) {
-        //        this.containers.info.transition().duration(1000).style('opacity', 0);
-        //        this.settings.notesIndex += 1;
-        //        if (this.settings.notesIndex === this.settings.notes.length) {
-        //            this.settings.notesIndex = 0;
-        //        }
-        //    }
-        //}
+                return typeof d === 'number' ? d3.format(',d')(d) : d;
+            });
     }
 
-    function update() {
+    function update$1() {
         // Update the node data.
         data.call(this); // Accentuate the orbits when an event occurs.
 
@@ -4539,9 +4625,11 @@
         var _this = this;
 
         var counter = this.settings.resetDelay / 1000 - 1;
-        this.containers.countdown.classed('fdg-hidden', function (d) {
-            return d !== counter;
-        });
+        this.containers.countdown
+            .classed('fdg-invisible', false)
+            .classed('fdg-hidden', function (d) {
+                return d !== counter;
+            });
         var interval = window.setInterval(function () {
             counter--;
 
@@ -4575,15 +4663,14 @@
         var _this = this;
 
         this.containers.modal
-            .text(this.settings.text[this.settings.modalIndex])
+            .html(this.settings.text[this.settings.modalIndex])
             .call(fadeIn, this.settings.modalSpeed);
         this.modal = d3.interval(function () {
             _this.settings.modalIndex++;
-            if (_this.settings.modalIndex === _this.settings.text.length - 1)
-                _this.settings.modalIndex = 0;
+            if (_this.settings.modalIndex === _this.settings.text.length - 1) _this.modal.stop(); //this.settings.modalIndex = 0;
 
             _this.containers.modal
-                .text(_this.settings.text[_this.settings.modalIndex])
+                .html(_this.settings.text[_this.settings.modalIndex])
                 .call(fadeIn, _this.settings.modalSpeed); //if (this.settings.modalIndex === text.length - 1) {
             //    d3.timeout(() => {
             //        this.modal.stop();
@@ -4597,7 +4684,7 @@
         var _this = this;
 
         this.settings.timepoint = 0;
-        this.settings.notesIndex = 0;
+        this.settings.modalIndex = 0;
         this.controls.timepoint.inputs.attr('value', 0); // Update the event object of the population.
 
         this.metadata.event.forEach(function (event) {
@@ -4608,13 +4695,14 @@
         this.data.nested.forEach(function (d) {
             // Initial event for the given individual.
             d.value.statePrevious = null;
-            d.value.state = getState.call(_this, d.value.group, 0); // Count state changes.
-
-            d.value.nStateChanges = countStateChanges.call(_this, d.value.group); // Define radius.
-
-            d.value.r = defineRadius.call(_this, d.value.nStateChanges); // Define color.
-
-            Object.assign(d.value, defineColor.call(_this, d.value.nStateChanges));
+            d.value.state = getState.call(_this, d.value.group, 0);
+            var datum = defineDatum.call(
+                _this,
+                d.value.group,
+                d.value.state,
+                d.value.statePrevious
+            );
+            Object.assign(d.value, datum);
         });
         if (this.modal) this.modal.stop();
         runModal.call(this);
@@ -4637,7 +4725,13 @@
             window.clearInterval(countdown);
             window.clearTimeout(timeout);
 
-            _this.containers.countdown.classed('fdg-hidden', true);
+            _this.containers.countdown
+                .classed('fdg-invisible', function (d) {
+                    return d === _this.settings.resetDelay / 1000 - 1;
+                })
+                .classed('fdg-hidden', function (d) {
+                    return d !== _this.settings.resetDelay / 1000 - 1;
+                });
 
             _this.interval = startInterval.call(_this);
         }, this.settings.resetDelay);
@@ -4658,7 +4752,11 @@
         this.metadata.event.forEach(function (event) {
             // Center points initially then remove centering force.
             if (_this.settings.timepoint === 1) event.forceSimulation.force('center', null);
-            event.forceSimulation.nodes(event.data);
+            event.forceSimulation.nodes(
+                event.data.filter(function (d) {
+                    return !d.value.noStateChange;
+                })
+            );
             event.forceSimulation.alpha(1).restart();
         });
     }
@@ -4667,7 +4765,7 @@
         // Increment the timepoint.
         this.settings.timepoint += !!arg; // update animation if timepoint is less than duration of animation
 
-        if (this.settings.timepoint <= this.settings.duration) update.call(this);
+        if (this.settings.timepoint <= this.settings.duration) update$1.call(this);
         // otherwise reset animation
         else reset.call(this); // Resume the force simulation.
 
@@ -5042,8 +5140,12 @@
         this.controls.step = step.call(this);
         this.controls.timepoint = timepoint.call(this);
         this.controls.reset = reset$1.call(this);
-        this.controls.eventList = eventList.call(this);
-        this.controls.colorSizeToggle = colorSizeToggle.call(this);
+
+        if (this.settings.colorBy.type === 'frequency') {
+            this.controls.eventList = eventList.call(this);
+            this.controls.colorSizeToggle = colorSizeToggle.call(this);
+        }
+
         this.controls.container
             .selectAll('.fdg-button')
             .on('mousedown', function () {
@@ -5051,7 +5153,199 @@
             })
             .on('mouseup', function () {
                 this.classList.toggle('clicked');
+            })
+            .on('mouseout', function () {
+                if (this.classList.contains('clicked')) this.classList.toggle('clicked');
             });
+    }
+
+    function ramp(color) {
+        var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 256;
+        //DOM.canvas(n, 1);
+        var canvas = document.createElement('canvas');
+        canvas.width = n;
+        canvas.height = 1;
+        var context = canvas.getContext('2d');
+
+        for (var i = 0; i < n; ++i) {
+            context.fillStyle = color(i / (n - 1));
+            context.fillRect(i, 0, 1, 1);
+        }
+
+        return canvas;
+    }
+
+    function continuous() {
+        var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+            color = _ref.color,
+            title = _ref.title,
+            _ref$tickSize = _ref.tickSize,
+            tickSize = _ref$tickSize === void 0 ? 6 : _ref$tickSize,
+            _ref$width = _ref.width,
+            width = _ref$width === void 0 ? 320 : _ref$width,
+            _ref$height = _ref.height,
+            height = _ref$height === void 0 ? 44 + tickSize : _ref$height,
+            _ref$marginTop = _ref.marginTop,
+            marginTop = _ref$marginTop === void 0 ? 18 : _ref$marginTop,
+            _ref$marginRight = _ref.marginRight,
+            marginRight = _ref$marginRight === void 0 ? 0 : _ref$marginRight,
+            _ref$marginBottom = _ref.marginBottom,
+            marginBottom = _ref$marginBottom === void 0 ? 16 + tickSize : _ref$marginBottom,
+            _ref$marginLeft = _ref.marginLeft,
+            marginLeft = _ref$marginLeft === void 0 ? 0 : _ref$marginLeft,
+            _ref$ticks = _ref.ticks,
+            ticks = _ref$ticks === void 0 ? width / 64 : _ref$ticks,
+            tickFormat = _ref.tickFormat,
+            tickValues = _ref.tickValues;
+
+        var svg = d3
+            .create('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .attr('viewBox', [0, 0, width, height])
+            .style('overflow', 'visible'); //.style('display', 'block');
+
+        var tickAdjust = function tickAdjust(g) {
+            return g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height);
+        };
+
+        var x; // Continuous
+
+        if (color.interpolate) {
+            var n = Math.min(color.domain().length, color.range().length);
+            x = color
+                .copy()
+                .rangeRound(d3.quantize(d3.interpolate(marginLeft, width - marginRight), n));
+            svg.append('image')
+                .attr('x', marginLeft)
+                .attr('y', marginTop)
+                .attr('width', width - marginLeft - marginRight)
+                .attr('height', height - marginTop - marginBottom)
+                .attr('preserveAspectRatio', 'none')
+                .attr(
+                    'xlink:href',
+                    ramp
+                        .call(this, color.copy().domain(d3.quantize(d3.interpolate(0, 1), n)))
+                        .toDataURL()
+                );
+        } // Sequential
+        else if (color.interpolator) {
+            x = Object.assign(
+                color.copy().interpolator(d3.interpolateRound(marginLeft, width - marginRight)),
+                {
+                    range: function range() {
+                        return [marginLeft, width - marginRight];
+                    },
+                }
+            );
+            svg.append('image')
+                .attr('x', marginLeft)
+                .attr('y', marginTop)
+                .attr('width', width - marginLeft - marginRight)
+                .attr('height', height - marginTop - marginBottom)
+                .attr('preserveAspectRatio', 'none')
+                .attr('xlink:href', ramp.call(this, color.interpolator()).toDataURL()); // scaleSequentialQuantile doesn’t implement ticks or tickFormat.
+
+            if (!x.ticks) {
+                if (tickValues === undefined) {
+                    var _n = Math.round(ticks + 1);
+
+                    tickValues = d3.range(_n).map(function (i) {
+                        return d3.quantile(color.domain(), i / (_n - 1));
+                    });
+                }
+
+                if (typeof tickFormat !== 'function') {
+                    tickFormat = d3.format(tickFormat === undefined ? ',f' : tickFormat);
+                }
+            }
+        } // Threshold
+        else if (color.invertExtent) {
+            var thresholds = color.thresholds
+                ? color.thresholds() // scaleQuantize
+                : color.quantiles
+                ? color.quantiles() // scaleQuantile
+                : color.domain(); // scaleThreshold
+
+            var thresholdFormat =
+                tickFormat === undefined
+                    ? function (d) {
+                          return d;
+                      }
+                    : typeof tickFormat === 'string'
+                    ? d3.format(tickFormat)
+                    : tickFormat;
+            x = d3
+                .scaleLinear()
+                .domain([-1, color.range().length - 1])
+                .rangeRound([marginLeft, width - marginRight]);
+            svg.append('g')
+                .selectAll('rect')
+                .data(color.range())
+                .join('rect')
+                .attr('x', function (d, i) {
+                    return x(i - 1);
+                })
+                .attr('y', marginTop)
+                .attr('width', function (d, i) {
+                    return x(i) - x(i - 1);
+                })
+                .attr('height', height - marginTop - marginBottom)
+                .attr('fill', function (d) {
+                    return d;
+                });
+            tickValues = d3.range(thresholds.length);
+
+            tickFormat = function tickFormat(i) {
+                return thresholdFormat(thresholds[i], i);
+            };
+        } // Ordinal
+        else {
+            x = d3
+                .scaleBand()
+                .domain(color.domain())
+                .rangeRound([marginLeft, width - marginRight]);
+            svg.append('g')
+                .selectAll('rect')
+                .data(color.domain())
+                .join('rect')
+                .attr('x', x)
+                .attr('y', marginTop)
+                .attr('width', Math.max(0, x.bandwidth() - 1))
+                .attr('height', height - marginTop - marginBottom)
+                .attr('fill', color);
+
+            tickAdjust = function tickAdjust() {};
+        }
+
+        svg.append('g')
+            .attr('transform', 'translate(0,'.concat(height - marginBottom, ')'))
+            .call(
+                d3
+                    .axisBottom(x)
+                    .ticks(ticks, typeof tickFormat === 'string' ? tickFormat : undefined)
+                    .tickFormat(typeof tickFormat === 'function' ? tickFormat : undefined)
+                    .tickSize(tickSize)
+                    .tickValues(tickValues)
+            )
+            .call(tickAdjust)
+            .call(function (g) {
+                return g.select('.domain').remove();
+            })
+            .call(function (g) {
+                return g
+                    .append('text')
+                    .classed('fdg-sidebar__label fdg-legend__label', true)
+                    .attr('x', marginLeft)
+                    .attr('y', marginTop + marginBottom - height - 6)
+                    .attr('fill', 'currentColor')
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'translate('.concat(width / 2, ',0)'))
+                    .attr('font-weight', 'bold')
+                    .attr('font-size', '1.25rem')
+                    .text(title);
+            });
+        return svg.node();
     }
 
     function color$1(svg, legendDimensions) {
@@ -5068,7 +5362,7 @@
             })
             .attr('y', 0)
             .attr('width', legendDimensions[0] / this.settings.colors().length)
-            .attr('height', legendDimensions[1] / 2)
+            .attr('height', legendDimensions[1] / 3)
             .attr('fill', function (d) {
                 return d;
             })
@@ -5156,7 +5450,7 @@
 
         var label = container
             .append('div')
-            .classed('fdg-legend__label', true) //.style('width', legendDimensions[0] + 'px')
+            .classed('fdg-sidebar__label fdg-legend__label', true) //.style('width', legendDimensions[0] + 'px')
             .html(
                 'Number of <span class = "fdg-measure">'.concat(
                     this.util.csv(this.settings.eventChangeCount),
@@ -5198,16 +5492,74 @@
         };
     }
 
-    //import size from './addLegends/size';
-    //import both from './addLegends/both';
-
     function addLegends() {
+        var _this = this;
+
         this.legends = {
             container: this.containers.legends,
         };
-        this.legends.color = makeLegend.call(this, 'color');
-        this.legends.size = makeLegend.call(this, 'size');
-        this.legends.both = makeLegend.call(this, 'both');
+
+        if (this.settings.colorBy.type === 'continuous') {
+            var container = this.legends.container
+                .append('div')
+                .classed('fdg-legend fdg-legend--continuous', true);
+            container.node().appendChild(
+                continuous({
+                    color: this.colorScale,
+                    title: this.settings.colorBy.label,
+                    width: 200,
+                    height: 50,
+                    tickValues: [
+                        this.colorScale.domain()[0],
+                        (this.colorScale.domain()[1] - this.colorScale.domain()[0]) / 2,
+                        this.colorScale.domain()[1],
+                    ],
+                })
+            );
+        } else if (this.settings.colorBy.type === 'categorical') {
+            var _container = this.legends.container
+                .append('div')
+                .classed('fdg-legend fdg-legend--categorical', true);
+
+            _container
+                .append('div')
+                .classed('fdg-sidebar__label fdg-legend__label', true)
+                .text(this.settings.colorBy.label);
+
+            var legendItems = _container
+                .append('svg')
+                .attr('width', 200)
+                .attr('height', 20 * this.colorScale.domain().length)
+                .selectAll('g')
+                .data(this.colorScale.domain())
+                .join('g');
+
+            legendItems
+                .append('circle')
+                .attr('cx', 20)
+                .attr('cy', function (d, i) {
+                    return i * 20 + 10;
+                })
+                .attr('r', 7)
+                .attr('fill', function (d) {
+                    return _this.colorScale(d);
+                });
+            legendItems
+                .append('text')
+                .attr('font-size', '1rem')
+                .attr('x', 35)
+                .attr('y', function (d, i) {
+                    return i * 20 + 12;
+                })
+                .attr('alignment-baseline', 'middle')
+                .text(function (d) {
+                    return d;
+                });
+        } else if (this.settings.colorBy.type === 'frequency') {
+            this.legends.color = makeLegend.call(this, 'color');
+            this.legends.size = makeLegend.call(this, 'size');
+            this.legends.both = makeLegend.call(this, 'both');
+        }
     }
 
     function addFreqTable() {
@@ -5218,6 +5570,7 @@
         freqTable.thead = freqTable.table.append('thead');
         freqTable.th = freqTable.thead
             .append('th')
+            .classed('fdg-sidebar__label', true)
             .attr('colspan', 2)
             .text('Cumulative Number of Events');
         freqTable.tbody = freqTable.table.append('tbody');
@@ -5232,13 +5585,12 @@
             })
             .join('td')
             .text(function (d) {
-                return d;
+                return typeof d === 'number' ? d3.format(',d')(d) : d;
             });
         return freqTable;
     }
 
     function addOrbits() {
-        // TODO: replace instances of svg with svgForeground
         var g = this.containers.svgBackground.append('g').classed('fdg-g fdg-g--orbits', true);
         var shadows = g
             .append('defs')
@@ -5275,18 +5627,12 @@
             .style('filter', function (d, i) {
                 return 'url(#orbit--'.concat(i, ')');
             });
-        if (this.settings.translate)
-            orbits.attr(
-                'transform',
-                'translate(-'
-                    .concat(this.settings.width / 2 - 100, ',-')
-                    .concat(this.settings.height / 2 - 100, ')')
-            );
         return orbits;
     }
 
     function annotateFoci() {
         var _this = this;
+
         var g = this.containers.svgForeground
             .append('g')
             .classed('fdg-g fdg-g--focus-annotations', true);
@@ -5294,27 +5640,10 @@
             .selectAll('g.fdg-focus-annotation')
             .data(this.metadata.event)
             .join('g')
-            .classed('fdg-focus-annotation', true);
-        if (this.settings.translate)
-            fociLabels.attr(
-                'transform',
-                'translate(-'
-                    .concat(this.settings.width / 2 - 100, ',-')
-                    .concat(this.settings.height / 2 - 100, ')')
-            ); // defs - give the text a background
-        //const filters = fociLabels
-        //    .append('defs')
-        //    .classed('fdg-focus-annotation__defs', true)
-        //        .append('filter')
-        //        .classed('fdg-focus-annotation__filter', true)
-        //        .attr('id', d => `fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')}`)
-        //        .attr('x', 0)
-        //        .attr('y', 0)
-        //        .attr('width', 1)
-        //        .attr('height', 1);
-        //filters.append('feFlood').attr('flood-color', '#aaaaaaaa');
-        //filters.append('feComposite').attr('in', 'SourceGraphic').attr('operator', 'xor');
-        // text
+            .classed('fdg-focus-annotation', true)
+            .attr('transform', function (d) {
+                return 'translate('.concat(d.x, ',').concat(d.y, ')');
+            });
 
         var isCenterX = function isCenterX(d) {
             return Math.round(d.x) === Math.round(_this.settings.orbitRadius / 2);
@@ -5324,12 +5653,12 @@
             return d.order === 1 || Math.round(d.x) < Math.round(_this.settings.width / 2);
         };
 
-        var getX = function getX(d) {
-            return isCenterX(d) ? d.x : d.x - Math.pow(-1, isLessThanCenterX(d)) * 10;
-        };
-
         var getTextAnchor = function getTextAnchor(d) {
             return isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end';
+        };
+
+        var getDx = function getDx(d) {
+            return isCenterX(d) ? 0 : isLessThanCenterX(d) ? '2em' : '-2em';
         };
 
         var isCenterY = function isCenterY(d) {
@@ -5340,90 +5669,37 @@
             return Math.round(d.y) < Math.round(_this.settings.height / 2);
         };
 
-        var getY = function getY(d) {
-            return isCenterY(d) ? d.y : d.y + Math.pow(-1, isLessThanCenterY(d)) * 35;
+        var getDy = function getDy(d) {
+            return isCenterY(d) ? 0 : isLessThanCenterY(d) ? '-2em' : '2em';
         };
 
-        var textBackground = fociLabels
-            .append('text')
-            .classed('fdg-focus-annotation__text', true)
-            .attr('x', function (d) {
-                return getX(d);
-            })
-            .attr('y', function (d) {
-                return getY(d);
-            }); //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
-
-        textBackground
-            .append('tspan')
-            .classed('fdg-focus-annotation__label', true)
-            .attr('x', function (d) {
-                return getX(d);
-            })
-            .attr('text-anchor', function (d) {
-                return getTextAnchor(d);
-            }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
-            .style('font-weight', 'bold')
-            .style('font-size', '20px')
-            .attr('stroke', 'white')
-            .attr('stroke-width', '4px')
-            .text(function (d) {
-                return d.value;
-            });
-        textBackground
-            .append('tspan')
-            .classed('fdg-focus-annotation__event-count', true)
-            .classed('fdg-hidden', this.settings.eventCount === false)
-            .attr('x', function (d) {
-                return getX(d);
-            })
-            .attr('text-anchor', function (d) {
-                return getTextAnchor(d);
-            }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
-            .attr('dy', '1.3em')
-            .style('font-weight', 'bold')
-            .attr('stroke', 'white')
-            .attr('stroke-width', '4px'); //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
-
-        var textForeground = fociLabels
-            .append('text')
-            .classed('fdg-focus-annotation__text', true)
-            .attr('x', function (d) {
-                return getX(d);
-            })
-            .attr('y', function (d) {
-                return getY(d);
-            }); //.attr('filter', d => `url(#fdg-focus-annotation__${d.value.toLowerCase().replace(/ /g, '-')})`);
-
-        textForeground
-            .append('tspan')
-            .classed('fdg-focus-annotation__label', true)
-            .attr('x', function (d) {
-                return getX(d);
-            })
-            .attr('text-anchor', function (d) {
-                return getTextAnchor(d);
-            }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
-            .style('font-weight', 'bold')
-            .style('font-size', '20px')
-            .attr('fill', 'black')
-            .text(function (d) {
-                return d.value;
-            });
-        textForeground
-            .append('tspan')
-            .classed('fdg-focus-annotation__event-count', true)
-            .classed('fdg-hidden', this.settings.eventCount === false)
-            .attr('x', function (d) {
-                return getX(d);
-            })
-            .attr('text-anchor', function (d) {
-                return getTextAnchor(d);
-            }) //.attr('alignment-baseline', d => getAlignmentBaseline(d))
-            .attr('dy', '1.3em')
-            .style('font-weight', 'bold')
-            .attr('fill', 'black'); //.text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
-
+        ['background', 'foreground'].forEach(function (pos) {
+            var text = fociLabels
+                .append('text')
+                .classed('fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos), true)
+                .style('transform', function (d) {
+                    return 'translate('.concat(getDx(d), ',').concat(getDy(d), ')');
+                });
+            var label = text
+                .append('tspan')
+                .classed('fdg-focus-annotation__label', true)
+                .attr('x', 0)
+                .attr('text-anchor', function (d) {
+                    return getTextAnchor(d);
+                })
+                .text(function (d) {
+                    return d.value;
+                });
+            var eventCount = text
+                .append('tspan')
+                .classed('fdg-focus-annotation__event-count', true)
+                .classed('fdg-hidden', _this.settings.eventCount === false)
+                .attr('x', 0)
+                .attr('dy', '1.3em')
+                .attr('text-anchor', function (d) {
+                    return getTextAnchor(d);
+                });
+        });
         return fociLabels;
     }
 
@@ -5432,10 +5708,10 @@
         // controls
         addControls.call(this); // sidebar
 
+        addLegends.call(this);
         this.containers.timer.text(
             ''.concat(this.settings.timepoint, ' ').concat(this.settings.timeUnit)
         );
-        addLegends.call(this);
         this.freqTable = addFreqTable.call(this); // Draw concentric circles.
 
         this.orbits = addOrbits.call(this); // Annotate foci.
@@ -5588,13 +5864,9 @@
                 var statePrevious = null;
                 var state = getState.call(_this, group, 0);
                 var noStateChange =
-                    group.length === 1 && state.event === _this.settings.eventCentral; // Count state changes.
+                    group.length === 1 && state.event === _this.settings.eventCentral; // Count number of state changes, define aesthetic, define radius, and define color.
 
-                var nStateChanges = countStateChanges.call(_this, group, statePrevious); // Define radius.
-
-                var r = defineRadius.call(_this, nStateChanges); // Define color.
-
-                var color = defineColor.call(_this, nStateChanges);
+                var datum = defineDatum.call(_this, group, state, statePrevious);
                 return _objectSpread2(
                     {
                         group: group,
@@ -5607,12 +5879,8 @@
                         state: state,
                         // object representing a single record of an individual
                         noStateChange: noStateChange,
-                        // boolean - did individual have any events? used to present those individuals in a static force layout
-                        nStateChanges: nStateChanges,
-                        // number of state changes the indivdual has experienceda thus far
-                        r: r,
                     },
-                    color
+                    datum
                 );
             })
             .entries(this.data);
@@ -6296,41 +6564,38 @@
             }) // draw bubbles with more state changes last
             .forEach(function (d, i) {
                 _this.containers.canvas.context.beginPath(); // circle
+                //if (this.settings.shape === 'circle') {
+                //if (i % 2) {
 
-                if (_this.settings.shape === 'circle') {
-                    _this.containers.canvas.context.moveTo(d.x + d.r, d.y);
+                _this.containers.canvas.context.moveTo(d.x + d.r, d.y);
 
-                    _this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
+                _this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
 
-                    if (_this.settings.fill) {
-                        _this.containers.canvas.context.fillStyle = d.value.fill;
+                if (_this.settings.fill) {
+                    _this.containers.canvas.context.fillStyle = d.value.fill;
 
-                        _this.containers.canvas.context.fill();
-                    }
-
-                    _this.containers.canvas.context.strokeStyle = d.value.stroke;
-
-                    _this.containers.canvas.context.stroke();
-                } // square
-                else {
-                    //this.containers.canvas.context.moveTo(d.x + d.r, d.y);
-                    _this.containers.canvas.context.rect(
-                        d.x - d.value.r,
-                        d.y - d.value.r,
-                        d.value.r * 2,
-                        d.value.r * 2
-                    );
-
-                    if (_this.settings.fill) {
-                        _this.containers.canvas.context.fillStyle = d.value.fill;
-
-                        _this.containers.canvas.context.fill();
-                    }
-
-                    _this.containers.canvas.context.strokeStyle = d.value.stroke;
-
-                    _this.containers.canvas.context.stroke();
+                    _this.containers.canvas.context.fill();
                 }
+
+                _this.containers.canvas.context.strokeStyle = d.value.stroke;
+
+                _this.containers.canvas.context.stroke(); //}
+                // square
+                //else {
+                //    //this.containers.canvas.context.moveTo(d.x + d.r, d.y);
+                //    this.containers.canvas.context.rect(
+                //        d.x - d.value.r,
+                //        d.y - d.value.r,
+                //        d.value.r * 2,
+                //        d.value.r * 2
+                //    );
+                //    if (this.settings.fill) {
+                //        this.containers.canvas.context.fillStyle = d.value.fill;
+                //        this.containers.canvas.context.fill();
+                //    }
+                //    this.containers.canvas.context.strokeStyle = d.value.stroke;
+                //    this.containers.canvas.context.stroke();
+                //}
             });
         this.containers.canvas.context.restore();
     }
@@ -6344,7 +6609,11 @@
         // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
         var forceSimulation = d3
             .forceSimulation()
-            .nodes(event.data)
+            .nodes(
+                event.data.filter(function (d) {
+                    return !d.value.noStateChange;
+                })
+            )
             .alphaDecay(0.01) //.alphaMin(.75)
             //.alphaTarget(.8)
             .velocityDecay(0.9)
@@ -6353,54 +6622,48 @@
                 d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)
             )
             .force('x', d3.forceX(event.x).strength(0.3))
-            .force('y', d3.forceY(event.y).strength(0.3)) //.force('charge', d3.forceManyBodyReuse().strength(-(2000 / this.metadata.id.length)))
-            .force('charge', forceManyBodyReuse().strength(-(2000 / this.metadata.id.length))) //.force('charge', d3.forceManyBodySampled().strength(-(2000 / this.metadata.id.length)))
+            .force('y', d3.forceY(event.y).strength(0.3))
+            .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength)) //.force('charge', d3.forceManyBodySampled().strength(this.settings.chargeStrength))
             .on('tick', tick.bind(this, event)); //if (event.value !== this.settings.eventCentral)
 
         forceSimulation.force(
             'collide', //d3.forceCollide().radius((d) => d.value.r + 0.5)
-            d3.forceCollide().radius(this.settings.minRadius + 0.5)
-        ); //forceSimulation.force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5));
-
+            d3.forceCollide().radius(this.settings.minRadius + 1)
+        );
         return forceSimulation;
     }
 
-    function circular(data) {
+    function radial(data) {
         var simulation = d3
-            .forceSimulation()
-            .nodes(data)
-            .force(
-                'center',
-                d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)
-            )
-            .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
-            .force('y', d3.forceY(this.settings.height / 2).strength(0.3))
-            .force('charge', d3.forceManyBodyReuse().strength(-(2000 / data.length)))
-            .force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5))
+            .forceSimulation(data)
+            .force('charge', d3.forceCollide().radius(this.settings.minRadius + 0.5))
+            .force('r', d3.forceRadial(this.settings.orbitRadius / 2))
             .stop();
 
-        for (var i = 0; i < 300; i++) {
+        for (var i = 0; i < 30; i++) {
             simulation.tick();
         }
 
-        var g = this.containers.svgBackground.insert('g', ':first-child'); //.attr('transform', `translate(${this.settings.orbitRadius/2},${this.settings.height/2})`);
+        var g = this.containers.svgBackground
+            .insert('g', ':first-child')
+            .attr(
+                'transform',
+                'translate('
+                    .concat(this.settings.orbitRadius / 2, ',')
+                    .concat(this.settings.height / 2, ')')
+            ); //g.append('text')
+        //    .attr('x', 0)
+        //    .attr('y', -this.settings.orbitRadius / 2)
+        //    .attr('dy', -36)
+        //    .attr('text-anchor', 'middle')
+        //    .text('No state changes');
+        //g.append('text')
+        //    .attr('x', 0)
+        //    .attr('y', -this.settings.orbitRadius / 2)
+        //    .attr('dy', -16)
+        //    .attr('text-anchor', 'middle')
+        //    .text(`${data.length} (${d3.format('.1%')(data.length / this.data.nested.length)})`);
 
-        g.append('text')
-            .attr('x', 0)
-            .attr('y', -this.settings.orbitRadius / 2)
-            .attr('dy', -36)
-            .attr('text-anchor', 'middle')
-            .text('No state changes');
-        g.append('text')
-            .attr('x', 0)
-            .attr('y', -this.settings.orbitRadius / 2)
-            .attr('dy', -16)
-            .attr('text-anchor', 'middle')
-            .text(
-                ''
-                    .concat(data.length, ' (')
-                    .concat(d3.format('.1%')(data.length / this.data.nested.length), ')')
-            );
         var nodes = g
             .selectAll('circle')
             .data(data)
@@ -6413,23 +6676,83 @@
                 return d.y;
             })
             .attr('r', this.settings.minRadius)
-            .attr('fill', this.settings.color(0));
+            .attr('fill', this.settings.color(0))
+            .attr('fill-opacity', 0.25);
+        return {
+            simulation: simulation,
+            g: g,
+            nodes: nodes,
+        };
+    }
+
+    function circular(data) {
+        var simulation = d3
+            .forceSimulation()
+            .nodes(data)
+            .force(
+                'center',
+                d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)
+            )
+            .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
+            .force('y', d3.forceY(this.settings.height / 2).strength(0.3))
+            .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
+            .force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5))
+            .stop();
+
+        for (var i = 0; i < 300; i++) {
+            simulation.tick();
+        }
+
+        var g = this.containers.svgBackground.insert('g', ':first-child'); //g.append('text')
+        //    .attr('x', this.settings.orbitRadius / 2)
+        //    .attr('y', this.settings.height/2)
+        //    .attr('dy', -(this.settings.orbitRadius / 2)-20)
+        //    .attr('text-anchor', 'middle')
+        //    .text('No state changes');
+        //g.append('text')
+        //    .attr('x', this.settings.orbitRadius / 2)
+        //    .attr('y', this.settings.height / 2)
+        //    .attr('dy', -(this.settings.orbitRadius / 2))
+        //    .attr('text-anchor', 'middle')
+        //    .text(`${data.length} (${d3.format('.1%')(data.length / this.data.nested.length)})`);
+
+        var nodes = g
+            .selectAll('circle')
+            .data(data)
+            .enter()
+            .append('circle')
+            .attr('cx', function (d) {
+                return d.x;
+            })
+            .attr('cy', function (d) {
+                return d.y;
+            })
+            .attr('r', this.settings.minRadius)
+            .attr('fill', this.settings.color(0))
+            .attr('fill-opacity', 0.25);
+        return {
+            simulation: simulation,
+            g: g,
+            nodes: nodes,
+        };
     }
 
     function addStaticForceSimulation() {
-        var noStateChange = this.data.nested
-            .filter(function (d) {
-                return d.value.noStateChange;
-            })
-            .map(function (d) {
-                return {
-                    key: d.key,
-                };
-            });
-
-        if (noStateChange.length) {
-            //radial.call(this, noStateChange);
-            circular.call(this, noStateChange);
+        if (this.settings.drawStaticSeparately) {
+            var noStateChange = this.data.nested
+                .filter(function (d) {
+                    return d.value.noStateChange;
+                })
+                .map(function (d) {
+                    return {
+                        key: d.key,
+                    };
+                });
+            var staticForceSimulation =
+                this.settings.staticLayout === 'radial'
+                    ? radial.call(this, noStateChange)
+                    : circular.call(this, noStateChange);
+            return staticForceSimulation;
         }
     }
 
@@ -6437,7 +6760,7 @@
         var _this = this;
 
         runModal.call(this);
-        addStaticForceSimulation.call(this);
+        this.staticForceSimulation = addStaticForceSimulation.call(this);
         this.metadata.event.forEach(function (event) {
             event.forceSimulation = addForceSimulation.call(_this, event);
         });
@@ -6453,12 +6776,8 @@
             settings: Object.assign(settings, settings$1),
             util: util,
         };
-        fdg.settings.text = []
-            .concat(fdg.settings.explanation)
-            .concat(fdg.settings.information)
-            .filter(function (text) {
-                return typeof text === 'string';
-            });
+        settings.update.call(fdg); // Update settings object.
+
         fdg.containers = layout.call(fdg); // add elements to DOM
 
         fdg.metadata = defineMetadata.call(fdg); // calculate characteristics of variables in data

@@ -3,15 +3,15 @@ import fadeOut from './runModal/fadeOut';
 
 export default function runModal() {
     this.containers.modal
-        .text(this.settings.text[this.settings.modalIndex])
+        .html(this.settings.text[this.settings.modalIndex])
         .call(fadeIn, this.settings.modalSpeed);
 
     this.modal = d3.interval(() => {
         this.settings.modalIndex++;
-        if (this.settings.modalIndex === this.settings.text.length - 1)
-            this.settings.modalIndex = 0;
+        if (this.settings.modalIndex === this.settings.text.length - 1) this.modal.stop();
+        //this.settings.modalIndex = 0;
         this.containers.modal
-            .text(this.settings.text[this.settings.modalIndex])
+            .html(this.settings.text[this.settings.modalIndex])
             .call(fadeIn, this.settings.modalSpeed);
 
         //if (this.settings.modalIndex === text.length - 1) {

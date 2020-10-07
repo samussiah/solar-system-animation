@@ -2,12 +2,18 @@ export default function id() {
     const nest = d3
         .nest()
         .key((d) => d.id)
-        .rollup((group) => d3.sum(group, (d) => +d.duration))
+        .rollup((group) => {
+            return {
+                duration: d3.sum(group, (d) => +d.duration),
+                static: group.length === 1,
+            };
+        })
         .entries(this.data);
 
     nest.forEach((d) => {
-        d.duration = d.value;
+        Object.assign(d, d.value);
         d.value = d.key;
+        d.duration = d.value;
         delete d.key;
     });
 

@@ -6,7 +6,7 @@ import startInterval from './init/startInterval';
 export default function init() {
     runModal.call(this);
 
-    addStaticForceSimulation.call(this);
+    this.staticForceSimulation = addStaticForceSimulation.call(this);
 
     this.metadata.event.forEach((event) => {
         event.forceSimulation = addForceSimulation.call(this, event);

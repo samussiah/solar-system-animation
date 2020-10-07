@@ -2,6 +2,7 @@ import addElement from './layout/addElement';
 import layoutControls from './layout/controls';
 import layoutSidebar from './layout/sidebar';
 import layoutCanvas from './layout/canvas';
+import resize from './layout/resize';
 
 export default function layout() {
     const main = addElement('main', d3.select(this.element));
@@ -14,6 +15,9 @@ export default function layout() {
 
     // animation to the right
     const canvas = layoutCanvas.call(this, main);
+
+    // add resize event
+    window.addEventListener('resize', resize.bind(this));
 
     return {
         main,

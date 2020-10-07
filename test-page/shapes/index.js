@@ -22,7 +22,7 @@ fetch('../data/data_1000.csv')
             if (d.event === 'Death')
                 d.event = Math.random() < .75 ? 'Death (CV-related)' : 'Death (other)';
             d.outcome = Math.random();
-            d.category = `Group ${i%3 + 1}`;
+            d.category = i%3;
             d.event_position = d.event === 'Home'
                 ? 0
                 : d.event === 'Hospitalization'
@@ -40,17 +40,16 @@ fetch('../data/data_1000.csv')
             data,
             '#container',
             {
-                //colorBy: {
-                //    type: 'continuous',
-                //    variable: 'outcome',
-                //    label: 'Random number',
-                //    mirror: true,
-                //},
                 colorBy: {
-                    type: 'categorical',
-                    variable: 'category',
-                    label: 'Random category',
+                    type: 'continuous',
+                    variable: 'outcome',
+                    label: 'Random number',
                 },
+                //colorBy: {
+                //    type: 'categorical',
+                //    variable: 'category',
+                //    label: 'Random category',
+                //},
             }
         );
     });

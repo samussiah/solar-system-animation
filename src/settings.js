@@ -1,8 +1,11 @@
+import update from './settings/update';
 import colors from './settings/colors';
 import colorScale from './settings/colorScale';
 import color from './settings/color';
 
 const settings = {
+    update,
+
     // data mappings
     id_var: 'id',
     event_var: 'event',
@@ -24,17 +27,14 @@ const settings = {
     eventCount: true, // display count (percentage) beneath focus labels?
     eventChangeCount: null, // defined in ./defineMetadata/dataDrivenSettings
     eventChangeCountAesthetic: 'color',
-    individualCounts: null,
-    individualCountEvents: null,
-    excludeFirst: true,
-    excludeLast: true,
+    drawStaticSeparately: true, // draw static bubbles in a static force simulation to improve performance
 
     // animation settings
-    speed: 'slow',
+    speed: 'medium',
     speeds: {
         slow: 1000,
         medium: 500,
-        fast: 50,
+        fast: 100,
     },
     playPause: 'play',
 
@@ -44,6 +44,7 @@ const settings = {
     padding: 1,
     nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
     orbitRadius: 150,
+    chargeStrength: null, // defined in ./defineMetadata
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
     hideControls: false,
@@ -70,6 +71,7 @@ const settings = {
         'Each bubble in this animation represents an individual.',
         'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
         'The number of state changes dictates the color and/or size of the bubbles.',
+        'Static bubbles represent individuals whose state never changes.',
         'Use the controls on the right to interact with and alter the animation.',
     ], // array of strings
     information: null, // array of strings

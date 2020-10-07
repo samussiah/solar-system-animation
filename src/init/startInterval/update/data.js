@@ -1,7 +1,5 @@
 import getState from '../../../dataManipulation/nestData/getState';
-import countStateChanges from '../../../dataManipulation/nestData/countStateChanges';
-import defineRadius from '../../../dataManipulation/nestData/defineRadius';
-import defineColor from '../../../dataManipulation/nestData/defineColor';
+import defineDatum from '../../../dataManipulation/nestData/defineDatum';
 
 export default function data() {
     // Count the number of individuals at each focus at previous timepoint.
@@ -14,14 +12,8 @@ export default function data() {
         d.value.statePrevious = d.value.state;
         d.value.state = getState.call(this, d.value.group);
 
-        // Count state changes.
-        d.value.nStateChanges = countStateChanges.call(this, d.value.group);
-
-        // Define radius.
-        d.value.r = defineRadius.call(this, d.value.nStateChanges);
-
-        // Define color.
-        Object.assign(d.value, defineColor.call(this, d.value.nStateChanges));
+        const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.statePrevious);
+        Object.assign(d.value, datum);
     });
 
     // Record change in number of IDs at each focus at current timepoint.

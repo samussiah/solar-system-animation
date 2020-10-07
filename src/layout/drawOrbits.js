@@ -1,5 +1,4 @@
 export default function addOrbits() {
-    // TODO: replace instances of svg with svgForeground
     const g = this.containers.svgBackground.append('g').classed('fdg-g fdg-g--orbits', true);
 
     const shadows = g
@@ -29,12 +28,6 @@ export default function addOrbits() {
         .attr('stroke', '#aaa')
         .attr('stroke-width', '.5')
         .style('filter', (d, i) => `url(#orbit--${i})`);
-
-    if (this.settings.translate)
-        orbits.attr(
-            'transform',
-            `translate(-${this.settings.width / 2 - 100},-${this.settings.height / 2 - 100})`
-        );
 
     return orbits;
 }

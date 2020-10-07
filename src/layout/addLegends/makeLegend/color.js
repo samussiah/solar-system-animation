@@ -8,7 +8,7 @@ export default function color(svg, legendDimensions) {
         .attr('x', (d, i) => i * (legendDimensions[0] / this.settings.colors().length))
         .attr('y', 0)
         .attr('width', legendDimensions[0] / this.settings.colors().length)
-        .attr('height', legendDimensions[1] / 2)
+        .attr('height', legendDimensions[1] / 3)
         .attr('fill', (d) => d)
         .attr('fill-opacity', 0.5)
         .attr('stroke', (d) => d)

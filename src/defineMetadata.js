@@ -12,30 +12,27 @@ export default function defineMetadata() {
 
     // Settings dependent on the ID set.
     this.settings.duration = this.settings.duration || d3.max(metadata.id, (id) => id.duration);
-    this.settings.minRadius = this.settings.minRadius || 3000 / metadata.id.length;
+    this.settings.minRadius =
+        this.settings.minRadius ||
+        3000 / metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length;
+    this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
     this.settings.maxRadius =
         this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
+    this.settings.chargeStrength = -(
+        2000 / metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length
+    );
+    this.settings.staticChargeStrength = -(2000 / metadata.id.length);
     this.settings.fill = this.settings.fill || metadata.id.length <= 2500;
 
     // Add additional metadata to event set.
     metadata.event = event.call(this);
 
     // Update settings that depend on event set.
-    this.settings.width = this.settings.width || metadata.event.length;
     this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
-    this.settings.eventFinal =
-        Array.isArray(this.settings.eventFinal) && this.settings.eventFinal.length
-            ? this.settings.eventFinal
-            : [this.settings.eventFinal || metadata.event[metadata.event.length - 1].value];
     this.settings.nFoci =
         this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
     this.settings.eventChangeCount =
         this.settings.eventChangeCount || metadata.event.slice(1).map((event) => event.value);
-    this.settings.eventSequence = metadata.event
-        .filter((event, i) => (this.settings.excludeLast ? i !== metadata.event.length - 1 : false))
-        .filter((event, i) => (this.settings.excludeFirst ? i !== 0 : false))
-        .map((event) => event.value);
-    this.settings.R = this.settings.width / metadata.event.length / 2;
 
     // Define orbits.
     metadata.orbit = orbit.call(this, metadata.event);
@@ -53,26 +50,17 @@ export default function defineMetadata() {
             .clamp(true);
     } else if (this.settings.colorBy.type === 'continuous') {
         this.colorScale = d3
-            .scaleSequential()
-            .domain(d3.extent(this.data, (d) => d[this.settings.colorBy.variable]).reverse())
-            .interpolator(d3.interpolateRdYlGn)
-            .clamp(true);
+            .scaleSequential(d3.interpolateRdYlGn)
+            .domain(d3.extent(this.data, (d) => d[this.settings.colorBy.variable]));
+        const interpolator = this.colorScale.interpolator(); // read the color scale's interpolator
+        const mirror = (t) => interpolator(1 - t); // returns the mirror image of the interpolator
+        if (this.settings.colorBy.mirror) this.colorScale.interpolator(mirror); // updates the scale's interpolator
     } else if (this.settings.colorBy.type === 'categorical') {
         this.colorScale = d3
             .scaleOrdinal()
             .domain([...new Set(this.data.map((d) => d[this.settings.colorBy.variable])).values()])
             .range(d3.schemeTableau10);
     }
-    //console.log(this.data);
-    //console.log(this.colorScale.domain());
-    //console.log(this.colorScale.range());
-    //console.log(
-    //    JSON.stringify(
-    //        d3.range(3).map(d => d3.color(this.colorScale(d/100)).formatHex()),
-    //        null,
-    //        4
-    //    )
-    //);
 
     return metadata;
 }

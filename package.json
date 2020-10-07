@@ -1,5 +1,5 @@
 {
-  "TODO": "",
+  "TODO": "figure out how to plot multiple static force layouts",
   "name": "force-directed-graph",
   "version": "1.4.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",

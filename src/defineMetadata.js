@@ -9,6 +9,7 @@ export default function defineMetadata() {
 
     // Add additional metadata to ID set.
     metadata.id = id.call(this);
+    console.log(metadata.id);
 
     // Settings dependent on the ID set.
     this.settings.duration = this.settings.duration || d3.max(metadata.id, (id) => id.duration);
@@ -39,6 +40,7 @@ export default function defineMetadata() {
 
     // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
     coordinates.call(this, metadata);
+    console.table(metadata.event);
 
     // Define color scale.
     const colors = this.settings.colors();

@@ -10,7 +10,7 @@ export default function addForceSimulation(event) {
     // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
     const forceSimulation = d3
         .forceSimulation()
-        .nodes(event.data.filter(d => !d.value.noStateChange))
+        .nodes(event.data.filter((d) => !d.value.noStateChange))
         .alphaDecay(0.01)
         //.alphaMin(.75)
         //.alphaTarget(.8)

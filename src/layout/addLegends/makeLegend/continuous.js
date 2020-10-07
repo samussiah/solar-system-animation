@@ -147,7 +147,7 @@ export default function continuous({
         .call((g) =>
             g
                 .append('text')
-                .classed('fdg-legend__label', true)
+                .classed('fdg-sidebar__label fdg-legend__label', true)
                 .attr('x', marginLeft)
                 .attr('y', marginTop + marginBottom - height - 6)
                 .attr('fill', 'currentColor')

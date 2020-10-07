@@ -48,7 +48,7 @@ fetch('./data/data_2000_fixed.csv')
                 //hideControls: true,
                 //playPause: 'pause',
                 //speed: 'medium',
-                //duration: 5,
+                //duration: 10,
                 //resetDelay: 5000,
                 information: [
                     'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.',

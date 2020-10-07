@@ -30,7 +30,7 @@ export default function addLegends() {
             .classed('fdg-legend fdg-legend--categorical', true);
         container
             .append('div')
-            .classed('fdg-legend__label', true)
+            .classed('fdg-sidebar__label fdg-legend__label', true)
             .text(this.settings.colorBy.label);
         const legendItems = container
             .append('svg')

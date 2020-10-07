@@ -1,8 +1,11 @@
+import update from './settings/update';
 import colors from './settings/colors';
 import colorScale from './settings/colorScale';
 import color from './settings/color';
 
 const settings = {
+    update,
+
     // data mappings
     id_var: 'id',
     event_var: 'event',
@@ -68,6 +71,7 @@ const settings = {
         'Each bubble in this animation represents an individual.',
         'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
         'The number of state changes dictates the color and/or size of the bubbles.',
+        'Static bubbles represent individuals whose state never changes.',
         'Use the controls on the right to interact with and alter the animation.',
     ], // array of strings
     information: null, // array of strings

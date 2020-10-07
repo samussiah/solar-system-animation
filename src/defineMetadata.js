@@ -12,29 +12,27 @@ export default function defineMetadata() {
 
     // Settings dependent on the ID set.
     this.settings.duration = this.settings.duration || d3.max(metadata.id, (id) => id.duration);
-    this.settings.minRadius = this.settings.minRadius || 3000 / metadata.id.filter(d => !(this.settings.drawStaticSeparately && d.static)).length;
+    this.settings.minRadius =
+        this.settings.minRadius ||
+        3000 / metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length;
     this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
     this.settings.maxRadius =
         this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
-    this.settings.chargeStrength = - ( 2000 / metadata.id.filter(d => !(this.settings.drawStaticSeparately && d.static)).length );
-    this.settings.staticChargeStrength = - ( 2000 / metadata.id.length );
+    this.settings.chargeStrength = -(
+        2000 / metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length
+    );
+    this.settings.staticChargeStrength = -(2000 / metadata.id.length);
     this.settings.fill = this.settings.fill || metadata.id.length <= 2500;
 
     // Add additional metadata to event set.
     metadata.event = event.call(this);
 
     // Update settings that depend on event set.
-    this.settings.width = this.settings.width || metadata.event.length;
     this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
-    this.settings.eventFinal =
-        Array.isArray(this.settings.eventFinal) && this.settings.eventFinal.length
-            ? this.settings.eventFinal
-            : [this.settings.eventFinal || metadata.event[metadata.event.length - 1].value];
     this.settings.nFoci =
         this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
     this.settings.eventChangeCount =
         this.settings.eventChangeCount || metadata.event.slice(1).map((event) => event.value);
-    this.settings.R = this.settings.width / metadata.event.length / 2;
 
     // Define orbits.
     metadata.orbit = orbit.call(this, metadata.event);

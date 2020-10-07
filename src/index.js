@@ -14,11 +14,7 @@ export default function forceDirectedGraph(data, element = 'body', settings = {}
         util,
     };
 
-    fdg.settings.text = []
-        .concat(fdg.settings.explanation)
-        .concat(fdg.settings.information)
-        .filter((text) => typeof text === 'string');
-
+    defaults.update.call(fdg); // Update settings object.
     fdg.containers = layout.call(fdg); // add elements to DOM
     fdg.metadata = defineMetadata.call(fdg); // calculate characteristics of variables in data
     dataDrivenLayout.call(fdg); // update the DOM

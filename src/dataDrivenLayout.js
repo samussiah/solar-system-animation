@@ -10,8 +10,8 @@ export default function dataDrivenLayout() {
     addControls.call(this);
 
     // sidebar
-    this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
     addLegends.call(this);
+    this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
     this.freqTable = addFreqTable.call(this);
 
     // Draw concentric circles.

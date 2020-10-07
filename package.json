@@ -1,5 +1,5 @@
 {
-  "TODO": "package this pile of crap up and ship it",
+  "TODO": "",
   "name": "force-directed-graph",
   "version": "1.3.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",

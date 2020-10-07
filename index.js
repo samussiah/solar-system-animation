@@ -5657,10 +5657,29 @@
             return isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end';
         };
 
+        var getDx = function getDx(d) {
+            return isCenterX(d) ? 0 : isLessThanCenterX(d) ? '2em' : '-2em';
+        };
+
+        var isCenterY = function isCenterY(d) {
+            return Math.round(d.y) === Math.round(_this.settings.height / 2);
+        };
+
+        var isLessThanCenterY = function isLessThanCenterY(d) {
+            return Math.round(d.y) < Math.round(_this.settings.height / 2);
+        };
+
+        var getDy = function getDy(d) {
+            return isCenterY(d) ? 0 : isLessThanCenterY(d) ? '-2em' : '2em';
+        };
+
         ['background', 'foreground'].forEach(function (pos) {
             var text = fociLabels
                 .append('text')
-                .classed('fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos), true);
+                .classed('fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos), true)
+                .style('transform', function (d) {
+                    return 'translate('.concat(getDx(d), ',').concat(getDy(d), ')');
+                });
             var label = text
                 .append('tspan')
                 .classed('fdg-focus-annotation__label', true)

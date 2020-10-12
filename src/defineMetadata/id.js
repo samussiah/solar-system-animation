@@ -11,8 +11,6 @@ export default function id() {
         .entries(this.data);
 
     nest.forEach((d,i) => {
-        if (i < 10)
-            console.table(d.value);
         Object.assign(d, d.value);
         d.value = d.key;
         d.duration = d.value;

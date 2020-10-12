@@ -10,6 +10,9 @@ export default function nestData() {
         .key((d) => d.id)
         .rollup((group) => {
             const duration = d3.sum(group, (d) => d.duration);
+            const category = this.settings.colorBy.type === 'categorical'
+                ? group[0][this.settings.colorBy.variable]
+                : null;
 
             // Initial state for the given individual.
             const statePrevious = null;
@@ -21,7 +24,8 @@ export default function nestData() {
 
             return {
                 group, // array of data representing all records for an individual
-                duration: d3.sum(group, (d) => d.duration), // full duration of individual in data
+                duration, // full duration of individual in data
+                category,
                 statePrevious,
                 state, // object representing a single record of an individual
                 noStateChange, // boolean - did individual have any events? used to present those individuals in a static force layout

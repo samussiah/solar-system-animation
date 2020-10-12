@@ -1,4 +1,4 @@
-export default function tick(event) {
+export default function tick() {
     this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
     this.containers.canvas.context.save();
 

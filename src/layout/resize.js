@@ -36,9 +36,11 @@ export default function resize() {
 
     // force simulations
     this.metadata.event.forEach((event) => {
-        event.forceSimulation
-            .force('x', d3.forceX(event.x).strength(0.3))
-            .force('y', d3.forceY(event.y).strength(0.3));
+        event.forceSimulation.forEach(forceSimulation => {
+            forceSimulation
+                .force('x', d3.forceX(event.x).strength(0.3))
+                .force('y', d3.forceY(event.y).strength(0.3));
+        });
     });
 
     // focus annotations

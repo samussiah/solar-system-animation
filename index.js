@@ -3350,15 +3350,9 @@
       var centerX = this.settings.orbitRadius / 2;
       var centerY = this.settings.height / 2;
       var theta = 2 * Math.PI / (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
-
-      var thetaFactor = function thetaFactor(i) {
-        return i === 0 ? 0 : i === 1 ? -1.75 : i === 2 ? 0.75 : i === 3 ? -0.25 : i === 4 ? 0.25 : 0;
-      };
-
       metadata.event.forEach(function (event, i) {
-        event.radius = event.order * _this.settings.orbitRadius; //event.theta = thetaFactor(i) * theta
-
-        event.theta = event.position !== 0 ? 2 * Math.PI * event.position / 360 : thetaFactor(i) * theta;
+        event.radius = event.order * _this.settings.orbitRadius;
+        event.theta = event.position !== 0 ? 2 * Math.PI * event.position / 360 : i * theta;
         event.x = event.order === 0 ? centerX : centerX + event.radius * // number of orbit radii from the center
         Math.cos(event.theta); // position along the circle at the given orbit along which
 
@@ -3406,7 +3400,9 @@
       }); // force simulations
 
       this.metadata.event.forEach(function (event) {
-        event.forceSimulation.force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3));
+        event.forceSimulation.forEach(function (forceSimulation) {
+          forceSimulation.force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3));
+        });
       }); // focus annotations
 
       this.focusAnnotations.attr('transform', function (d) {
@@ -3441,7 +3437,6 @@
         };
       }).entries(this.data);
       nest.forEach(function (d, i) {
-        if (i < 10) console.table(d.value);
         Object.assign(d, d.value);
         d.value = d.key;
         d.duration = d.value;
@@ -3495,8 +3490,7 @@
       // Define sets.
       var metadata = {}; // Add additional metadata to ID set.
 
-      metadata.id = id.call(this);
-      console.log(metadata.id); // Settings dependent on the ID set.
+      metadata.id = id.call(this); // Settings dependent on the ID set.
 
       this.settings.duration = this.settings.duration || d3.max(metadata.id, function (id) {
         return id.duration;
@@ -3523,17 +3517,19 @@
 
       metadata.orbit = orbit.call(this, metadata.event); // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
 
-      coordinates.call(this, metadata);
-      console.table(metadata.event); // Define color scale.
+      coordinates.call(this, metadata); // Define color scale.
 
       var colors = this.settings.colors();
+      var domain;
 
       if (this.settings.colorBy.type === 'frequency') {
-        this.colorScale = d3.scaleLinear().domain(d3.range(colors.length)).range(colors).clamp(true);
+        domain = d3.range(colors.length);
+        this.colorScale = d3.scaleLinear().domain(domain).range(colors).clamp(true);
       } else if (this.settings.colorBy.type === 'continuous') {
-        this.colorScale = d3.scaleSequential(d3.interpolateRdYlGn).domain(d3.extent(this.data, function (d) {
+        domain = d3.extent(this.data, function (d) {
           return d[_this.settings.colorBy.variable];
-        }));
+        });
+        this.colorScale = d3.scaleSequential(d3.interpolateRdYlGn).domain(domain);
         var interpolator = this.colorScale.interpolator(); // read the color scale's interpolator
 
         var mirror = function mirror(t) {
@@ -3543,9 +3539,27 @@
 
         if (this.settings.colorBy.mirror) this.colorScale.interpolator(mirror); // updates the scale's interpolator
       } else if (this.settings.colorBy.type === 'categorical') {
-        this.colorScale = d3.scaleOrdinal().domain(_toConsumableArray(new Set(this.data.map(function (d) {
+        domain = _toConsumableArray(new Set(this.data.map(function (d) {
           return d[_this.settings.colorBy.variable];
-        })).values())).range(d3.schemeTableau10);
+        })).values());
+        this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10); // TODO:
+        //   1. define theta given number of groups
+        //   2. use theta to offset each category around the focus
+        //   3a either define as many force simulations per event as there are categories
+        //   or
+        //   3b attach the category's coordinates to each data point and update the x and y forces of the force simulation
+
+        var theta = 2 * Math.PI / domain.length;
+        metadata.event.forEach(function (event) {
+          event.foci = domain.map(function (category, i) {
+            var focus = {
+              key: category,
+              x: event.x + 50 * Math.cos(i * theta),
+              y: event.y + 50 * Math.sin(i * theta)
+            };
+            return focus;
+          });
+        });
       }
 
       return metadata;
@@ -3581,7 +3595,7 @@
 
     function defineColor(value) {
       var color = this.settings.eventChangeCountAesthetic !== 'size' ? //? this.settings.color(value)
-      this.colorScale(value) : 'rgb(170,170,170)';
+      d3.rgb(this.colorScale(value)).toString() : 'rgb(170,170,170)';
       var fill = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
       var stroke = color.replace('rgb', 'rgba').replace(')', ', 1)');
       return {
@@ -3784,20 +3798,24 @@
       var _this = this;
 
       this.metadata.event.forEach(function (event) {
-        // Center points initially then remove centering force.
-        if (_this.settings.timepoint === 1) event.forceSimulation.force('center', null);
-        event.forceSimulation.nodes(event.data.filter(function (d) {
-          return !d.value.noStateChange;
-        }));
-        event.forceSimulation.alpha(1).restart();
+        event.forceSimulation.forEach(function (forceSimulation) {
+          // Center points initially then remove centering force.
+          if (_this.settings.timepoint === 1) forceSimulation.force('center', null); // Update data.
+
+          forceSimulation.nodes(event.data.filter(function (d) {
+            return !d.value.noStateChange && d.value.category === forceSimulation.category;
+          })); // Reheat simulation.
+
+          forceSimulation.alpha(1).restart();
+        });
       });
     }
 
     var increment = function increment(arg) {
       // Increment the timepoint.
-      this.settings.timepoint += !!arg; // update animation if timepoint is less than duration of animation
+      this.settings.timepoint += !!arg; // Update animation if the current timepoint is less than duration of animation.
 
-      if (this.settings.timepoint <= this.settings.duration) update$1.call(this); // otherwise reset animation
+      if (this.settings.timepoint <= this.settings.duration) update$1.call(this); // Otherwise reset animation.
       else reset.call(this); // Resume the force simulation.
 
       restartForceSimulation.call(this);
@@ -4340,7 +4358,8 @@
       };
 
       ['background', 'foreground'].forEach(function (pos) {
-        var text = fociLabels.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true).style('transform', function (d) {
+        var text = fociLabels.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true);
+        if (_this.settings.colorBy.type !== 'categorical') text.style('transform', function (d) {
           return "translate(".concat(getDx(d), ",").concat(getDy(d), ")");
         });
         var label = text.append('tspan').classed('fdg-focus-annotation__label', true).attr('x', 0).attr('text-anchor', function (d) {
@@ -4486,7 +4505,8 @@
       }).rollup(function (group) {
         var duration = d3.sum(group, function (d) {
           return d.duration;
-        }); // Initial state for the given individual.
+        });
+        var category = _this.settings.colorBy.type === 'categorical' ? group[0][_this.settings.colorBy.variable] : null; // Initial state for the given individual.
 
         var statePrevious = null;
         var state = getState.call(_this, group, 0);
@@ -4496,10 +4516,9 @@
         return _objectSpread2({
           group: group,
           // array of data representing all records for an individual
-          duration: d3.sum(group, function (d) {
-            return d.duration;
-          }),
+          duration: duration,
           // full duration of individual in data
+          category: category,
           statePrevious: statePrevious,
           state: state,
           // object representing a single record of an individual
@@ -5094,7 +5113,7 @@
       return force;
     }
 
-    function tick(event) {
+    function tick() {
       var _this = this;
 
       this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
@@ -5142,19 +5161,18 @@
       this.containers.canvas.context.restore();
     }
 
-    function addForceSimulation(event) {
+    function addForceSimulation(data, x, y) {
       // When using D3’s force layout with a disjoint graph, you typically want the positioning
       // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
       // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
       // the viewport.
       //
       // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
-      var forceSimulation = d3.forceSimulation().nodes(event.data.filter(function (d) {
-        return !d.value.noStateChange;
-      })).alphaDecay(0.01) //.alphaMin(.75)
+      var forceSimulation = d3.forceSimulation() //.nodes(event.data.filter((d) => !d.value.noStateChange))
+      .nodes(data).alphaDecay(0.01) //.alphaMin(.75)
       //.alphaTarget(.8)
-      .velocityDecay(0.9).force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)).force('x', d3.forceX(event.x).strength(0.3)).force('y', d3.forceY(event.y).strength(0.3)).force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength)) //.force('charge', d3.forceManyBodySampled().strength(this.settings.chargeStrength))
-      .on('tick', tick.bind(this, event)); //if (event.value !== this.settings.eventCentral)
+      .velocityDecay(0.9).force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)).force('x', d3.forceX(x).strength(0.3)).force('y', d3.forceY(y).strength(0.3)).force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength)) //.force('charge', d3.forceManyBodySampled().strength(this.settings.chargeStrength))
+      .on('tick', tick.bind(this)); //if (event.value !== this.settings.eventCentral)
 
       forceSimulation.force('collide', //d3.forceCollide().radius((d) => d.value.r + 0.5)
       d3.forceCollide().radius(this.settings.minRadius + 1));
@@ -5245,7 +5263,27 @@
       runModal.call(this);
       this.staticForceSimulation = addStaticForceSimulation.call(this);
       this.metadata.event.forEach(function (event) {
-        event.forceSimulation = addForceSimulation.call(_this, event);
+        if (event.foci === undefined) {
+          var forceSimulation = addForceSimulation.call(_this, event.data.filter(function (d) {
+            return !d.value.noStateChange;
+          }), // data
+          event.x, // x-coordinate
+          event.y // y-coordinate
+          );
+          forceSimulation.category === null;
+          event.forceSimulation = [forceSimulation];
+        } else {
+          event.forceSimulation = event.foci.map(function (focus) {
+            var forceSimulation = addForceSimulation.call(_this, event.data.filter(function (d) {
+              return !d.value.noStateChange && d.value.category === focus.key;
+            }), // data
+            focus.x, // x-coordinate
+            focus.y // y-coordinate
+            );
+            forceSimulation.category = focus.key;
+            return forceSimulation;
+          });
+        }
       });
       if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
     }

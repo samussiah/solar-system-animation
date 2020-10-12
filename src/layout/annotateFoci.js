@@ -27,8 +27,9 @@ export default function annotateFoci() {
     ['background', 'foreground'].forEach((pos) => {
         const text = fociLabels
             .append('text')
-            .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
-            .style('transform', (d) => `translate(${getDx(d)},${getDy(d)})`);
+            .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true);
+        if (this.settings.colorBy.type !== 'categorical')
+            text.style('transform', (d) => `translate(${getDx(d)},${getDy(d)})`);
         const label = text
             .append('tspan')
             .classed('fdg-focus-annotation__label', true)

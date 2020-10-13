@@ -46,25 +46,16 @@ export default function defineMetadata() {
     let domain;
     if (this.settings.colorBy.type === 'frequency') {
         domain = d3.range(colors.length);
-        this.colorScale = d3
-            .scaleLinear()
-            .domain(domain)
-            .range(colors)
-            .clamp(true);
+        this.colorScale = d3.scaleLinear().domain(domain).range(colors).clamp(true);
     } else if (this.settings.colorBy.type === 'continuous') {
         domain = d3.extent(this.data, (d) => d[this.settings.colorBy.variable]);
-        this.colorScale = d3
-            .scaleSequential(d3.interpolateRdYlGn)
-            .domain(domain);
+        this.colorScale = d3.scaleSequential(d3.interpolateRdYlGn).domain(domain);
         const interpolator = this.colorScale.interpolator(); // read the color scale's interpolator
         const mirror = (t) => interpolator(1 - t); // returns the mirror image of the interpolator
         if (this.settings.colorBy.mirror) this.colorScale.interpolator(mirror); // updates the scale's interpolator
     } else if (this.settings.colorBy.type === 'categorical') {
         domain = [...new Set(this.data.map((d) => d[this.settings.colorBy.variable])).values()];
-        this.colorScale = d3
-            .scaleOrdinal()
-            .domain(domain)
-            .range(d3.schemeTableau10);
+        this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10);
 
         // TODO:
         //   1. define theta given number of groups
@@ -72,19 +63,20 @@ export default function defineMetadata() {
         //   3a either define as many force simulations per event as there are categories
         //   or
         //   3b attach the category's coordinates to each data point and update the x and y forces of the force simulation
-        const theta = (2 * Math.PI) / (domain.length);
-        metadata.event.forEach(event => {
-            event.foci = domain.map((category,i) => {
+        const theta = (2 * Math.PI) / domain.length;
+        metadata.event.forEach((event) => {
+            event.foci = domain.map((category, i) => {
                 const focus = {
                     key: category,
-                    x: event.x + 50 * Math.cos(i*theta),
-                    y: event.y + 50 * Math.sin(i*theta),
+                    x: event.x + 50 * Math.cos(i * theta),
+                    y: event.y + 50 * Math.sin(i * theta),
                 };
 
-                return focus
+                return focus;
             });
         });
     }
+    this.domain = domain;
 
     return metadata;
 }

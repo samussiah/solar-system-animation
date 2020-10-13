@@ -10,7 +10,7 @@ export default function id() {
         })
         .entries(this.data);
 
-    nest.forEach((d,i) => {
+    nest.forEach((d, i) => {
         Object.assign(d, d.value);
         d.value = d.key;
         d.duration = d.value;

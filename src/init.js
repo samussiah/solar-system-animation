@@ -14,23 +14,23 @@ export default function init() {
                 this,
                 event.data.filter((d) => !d.value.noStateChange), // data
                 event.x, // x-coordinate
-                event.y, // y-coordinate
+                event.y // y-coordinate
             );
-            forceSimulation.category === null;
+            forceSimulation.category = null;
 
             event.forceSimulation = [forceSimulation];
         } else {
-            event.forceSimulation = event.foci.map(focus => {
-                const forceSimulation =  addForceSimulation.call(
+            event.forceSimulation = event.foci.map((focus) => {
+                const forceSimulation = addForceSimulation.call(
                     this,
-                    event.data.filter((d) => (
-                        !d.value.noStateChange &&
-                        d.value.category === focus.key
-                    )), // data
+                    event.data.filter(
+                        (d) => !d.value.noStateChange && d.value.category === focus.key
+                    ), // data
                     focus.x, // x-coordinate
-                    focus.y, // y-coordinate
+                    focus.y // y-coordinate
                 );
                 forceSimulation.category = focus.key;
+                forceSimulation.focus = focus;
 
                 return forceSimulation;
             });

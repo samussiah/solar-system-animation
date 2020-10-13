@@ -10,9 +10,10 @@ export default function nestData() {
         .key((d) => d.id)
         .rollup((group) => {
             const duration = d3.sum(group, (d) => d.duration);
-            const category = this.settings.colorBy.type === 'categorical'
-                ? group[0][this.settings.colorBy.variable]
-                : null;
+            const category =
+                this.settings.colorBy.type === 'categorical'
+                    ? group[0][this.settings.colorBy.variable]
+                    : null;
 
             // Initial state for the given individual.
             const statePrevious = null;

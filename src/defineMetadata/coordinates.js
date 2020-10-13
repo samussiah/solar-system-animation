@@ -11,8 +11,7 @@ export default function coordinates(metadata) {
 
     metadata.event.forEach((event, i) => {
         event.radius = event.order * this.settings.orbitRadius;
-        event.theta =
-            event.position !== 0 ? (2 * Math.PI * event.position) / 360 : i * theta;
+        event.theta = event.position !== 0 ? (2 * Math.PI * event.position) / 360 : i * theta;
         event.x =
             event.order === 0
                 ? centerX

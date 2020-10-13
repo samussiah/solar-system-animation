@@ -120,7 +120,7 @@
       modalSpeed: 15000,
       // amount of time for which each modal appears
       modalIndex: 0,
-      explanation: ['Each bubble in this animation represents an individual.', 'As individuals experience events, their bubble gravitates toward the focus or "planet" representing that event.', 'The number of events an individual experiences dictates the color and/or size of the bubbles.', 'Static bubbles represent individuals who never experience an event.', 'Use the controls on the right to interact with and alter the animation.'],
+      explanation: ['Each bubble in this animation represents an individual.', 'As time progresses and individuals experience events, their bubble gravitates toward the focus or "planet" representing that event.', 'The number of events an individual has experienced determines the color and/or size of the bubbles.', 'Static bubbles represent individuals who never experience an event.', 'Use the controls on the right to interact with and alter the animation.', 'Curious where everyone ends up?  Stick around to find out!'],
       // array of strings
       information: null // array of strings
 
@@ -3713,30 +3713,49 @@
     }
 
     function fadeOut(modalSpeed) {
+      // Transition text from full opacity to zero opacity to create fade-out effect.
       d3.select(this).transition().duration(modalSpeed / 15).delay(modalSpeed - modalSpeed / 15 * 2).style('opacity', 0);
     }
 
     function fadeIn(selection, modalSpeed) {
+      // Transition text from zero opacity to full opacity to create fade-in effect.
       selection.style('opacity', 0).transition().duration(modalSpeed / 15).style('opacity', 1).on('end', function () {
         fadeOut.call(this, modalSpeed);
       });
     }
 
+    function emphasizeComponent(component) {
+      component.style('outline', 'thick groove rgba(215,25,28,0)').transition().duration(this.settings.modalSpeed / 15).style('outline', 'thick groove rgba(215,25,28,.5)').transition().duration(this.settings.modalSpeed / 15).delay(this.settings.modalSpeed - this.settings.modalSpeed / 15 * 2).style('outline', 'thick groove rgba(215,25,28,0)');
+    }
+
     function runModal() {
       var _this = this;
 
-      this.containers.modal.html(this.settings.text[this.settings.modalIndex]).call(fadeIn, this.settings.modalSpeed);
+      // Set initial modal text.
+      this.modalText = this.settings.text[this.settings.modalIndex];
+      this.containers.modal.html(this.modalText).call(fadeIn, this.settings.modalSpeed);
       this.modal = d3.interval(function () {
         _this.settings.modalIndex++;
-        if (_this.settings.modalIndex === _this.settings.text.length - 1) _this.modal.stop(); //this.settings.modalIndex = 0;
+        _this.modalText = _this.settings.text[_this.settings.modalIndex];
+        if (_this.settings.modalIndex === _this.settings.text.length - 1) _this.modal.stop(); // Update modal text.
 
-        _this.containers.modal.html(_this.settings.text[_this.settings.modalIndex]).call(fadeIn, _this.settings.modalSpeed); //if (this.settings.modalIndex === text.length - 1) {
-        //    d3.timeout(() => {
-        //        this.modal.stop();
-        //        //this.containers.modal.classed('fdg-hidden', true);
-        //    }, 8000);
-        //}
+        _this.containers.modal.html(_this.modalText).call(fadeIn, _this.settings.modalSpeed); // Highlight referenced component.
 
+
+        switch (true) {
+          case /time progresses/i.test(_this.modalText):
+            emphasizeComponent.call(_this, _this.containers.progress);
+            emphasizeComponent.call(_this, _this.focusAnnotations);
+            break;
+
+          case /determines the color/i.test(_this.modalText):
+            emphasizeComponent.call(_this, _this.containers.legends);
+            break;
+
+          case /use the controls/i.test(_this.modalText):
+            emphasizeComponent.call(_this, _this.containers.controls);
+            break;
+        }
       }, this.settings.modalSpeed);
     }
 

@@ -16,6 +16,9 @@ body {
 .fdg-invisible {
     visibility: hidden !important;
 }
+.fdg-emphasized {
+    outline: 3px solid red;
+}
 .fdg-main > * {
     display: inline-block;
 }

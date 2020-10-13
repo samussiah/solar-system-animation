@@ -1,4 +1,5 @@
 export default function fadeOut(modalSpeed) {
+    // Transition text from full opacity to zero opacity to create fade-out effect.
     d3.select(this)
         .transition()
         .duration(modalSpeed / 15)

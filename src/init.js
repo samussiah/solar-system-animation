@@ -17,6 +17,7 @@ export default function init() {
                 event.y // y-coordinate
             );
             forceSimulation.category = null;
+            forceSimulation.coordinates = [event.x, event.y];
 
             event.forceSimulation = [forceSimulation];
         } else {
@@ -30,7 +31,7 @@ export default function init() {
                     focus.y // y-coordinate
                 );
                 forceSimulation.category = focus.key;
-                forceSimulation.focus = focus;
+                forceSimulation.coordinates = [focus.x, focus.y];
 
                 return forceSimulation;
             });

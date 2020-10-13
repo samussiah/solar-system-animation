@@ -36,11 +36,23 @@ export default function resize() {
 
     // force simulations
     this.metadata.event.forEach((event) => {
-        event.forceSimulation.forEach((forceSimulation) => {
-            forceSimulation
-                .force('x', d3.forceX(event.x).strength(0.3))
-                .force('y', d3.forceY(event.y).strength(0.3));
-        });
+        // Update coordinates of categorical foci.
+        if (this.settings.colorBy.type === 'categorical')
+            event.foci.forEach((focus, i) => {
+                focus.x = event.x + 50 * Math.cos(i * this.settings.colorBy.theta);
+                focus.y = event.y + 50 * Math.sin(i * this.settings.colorBy.theta);
+                const forceSimulation = event.forceSimulation.find(
+                    (forceSimulation) => forceSimulation.category === focus.key
+                );
+                forceSimulation.force('x', d3.forceX(focus.x).strength(0.3));
+                forceSimulation.force('y', d3.forceY(focus.y).strength(0.3));
+            });
+        else
+            event.forceSimulation.forEach((forceSimulation) => {
+                forceSimulation
+                    .force('x', d3.forceX(event.x).strength(0.3))
+                    .force('y', d3.forceY(event.y).strength(0.3));
+            });
     });
 
     // focus annotations

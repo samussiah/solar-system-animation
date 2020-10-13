@@ -6,6 +6,9 @@ fetch('../data/data_1000.csv')
             data,
             '#container',
             {
+                duration: 5,
+                resetDelay: 3000,
+                //eventChangeCountAesthetic: 'size',
                 colorBy: {
                     type: 'categorical',
                     variable: 'category',

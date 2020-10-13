@@ -49,7 +49,7 @@ const settings = {
     translate: false,
     hideControls: false,
 
-    // color and size settings
+    // bubble color settings
     colorBy: {
         type: 'frequency', // ['frequency', 'continuous', 'categorical']
         variable: null,
@@ -59,6 +59,13 @@ const settings = {
     colorScale,
     color,
     fill: null, // defined in ./defineMetadata/dataDrivenSettings
+
+    // bubble size settings
+    sizeBy: {
+        type: 'frequency', // ['frequency', 'continuous']
+        variable: null,
+        label: null,
+    },
     minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
     maxRadius: null, // defined in ./defineMetadata/dataDrivenSettings
     shape: 'circle',

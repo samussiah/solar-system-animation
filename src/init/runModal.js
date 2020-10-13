@@ -5,9 +5,7 @@ import emphasizeComponent from './runModal/emphasizeComponent';
 export default function runModal() {
     // Set initial modal text.
     this.modalText = this.settings.text[this.settings.modalIndex];
-    this.containers.modal
-        .html(this.modalText)
-        .call(fadeIn, this.settings.modalSpeed);
+    this.containers.modal.html(this.modalText).call(fadeIn, this.settings.modalSpeed);
 
     this.modal = d3.interval(() => {
         this.settings.modalIndex++;
@@ -15,9 +13,7 @@ export default function runModal() {
         if (this.settings.modalIndex === this.settings.text.length - 1) this.modal.stop();
 
         // Update modal text.
-        this.containers.modal
-            .html(this.modalText)
-            .call(fadeIn, this.settings.modalSpeed);
+        this.containers.modal.html(this.modalText).call(fadeIn, this.settings.modalSpeed);
 
         // Highlight referenced component.
         switch (true) {

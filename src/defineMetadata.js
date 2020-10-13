@@ -54,22 +54,20 @@ export default function defineMetadata() {
         const mirror = (t) => interpolator(1 - t); // returns the mirror image of the interpolator
         if (this.settings.colorBy.mirror) this.colorScale.interpolator(mirror); // updates the scale's interpolator
     } else if (this.settings.colorBy.type === 'categorical') {
-        domain = [...new Set(this.data.map((d) => d[this.settings.colorBy.variable])).values()];
+        domain = [
+            ...new Set(this.data.map((d) => d[this.settings.colorBy.variable])).values(),
+        ].sort();
         this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10);
 
-        // TODO:
-        //   1. define theta given number of groups
-        //   2. use theta to offset each category around the focus
-        //   3a either define as many force simulations per event as there are categories
-        //   or
-        //   3b attach the category's coordinates to each data point and update the x and y forces of the force simulation
-        const theta = (2 * Math.PI) / domain.length;
+        // Define the offset of each cateogry as function of the focus coordinates, the category
+        // sequence, and theta.
+        this.settings.colorBy.theta = (2 * Math.PI) / domain.length;
         metadata.event.forEach((event) => {
             event.foci = domain.map((category, i) => {
                 const focus = {
                     key: category,
-                    x: event.x + 50 * Math.cos(i * theta),
-                    y: event.y + 50 * Math.sin(i * theta),
+                    x: event.x + 50 * Math.cos(i * this.settings.colorBy.theta),
+                    y: event.y + 50 * Math.sin(i * this.settings.colorBy.theta),
                 };
 
                 return focus;

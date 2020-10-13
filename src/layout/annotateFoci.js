@@ -10,6 +10,7 @@ export default function annotateFoci() {
         .classed('fdg-focus-annotation', true)
         .attr('transform', (d) => `translate(${d.x},${d.y})`);
 
+    // Position annotation relative to focus along the x-axis.
     const isCenterX = (d) => Math.round(d.x) === Math.round(this.settings.orbitRadius / 2);
     const isLessThanCenterX = (d) =>
         d.order === 1 || Math.round(d.x) < Math.round(this.settings.width / 2);
@@ -17,6 +18,7 @@ export default function annotateFoci() {
     const getTextAnchor = (d) => (isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end');
     const getDx = (d) => (isCenterX(d) ? 0 : isLessThanCenterX(d) ? '2em' : '-2em');
 
+    // Position annotation relative to focus along the y-axis.
     const isCenterY = (d) => Math.round(d.y) === Math.round(this.settings.height / 2);
     const isLessThanCenterY = (d) => Math.round(d.y) < Math.round(this.settings.height / 2);
     const getY = (d) => (isCenterY(d) ? d.y : d.y + (-1) ** isLessThanCenterY(d) * 35);
@@ -24,12 +26,13 @@ export default function annotateFoci() {
         isCenterY(d) ? 'center' : isLessThanCenterY(d) ? 'bottom' : 'top';
     const getDy = (d) => (isCenterY(d) ? 0 : isLessThanCenterY(d) ? '-2em' : '2em');
 
+    // background - white annotation highlight
+    // foreground - black annotation text
     ['background', 'foreground'].forEach((pos) => {
         const text = fociLabels
             .append('text')
             .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true);
-        if (this.settings.colorBy.type !== 'categorical')
-            text.style('transform', (d) => `translate(${getDx(d)},${getDy(d)})`);
+        text.style('transform', (d) => `translate(${getDx(d)},${getDy(d)})`);
         const label = text
             .append('tspan')
             .classed('fdg-focus-annotation__label', true)
@@ -43,6 +46,16 @@ export default function annotateFoci() {
             .attr('x', 0)
             .attr('dy', '1.3em')
             .attr('text-anchor', (d) => getTextAnchor(d));
+
+        // Position annotations differently in categorical layout.
+        if (this.settings.colorBy.type === 'categorical') {
+            text.style(
+                'transform',
+                (d) => `translate(0,${isCenterY(d) ? '0' : isLessThanCenterY(d) ? '5em' : '-5em'})`
+            );
+            label.attr('text-anchor', 'middle');
+            eventCount.attr('text-anchor', 'middle');
+        }
     });
 
     return fociLabels;

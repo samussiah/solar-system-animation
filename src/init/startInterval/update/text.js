@@ -1,4 +1,6 @@
 export default function text() {
+    this.settings.progress = this.settings.timepoint / this.settings.duration;
+
     // Update timepoint control.
     this.controls.timepoint.inputs.property('value', this.settings.timepoint);
 
@@ -8,21 +10,28 @@ export default function text() {
     // Update progress bar.
     this.containers.progress.attr(
         'title',
-        `The animation is ${d3.format('.1%')(
-            this.settings.timepoint / this.settings.duration
-        )} complete with ${this.settings.duration - this.settings.timepoint} ${
-            this.settings.timeUnit.split(' ')[0]
-        } to go.`
+        `The animation is ${d3.format('.1%')(this.settings.progress)} complete with ${
+            this.settings.duration - this.settings.timepoint
+        } ${this.settings.timeUnit.split(' ')[0]} to go.`
     );
-    this.containers.progress.circle
-        .animate(this.settings.timepoint / this.settings.duration);
-    //this.containers.arcPath
-    //    .transition()
-    //    .duration(this.settings.speed)
-    //    .attrTween('d', this.util.arcTween(
-    //        this.settings.timepoint / this.settings.duration * Math.PI * 2,
-    //        this.containers.progress.arc
-    //    ));
+    this.containers.stopwatch.foreground
+        .transition()
+        .duration(this.settings.speed)
+        .attrTween(
+            'd',
+            this.util.arcTween(this.settings.progress * Math.PI * 2, this.containers.stopwatch.arc)
+        )
+        .style('fill', d3.interpolateRdYlGn(1 - this.settings.progress));
+    this.containers.stopwatch.percentBackground.text(
+        this.settings.progress < 0.0095
+            ? d3.format('.1%')(this.settings.progress)
+            : d3.format('.0%')(this.settings.progress)
+    );
+    this.containers.stopwatch.percentForeground.text(
+        this.settings.progress < 0.0095
+            ? d3.format('.1%')(this.settings.progress)
+            : d3.format('.0%')(this.settings.progress)
+    );
 
     // Update focus percentages
     if (this.settings.eventCount)

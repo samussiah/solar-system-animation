@@ -9,10 +9,7 @@ export default function radial(data, x, y) {
 
     const g = this.containers.svgBackground
         .insert('g', ':first-child')
-        .attr(
-            'transform',
-            `translate(${x},${y})`
-        );
+        .attr('transform', `translate(${x},${y})`);
     //g.append('text')
     //    .attr('x', 0)
     //    .attr('y', -this.settings.orbitRadius / 2)

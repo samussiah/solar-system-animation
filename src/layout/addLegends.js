@@ -51,7 +51,7 @@ export default function addLegends() {
             .attr('x', 35)
             .attr('y', (d, i) => i * 20 + 12)
             .attr('alignment-baseline', 'middle')
-            .text((d) => d);
+            .text((d) => `${d} (n=${this.metadata.id.filter((di) => di.category === d).length})`);
     } else if (this.settings.colorBy.type === 'frequency') {
         this.legends.color = makeLegend.call(this, 'color');
         this.legends.size = makeLegend.call(this, 'size');

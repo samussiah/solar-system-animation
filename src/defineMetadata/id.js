@@ -6,11 +6,15 @@ export default function id() {
             return {
                 duration: d3.sum(group, (d) => +d.duration),
                 static: group.length === 1,
+                category:
+                    this.settings.colorBy.type === 'categorical'
+                        ? group[0][this.settings.colorBy.variable]
+                        : null,
             };
         })
         .entries(this.data);
 
-    nest.forEach((d) => {
+    nest.forEach((d, i) => {
         Object.assign(d, d.value);
         d.value = d.key;
         d.duration = d.value;

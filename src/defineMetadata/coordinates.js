@@ -8,14 +8,15 @@ export default function coordinates(metadata) {
     const theta =
         (2 * Math.PI) /
         (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
-    const thetaFactor = (i) =>
-        i === 0 ? 0 : i === 1 ? -1.75 : i === 2 ? 0.75 : i === 3 ? -0.25 : i === 4 ? 0.25 : 0;
 
     metadata.event.forEach((event, i) => {
+        // Define radius of the orbit on which the event focus will appear.
         event.radius = event.order * this.settings.orbitRadius;
-        //event.theta = thetaFactor(i) * theta
-        event.theta =
-            event.position !== 0 ? (2 * Math.PI * event.position) / 360 : thetaFactor(i) * theta;
+
+        // Define angle of event focus.
+        event.theta = (2 * Math.PI * event.position) / 360;
+
+        // Define position along orbit on which the event focus will appear.
         event.x =
             event.order === 0
                 ? centerX

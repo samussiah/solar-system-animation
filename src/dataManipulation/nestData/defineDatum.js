@@ -13,7 +13,7 @@ export default function defineDatum(group, state, statePrevious) {
             : state[this.settings.colorBy.variable];
 
     // Define radius.
-    const r = defineRadius.call(this, aesthetic);
+    const r = defineRadius.call(this, nStateChanges);
 
     // Define color.
     const color = defineColor.call(this, aesthetic);
@@ -25,3 +25,20 @@ export default function defineDatum(group, state, statePrevious) {
         ...color, // color/fill/stroke of bubble
     };
 }
+
+/*
+    // Define radius input.
+    const rInput = this.settings.
+
+    // Define radius.
+    const r = defineRadius.call(this, rInput);
+
+    // Define color input.
+    const colorInput =
+        this.settings.colorBy.type === 'frequency'
+            ? nStateChanges
+            : state[this.settings.colorBy.variable];
+
+    // Define color.
+    const color = defineColor.call(this, colorInput);
+*/

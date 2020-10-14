@@ -49,7 +49,7 @@ const settings = {
     translate: false,
     hideControls: false,
 
-    // color and size settings
+    // bubble color settings
     colorBy: {
         type: 'frequency', // ['frequency', 'continuous', 'categorical']
         variable: null,
@@ -59,6 +59,13 @@ const settings = {
     colorScale,
     color,
     fill: null, // defined in ./defineMetadata/dataDrivenSettings
+
+    // bubble size settings
+    sizeBy: {
+        type: 'frequency', // ['frequency', 'continuous']
+        variable: null,
+        label: null,
+    },
     minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
     maxRadius: null, // defined in ./defineMetadata/dataDrivenSettings
     shape: 'circle',
@@ -69,10 +76,11 @@ const settings = {
     modalIndex: 0,
     explanation: [
         'Each bubble in this animation represents an individual.',
-        'As individuals experience events and change states, their bubble gravitates toward the focus representing that event.',
-        'The number of state changes dictates the color and/or size of the bubbles.',
-        'Static bubbles represent individuals whose state never changes.',
+        'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their bubble gravitates toward the focus or "planet" representing that event.',
+        'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the color and/or size of their bubble.',
+        'Static bubbles represent individuals who never experience an event.',
         'Use the controls on the right to interact with and alter the animation.',
+        'Curious where everyone ends up?  Stick around to find out!',
     ], // array of strings
     information: null, // array of strings
 };

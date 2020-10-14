@@ -13,6 +13,21 @@ export default function defineMetadata() {
 
     // Settings dependent on the ID set.
     this.settings.duration = this.settings.duration || d3.max(metadata.id, (id) => id.duration);
+    this.settings.text = this.settings.text
+        .filter(text => (
+            // Remove if:
+            //   - text contains static
+            //   - there are no static IDs
+            //   - static IDs are drawn separately
+            ! (
+                /static/i.test(text) &&
+                (
+                    metadata.id.every(id => id.static === false) ||
+                    this.settings.drawStaticSeparately === false
+                )
+            )
+        ))
+        .map(text => text.replace('[duration]', d3.format(',d')(this.settings.duration)));
     this.settings.minRadius =
         this.settings.minRadius ||
         3000 / metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length;

@@ -1,4 +1,6 @@
 export default function emphasizeComponent(component) {
+    //console.log(this.staticForceSimulation[0].nodes.node().tagName);
+    // TODO: use tagName to style static bubbles differently.
     component
         .style('outline', 'thick groove rgba(215,25,28,0)')
         .transition()

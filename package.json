@@ -1,7 +1,7 @@
 {
-  "TODO": "figure out how to plot multiple static force layouts",
+  "TODO": "ensure each point reaches their destination before moving to next destination",
   "name": "force-directed-graph",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",
   "module": "./src/index.js",
   "main": "./index.js",

@@ -48,6 +48,7 @@ const settings = {
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
     hideControls: false,
+    distance: 25,
 
     // bubble color settings
     colorBy: {

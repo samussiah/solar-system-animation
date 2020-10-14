@@ -16,6 +16,11 @@ export default function data() {
         Object.assign(d.value, datum);
     });
 
+    // TODO: calculate the Euclidean distance between a bubble and its destination and only until
+    // that distance is below a certain threshold is the bubble allowed to progress to the next
+    // destination.
+    console.log(this.data.nested.filter(d => d.value.state.event !== 'Home'));
+
     // Record change in number of IDs at each focus at current timepoint.
     this.metadata.event.forEach((event) => {
         event.data = this.data.nested.filter((d) => d.value.state.event === event.value);

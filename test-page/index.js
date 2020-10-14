@@ -10,8 +10,6 @@ fetch('./data/data_1000.csv')
             {
                 eventChangeCount: ['Hospitalization', 'ICU'],
                 eventChangeCountAesthetic: 'both',
-                //shape: 'square',
-                //hideControls: true,
                 //playPause: 'pause',
                 //speed: 'medium',
                 //duration: 10,

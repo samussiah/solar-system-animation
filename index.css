@@ -149,11 +149,14 @@ body {
 .fdg-percent-complete {
     margin-left: 4px;
 }
+.fdg-timer,
 .fdg-countdown {
     margin-top: 8px;
+    padding-top: 8px;
+}
+.fdg-countdown {
     border-top: 1px solid #aaa;
     border-bottom: none;
-    padding-top: 8px;
 }
 .fdg-countdown div {
     border-bottom: none !important;

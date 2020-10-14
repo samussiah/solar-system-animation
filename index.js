@@ -525,8 +525,11 @@
             (2 * Math.PI) /
             (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
         metadata.event.forEach(function (event, i) {
-            event.radius = event.order * _this.settings.orbitRadius;
-            event.theta = event.position !== 0 ? (2 * Math.PI * event.position) / 360 : i * theta;
+            // Define radius of the orbit on which the event focus will appear.
+            event.radius = event.order * _this.settings.orbitRadius; // Define angle of event focus.
+
+            event.theta = (2 * Math.PI * event.position) / 360; // Define position along orbit on which the event focus will appear.
+
             event.x =
                 event.order === 0
                     ? centerX
@@ -733,7 +736,7 @@
                 var order = parseInt(event.event_order);
                 var position = event.hasOwnProperty('event_position')
                     ? parseInt(event.event_position)
-                    : 0;
+                    : null;
                 return {
                     order: order,
                     position: position,
@@ -748,7 +751,21 @@
             Object.assign(event, event.value);
             event.value = event.key;
             delete event.key;
-        }); // Ensure events plot in order.
+        }); // Define position of event focus along orbit.
+
+        d3.nest()
+            .key(function (d) {
+                return d.order;
+            })
+            .rollup(function (group) {
+                var n = group.length;
+                var range = d3.range(-45, 46);
+                group.forEach(function (d, i) {
+                    d.position =
+                        d.position === null ? d3.quantile(range, (i + 1) / (n + 1)) : d.position;
+                });
+            })
+            .entries(nest); // Ensure events plot in order.
 
         nest.sort(function (a, b) {
             return a.order - b.order || b.nEvents - a.nEvents;
@@ -948,21 +965,21 @@
         );
     }
     /*
-      // Define radius input.
-      const rInput = this.settings.
+        // Define radius input.
+        const rInput = this.settings.
 
-      // Define radius.
-      const r = defineRadius.call(this, rInput);
+        // Define radius.
+        const r = defineRadius.call(this, rInput);
 
-      // Define color input.
-      const colorInput =
-          this.settings.colorBy.type === 'frequency'
-              ? nStateChanges
-              : state[this.settings.colorBy.variable];
+        // Define color input.
+        const colorInput =
+            this.settings.colorBy.type === 'frequency'
+                ? nStateChanges
+                : state[this.settings.colorBy.variable];
 
-      // Define color.
-      const color = defineColor.call(this, colorInput);
-  */
+        // Define color.
+        const color = defineColor.call(this, colorInput);
+    */
 
     function data() {
         var _this = this;

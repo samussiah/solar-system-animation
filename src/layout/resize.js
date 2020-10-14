@@ -27,12 +27,28 @@ export default function resize() {
         .attr('r', (d) => d.r);
 
     // static force simulation
-    this.staticForceSimulation.simulation
-        .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
-        .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
-        .force('y', d3.forceY(this.settings.height / 2).strength(0.3));
-    for (let i = 0; i < 30; i++) this.staticForceSimulation.simulation.tick();
-    this.staticForceSimulation.nodes.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+    if (this.settings.colorBy.type === 'categorical') {
+        const event = this.metadata.event[0];
+        event.foci.forEach((focus,i) => {
+            const staticForceSimulation = this.staticForceSimulation[i];
+            focus.x = event.x + 50 * Math.cos(i * this.settings.colorBy.theta);
+            focus.y = event.y + 50 * Math.sin(i * this.settings.colorBy.theta);
+            staticForceSimulation.simulation
+                .force('center', d3.forceCenter(focus.x, focus.y))
+                .force('x', d3.forceX(focus.x).strength(0.3))
+                .force('y', d3.forceY(focus.y).strength(0.3));
+            for (let i = 0; i < 30; i++) staticForceSimulation.simulation.tick();
+            staticForceSimulation.nodes.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+        });
+    } else {
+        const staticForceSimulation = this.staticForceSimulation[0];
+        staticForceSimulation.simulation
+            .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
+            .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
+            .force('y', d3.forceY(this.settings.height / 2).strength(0.3));
+        for (let i = 0; i < 30; i++) staticForceSimulation.simulation.tick();
+        staticForceSimulation.nodes.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+    }
 
     // force simulations
     this.metadata.event.forEach((event) => {

@@ -1,4 +1,4 @@
-export default function radial(data) {
+export default function radial(data, x, y) {
     const simulation = d3
         .forceSimulation(data)
         .force('charge', d3.forceCollide().radius(this.settings.minRadius + 0.5))
@@ -11,7 +11,7 @@ export default function radial(data) {
         .insert('g', ':first-child')
         .attr(
             'transform',
-            `translate(${this.settings.orbitRadius / 2},${this.settings.height / 2})`
+            `translate(${x},${y})`
         );
     //g.append('text')
     //    .attr('x', 0)

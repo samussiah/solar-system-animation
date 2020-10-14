@@ -13,7 +13,7 @@ export default function defineDatum(group, state, statePrevious) {
             : state[this.settings.colorBy.variable];
 
     // Define radius.
-    const r = defineRadius.call(this, aesthetic);
+    const r = defineRadius.call(this, nStateChanges);
 
     // Define color.
     const color = defineColor.call(this, aesthetic);

@@ -1,12 +1,12 @@
 import { forceManyBodyReuse } from 'd3-force-reuse';
 
-export default function circular(data) {
+export default function circular(data, x, y, color) {
     const simulation = d3
         .forceSimulation()
         .nodes(data)
-        .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2))
-        .force('x', d3.forceX(this.settings.orbitRadius / 2).strength(0.3))
-        .force('y', d3.forceY(this.settings.height / 2).strength(0.3))
+        .force('center', d3.forceCenter(x, y))
+        .force('x', d3.forceX(x).strength(0.3))
+        .force('y', d3.forceY(y).strength(0.3))
         .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
         .force('collide', d3.forceCollide().radius(this.settings.minRadius + 0.5))
         .stop();
@@ -34,7 +34,7 @@ export default function circular(data) {
         .attr('cx', (d) => d.x)
         .attr('cy', (d) => d.y)
         .attr('r', this.settings.minRadius)
-        .attr('fill', this.settings.color(0))
+        .attr('fill', color)
         .attr('fill-opacity', 0.25);
 
     return {

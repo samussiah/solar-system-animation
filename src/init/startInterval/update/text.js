@@ -14,7 +14,15 @@ export default function text() {
             this.settings.timeUnit.split(' ')[0]
         } to go.`
     );
-    this.containers.progress.circle.animate(this.settings.timepoint / this.settings.duration);
+    this.containers.progress.circle
+        .animate(this.settings.timepoint / this.settings.duration);
+    //this.containers.arcPath
+    //    .transition()
+    //    .duration(this.settings.speed)
+    //    .attrTween('d', this.util.arcTween(
+    //        this.settings.timepoint / this.settings.duration * Math.PI * 2,
+    //        this.containers.progress.arc
+    //    ));
 
     // Update focus percentages
     if (this.settings.eventCount)

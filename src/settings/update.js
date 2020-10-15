@@ -1,6 +1,5 @@
 export default function update() {
-    this.settings.explanation.forEach(text => {
-    });
+    this.settings.explanation.forEach((text) => {});
 
     // Define array of modal text.
     this.settings.text = []

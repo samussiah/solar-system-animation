@@ -19,6 +19,8 @@ export default function nestData() {
             const statePrevious = null;
             const state = getState.call(this, group, 0);
             const noStateChange = group.length === 1 && state.event === this.settings.eventCentral;
+            const event = this.metadata.event.find((event) => event.value === state.event);
+            const coordinates = { x: event.x, y: event.y };
 
             // Count number of state changes, define aesthetic, define radius, and define color.
             const datum = defineDatum.call(this, group, state, statePrevious);
@@ -30,6 +32,7 @@ export default function nestData() {
                 statePrevious,
                 state, // object representing a single record of an individual
                 noStateChange, // boolean - did individual have any events? used to present those individuals in a static force layout
+                coordinates,
                 ...datum,
             };
         })

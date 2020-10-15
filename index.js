@@ -1014,7 +1014,7 @@
             // Ensure point reaches a minimum distance from destination
             // before moving to next destination.
 
-            if (d.value.distance < _this.settings.orbitRadius / 3)
+            if (d.value.distance < _this.settings.orbitRadius / 4)
                 d.value.state = getState.call(_this, d.value.group);
             var datum = defineDatum.call(
                 _this,

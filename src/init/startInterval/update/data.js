@@ -21,7 +21,7 @@ export default function data() {
 
         // Ensure point reaches a minimum distance from destination
         // before moving to next destination.
-        if (d.value.distance < this.settings.orbitRadius / 3)
+        if (d.value.distance < this.settings.orbitRadius / 4)
             d.value.state = getState.call(this, d.value.group);
 
         const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.statePrevious);

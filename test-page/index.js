@@ -4,6 +4,11 @@ fetch('./data/data_2000_fixed.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
+        data.forEach(d => {
+            if (d.event === 'ICU')
+                d.duration = '3';
+        });
+
         const fdg = forceDirectedGraph(
             data,
             '#container',

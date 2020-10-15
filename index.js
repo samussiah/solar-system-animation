@@ -67,7 +67,8 @@
     function update() {
         var _this = this;
 
-        // Define array of modal text.
+        this.settings.explanation.forEach(function (text) {}); // Define array of modal text.
+
         this.settings.text = []
             .concat(
                 this.settings.explanation.filter(function (el) {
@@ -77,15 +78,7 @@
             .concat(this.settings.information)
             .filter(function (text) {
                 return typeof text === 'string';
-            }); //explanation: [
-        //    'Each bubble in this animation represents an individual.',
-        ////    'As time progresses and individuals experience events, their bubble gravitates toward the focus or "planet" representing that event.',
-        //    'The number of events an individual has experienced determines the color and/or size of the bubbles.',
-        //    'The number of events an individual has experienced determines the color and/or size of the bubbles.',
-        //    'Static bubbles represent individuals who never experience an event.',
-        //    'Use the controls on the right to interact with and alter the animation.',
-        //    'Curious where everyone ends up?  Stick around to find out!',
-        //], // array of strings
+            });
     }
 
     function colors() {
@@ -201,9 +194,9 @@
             'Each bubble in this animation represents an individual.',
             'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their bubble gravitates toward the focus or "planet" representing that event.',
             'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the color and/or size of their bubble.',
-            'Static bubbles represent individuals who never experience an event.',
-            'Use the controls on the right to interact with and alter the animation.',
-            'Curious where everyone ends up?  Stick around to find out!',
+            '<span class = "fdg-emphasized">Static bubbles</span> represent individuals who never experience an event.',
+            'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.',
+            'Continue watching to learn how these individuals progress over the course of [duration] days.',
         ],
         // array of strings
         information: null, // array of strings
@@ -802,6 +795,25 @@
             d3.max(metadata.id, function (id) {
                 return id.duration;
             });
+        this.settings.text = this.settings.text
+            .filter(function (text) {
+                return (
+                    // Remove if:
+                    //   - text contains static
+                    //   - there are no static IDs
+                    //   - static IDs are drawn separately
+                    !(
+                        /static/i.test(text) &&
+                        (metadata.id.every(function (id) {
+                            return id['static'] === false;
+                        }) ||
+                            _this.settings.drawStaticSeparately === false)
+                    )
+                );
+            })
+            .map(function (text) {
+                return text.replace('[duration]', d3.format(',d')(_this.settings.duration));
+            });
         this.settings.minRadius =
             this.settings.minRadius ||
             3000 /
@@ -991,7 +1003,19 @@
         this.data.nested.forEach(function (d) {
             // Update individual to next event.
             d.value.statePrevious = d.value.state;
-            d.value.state = getState.call(_this, d.value.group);
+
+            var event = _this.metadata.event.find(function (event) {
+                return event.value === d.value.state.event;
+            }); // Calculate Euclidean distance between point and destination.
+
+            d.value.distance = Math.sqrt(Math.pow(event.x - d.x, 2) + Math.pow(event.y - d.y, 2)); // calculate the Euclidean distance between a bubble and its destination and only until
+            // that distance is below a certain threshold is the bubble allowed to progress to the next
+            // destination.
+            // Ensure point reaches a minimum distance from destination
+            // before moving to next destination.
+
+            if (d.value.distance < _this.settings.orbitRadius / 4)
+                d.value.state = getState.call(_this, d.value.group);
             var datum = defineDatum.call(
                 _this,
                 d.value.group,
@@ -1002,7 +1026,7 @@
         }); // Record change in number of IDs at each focus at current timepoint.
 
         this.metadata.event.forEach(function (event) {
-            event.data = _this.data.nested.filter(function (d) {
+            event.data = _this.data.nested.filter(function (d, i) {
                 return d.value.state.event === event.value;
             });
             event.count = event.data.length;
@@ -1142,34 +1166,61 @@
     }
 
     function emphasizeComponent(component) {
+        var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'outline';
+        var value1 =
+            arguments.length > 2 && arguments[2] !== undefined
+                ? arguments[2]
+                : 'thick groove rgba(215,25,28,0)';
+        var value2 =
+            arguments.length > 3 && arguments[3] !== undefined
+                ? arguments[3]
+                : 'thick groove rgba(215,25,28,.5)';
         component
-            .style('outline', 'thick groove rgba(215,25,28,0)')
+            .style(style, value1)
             .transition()
             .duration(this.settings.modalSpeed / 15)
-            .style('outline', 'thick groove rgba(215,25,28,.5)')
+            .style(style, value2)
             .transition()
             .duration(this.settings.modalSpeed / 15)
             .delay(this.settings.modalSpeed - (this.settings.modalSpeed / 15) * 2)
-            .style('outline', 'thick groove rgba(215,25,28,0)');
+            .style(style, value1)
+            .on('end', function () {
+                return component.style(style, null);
+            });
     }
 
     function update$2() {
+        var _this = this;
+
         this.modalText = this.settings.text[this.settings.modalIndex];
         if (this.settings.modalIndex === this.settings.text.length - 1) this.modal.stop(); // Update modal text.
 
         this.containers.modal.html(this.modalText).call(fadeIn, this.settings.modalSpeed); // Highlight referenced component.
 
         switch (true) {
-            case /time progresses/i.test(this.modalText):
+            case /time/i.test(this.modalText):
                 emphasizeComponent.call(this, this.containers.progress); //emphasizeComponent.call(this, this.focusAnnotations);
 
                 break;
 
-            case /determines the color/i.test(this.modalText):
+            case /color/i.test(this.modalText):
                 emphasizeComponent.call(this, this.containers.legends);
                 break;
 
-            case /use the controls/i.test(this.modalText):
+            case /static/i.test(this.modalText):
+                this.staticForceSimulation.forEach(function (sfs) {
+                    // Style static bubbles differently than components.
+                    emphasizeComponent.call(
+                        _this,
+                        sfs.nodes,
+                        'stroke',
+                        'rgba(215,25,28,0)',
+                        'rgba(215,25,28,.5)'
+                    );
+                });
+                break;
+
+            case /controls/i.test(this.modalText):
                 emphasizeComponent.call(this, this.containers.controls);
                 break;
         }
@@ -2408,7 +2459,16 @@
                 var statePrevious = null;
                 var state = getState.call(_this, group, 0);
                 var noStateChange =
-                    group.length === 1 && state.event === _this.settings.eventCentral; // Count number of state changes, define aesthetic, define radius, and define color.
+                    group.length === 1 && state.event === _this.settings.eventCentral;
+
+                var event = _this.metadata.event.find(function (event) {
+                    return event.value === state.event;
+                });
+
+                var coordinates = {
+                    x: event.x,
+                    y: event.y,
+                }; // Count number of state changes, define aesthetic, define radius, and define color.
 
                 var datum = defineDatum.call(_this, group, state, statePrevious);
                 return _objectSpread2(
@@ -2422,6 +2482,8 @@
                         state: state,
                         // object representing a single record of an individual
                         noStateChange: noStateChange,
+                        // boolean - did individual have any events? used to present those individuals in a static force layout
+                        coordinates: coordinates,
                     },
                     datum
                 );

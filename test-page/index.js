@@ -1,19 +1,27 @@
-fetch('./data/data_1000.csv')
-//fetch('./data/data_2000_fixed.csv')
+//fetch('./data/data_1000.csv')
+fetch('./data/data_2000_fixed.csv')
 //fetch('./data/data_4000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
+        data.forEach(d => {
+            if (d.event === 'ICU')
+                d.duration = '3';
+        });
+
         const fdg = forceDirectedGraph(
             data,
             '#container',
             {
                 eventChangeCount: ['Hospitalization', 'ICU'],
                 eventChangeCountAesthetic: 'both',
+                //drawStaticSeparately: false,
                 //playPause: 'pause',
-                //speed: 'medium',
+                //speed: 'slow',
+                //speed: 'fast',
                 //duration: 10,
                 //resetDelay: 5000,
+                //modalSpeed: 5000,
                 information: [
                     'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.',
                     'One person dies every 37 seconds in the United States from cardiovascular disease.',

@@ -10,14 +10,26 @@ export default function update() {
 
     // Highlight referenced component.
     switch (true) {
-        case /time progresses/i.test(this.modalText):
+        case /time/i.test(this.modalText):
             emphasizeComponent.call(this, this.containers.progress);
             //emphasizeComponent.call(this, this.focusAnnotations);
             break;
-        case /determines the color/i.test(this.modalText):
+        case /color/i.test(this.modalText):
             emphasizeComponent.call(this, this.containers.legends);
             break;
-        case /use the controls/i.test(this.modalText):
+        case /static/i.test(this.modalText):
+            this.staticForceSimulation.forEach((sfs) => {
+                // Style static bubbles differently than components.
+                emphasizeComponent.call(
+                    this,
+                    sfs.nodes,
+                    'stroke',
+                    'rgba(215,25,28,0)',
+                    'rgba(215,25,28,.5)'
+                );
+            });
+            break;
+        case /controls/i.test(this.modalText):
             emphasizeComponent.call(this, this.containers.controls);
             break;
         default:

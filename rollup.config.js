@@ -33,6 +33,8 @@ export default {
         }),
         nodeResolve(),
         commonjs(),
-        webWorkerLoader(),
+        webWorkerLoader({
+            targetPlatform: 'browser',
+        }),
     ]
 };

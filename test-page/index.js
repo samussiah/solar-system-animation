@@ -1,5 +1,5 @@
-//fetch('./data/data_1000.csv')
-fetch('./data/data_2000_fixed.csv')
+fetch('./data/data_1000.csv')
+//fetch('./data/data_2000_fixed.csv')
 //fetch('./data/data_4000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
@@ -8,6 +8,8 @@ fetch('./data/data_2000_fixed.csv')
             if (d.event === 'ICU')
                 d.duration = '3';
         });
+
+        console.log(JSON.stringify(data));
 
         const fdg = forceDirectedGraph(
             data,

@@ -21,7 +21,7 @@ fetch('./data/data_2000_fixed.csv')
                 //speed: 'fast',
                 //duration: 10,
                 //resetDelay: 5000,
-                //modalSpeed: 5000,
+                modalSpeed: 5000,
                 information: [
                     'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.',
                     'One person dies every 37 seconds in the United States from cardiovascular disease.',

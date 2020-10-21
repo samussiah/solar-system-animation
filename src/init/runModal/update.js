@@ -18,16 +18,14 @@ export default function update() {
             emphasizeComponent.call(this, this.containers.legends);
             break;
         case /static/i.test(this.modalText):
-            this.staticForceSimulation.forEach((sfs) => {
-                // Style static bubbles differently than components.
-                emphasizeComponent.call(
-                    this,
-                    sfs.nodes,
-                    'stroke',
-                    'rgba(215,25,28,0)',
-                    'rgba(215,25,28,.5)'
-                );
-            });
+            // Style static bubbles differently than components.
+            emphasizeComponent.call(
+                this,
+                this.containers.svgBackground.selectAll('circle.fdg-static-circle'),
+                'stroke',
+                'rgba(215,25,28,0)',
+                'rgba(215,25,28,.5)'
+            );
             break;
         case /controls/i.test(this.modalText):
             emphasizeComponent.call(this, this.containers.controls);

@@ -37,6 +37,7 @@ const settings = {
         fast: 100,
     },
     playPause: 'play',
+    pulseOrbits: false,
 
     // dimensions
     width: null, // defined in ./defineMetadata/coordinates
@@ -45,6 +46,7 @@ const settings = {
     nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
     orbitRadius: 150,
     chargeStrength: null, // defined in ./defineMetadata
+    staticLayout: 'circular',
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
     hideControls: false,

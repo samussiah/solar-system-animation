@@ -45,11 +45,14 @@ const settings = {
     padding: 1,
     nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
     orbitRadius: 150,
-    chargeStrength: null, // defined in ./defineMetadata
-    staticLayout: 'circular',
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
     hideControls: false,
+
+    // force simulation settings
+    chargeStrength: null, // defined in ./defineMetadata
+    staticLayout: 'circular',
+    manyBody: 'forceManyBodyReuse', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
 
     // bubble color settings
     colorBy: {

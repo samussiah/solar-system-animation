@@ -1,4 +1,5 @@
 import { forceManyBodyReuse } from 'd3-force-reuse';
+import { forceManyBodySampled } from 'd3-force-sampled';
 import tick from './addForceSimulation/tick';
 
 export default function addForceSimulation(data, x, y) {
@@ -20,7 +21,7 @@ export default function addForceSimulation(data, x, y) {
         .force('x', d3.forceX(x).strength(0.3))
         .force('y', d3.forceY(y).strength(0.3))
         .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
-        //.force('charge', d3.forceManyBodySampled().strength(this.settings.chargeStrength))
+        //.force('charge', forceManyBodySampled().strength(this.settings.chargeStrength*2))
         .on('tick', tick.bind(this));
 
     //if (event.value !== this.settings.eventCentral)

@@ -21,7 +21,7 @@ export default function update() {
             // Style static bubbles differently than components.
             emphasizeComponent.call(
                 this,
-                this.containers.svgBackground.selectAll('circle.fdg-static-circle'),
+                this.containers.svgBackground.selectAll('circle.fdg-static__circle'),
                 'stroke',
                 'rgba(215,25,28,0)',
                 'rgba(215,25,28,.5)'

@@ -19,13 +19,32 @@ export default function addStaticForceSimulation() {
         if (this.settings.colorBy.type === 'categorical') {
             this.metadata.event[0].foci.forEach((focus) => {
                 const data = noStateChange.filter((d) => d.category === focus.key);
-                const worker = simulate.call(this, data);
+
+                // Pass data, coordinates, and color to web worker.
+                const worker = simulate.call(
+                    this,
+                    data,
+                    focus.x,
+                    focus.y,
+                    this.colorScale(focus.key)
+                );
+
+                // Pass web worker to draw function.
                 draw.call(this, worker);
             });
         }
         // Simulate and render force layout for all individuals.
         else {
-            const worker = simulate.call(this, noStateChange);
+            // Pass data, coordinates, and color to web worker.
+            const worker = simulate.call(
+                this,
+                noStateChange,
+                this.settings.orbitRadius / 2,
+                this.settings.height / 2,
+                this.colorScale(0)
+            );
+
+            // Pass web worker to draw function.
             draw.call(this, worker);
         }
     }

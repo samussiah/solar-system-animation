@@ -43,9 +43,6 @@ export default function resize() {
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r);
 
-    // static force simulation
-    addStaticForceSimulation.call(this);
-
     // force simulations
     this.metadata.event.forEach((event) => {
         // Update coordinates of categorical foci.
@@ -66,6 +63,9 @@ export default function resize() {
                     .force('y', d3.forceY(event.y).strength(0.3));
             });
     });
+
+    // static force simulation
+    addStaticForceSimulation.call(this);
 
     // focus annotations
     this.focusAnnotations.attr('transform', (d) => `translate(${d.x},${d.y})`);

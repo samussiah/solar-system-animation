@@ -4,16 +4,19 @@ self.importScripts('https://d3js.org/d3-timer.v2.min.js');
 self.importScripts('https://d3js.org/d3-force.v2.min.js');
 self.importScripts('https://cdn.jsdelivr.net/npm/d3-force-reuse@1.0.1/build/d3-force-reuse.min.js');
 
-onmessage = function(event) {
+onmessage = function (event) {
     const {
-        nodes, layout, radius,
-        x, y, strength, // for standard force layout
-        orbitRadius // for radial force layout
+        nodes, // data
+        layout,
+        strength,
+        orbitRadius, // force simulation settings
+        x,
+        y, // coordinates
+        radius,
+        color, // aesthetics
     } = event.data;
 
-    const simulation = d3
-        .forceSimulation()
-        .nodes(nodes);
+    const simulation = d3.forceSimulation().nodes(nodes);
 
     if (layout === 'circular')
         simulation
@@ -31,10 +34,15 @@ onmessage = function(event) {
     simulation.stop();
 
     // increment simulation manually
-    for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
+    for (
+        var i = 0,
+            n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()));
+        i < n;
+        ++i
+    ) {
         simulation.tick();
     }
 
     // return updated nodes array to be drawn and endered
-    postMessage(nodes);
+    postMessage({ nodes, radius, color });
 };

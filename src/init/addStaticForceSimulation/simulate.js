@@ -1,16 +1,24 @@
 import forceSimulationWorker from 'web-worker:./forceSimulationWorker';
 
-export default function simulate(data) {
+export default function simulate(data, x, y, color) {
     const worker = new forceSimulationWorker();
 
     worker.postMessage({
+        // data
         nodes: data,
+
+        // force simulation settings
         layout: this.settings.staticLayout,
-        radius: this.settings.minRadius,
-        x: this.settings.orbitRadius / 2,
-        y: this.settings.height / 2,
         strength: this.settings.chargeStrength,
         orbitRadius: this.settings.orbitRadius,
+
+        // coordinates
+        x,
+        y,
+
+        // aesthetics
+        radius: this.settings.minRadius,
+        color,
     });
 
     return worker;

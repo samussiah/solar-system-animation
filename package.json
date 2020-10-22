@@ -29,6 +29,7 @@
   "dependencies": {
     "d3": "^5.16.0",
     "d3-force-reuse": "^1.0.1",
+    "d3-force-sampled": "^1.0.0",
     "progressbar.js": "^1.1.0"
   },
   "devDependencies": {
@@ -41,8 +42,9 @@
     "http-server": "^0.12.3",
     "minify": "^5.1.1",
     "prettier": "^2.0.5",
-    "rollup": "^2.18.2",
+    "rollup": "^2.32.0",
     "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-web-worker-loader": "^1.4.0",
     "webpack": "^4.44.1"
   }
 }

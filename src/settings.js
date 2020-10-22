@@ -37,6 +37,7 @@ const settings = {
         fast: 100,
     },
     playPause: 'play',
+    pulseOrbits: false,
 
     // dimensions
     width: null, // defined in ./defineMetadata/coordinates
@@ -44,10 +45,14 @@ const settings = {
     padding: 1,
     nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
     orbitRadius: 150,
-    chargeStrength: null, // defined in ./defineMetadata
     nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
     translate: false,
     hideControls: false,
+
+    // force simulation settings
+    chargeStrength: null, // defined in ./defineMetadata
+    staticLayout: 'circular',
+    manyBody: 'forceManyBodyReuse', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
 
     // bubble color settings
     colorBy: {

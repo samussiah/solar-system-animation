@@ -1,6 +1,7 @@
 import babel from 'rollup-plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 
 const pkg = require('./package.json');
 
@@ -32,5 +33,8 @@ export default {
         }),
         nodeResolve(),
         commonjs(),
+        webWorkerLoader({
+            targetPlatform: 'browser',
+        }),
     ]
 };

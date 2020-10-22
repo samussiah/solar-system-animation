@@ -3,7 +3,9 @@ self.importScripts('https://d3js.org/d3-quadtree.v2.min.js');
 self.importScripts('https://d3js.org/d3-timer.v2.min.js');
 self.importScripts('https://d3js.org/d3-force.v2.min.js');
 //self.importScripts('https://cdn.jsdelivr.net/npm/d3-force-reuse@1.0.1/build/d3-force-reuse.min.js');
-self.importScripts('https://cdn.jsdelivr.net/npm/d3-force-sampled@1.0.0/build/d3-force-sampled.min.js');
+self.importScripts(
+    'https://cdn.jsdelivr.net/npm/d3-force-sampled@1.0.0/build/d3-force-sampled.min.js'
+);
 
 onmessage = function (event) {
     const {

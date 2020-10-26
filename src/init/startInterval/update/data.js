@@ -10,7 +10,9 @@ export default function data() {
     this.data.nested.forEach((d) => {
         // Update individual to next event.
         d.value.statePrevious = d.value.state;
-        const event = this.metadata.event.find((event) => event.value === d.value.state.event);
+        const event = this.metadata.event
+            .find((event) => event.value === d.value.state.event);
+        d.value.coordinates = { x: event.x, y: event.y };
 
         // Calculate Euclidean distance between point and destination.
         d.value.distance = Math.sqrt((event.x - d.x) ** 2 + (event.y - d.y) ** 2);
@@ -27,6 +29,8 @@ export default function data() {
         const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.statePrevious);
         Object.assign(d.value, datum);
     });
+    //console.table(d3.nest().key(d => d.value.state.event).rollup(group => d3.median(group, d => d.y)).entries(this.data.nested));
+    //console.table(d3.nest().key(d => d.value.coordinates.x).rollup(group => group.length).entries(this.data.nested));
 
     // Record change in number of IDs at each focus at current timepoint.
     this.metadata.event.forEach((event) => {

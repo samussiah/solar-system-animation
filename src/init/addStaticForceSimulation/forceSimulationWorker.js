@@ -48,6 +48,6 @@ onmessage = function (event) {
         simulation.tick();
     }
 
-    // return updated nodes array to be drawn and endered
+    // return updated nodes array to be drawn and rendered
     postMessage({ nodes, radius, color });
 };

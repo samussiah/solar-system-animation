@@ -13,6 +13,7 @@ export const increment = function (arg) {
 
     // Resume the force simulation.
     restartForceSimulation.call(this);
+
 };
 
 // Default returns an interval that runs increment() every time unit.

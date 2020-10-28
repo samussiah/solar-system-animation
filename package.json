@@ -1,7 +1,7 @@
 {
-  "TODO": "",
+  "TODO": "move force simulations to web workers",
   "name": "force-directed-graph",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",
   "module": "./src/index.js",
   "main": "./index.js",

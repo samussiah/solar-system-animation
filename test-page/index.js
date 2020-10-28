@@ -1,7 +1,7 @@
-fetch('./data/data_1000.csv')
+//fetch('./data/data_1000.csv')
 //fetch('./data/data_2000_fixed.csv')
 //fetch('./data/data_4000.csv')
-//fetch('./data/data_8000_fixed.csv')
+fetch('./data/data_8000_fixed.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -11,11 +11,16 @@ fetch('./data/data_1000.csv')
             {
                 eventChangeCount: ['Hospitalization', 'ICU'],
                 eventChangeCountAesthetic: 'both',
+                minRadius: 3,
+                fill: true,
+                shape: 'square',
                 //drawStaticSeparately: false,
+                //hideControls: true,
                 //playPause: 'pause',
                 //speed: 'slow',
                 //speed: 'fast',
-                //duration: 10,
+                //duration: 100,
+                //loop: false,
                 //resetDelay: 5000,
                 //modalSpeed: 5000,
                 //information: [

@@ -68,7 +68,10 @@
     function update() {
         var _this = this;
 
-        this.settings.explanation.forEach(function (text) {}); // Define array of modal text.
+        // Update explanation text with appropriate shape.
+        this.settings.explanation = this.settings.explanation.map(function (text) {
+            return text.replace(/bubble/g, _this.settings.shape);
+        }); // Define array of modal text.
 
         this.settings.text = []
             .concat(
@@ -147,6 +150,7 @@
         },
         playPause: 'play',
         pulseOrbits: false,
+        loop: true,
         // dimensions
         width: null,
         // defined in ./defineMetadata/coordinates
@@ -582,8 +586,8 @@
     }
 
     var WorkerFactory = createBase64WorkerFactory(
-        'Lyogcm9sbHVwLXBsdWdpbi13ZWItd29ya2VyLWxvYWRlciAqLwooZnVuY3Rpb24gKCkgewogICAgJ3VzZSBzdHJpY3QnOwoKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1kaXNwYXRjaC52Mi5taW4uanMnKTsKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1xdWFkdHJlZS52Mi5taW4uanMnKTsKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy10aW1lci52Mi5taW4uanMnKTsKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1mb3JjZS52Mi5taW4uanMnKTsgLy9zZWxmLmltcG9ydFNjcmlwdHMoJ2h0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vZDMtZm9yY2UtcmV1c2VAMS4wLjEvYnVpbGQvZDMtZm9yY2UtcmV1c2UubWluLmpzJyk7CgogICAgc2VsZi5pbXBvcnRTY3JpcHRzKCdodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvbnBtL2QzLWZvcmNlLXNhbXBsZWRAMS4wLjAvYnVpbGQvZDMtZm9yY2Utc2FtcGxlZC5taW4uanMnKTsKCiAgICBvbm1lc3NhZ2UgPSBmdW5jdGlvbiBvbm1lc3NhZ2UoZXZlbnQpIHsKICAgICAgdmFyIF9ldmVudCRkYXRhID0gZXZlbnQuZGF0YSwKICAgICAgICAgIG5vZGVzID0gX2V2ZW50JGRhdGEubm9kZXMsCiAgICAgICAgICBsYXlvdXQgPSBfZXZlbnQkZGF0YS5sYXlvdXQsCiAgICAgICAgICBzdHJlbmd0aCA9IF9ldmVudCRkYXRhLnN0cmVuZ3RoLAogICAgICAgICAgb3JiaXRSYWRpdXMgPSBfZXZlbnQkZGF0YS5vcmJpdFJhZGl1cywKICAgICAgICAgIHggPSBfZXZlbnQkZGF0YS54LAogICAgICAgICAgeSA9IF9ldmVudCRkYXRhLnksCiAgICAgICAgICByYWRpdXMgPSBfZXZlbnQkZGF0YS5yYWRpdXMsCiAgICAgICAgICBjb2xvciA9IF9ldmVudCRkYXRhLmNvbG9yOwogICAgICB2YXIgc2ltdWxhdGlvbiA9IGQzLmZvcmNlU2ltdWxhdGlvbigpLm5vZGVzKG5vZGVzKTsKICAgICAgaWYgKGxheW91dCA9PT0gJ2NpcmN1bGFyJykgc2ltdWxhdGlvbi5mb3JjZSgnY29sbGlkZScsIGQzLmZvcmNlQ29sbGlkZSgpLnJhZGl1cyhyYWRpdXMgKyAwLjUpKSAvLyBjb2xsaXNpb24gZGV0ZWN0aW9uCiAgICAgIC8vLmZvcmNlKCdjZW50ZXInLCBkMy5mb3JjZUNlbnRlcih4LCB5KSkgLy8gcG9zaXRpb25pbmcKICAgICAgLy8uZm9yY2UoJ2NoYXJnZScsIGQzLmZvcmNlTWFueUJvZHkoKS5zdHJlbmd0aChzdHJlbmd0aCkpIC8vIGNoYXJnZQogICAgICAvLy5mb3JjZSgnY2hhcmdlJywgZDMuZm9yY2VNYW55Qm9keVJldXNlKCkuc3RyZW5ndGgoc3RyZW5ndGgpKSAvLyBjaGFyZ2UKICAgICAgLmZvcmNlKCdjaGFyZ2UnLCBkMy5mb3JjZU1hbnlCb2R5U2FtcGxlZCgpLnN0cmVuZ3RoKHN0cmVuZ3RoKSkgLy8gY2hhcmdlCiAgICAgIC5mb3JjZSgneCcsIGQzLmZvcmNlWCh4KS5zdHJlbmd0aCgwLjMpKS5mb3JjZSgneScsIGQzLmZvcmNlWSh5KS5zdHJlbmd0aCgwLjMpKTtlbHNlIGlmIChsYXlvdXQgPT09ICdyYWRpYWwnKSBzaW11bGF0aW9uLmZvcmNlKCdjb2xsaWRlJywgZDMuZm9yY2VDb2xsaWRlKCkucmFkaXVzKHJhZGl1cyArIDAuNSkpIC8vIGNvbGxpc2lvbiBkZXRlY3Rpb24KICAgICAgLmZvcmNlKCdyJywgZDMuZm9yY2VSYWRpYWwob3JiaXRSYWRpdXMgLyAyKSk7IC8vIHBvc2l0aW9uaW5nCiAgICAgIC8vIHN0b3Agc2ltdWxhdGlvbgoKICAgICAgc2ltdWxhdGlvbi5zdG9wKCk7IC8vIGluY3JlbWVudCBzaW11bGF0aW9uIG1hbnVhbGx5CgogICAgICBmb3IgKHZhciBpID0gMCwgbiA9IE1hdGguY2VpbChNYXRoLmxvZyhzaW11bGF0aW9uLmFscGhhTWluKCkpIC8gTWF0aC5sb2coMSAtIHNpbXVsYXRpb24uYWxwaGFEZWNheSgpKSk7IGkgPCBuOyArK2kpIHsKICAgICAgICBzaW11bGF0aW9uLnRpY2soKTsKICAgICAgfSAvLyByZXR1cm4gdXBkYXRlZCBub2RlcyBhcnJheSB0byBiZSBkcmF3biBhbmQgZW5kZXJlZAoKCiAgICAgIHBvc3RNZXNzYWdlKHsKICAgICAgICBub2Rlczogbm9kZXMsCiAgICAgICAgcmFkaXVzOiByYWRpdXMsCiAgICAgICAgY29sb3I6IGNvbG9yCiAgICAgIH0pOwogICAgfTsKCn0oKSk7Cgo=',
-        'data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZm9yY2VTaW11bGF0aW9uV29ya2VyLmpzIiwic291cmNlcyI6WyJzcmMvaW5pdC9hZGRTdGF0aWNGb3JjZVNpbXVsYXRpb24vZm9yY2VTaW11bGF0aW9uV29ya2VyLmpzIl0sInNvdXJjZXNDb250ZW50IjpbInNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1kaXNwYXRjaC52Mi5taW4uanMnKTtcclxuc2VsZi5pbXBvcnRTY3JpcHRzKCdodHRwczovL2QzanMub3JnL2QzLXF1YWR0cmVlLnYyLm1pbi5qcycpO1xyXG5zZWxmLmltcG9ydFNjcmlwdHMoJ2h0dHBzOi8vZDNqcy5vcmcvZDMtdGltZXIudjIubWluLmpzJyk7XHJcbnNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1mb3JjZS52Mi5taW4uanMnKTtcclxuLy9zZWxmLmltcG9ydFNjcmlwdHMoJ2h0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vZDMtZm9yY2UtcmV1c2VAMS4wLjEvYnVpbGQvZDMtZm9yY2UtcmV1c2UubWluLmpzJyk7XHJcbnNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L25wbS9kMy1mb3JjZS1zYW1wbGVkQDEuMC4wL2J1aWxkL2QzLWZvcmNlLXNhbXBsZWQubWluLmpzJyk7XHJcblxyXG5vbm1lc3NhZ2UgPSBmdW5jdGlvbiAoZXZlbnQpIHtcclxuICAgIGNvbnN0IHtcclxuICAgICAgICBub2RlcywgLy8gZGF0YVxyXG4gICAgICAgIGxheW91dCxcclxuICAgICAgICBzdHJlbmd0aCxcclxuICAgICAgICBvcmJpdFJhZGl1cywgLy8gZm9yY2Ugc2ltdWxhdGlvbiBzZXR0aW5nc1xyXG4gICAgICAgIHgsXHJcbiAgICAgICAgeSwgLy8gY29vcmRpbmF0ZXNcclxuICAgICAgICByYWRpdXMsXHJcbiAgICAgICAgY29sb3IsIC8vIGFlc3RoZXRpY3NcclxuICAgIH0gPSBldmVudC5kYXRhO1xyXG5cclxuICAgIGNvbnN0IHNpbXVsYXRpb24gPSBkMy5mb3JjZVNpbXVsYXRpb24oKS5ub2Rlcyhub2Rlcyk7XHJcblxyXG4gICAgaWYgKGxheW91dCA9PT0gJ2NpcmN1bGFyJylcclxuICAgICAgICBzaW11bGF0aW9uXHJcbiAgICAgICAgICAgIC5mb3JjZSgnY29sbGlkZScsIGQzLmZvcmNlQ29sbGlkZSgpLnJhZGl1cyhyYWRpdXMgKyAwLjUpKSAvLyBjb2xsaXNpb24gZGV0ZWN0aW9uXHJcbiAgICAgICAgICAgIC8vLmZvcmNlKCdjZW50ZXInLCBkMy5mb3JjZUNlbnRlcih4LCB5KSkgLy8gcG9zaXRpb25pbmdcclxuICAgICAgICAgICAgLy8uZm9yY2UoJ2NoYXJnZScsIGQzLmZvcmNlTWFueUJvZHkoKS5zdHJlbmd0aChzdHJlbmd0aCkpIC8vIGNoYXJnZVxyXG4gICAgICAgICAgICAvLy5mb3JjZSgnY2hhcmdlJywgZDMuZm9yY2VNYW55Qm9keVJldXNlKCkuc3RyZW5ndGgoc3RyZW5ndGgpKSAvLyBjaGFyZ2VcclxuICAgICAgICAgICAgLmZvcmNlKCdjaGFyZ2UnLCBkMy5mb3JjZU1hbnlCb2R5U2FtcGxlZCgpLnN0cmVuZ3RoKHN0cmVuZ3RoKSkgLy8gY2hhcmdlXHJcbiAgICAgICAgICAgIC5mb3JjZSgneCcsIGQzLmZvcmNlWCh4KS5zdHJlbmd0aCgwLjMpKVxyXG4gICAgICAgICAgICAuZm9yY2UoJ3knLCBkMy5mb3JjZVkoeSkuc3RyZW5ndGgoMC4zKSk7XHJcbiAgICBlbHNlIGlmIChsYXlvdXQgPT09ICdyYWRpYWwnKVxyXG4gICAgICAgIHNpbXVsYXRpb25cclxuICAgICAgICAgICAgLmZvcmNlKCdjb2xsaWRlJywgZDMuZm9yY2VDb2xsaWRlKCkucmFkaXVzKHJhZGl1cyArIDAuNSkpIC8vIGNvbGxpc2lvbiBkZXRlY3Rpb25cclxuICAgICAgICAgICAgLmZvcmNlKCdyJywgZDMuZm9yY2VSYWRpYWwob3JiaXRSYWRpdXMgLyAyKSk7IC8vIHBvc2l0aW9uaW5nXHJcblxyXG4gICAgLy8gc3RvcCBzaW11bGF0aW9uXHJcbiAgICBzaW11bGF0aW9uLnN0b3AoKTtcclxuXHJcbiAgICAvLyBpbmNyZW1lbnQgc2ltdWxhdGlvbiBtYW51YWxseVxyXG4gICAgZm9yIChcclxuICAgICAgICB2YXIgaSA9IDAsXHJcbiAgICAgICAgICAgIG4gPSBNYXRoLmNlaWwoTWF0aC5sb2coc2ltdWxhdGlvbi5hbHBoYU1pbigpKSAvIE1hdGgubG9nKDEgLSBzaW11bGF0aW9uLmFscGhhRGVjYXkoKSkpO1xyXG4gICAgICAgIGkgPCBuO1xyXG4gICAgICAgICsraVxyXG4gICAgKSB7XHJcbiAgICAgICAgc2ltdWxhdGlvbi50aWNrKCk7XHJcbiAgICB9XHJcblxyXG4gICAgLy8gcmV0dXJuIHVwZGF0ZWQgbm9kZXMgYXJyYXkgdG8gYmUgZHJhd24gYW5kIGVuZGVyZWRcclxuICAgIHBvc3RNZXNzYWdlKHsgbm9kZXMsIHJhZGl1cywgY29sb3IgfSk7XHJcbn07XHJcbiJdLCJuYW1lcyI6WyJzZWxmIiwiaW1wb3J0U2NyaXB0cyIsIm9ubWVzc2FnZSIsImV2ZW50IiwiZGF0YSIsIm5vZGVzIiwibGF5b3V0Iiwic3RyZW5ndGgiLCJvcmJpdFJhZGl1cyIsIngiLCJ5IiwicmFkaXVzIiwiY29sb3IiLCJzaW11bGF0aW9uIiwiZDMiLCJmb3JjZVNpbXVsYXRpb24iLCJmb3JjZSIsImZvcmNlQ29sbGlkZSIsImZvcmNlTWFueUJvZHlTYW1wbGVkIiwiZm9yY2VYIiwiZm9yY2VZIiwiZm9yY2VSYWRpYWwiLCJzdG9wIiwiaSIsIm4iLCJNYXRoIiwiY2VpbCIsImxvZyIsImFscGhhTWluIiwiYWxwaGFEZWNheSIsInRpY2siLCJwb3N0TWVzc2FnZSJdLCJtYXBwaW5ncyI6Ijs7O0lBQUFBLElBQUksQ0FBQ0MsYUFBTCxDQUFtQix3Q0FBbkI7SUFDQUQsSUFBSSxDQUFDQyxhQUFMLENBQW1CLHdDQUFuQjtJQUNBRCxJQUFJLENBQUNDLGFBQUwsQ0FBbUIscUNBQW5CO0lBQ0FELElBQUksQ0FBQ0MsYUFBTCxDQUFtQixxQ0FBbkI7O0lBRUFELElBQUksQ0FBQ0MsYUFBTCxDQUFtQixtRkFBbkI7O0lBRUFDLFNBQVMsR0FBRyxtQkFBVUMsS0FBVixFQUFpQjtJQUFBLG9CQVVyQkEsS0FBSyxDQUFDQyxJQVZlO0lBQUEsTUFFckJDLEtBRnFCLGVBRXJCQSxLQUZxQjtJQUFBLE1BR3JCQyxNQUhxQixlQUdyQkEsTUFIcUI7SUFBQSxNQUlyQkMsUUFKcUIsZUFJckJBLFFBSnFCO0lBQUEsTUFLckJDLFdBTHFCLGVBS3JCQSxXQUxxQjtJQUFBLE1BTXJCQyxDQU5xQixlQU1yQkEsQ0FOcUI7SUFBQSxNQU9yQkMsQ0FQcUIsZUFPckJBLENBUHFCO0lBQUEsTUFRckJDLE1BUnFCLGVBUXJCQSxNQVJxQjtJQUFBLE1BU3JCQyxLQVRxQixlQVNyQkEsS0FUcUI7SUFZekIsTUFBTUMsVUFBVSxHQUFHQyxFQUFFLENBQUNDLGVBQUgsR0FBcUJWLEtBQXJCLENBQTJCQSxLQUEzQixDQUFuQjtJQUVBLE1BQUlDLE1BQU0sS0FBSyxVQUFmLEVBQ0lPLFVBQVUsQ0FDTEcsS0FETCxDQUNXLFNBRFgsRUFDc0JGLEVBQUUsQ0FBQ0csWUFBSCxHQUFrQk4sTUFBbEIsQ0FBeUJBLE1BQU0sR0FBRyxHQUFsQyxDQUR0QjtJQUVJO0lBQ0E7SUFDQTtJQUpKLEdBS0tLLEtBTEwsQ0FLVyxRQUxYLEVBS3FCRixFQUFFLENBQUNJLG9CQUFILEdBQTBCWCxRQUExQixDQUFtQ0EsUUFBbkMsQ0FMckI7SUFBQSxHQU1LUyxLQU5MLENBTVcsR0FOWCxFQU1nQkYsRUFBRSxDQUFDSyxNQUFILENBQVVWLENBQVYsRUFBYUYsUUFBYixDQUFzQixHQUF0QixDQU5oQixFQU9LUyxLQVBMLENBT1csR0FQWCxFQU9nQkYsRUFBRSxDQUFDTSxNQUFILENBQVVWLENBQVYsRUFBYUgsUUFBYixDQUFzQixHQUF0QixDQVBoQixFQURKLEtBU0ssSUFBSUQsTUFBTSxLQUFLLFFBQWYsRUFDRE8sVUFBVSxDQUNMRyxLQURMLENBQ1csU0FEWCxFQUNzQkYsRUFBRSxDQUFDRyxZQUFILEdBQWtCTixNQUFsQixDQUF5QkEsTUFBTSxHQUFHLEdBQWxDLENBRHRCO0lBQUEsR0FFS0ssS0FGTCxDQUVXLEdBRlgsRUFFZ0JGLEVBQUUsQ0FBQ08sV0FBSCxDQUFlYixXQUFXLEdBQUcsQ0FBN0IsQ0FGaEIsRUF4QnFCO0lBNEJ6Qjs7SUFDQUssRUFBQUEsVUFBVSxDQUFDUyxJQUFYLEdBN0J5Qjs7SUFnQ3pCLE9BQ0ksSUFBSUMsQ0FBQyxHQUFHLENBQVIsRUFDSUMsQ0FBQyxHQUFHQyxJQUFJLENBQUNDLElBQUwsQ0FBVUQsSUFBSSxDQUFDRSxHQUFMLENBQVNkLFVBQVUsQ0FBQ2UsUUFBWCxFQUFULElBQWtDSCxJQUFJLENBQUNFLEdBQUwsQ0FBUyxJQUFJZCxVQUFVLENBQUNnQixVQUFYLEVBQWIsQ0FBNUMsQ0FGWixFQUdJTixDQUFDLEdBQUdDLENBSFIsRUFJSSxFQUFFRCxDQUpOLEVBS0U7SUFDRVYsSUFBQUEsVUFBVSxDQUFDaUIsSUFBWDtJQUNILEdBdkN3Qjs7O0lBMEN6QkMsRUFBQUEsV0FBVyxDQUFDO0lBQUUxQixJQUFBQSxLQUFLLEVBQUxBLEtBQUY7SUFBU00sSUFBQUEsTUFBTSxFQUFOQSxNQUFUO0lBQWlCQyxJQUFBQSxLQUFLLEVBQUxBO0lBQWpCLEdBQUQsQ0FBWDtJQUNILENBM0NEOzs7Ozs7In0=',
+        'Lyogcm9sbHVwLXBsdWdpbi13ZWItd29ya2VyLWxvYWRlciAqLwooZnVuY3Rpb24gKCkgewogICAgJ3VzZSBzdHJpY3QnOwoKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1kaXNwYXRjaC52Mi5taW4uanMnKTsKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1xdWFkdHJlZS52Mi5taW4uanMnKTsKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy10aW1lci52Mi5taW4uanMnKTsKICAgIHNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1mb3JjZS52Mi5taW4uanMnKTsgLy9zZWxmLmltcG9ydFNjcmlwdHMoJ2h0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vZDMtZm9yY2UtcmV1c2VAMS4wLjEvYnVpbGQvZDMtZm9yY2UtcmV1c2UubWluLmpzJyk7CgogICAgc2VsZi5pbXBvcnRTY3JpcHRzKCdodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvbnBtL2QzLWZvcmNlLXNhbXBsZWRAMS4wLjAvYnVpbGQvZDMtZm9yY2Utc2FtcGxlZC5taW4uanMnKTsKCiAgICBvbm1lc3NhZ2UgPSBmdW5jdGlvbiBvbm1lc3NhZ2UoZXZlbnQpIHsKICAgICAgdmFyIF9ldmVudCRkYXRhID0gZXZlbnQuZGF0YSwKICAgICAgICAgIG5vZGVzID0gX2V2ZW50JGRhdGEubm9kZXMsCiAgICAgICAgICBsYXlvdXQgPSBfZXZlbnQkZGF0YS5sYXlvdXQsCiAgICAgICAgICBzdHJlbmd0aCA9IF9ldmVudCRkYXRhLnN0cmVuZ3RoLAogICAgICAgICAgb3JiaXRSYWRpdXMgPSBfZXZlbnQkZGF0YS5vcmJpdFJhZGl1cywKICAgICAgICAgIHggPSBfZXZlbnQkZGF0YS54LAogICAgICAgICAgeSA9IF9ldmVudCRkYXRhLnksCiAgICAgICAgICByYWRpdXMgPSBfZXZlbnQkZGF0YS5yYWRpdXMsCiAgICAgICAgICBjb2xvciA9IF9ldmVudCRkYXRhLmNvbG9yOwogICAgICB2YXIgc2ltdWxhdGlvbiA9IGQzLmZvcmNlU2ltdWxhdGlvbigpLm5vZGVzKG5vZGVzKTsKICAgICAgaWYgKGxheW91dCA9PT0gJ2NpcmN1bGFyJykgc2ltdWxhdGlvbi5mb3JjZSgnY29sbGlkZScsIGQzLmZvcmNlQ29sbGlkZSgpLnJhZGl1cyhyYWRpdXMgKyAwLjUpKSAvLyBjb2xsaXNpb24gZGV0ZWN0aW9uCiAgICAgIC8vLmZvcmNlKCdjaGFyZ2UnLCBkMy5mb3JjZU1hbnlCb2R5KCkuc3RyZW5ndGgoc3RyZW5ndGgpKSAvLyBjaGFyZ2UKICAgICAgLy8uZm9yY2UoJ2NoYXJnZScsIGQzLmZvcmNlTWFueUJvZHlSZXVzZSgpLnN0cmVuZ3RoKHN0cmVuZ3RoKSkgLy8gY2hhcmdlCiAgICAgIC5mb3JjZSgnY2hhcmdlJywgZDMuZm9yY2VNYW55Qm9keVNhbXBsZWQoKS5zdHJlbmd0aChzdHJlbmd0aCkpIC8vIGNoYXJnZQogICAgICAuZm9yY2UoJ3gnLCBkMy5mb3JjZVgoeCkuc3RyZW5ndGgoMC4zKSkuZm9yY2UoJ3knLCBkMy5mb3JjZVkoeSkuc3RyZW5ndGgoMC4zKSk7ZWxzZSBpZiAobGF5b3V0ID09PSAncmFkaWFsJykgc2ltdWxhdGlvbi5mb3JjZSgnY29sbGlkZScsIGQzLmZvcmNlQ29sbGlkZSgpLnJhZGl1cyhyYWRpdXMgKyAwLjUpKSAvLyBjb2xsaXNpb24gZGV0ZWN0aW9uCiAgICAgIC5mb3JjZSgncicsIGQzLmZvcmNlUmFkaWFsKG9yYml0UmFkaXVzIC8gMikpOyAvLyBwb3NpdGlvbmluZwogICAgICAvLyBzdG9wIHNpbXVsYXRpb24KCiAgICAgIHNpbXVsYXRpb24uc3RvcCgpOyAvLyBpbmNyZW1lbnQgc2ltdWxhdGlvbiBtYW51YWxseQoKICAgICAgZm9yICh2YXIgaSA9IDAsIG4gPSBNYXRoLmNlaWwoTWF0aC5sb2coc2ltdWxhdGlvbi5hbHBoYU1pbigpKSAvIE1hdGgubG9nKDEgLSBzaW11bGF0aW9uLmFscGhhRGVjYXkoKSkpOyBpIDwgbjsgKytpKSB7CiAgICAgICAgc2ltdWxhdGlvbi50aWNrKCk7CiAgICAgIH0gLy8gcmV0dXJuIHVwZGF0ZWQgbm9kZXMgYXJyYXkgdG8gYmUgZHJhd24gYW5kIHJlbmRlcmVkCgoKICAgICAgcG9zdE1lc3NhZ2UoewogICAgICAgIG5vZGVzOiBub2RlcywKICAgICAgICByYWRpdXM6IHJhZGl1cywKICAgICAgICBjb2xvcjogY29sb3IKICAgICAgfSk7CiAgICB9OwoKfSgpKTsKCg==',
+        'data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZm9yY2VTaW11bGF0aW9uV29ya2VyLmpzIiwic291cmNlcyI6WyJzcmMvaW5pdC9hZGRTdGF0aWNGb3JjZVNpbXVsYXRpb24vZm9yY2VTaW11bGF0aW9uV29ya2VyLmpzIl0sInNvdXJjZXNDb250ZW50IjpbInNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1kaXNwYXRjaC52Mi5taW4uanMnKTtcclxuc2VsZi5pbXBvcnRTY3JpcHRzKCdodHRwczovL2QzanMub3JnL2QzLXF1YWR0cmVlLnYyLm1pbi5qcycpO1xyXG5zZWxmLmltcG9ydFNjcmlwdHMoJ2h0dHBzOi8vZDNqcy5vcmcvZDMtdGltZXIudjIubWluLmpzJyk7XHJcbnNlbGYuaW1wb3J0U2NyaXB0cygnaHR0cHM6Ly9kM2pzLm9yZy9kMy1mb3JjZS52Mi5taW4uanMnKTtcclxuLy9zZWxmLmltcG9ydFNjcmlwdHMoJ2h0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vZDMtZm9yY2UtcmV1c2VAMS4wLjEvYnVpbGQvZDMtZm9yY2UtcmV1c2UubWluLmpzJyk7XHJcbnNlbGYuaW1wb3J0U2NyaXB0cyhcclxuICAgICdodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvbnBtL2QzLWZvcmNlLXNhbXBsZWRAMS4wLjAvYnVpbGQvZDMtZm9yY2Utc2FtcGxlZC5taW4uanMnXHJcbik7XHJcblxyXG5vbm1lc3NhZ2UgPSBmdW5jdGlvbiAoZXZlbnQpIHtcclxuICAgIGNvbnN0IHtcclxuICAgICAgICBub2RlcywgLy8gZGF0YVxyXG4gICAgICAgIGxheW91dCxcclxuICAgICAgICBzdHJlbmd0aCxcclxuICAgICAgICBvcmJpdFJhZGl1cywgLy8gZm9yY2Ugc2ltdWxhdGlvbiBzZXR0aW5nc1xyXG4gICAgICAgIHgsXHJcbiAgICAgICAgeSwgLy8gY29vcmRpbmF0ZXNcclxuICAgICAgICByYWRpdXMsXHJcbiAgICAgICAgY29sb3IsIC8vIGFlc3RoZXRpY3NcclxuICAgIH0gPSBldmVudC5kYXRhO1xyXG5cclxuICAgIGNvbnN0IHNpbXVsYXRpb24gPSBkMy5mb3JjZVNpbXVsYXRpb24oKS5ub2Rlcyhub2Rlcyk7XHJcblxyXG4gICAgaWYgKGxheW91dCA9PT0gJ2NpcmN1bGFyJylcclxuICAgICAgICBzaW11bGF0aW9uXHJcbiAgICAgICAgICAgIC5mb3JjZSgnY29sbGlkZScsIGQzLmZvcmNlQ29sbGlkZSgpLnJhZGl1cyhyYWRpdXMgKyAwLjUpKSAvLyBjb2xsaXNpb24gZGV0ZWN0aW9uXHJcbiAgICAgICAgICAgIC8vLmZvcmNlKCdjaGFyZ2UnLCBkMy5mb3JjZU1hbnlCb2R5KCkuc3RyZW5ndGgoc3RyZW5ndGgpKSAvLyBjaGFyZ2VcclxuICAgICAgICAgICAgLy8uZm9yY2UoJ2NoYXJnZScsIGQzLmZvcmNlTWFueUJvZHlSZXVzZSgpLnN0cmVuZ3RoKHN0cmVuZ3RoKSkgLy8gY2hhcmdlXHJcbiAgICAgICAgICAgIC5mb3JjZSgnY2hhcmdlJywgZDMuZm9yY2VNYW55Qm9keVNhbXBsZWQoKS5zdHJlbmd0aChzdHJlbmd0aCkpIC8vIGNoYXJnZVxyXG4gICAgICAgICAgICAuZm9yY2UoJ3gnLCBkMy5mb3JjZVgoeCkuc3RyZW5ndGgoMC4zKSlcclxuICAgICAgICAgICAgLmZvcmNlKCd5JywgZDMuZm9yY2VZKHkpLnN0cmVuZ3RoKDAuMykpO1xyXG4gICAgZWxzZSBpZiAobGF5b3V0ID09PSAncmFkaWFsJylcclxuICAgICAgICBzaW11bGF0aW9uXHJcbiAgICAgICAgICAgIC5mb3JjZSgnY29sbGlkZScsIGQzLmZvcmNlQ29sbGlkZSgpLnJhZGl1cyhyYWRpdXMgKyAwLjUpKSAvLyBjb2xsaXNpb24gZGV0ZWN0aW9uXHJcbiAgICAgICAgICAgIC5mb3JjZSgncicsIGQzLmZvcmNlUmFkaWFsKG9yYml0UmFkaXVzIC8gMikpOyAvLyBwb3NpdGlvbmluZ1xyXG5cclxuICAgIC8vIHN0b3Agc2ltdWxhdGlvblxyXG4gICAgc2ltdWxhdGlvbi5zdG9wKCk7XHJcblxyXG4gICAgLy8gaW5jcmVtZW50IHNpbXVsYXRpb24gbWFudWFsbHlcclxuICAgIGZvciAoXHJcbiAgICAgICAgdmFyIGkgPSAwLFxyXG4gICAgICAgICAgICBuID0gTWF0aC5jZWlsKE1hdGgubG9nKHNpbXVsYXRpb24uYWxwaGFNaW4oKSkgLyBNYXRoLmxvZygxIC0gc2ltdWxhdGlvbi5hbHBoYURlY2F5KCkpKTtcclxuICAgICAgICBpIDwgbjtcclxuICAgICAgICArK2lcclxuICAgICkge1xyXG4gICAgICAgIHNpbXVsYXRpb24udGljaygpO1xyXG4gICAgfVxyXG5cclxuICAgIC8vIHJldHVybiB1cGRhdGVkIG5vZGVzIGFycmF5IHRvIGJlIGRyYXduIGFuZCByZW5kZXJlZFxyXG4gICAgcG9zdE1lc3NhZ2UoeyBub2RlcywgcmFkaXVzLCBjb2xvciB9KTtcclxufTtcclxuIl0sIm5hbWVzIjpbInNlbGYiLCJpbXBvcnRTY3JpcHRzIiwib25tZXNzYWdlIiwiZXZlbnQiLCJkYXRhIiwibm9kZXMiLCJsYXlvdXQiLCJzdHJlbmd0aCIsIm9yYml0UmFkaXVzIiwieCIsInkiLCJyYWRpdXMiLCJjb2xvciIsInNpbXVsYXRpb24iLCJkMyIsImZvcmNlU2ltdWxhdGlvbiIsImZvcmNlIiwiZm9yY2VDb2xsaWRlIiwiZm9yY2VNYW55Qm9keVNhbXBsZWQiLCJmb3JjZVgiLCJmb3JjZVkiLCJmb3JjZVJhZGlhbCIsInN0b3AiLCJpIiwibiIsIk1hdGgiLCJjZWlsIiwibG9nIiwiYWxwaGFNaW4iLCJhbHBoYURlY2F5IiwidGljayIsInBvc3RNZXNzYWdlIl0sIm1hcHBpbmdzIjoiOzs7SUFBQUEsSUFBSSxDQUFDQyxhQUFMLENBQW1CLHdDQUFuQjtJQUNBRCxJQUFJLENBQUNDLGFBQUwsQ0FBbUIsd0NBQW5CO0lBQ0FELElBQUksQ0FBQ0MsYUFBTCxDQUFtQixxQ0FBbkI7SUFDQUQsSUFBSSxDQUFDQyxhQUFMLENBQW1CLHFDQUFuQjs7SUFFQUQsSUFBSSxDQUFDQyxhQUFMLENBQ0ksbUZBREo7O0lBSUFDLFNBQVMsR0FBRyxtQkFBVUMsS0FBVixFQUFpQjtJQUFBLG9CQVVyQkEsS0FBSyxDQUFDQyxJQVZlO0lBQUEsTUFFckJDLEtBRnFCLGVBRXJCQSxLQUZxQjtJQUFBLE1BR3JCQyxNQUhxQixlQUdyQkEsTUFIcUI7SUFBQSxNQUlyQkMsUUFKcUIsZUFJckJBLFFBSnFCO0lBQUEsTUFLckJDLFdBTHFCLGVBS3JCQSxXQUxxQjtJQUFBLE1BTXJCQyxDQU5xQixlQU1yQkEsQ0FOcUI7SUFBQSxNQU9yQkMsQ0FQcUIsZUFPckJBLENBUHFCO0lBQUEsTUFRckJDLE1BUnFCLGVBUXJCQSxNQVJxQjtJQUFBLE1BU3JCQyxLQVRxQixlQVNyQkEsS0FUcUI7SUFZekIsTUFBTUMsVUFBVSxHQUFHQyxFQUFFLENBQUNDLGVBQUgsR0FBcUJWLEtBQXJCLENBQTJCQSxLQUEzQixDQUFuQjtJQUVBLE1BQUlDLE1BQU0sS0FBSyxVQUFmLEVBQ0lPLFVBQVUsQ0FDTEcsS0FETCxDQUNXLFNBRFgsRUFDc0JGLEVBQUUsQ0FBQ0csWUFBSCxHQUFrQk4sTUFBbEIsQ0FBeUJBLE1BQU0sR0FBRyxHQUFsQyxDQUR0QjtJQUVJO0lBQ0E7SUFISixHQUlLSyxLQUpMLENBSVcsUUFKWCxFQUlxQkYsRUFBRSxDQUFDSSxvQkFBSCxHQUEwQlgsUUFBMUIsQ0FBbUNBLFFBQW5DLENBSnJCO0lBQUEsR0FLS1MsS0FMTCxDQUtXLEdBTFgsRUFLZ0JGLEVBQUUsQ0FBQ0ssTUFBSCxDQUFVVixDQUFWLEVBQWFGLFFBQWIsQ0FBc0IsR0FBdEIsQ0FMaEIsRUFNS1MsS0FOTCxDQU1XLEdBTlgsRUFNZ0JGLEVBQUUsQ0FBQ00sTUFBSCxDQUFVVixDQUFWLEVBQWFILFFBQWIsQ0FBc0IsR0FBdEIsQ0FOaEIsRUFESixLQVFLLElBQUlELE1BQU0sS0FBSyxRQUFmLEVBQ0RPLFVBQVUsQ0FDTEcsS0FETCxDQUNXLFNBRFgsRUFDc0JGLEVBQUUsQ0FBQ0csWUFBSCxHQUFrQk4sTUFBbEIsQ0FBeUJBLE1BQU0sR0FBRyxHQUFsQyxDQUR0QjtJQUFBLEdBRUtLLEtBRkwsQ0FFVyxHQUZYLEVBRWdCRixFQUFFLENBQUNPLFdBQUgsQ0FBZWIsV0FBVyxHQUFHLENBQTdCLENBRmhCLEVBdkJxQjtJQTJCekI7O0lBQ0FLLEVBQUFBLFVBQVUsQ0FBQ1MsSUFBWCxHQTVCeUI7O0lBK0J6QixPQUNJLElBQUlDLENBQUMsR0FBRyxDQUFSLEVBQ0lDLENBQUMsR0FBR0MsSUFBSSxDQUFDQyxJQUFMLENBQVVELElBQUksQ0FBQ0UsR0FBTCxDQUFTZCxVQUFVLENBQUNlLFFBQVgsRUFBVCxJQUFrQ0gsSUFBSSxDQUFDRSxHQUFMLENBQVMsSUFBSWQsVUFBVSxDQUFDZ0IsVUFBWCxFQUFiLENBQTVDLENBRlosRUFHSU4sQ0FBQyxHQUFHQyxDQUhSLEVBSUksRUFBRUQsQ0FKTixFQUtFO0lBQ0VWLElBQUFBLFVBQVUsQ0FBQ2lCLElBQVg7SUFDSCxHQXRDd0I7OztJQXlDekJDLEVBQUFBLFdBQVcsQ0FBQztJQUFFMUIsSUFBQUEsS0FBSyxFQUFMQSxLQUFGO0lBQVNNLElBQUFBLE1BQU0sRUFBTkEsTUFBVDtJQUFpQkMsSUFBQUEsS0FBSyxFQUFMQTtJQUFqQixHQUFELENBQVg7SUFDSCxDQTFDRDs7Ozs7OyJ9',
         false
     );
     /* eslint-enable */
@@ -624,21 +628,32 @@
                         .concat(main.settings.orbitRadius / 2, ',')
                         .concat(main.settings.height / 2, ')')
                 );
-            var circles = g
-                .selectAll('.fdg-static__circle')
+            var marks = g
+                .selectAll('.fdg-static__mark')
                 .data(event.data.nodes)
-                .enter()
-                .append('circle')
-                .classed('fdg-static__circle', true)
-                .attr('cx', function (d) {
-                    return d.x;
-                })
-                .attr('cy', function (d) {
-                    return d.y;
-                })
-                .attr('r', event.data.radius)
+                .join(main.settings.shape === 'circle' ? 'circle' : 'rect')
+                .classed('fdg-static__mark', true)
                 .attr('fill', event.data.color)
                 .attr('fill-opacity', 0.25);
+            if (main.settings.shape === 'circle')
+                marks
+                    .attr('cx', function (d) {
+                        return d.x;
+                    })
+                    .attr('cy', function (d) {
+                        return d.y;
+                    })
+                    .attr('r', event.data.radius);
+            else
+                marks
+                    .attr('x', function (d) {
+                        return d.x - event.data.radius;
+                    })
+                    .attr('y', function (d) {
+                        return d.y - event.data.radius;
+                    })
+                    .attr('width', event.data.radius * 2)
+                    .attr('height', event.data.radius * 2);
         };
     }
 
@@ -691,9 +706,157 @@
         }
     }
 
-    function resize() {
+    function getState(group, index) {
         var _this = this;
 
+        var state =
+            index !== undefined
+                ? group[index]
+                : group.find(function (d, i) {
+                      return (
+                          (d.start_timepoint <= _this.settings.timepoint &&
+                              _this.settings.timepoint <= d.end_timepoint) ||
+                          i === group.length - 1
+                      );
+                  });
+        return state;
+    }
+
+    function countStateChanges(group) {
+        var _this = this;
+
+        var nStateChanges = group
+            .filter(function (d) {
+                return d.start_timepoint <= _this.settings.timepoint;
+            })
+            .sort(function (a, b) {
+                return a.start_timepoint - b.start_timepoint;
+            })
+            .filter(function (d, i, data) {
+                var eventPrevious = data[i - 1] ? data[i - 1].event : null;
+                return (
+                    !_this.settings.eventChangeCount.includes(eventPrevious) &&
+                    _this.settings.eventChangeCount.includes(d.event)
+                );
+            }).length;
+        return nStateChanges;
+    }
+
+    function defineRadius(stateChanges) {
+        var r =
+            this.settings.eventChangeCountAesthetic !== 'color'
+                ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
+                : this.settings.minRadius;
+        return r;
+    }
+
+    function defineColor(value) {
+        var color =
+            this.settings.colorBy.type !== 'frequency' ||
+            this.settings.eventChangeCountAesthetic !== 'size'
+                ? d3.rgb(this.colorScale(value)).toString()
+                : 'rgb(170,170,170)';
+        var fill = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+        var stroke = color.replace('rgb', 'rgba').replace(')', ', 1)');
+        return {
+            color: color,
+            fill: fill,
+            stroke: stroke,
+        };
+    }
+
+    function defineDatum(group, state, statePrevious) {
+        // Count state changes.
+        var nStateChanges = countStateChanges.call(this, group, statePrevious); // Count state changes.
+
+        var aesthetic =
+            this.settings.colorBy.type === 'frequency'
+                ? nStateChanges
+                : state[this.settings.colorBy.variable]; // Define radius.
+
+        var r = defineRadius.call(this, nStateChanges); // Define color.
+
+        var color = defineColor.call(this, aesthetic);
+        return _objectSpread2(
+            {
+                nStateChanges: nStateChanges,
+                // number of state changes the indivdual has experienced a thus far
+                aesthetic: aesthetic,
+                // value that controls color
+                r: r,
+            },
+            color
+        );
+    }
+    /*
+        // Define radius input.
+        const rInput = this.settings.
+
+        // Define radius.
+        const r = defineRadius.call(this, rInput);
+
+        // Define color input.
+        const colorInput =
+            this.settings.colorBy.type === 'frequency'
+                ? nStateChanges
+                : state[this.settings.colorBy.variable];
+
+        // Define color.
+        const color = defineColor.call(this, colorInput);
+    */
+
+    function data() {
+        var _this = this;
+
+        // Count the number of individuals at each focus at previous timepoint.
+        this.metadata.event.forEach(function (event) {
+            event.prevCount = event.count;
+        });
+        this.data.nested.forEach(function (d) {
+            // Update individual to next event.
+            d.value.statePrevious = d.value.state;
+
+            var event = _this.metadata.event.find(function (event) {
+                return event.value === d.value.state.event;
+            });
+
+            d.value.coordinates = {
+                x: event.x,
+                y: event.y,
+            }; // Calculate Euclidean distance between point and destination.
+
+            d.value.distance = Math.sqrt(Math.pow(event.x - d.x, 2) + Math.pow(event.y - d.y, 2)); // calculate the Euclidean distance between a bubble and its destination and only until
+            // that distance is below a certain threshold is the bubble allowed to progress to the next
+            // destination.
+            // Ensure point reaches a minimum distance from destination
+            // before moving to next destination.
+
+            if (d.value.distance < _this.settings.orbitRadius / 4)
+                d.value.state = getState.call(_this, d.value.group);
+            var datum = defineDatum.call(
+                _this,
+                d.value.group,
+                d.value.state,
+                d.value.statePrevious
+            );
+            Object.assign(d.value, datum);
+        }); //console.table(d3.nest().key(d => d.value.state.event).rollup(group => d3.median(group, d => d.y)).entries(this.data.nested));
+        //console.table(d3.nest().key(d => d.value.coordinates.x).rollup(group => group.length).entries(this.data.nested));
+        // Record change in number of IDs at each focus at current timepoint.
+
+        this.metadata.event.forEach(function (event) {
+            event.data = _this.data.nested.filter(function (d, i) {
+                return d.value.state.event === event.value;
+            });
+            event.count = event.data.length;
+            event.cumulative = _this.data.filter(function (d) {
+                return d.event === event.value && d.start_timepoint <= _this.settings.timepoint;
+            }).length;
+            event.change = event.count - event.prevCount;
+        });
+    }
+
+    function resize() {
         var node = this.containers.animation.node();
         this.settings.width = node.clientWidth;
         this.settings.height = this.containers.animation.node().clientHeight; // stopwatch
@@ -738,26 +901,47 @@
             .attr('r', function (d) {
                 return d.r;
             }); // force simulations
+        //this.metadata.event.forEach((event) => {
+        //    // Update coordinates of categorical foci.
+        //    if (this.settings.colorBy.type === 'categorical')
+        //        event.foci.forEach((focus, i) => {
+        //            focus.x = event.x + 50 * Math.cos(i * this.settings.colorBy.theta);
+        //            focus.y = event.y + 50 * Math.sin(i * this.settings.colorBy.theta);
+        //            const forceSimulation = event.forceSimulation.find(
+        //                (forceSimulation) => forceSimulation.category === focus.key
+        //            );
+        //            forceSimulation.force('x', d3.forceX(focus.x).strength(0.3));
+        //            forceSimulation.force('y', d3.forceY(focus.y).strength(0.3));
+        //        });
+        //    else
+        //        event.forceSimulation.forEach((forceSimulation) => {
+        //            forceSimulation
+        //                .force('x', d3.forceX(event.x).strength(0.3))
+        //                .force('y', d3.forceY(event.y).strength(0.3));
+        //        });
+        //});
+        // Update the node data.
 
-        this.metadata.event.forEach(function (event) {
-            // Update coordinates of categorical foci.
-            if (_this.settings.colorBy.type === 'categorical')
-                event.foci.forEach(function (focus, i) {
-                    focus.x = event.x + 50 * Math.cos(i * _this.settings.colorBy.theta);
-                    focus.y = event.y + 50 * Math.sin(i * _this.settings.colorBy.theta);
-                    var forceSimulation = event.forceSimulation.find(function (forceSimulation) {
-                        return forceSimulation.category === focus.key;
-                    });
-                    forceSimulation.force('x', d3.forceX(focus.x).strength(0.3));
-                    forceSimulation.force('y', d3.forceY(focus.y).strength(0.3));
-                });
-            else
-                event.forceSimulation.forEach(function (forceSimulation) {
-                    forceSimulation
-                        .force('x', d3.forceX(event.x).strength(0.3))
-                        .force('y', d3.forceY(event.y).strength(0.3));
-                });
-        }); // static force simulation
+        data.call(this);
+        this.forceSimulation
+            .force(
+                'x',
+                d3
+                    .forceX()
+                    .x(function (d) {
+                        return d.value.coordinates.x;
+                    })
+                    .strength(0.3)
+            )
+            .force(
+                'y',
+                d3
+                    .forceY()
+                    .y(function (d) {
+                        return d.value.coordinates.y;
+                    })
+                    .strength(0.3)
+            ); // static force simulation
 
         addStaticForceSimulation.call(this); // focus annotations
 
@@ -996,149 +1180,6 @@
         return metadata;
     }
 
-    function getState(group, index) {
-        var _this = this;
-
-        var state =
-            index !== undefined
-                ? group[index]
-                : group.find(function (d, i) {
-                      return (
-                          (d.start_timepoint <= _this.settings.timepoint &&
-                              _this.settings.timepoint <= d.end_timepoint) ||
-                          i === group.length - 1
-                      );
-                  });
-        return state;
-    }
-
-    function countStateChanges(group) {
-        var _this = this;
-
-        var nStateChanges = group
-            .filter(function (d) {
-                return d.start_timepoint <= _this.settings.timepoint;
-            })
-            .sort(function (a, b) {
-                return a.start_timepoint - b.start_timepoint;
-            })
-            .filter(function (d, i, data) {
-                var eventPrevious = data[i - 1] ? data[i - 1].event : null;
-                return (
-                    !_this.settings.eventChangeCount.includes(eventPrevious) &&
-                    _this.settings.eventChangeCount.includes(d.event)
-                );
-            }).length;
-        return nStateChanges;
-    }
-
-    function defineRadius(stateChanges) {
-        var r =
-            this.settings.eventChangeCountAesthetic !== 'color'
-                ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
-                : this.settings.minRadius;
-        return r;
-    }
-
-    function defineColor(value) {
-        var color =
-            this.settings.colorBy.type !== 'frequency' ||
-            this.settings.eventChangeCountAesthetic !== 'size'
-                ? d3.rgb(this.colorScale(value)).toString()
-                : 'rgb(170,170,170)';
-        var fill = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
-        var stroke = color.replace('rgb', 'rgba').replace(')', ', 1)');
-        return {
-            color: color,
-            fill: fill,
-            stroke: stroke,
-        };
-    }
-
-    function defineDatum(group, state, statePrevious) {
-        // Count state changes.
-        var nStateChanges = countStateChanges.call(this, group, statePrevious); // Count state changes.
-
-        var aesthetic =
-            this.settings.colorBy.type === 'frequency'
-                ? nStateChanges
-                : state[this.settings.colorBy.variable]; // Define radius.
-
-        var r = defineRadius.call(this, nStateChanges); // Define color.
-
-        var color = defineColor.call(this, aesthetic);
-        return _objectSpread2(
-            {
-                nStateChanges: nStateChanges,
-                // number of state changes the indivdual has experienced a thus far
-                aesthetic: aesthetic,
-                // value that controls color
-                r: r,
-            },
-            color
-        );
-    }
-    /*
-        // Define radius input.
-        const rInput = this.settings.
-
-        // Define radius.
-        const r = defineRadius.call(this, rInput);
-
-        // Define color input.
-        const colorInput =
-            this.settings.colorBy.type === 'frequency'
-                ? nStateChanges
-                : state[this.settings.colorBy.variable];
-
-        // Define color.
-        const color = defineColor.call(this, colorInput);
-    */
-
-    function data() {
-        var _this = this;
-
-        // Count the number of individuals at each focus at previous timepoint.
-        this.metadata.event.forEach(function (event) {
-            event.prevCount = event.count;
-        });
-        this.data.nested.forEach(function (d) {
-            // Update individual to next event.
-            d.value.statePrevious = d.value.state;
-
-            var event = _this.metadata.event.find(function (event) {
-                return event.value === d.value.state.event;
-            }); // Calculate Euclidean distance between point and destination.
-
-            d.value.distance = Math.sqrt(Math.pow(event.x - d.x, 2) + Math.pow(event.y - d.y, 2)); // calculate the Euclidean distance between a bubble and its destination and only until
-            // that distance is below a certain threshold is the bubble allowed to progress to the next
-            // destination.
-            // Ensure point reaches a minimum distance from destination
-            // before moving to next destination.
-
-            if (d.value.distance < _this.settings.orbitRadius / 4)
-                d.value.state = getState.call(_this, d.value.group);
-            var datum = defineDatum.call(
-                _this,
-                d.value.group,
-                d.value.state,
-                d.value.statePrevious
-            );
-            Object.assign(d.value, datum);
-        }); // Record change in number of IDs at each focus at current timepoint.
-
-        this.metadata.event.forEach(function (event) {
-            event.data = _this.data.nested.filter(function (d, i) {
-                return d.value.state.event === event.value;
-            });
-            event.count = event.data.length;
-            event.cumulative = _this.data.filter(function (d) {
-                return d.event === event.value && d.start_timepoint <= _this.settings.timepoint;
-            }).length;
-            event.change = event.count - event.prevCount;
-        });
-    }
-
     function pulseOrbits() {
         var fdg = this;
 
@@ -1228,6 +1269,33 @@
         pulseOrbits.call(this); // Update timer, focus labels, and annotations.
 
         text.call(this);
+    }
+
+    function restartForceSimulation() {
+        // Remove centering force after first interval.
+        if (this.settings.timepoint === 1) this.forceSimulation.force('center', null); // Reheat the simulation (alpha(1)) and update the coordinates of the x- and y- forces.
+
+        this.forceSimulation
+            .alpha(1)
+            .force(
+                'x',
+                d3
+                    .forceX()
+                    .x(function (d) {
+                        return d.value.coordinates.x;
+                    })
+                    .strength(0.3)
+            )
+            .force(
+                'y',
+                d3
+                    .forceY()
+                    .y(function (d) {
+                        return d.value.coordinates.y;
+                    })
+                    .strength(0.3)
+            )
+            .restart();
     }
 
     function countdown() {
@@ -1408,32 +1476,13 @@
     }
 
     function reset() {
-        this.interval.stop(); // Display a visual countdown to reset.
+        this.interval.stop(); // Reheat the animation one last time so marks reach to their final destination.
+
+        restartForceSimulation.call(this); // Display a visual countdown to reset.
 
         var countdown$1 = countdown.call(this); // Set a timeout before resetting the animation.
 
         var timeout$1 = timeout.call(this, countdown$1);
-    }
-
-    function restartForceSimulation() {
-        var _this = this;
-
-        this.metadata.event.forEach(function (event) {
-            event.forceSimulation.forEach(function (forceSimulation) {
-                // Center points initially then remove centering force.
-                if (_this.settings.timepoint === 1) forceSimulation.force('center', null); // Update data.
-
-                forceSimulation.nodes(
-                    event.data.filter(function (d) {
-                        return (
-                            !d.value.noStateChange && d.value.category === forceSimulation.category
-                        );
-                    })
-                ); // Reheat simulation.
-
-                forceSimulation.alpha(1).restart();
-            });
-        });
     }
 
     var increment = function increment(arg) {
@@ -1442,7 +1491,7 @@
 
         if (this.settings.timepoint <= this.settings.duration) update$1.call(this);
         // Otherwise reset animation.
-        else reset.call(this); // Resume the force simulation.
+        else if (this.settings.loop === true) reset.call(this); // Resume the force simulation.
 
         restartForceSimulation.call(this);
     }; // Default returns an interval that runs increment() every time unit.
@@ -2049,51 +2098,63 @@
         return marks;
     }
 
-    function size(svg, legendDimensions) {
-        var _this = this;
-
-        var marks = svg
-            .selectAll('circle.legend-mark')
-            .data(this.settings.colors())
-            .enter()
-            .append('circle')
-            .classed('legend-mark', true)
-            .attr('cx', function (d, i) {
-                return (
-                    i * (legendDimensions[0] / _this.settings.colors().length) +
-                    legendDimensions[0] / _this.settings.colors().length / 2
-                );
-            })
-            .attr('cy', legendDimensions[1] / 4)
-            .attr('r', function (d, i) {
-                return i + _this.settings.minRadius;
-            })
-            .attr('fill', '#aaa')
-            .attr('fill-opacity', 0.5)
-            .attr('stroke', '#aaa')
-            .attr('stroke-opacity', 1);
-        return marks;
-    }
-
     function both(svg, legendDimensions) {
         var _this = this;
 
         var marks = svg
             .selectAll('circle.legend-mark')
             .data(this.settings.colors())
-            .enter()
-            .append('circle')
+            .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
             .classed('legend-mark', true)
-            .attr('cx', function (d, i) {
-                return (
-                    i * (legendDimensions[0] / _this.settings.colors().length) +
-                    legendDimensions[0] / _this.settings.colors().length / 2
-                );
+            .attr('fill', function (d) {
+                return '#aaa';
             })
-            .attr('cy', legendDimensions[1] / 4)
-            .attr('r', function (d, i) {
-                return i + _this.settings.minRadius;
+            .attr('fill-opacity', 0.5)
+            .attr('stroke', function (d) {
+                return '#aaa';
             })
+            .attr('stroke-opacity', 1);
+        if (this.settings.shape === 'circle')
+            marks
+                .attr('cx', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colors().length) +
+                        legendDimensions[0] / _this.settings.colors().length / 2
+                    );
+                })
+                .attr('cy', legendDimensions[1] / 4)
+                .attr('r', function (d, i) {
+                    return i + _this.settings.minRadius;
+                });
+        else
+            marks
+                .attr('x', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colors().length) +
+                        legendDimensions[0] / _this.settings.colors().length / 2 -
+                        (i + _this.settings.minRadius)
+                    );
+                })
+                .attr('y', function (d, i) {
+                    return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
+                })
+                .attr('width', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                })
+                .attr('height', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                });
+        return marks;
+    }
+
+    function both$1(svg, legendDimensions) {
+        var _this = this;
+
+        var marks = svg
+            .selectAll('circle.legend-mark')
+            .data(this.settings.colors())
+            .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
+            .classed('legend-mark', true)
             .attr('fill', function (d) {
                 return d;
             })
@@ -2102,13 +2163,43 @@
                 return d;
             })
             .attr('stroke-opacity', 1);
+        if (this.settings.shape === 'circle')
+            marks
+                .attr('cx', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colors().length) +
+                        legendDimensions[0] / _this.settings.colors().length / 2
+                    );
+                })
+                .attr('cy', legendDimensions[1] / 4)
+                .attr('r', function (d, i) {
+                    return i + _this.settings.minRadius;
+                });
+        else
+            marks
+                .attr('x', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colors().length) +
+                        legendDimensions[0] / _this.settings.colors().length / 2 -
+                        (i + _this.settings.minRadius)
+                    );
+                })
+                .attr('y', function (d, i) {
+                    return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
+                })
+                .attr('width', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                })
+                .attr('height', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                });
         return marks;
     }
 
     var makeLegendMarks = {
         color: color$1,
-        size: size,
-        both: both,
+        size: both,
+        both: both$1,
     };
 
     function makeLegend(type) {
@@ -2611,620 +2702,187 @@
         };
     }
 
-    function tree_add(d) {
-        var x = +this._x.call(null, d),
-            y = +this._y.call(null, d);
-        return add(this.cover(x, y), x, y, d);
-    }
-
-    function add(tree, x, y, d) {
-        if (isNaN(x) || isNaN(y)) return tree; // ignore invalid points
-
-        var parent,
-            node = tree._root,
-            leaf = { data: d },
-            x0 = tree._x0,
-            y0 = tree._y0,
-            x1 = tree._x1,
-            y1 = tree._y1,
-            xm,
-            ym,
-            xp,
-            yp,
-            right,
-            bottom,
-            i,
-            j;
-
-        // If the tree is empty, initialize the root as a leaf.
-        if (!node) return (tree._root = leaf), tree;
-
-        // Find the existing leaf for the new point, or add it.
-        while (node.length) {
-            if ((right = x >= (xm = (x0 + x1) / 2))) x0 = xm;
-            else x1 = xm;
-            if ((bottom = y >= (ym = (y0 + y1) / 2))) y0 = ym;
-            else y1 = ym;
-            if (((parent = node), !(node = node[(i = (bottom << 1) | right)])))
-                return (parent[i] = leaf), tree;
-        }
-
-        // Is the new point is exactly coincident with the existing point?
-        xp = +tree._x.call(null, node.data);
-        yp = +tree._y.call(null, node.data);
-        if (x === xp && y === yp)
-            return (leaf.next = node), parent ? (parent[i] = leaf) : (tree._root = leaf), tree;
-
-        // Otherwise, split the leaf node until the old and new point are separated.
-        do {
-            parent = parent ? (parent[i] = new Array(4)) : (tree._root = new Array(4));
-            if ((right = x >= (xm = (x0 + x1) / 2))) x0 = xm;
-            else x1 = xm;
-            if ((bottom = y >= (ym = (y0 + y1) / 2))) y0 = ym;
-            else y1 = ym;
-        } while ((i = (bottom << 1) | right) === (j = ((yp >= ym) << 1) | (xp >= xm)));
-        return (parent[j] = node), (parent[i] = leaf), tree;
-    }
-
-    function addAll(data) {
-        var d,
-            i,
-            n = data.length,
-            x,
-            y,
-            xz = new Array(n),
-            yz = new Array(n),
-            x0 = Infinity,
-            y0 = Infinity,
-            x1 = -Infinity,
-            y1 = -Infinity;
-
-        // Compute the points and their extent.
-        for (i = 0; i < n; ++i) {
-            if (
-                isNaN((x = +this._x.call(null, (d = data[i])))) ||
-                isNaN((y = +this._y.call(null, d)))
-            )
-                continue;
-            xz[i] = x;
-            yz[i] = y;
-            if (x < x0) x0 = x;
-            if (x > x1) x1 = x;
-            if (y < y0) y0 = y;
-            if (y > y1) y1 = y;
-        }
-
-        // If there were no (valid) points, abort.
-        if (x0 > x1 || y0 > y1) return this;
-
-        // Expand the tree to cover the new points.
-        this.cover(x0, y0).cover(x1, y1);
-
-        // Add the new points.
-        for (i = 0; i < n; ++i) {
-            add(this, xz[i], yz[i], data[i]);
-        }
-
-        return this;
-    }
-
-    function tree_cover(x, y) {
-        if (isNaN((x = +x)) || isNaN((y = +y))) return this; // ignore invalid points
-
-        var x0 = this._x0,
-            y0 = this._y0,
-            x1 = this._x1,
-            y1 = this._y1;
-
-        // If the quadtree has no extent, initialize them.
-        // Integer extent are necessary so that if we later double the extent,
-        // the existing quadrant boundaries don’t change due to floating point error!
-        if (isNaN(x0)) {
-            x1 = (x0 = Math.floor(x)) + 1;
-            y1 = (y0 = Math.floor(y)) + 1;
-        }
-
-        // Otherwise, double repeatedly to cover.
-        else {
-            var z = x1 - x0,
-                node = this._root,
-                parent,
-                i;
-
-            while (x0 > x || x >= x1 || y0 > y || y >= y1) {
-                i = ((y < y0) << 1) | (x < x0);
-                (parent = new Array(4)), (parent[i] = node), (node = parent), (z *= 2);
-                switch (i) {
-                    case 0:
-                        (x1 = x0 + z), (y1 = y0 + z);
-                        break;
-                    case 1:
-                        (x0 = x1 - z), (y1 = y0 + z);
-                        break;
-                    case 2:
-                        (x1 = x0 + z), (y0 = y1 - z);
-                        break;
-                    case 3:
-                        (x0 = x1 - z), (y0 = y1 - z);
-                        break;
-                }
-            }
-
-            if (this._root && this._root.length) this._root = node;
-        }
-
-        this._x0 = x0;
-        this._y0 = y0;
-        this._x1 = x1;
-        this._y1 = y1;
-        return this;
-    }
-
-    function tree_data() {
-        var data = [];
-        this.visit(function (node) {
-            if (!node.length)
-                do data.push(node.data);
-                while ((node = node.next));
-        });
-        return data;
-    }
-
-    function tree_extent(_) {
-        return arguments.length
-            ? this.cover(+_[0][0], +_[0][1]).cover(+_[1][0], +_[1][1])
-            : isNaN(this._x0)
-            ? undefined
-            : [
-                  [this._x0, this._y0],
-                  [this._x1, this._y1],
-              ];
-    }
-
-    function Quad(node, x0, y0, x1, y1) {
-        this.node = node;
-        this.x0 = x0;
-        this.y0 = y0;
-        this.x1 = x1;
-        this.y1 = y1;
-    }
-
-    function tree_find(x, y, radius) {
-        var data,
-            x0 = this._x0,
-            y0 = this._y0,
-            x1,
-            y1,
-            x2,
-            y2,
-            x3 = this._x1,
-            y3 = this._y1,
-            quads = [],
-            node = this._root,
-            q,
-            i;
-
-        if (node) quads.push(new Quad(node, x0, y0, x3, y3));
-        if (radius == null) radius = Infinity;
-        else {
-            (x0 = x - radius), (y0 = y - radius);
-            (x3 = x + radius), (y3 = y + radius);
-            radius *= radius;
-        }
-
-        while ((q = quads.pop())) {
-            // Stop searching if this quadrant can’t contain a closer node.
-            if (
-                !(node = q.node) ||
-                (x1 = q.x0) > x3 ||
-                (y1 = q.y0) > y3 ||
-                (x2 = q.x1) < x0 ||
-                (y2 = q.y1) < y0
-            )
-                continue;
-
-            // Bisect the current quadrant.
-            if (node.length) {
-                var xm = (x1 + x2) / 2,
-                    ym = (y1 + y2) / 2;
-
-                quads.push(
-                    new Quad(node[3], xm, ym, x2, y2),
-                    new Quad(node[2], x1, ym, xm, y2),
-                    new Quad(node[1], xm, y1, x2, ym),
-                    new Quad(node[0], x1, y1, xm, ym)
-                );
-
-                // Visit the closest quadrant first.
-                if ((i = ((y >= ym) << 1) | (x >= xm))) {
-                    q = quads[quads.length - 1];
-                    quads[quads.length - 1] = quads[quads.length - 1 - i];
-                    quads[quads.length - 1 - i] = q;
-                }
-            }
-
-            // Visit this point. (Visiting coincident points isn’t necessary!)
-            else {
-                var dx = x - +this._x.call(null, node.data),
-                    dy = y - +this._y.call(null, node.data),
-                    d2 = dx * dx + dy * dy;
-                if (d2 < radius) {
-                    var d = Math.sqrt((radius = d2));
-                    (x0 = x - d), (y0 = y - d);
-                    (x3 = x + d), (y3 = y + d);
-                    data = node.data;
-                }
-            }
-        }
-
-        return data;
-    }
-
-    function tree_remove(d) {
-        if (isNaN((x = +this._x.call(null, d))) || isNaN((y = +this._y.call(null, d)))) return this; // ignore invalid points
-
-        var parent,
-            node = this._root,
-            retainer,
-            previous,
-            next,
-            x0 = this._x0,
-            y0 = this._y0,
-            x1 = this._x1,
-            y1 = this._y1,
-            x,
-            y,
-            xm,
-            ym,
-            right,
-            bottom,
-            i,
-            j;
-
-        // If the tree is empty, initialize the root as a leaf.
-        if (!node) return this;
-
-        // Find the leaf node for the point.
-        // While descending, also retain the deepest parent with a non-removed sibling.
-        if (node.length)
-            while (true) {
-                if ((right = x >= (xm = (x0 + x1) / 2))) x0 = xm;
-                else x1 = xm;
-                if ((bottom = y >= (ym = (y0 + y1) / 2))) y0 = ym;
-                else y1 = ym;
-                if (!((parent = node), (node = node[(i = (bottom << 1) | right)]))) return this;
-                if (!node.length) break;
-                if (parent[(i + 1) & 3] || parent[(i + 2) & 3] || parent[(i + 3) & 3])
-                    (retainer = parent), (j = i);
-            }
-
-        // Find the point to remove.
-        while (node.data !== d) if (!((previous = node), (node = node.next))) return this;
-        if ((next = node.next)) delete node.next;
-
-        // If there are multiple coincident points, remove just the point.
-        if (previous) return next ? (previous.next = next) : delete previous.next, this;
-
-        // If this is the root point, remove it.
-        if (!parent) return (this._root = next), this;
-
-        // Remove this leaf.
-        next ? (parent[i] = next) : delete parent[i];
-
-        // If the parent now contains exactly one leaf, collapse superfluous parents.
-        if (
-            (node = parent[0] || parent[1] || parent[2] || parent[3]) &&
-            node === (parent[3] || parent[2] || parent[1] || parent[0]) &&
-            !node.length
-        ) {
-            if (retainer) retainer[j] = node;
-            else this._root = node;
-        }
-
-        return this;
-    }
-
-    function removeAll(data) {
-        for (var i = 0, n = data.length; i < n; ++i) this.remove(data[i]);
-        return this;
-    }
-
-    function tree_root() {
-        return this._root;
-    }
-
-    function tree_size() {
-        var size = 0;
-        this.visit(function (node) {
-            if (!node.length)
-                do ++size;
-                while ((node = node.next));
-        });
-        return size;
-    }
-
-    function tree_visit(callback) {
-        var quads = [],
-            q,
-            node = this._root,
-            child,
-            x0,
-            y0,
-            x1,
-            y1;
-        if (node) quads.push(new Quad(node, this._x0, this._y0, this._x1, this._y1));
-        while ((q = quads.pop())) {
-            if (
-                !callback((node = q.node), (x0 = q.x0), (y0 = q.y0), (x1 = q.x1), (y1 = q.y1)) &&
-                node.length
-            ) {
-                var xm = (x0 + x1) / 2,
-                    ym = (y0 + y1) / 2;
-                if ((child = node[3])) quads.push(new Quad(child, xm, ym, x1, y1));
-                if ((child = node[2])) quads.push(new Quad(child, x0, ym, xm, y1));
-                if ((child = node[1])) quads.push(new Quad(child, xm, y0, x1, ym));
-                if ((child = node[0])) quads.push(new Quad(child, x0, y0, xm, ym));
-            }
-        }
-        return this;
-    }
-
-    function tree_visitAfter(callback) {
-        var quads = [],
-            next = [],
-            q;
-        if (this._root) quads.push(new Quad(this._root, this._x0, this._y0, this._x1, this._y1));
-        while ((q = quads.pop())) {
-            var node = q.node;
-            if (node.length) {
-                var child,
-                    x0 = q.x0,
-                    y0 = q.y0,
-                    x1 = q.x1,
-                    y1 = q.y1,
-                    xm = (x0 + x1) / 2,
-                    ym = (y0 + y1) / 2;
-                if ((child = node[0])) quads.push(new Quad(child, x0, y0, xm, ym));
-                if ((child = node[1])) quads.push(new Quad(child, xm, y0, x1, ym));
-                if ((child = node[2])) quads.push(new Quad(child, x0, ym, xm, y1));
-                if ((child = node[3])) quads.push(new Quad(child, xm, ym, x1, y1));
-            }
-            next.push(q);
-        }
-        while ((q = next.pop())) {
-            callback(q.node, q.x0, q.y0, q.x1, q.y1);
-        }
-        return this;
-    }
-
-    function defaultX(d) {
-        return d[0];
-    }
-
-    function tree_x(_) {
-        return arguments.length ? ((this._x = _), this) : this._x;
-    }
-
-    function defaultY(d) {
-        return d[1];
-    }
-
-    function tree_y(_) {
-        return arguments.length ? ((this._y = _), this) : this._y;
-    }
-
-    function quadtree(nodes, x, y) {
-        var tree = new Quadtree(
-            x == null ? defaultX : x,
-            y == null ? defaultY : y,
-            NaN,
-            NaN,
-            NaN,
-            NaN
-        );
-        return nodes == null ? tree : tree.addAll(nodes);
-    }
-
-    function Quadtree(x, y, x0, y0, x1, y1) {
-        this._x = x;
-        this._y = y;
-        this._x0 = x0;
-        this._y0 = y0;
-        this._x1 = x1;
-        this._y1 = y1;
-        this._root = undefined;
-    }
-
-    function leaf_copy(leaf) {
-        var copy = { data: leaf.data },
-            next = copy;
-        while ((leaf = leaf.next)) next = next.next = { data: leaf.data };
-        return copy;
-    }
-
-    var treeProto = (quadtree.prototype = Quadtree.prototype);
-
-    treeProto.copy = function () {
-        var copy = new Quadtree(this._x, this._y, this._x0, this._y0, this._x1, this._y1),
-            node = this._root,
-            nodes,
-            child;
-
-        if (!node) return copy;
-
-        if (!node.length) return (copy._root = leaf_copy(node)), copy;
-
-        nodes = [{ source: node, target: (copy._root = new Array(4)) }];
-        while ((node = nodes.pop())) {
-            for (var i = 0; i < 4; ++i) {
-                if ((child = node.source[i])) {
-                    if (child.length)
-                        nodes.push({ source: child, target: (node.target[i] = new Array(4)) });
-                    else node.target[i] = leaf_copy(child);
-                }
-            }
-        }
-
-        return copy;
-    };
-
-    treeProto.add = tree_add;
-    treeProto.addAll = addAll;
-    treeProto.cover = tree_cover;
-    treeProto.data = tree_data;
-    treeProto.extent = tree_extent;
-    treeProto.find = tree_find;
-    treeProto.remove = tree_remove;
-    treeProto.removeAll = removeAll;
-    treeProto.root = tree_root;
-    treeProto.size = tree_size;
-    treeProto.visit = tree_visit;
-    treeProto.visitAfter = tree_visitAfter;
-    treeProto.x = tree_x;
-    treeProto.y = tree_y;
-
-    function forceManyBodyReuse() {
+    function forceManyBodySampled() {
         var nodes,
-            node,
             alpha,
-            iter = 0,
-            tree,
-            updateClosure,
-            updateBH,
             strength = constant(-30),
             strengths,
+            indicesRepulse,
+            prevIndex = 0,
             distanceMin2 = 1,
             distanceMax2 = Infinity,
-            theta2 = 0.81;
+            neighborSize = function () {
+                return 15;
+            },
+            updateSize = function (nodes) {
+                return Math.pow(nodes.length, 0.75);
+            },
+            sampleSize = function (nodes) {
+                return Math.pow(nodes.length, 0.25);
+            },
+            numNeighbors,
+            numUpdate,
+            numSamples,
+            chargeMultiplier = function (nodes) {
+                return nodes.length < 100 ? 1 : nodes.length < 200 ? 3 : Math.sqrt(nodes.length);
+            },
+            cMult,
+            rand = Math.random;
 
-        function jiggle() {
-            return (Math.random() - 0.5) * 1e-6;
-        }
+        function addRandomNode(node) {
+            var randIdx = Math.floor(rand() * nodes.length),
+                randNode = nodes[randIdx],
+                randDist =
+                    (node.x - randNode.x) * (node.x - randNode.x) +
+                    (node.y - randNode.y) * (node.y - randNode.y),
+                currIdx,
+                currNode,
+                currDist,
+                maxI,
+                maxDist = -Infinity,
+                i = -1;
 
-        function x(d) {
-            return d.x;
-        }
+            // Is this already in the list?
+            if (node.nearest.indexOf(randIdx) >= 0) return;
 
-        function y(d) {
-            return d.y;
-        }
+            // If there is room for another, add it.
+            if (node.nearest.length < numNeighbors) {
+                node.nearest.push(randIdx);
+                return;
+            }
 
-        updateClosure = function () {
-            return function (i) {
-                if (i % 13 === 0) {
-                    return true;
-                } else {
-                    return false;
+            // Replace the farthest away "neighbor" with the new node.
+            while (++i < node.nearest.length) {
+                currIdx = node.nearest[i];
+                currNode = nodes[currIdx];
+                currDist = Math.hypot(node.x - currNode.x, node.y - currNode.y);
+                if (currDist > maxDist) {
+                    maxI = i;
+                    maxDist = currDist;
                 }
-            };
-        };
+            }
+
+            if (randDist < maxDist) {
+                node.nearest[maxI] = randIdx;
+            }
+        }
+
+        function getRandIndices(indices, num) {
+            num = Math.floor(num);
+            var i,
+                n = nodes.length,
+                cnt = n - num,
+                randIdx,
+                temp;
+
+            // Choose random indices.
+            for (i = n - 1; i >= cnt; --i) {
+                randIdx = Math.floor(rand() * i);
+                temp = indices[randIdx];
+                indices[randIdx] = indices[i];
+                indices[i] = temp;
+            }
+
+            return indices.slice(cnt);
+        }
+
+        function approxRepulse(node) {
+            var i, randIndices, currNode, w, x, y, l;
+
+            // Choose random nodes to update.
+            randIndices = getRandIndices(indicesRepulse, numSamples);
+
+            for (i = randIndices.length - 1; i >= 0; --i) {
+                currNode = nodes[randIndices[i]];
+
+                if (currNode === node) continue;
+
+                x = currNode.x - node.x;
+                y = currNode.y - node.y;
+                l = x * x + y * y;
+
+                if (l >= distanceMax2) continue;
+
+                // Limit forces for very close nodes; randomize direction if coincident.
+                if (x === 0) (x = (rand() - 0.5) * 1e-6), (l += x * x);
+                if (y === 0) (y = (rand() - 0.5) * 1e-6), (l += y * y);
+                if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
+
+                w = (strengths[node.index] * alpha * cMult) / l;
+                node.vx += x * w;
+                node.vy += y * w;
+            }
+        }
+
+        function constantRepulse(node) {
+            var i, nearest, currNode, w, x, y, l;
+
+            // Update the list of nearest nodes.
+            if (numNeighbors) addRandomNode(node);
+
+            nearest = node.nearest;
+
+            if (numNeighbors)
+                for (i = nearest.length - 1; i >= 0; --i) {
+                    currNode = nodes[nearest[i]];
+
+                    if (currNode === node) continue;
+
+                    x = currNode.x - node.x;
+                    y = currNode.y - node.y;
+                    l = x * x + y * y;
+
+                    if (l >= distanceMax2) continue;
+
+                    // Limit forces for very close nodes; randomize direction if coincident.
+                    if (x === 0) (x = (rand() - 0.5) * 1e-6), (l += x * x);
+                    if (y === 0) (y = (rand() - 0.5) * 1e-6), (l += y * y);
+                    if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
+
+                    w = (strengths[node.index] * alpha * cMult) / l;
+                    node.vx += x * w;
+                    node.vy += y * w;
+                }
+        }
 
         function force(_) {
-            var i,
-                n = nodes.length;
-            if (!tree || updateBH(iter, nodes)) {
-                tree = quadtree(nodes, x, y).visitAfter(accumulate);
-                nodes.update.push(iter);
+            var i = 0,
+                j = prevIndex,
+                n = nodes.length,
+                upperIndex = prevIndex + numUpdate;
+            for (alpha = _; i < n || j < upperIndex; ++i, ++j) {
+                if (j < upperIndex) approxRepulse(nodes[j % n]);
+                if (numNeighbors && i < n) constantRepulse(nodes[i]);
             }
-            for (alpha = _, i = 0; i < n; ++i) (node = nodes[i]), tree.visit(apply);
-            ++iter;
+            prevIndex = upperIndex % n;
         }
 
         function initialize() {
             if (!nodes) return;
-            iter = 0;
-            nodes.update = [];
-            updateBH = updateClosure();
-            tree = null;
             var i,
                 n = nodes.length,
                 node;
+            indicesRepulse = new Array(n);
+            for (i = 0; i < n; ++i) indicesRepulse[i] = i;
             strengths = new Array(n);
-            for (i = 0; i < n; ++i)
-                (node = nodes[i]), (strengths[node.index] = +strength(node, i, nodes));
-        }
 
-        function accumulate(quad) {
-            var strength = 0,
-                q,
-                c,
-                weight = 0,
-                x,
-                y,
-                i;
+            // Cannot be negative.
+            numNeighbors = Math.min(Math.ceil(neighborSize(nodes)), n);
+            numNeighbors = numNeighbors < 0 ? 0 : Math.min(numNeighbors, nodes.length);
+            numUpdate = Math.ceil(updateSize(nodes));
+            numUpdate = numUpdate < 0 ? 0 : Math.min(numUpdate, n);
+            numSamples = Math.ceil(sampleSize(nodes));
+            numSamples = numSamples < 0 ? 0 : Math.min(numSamples, n);
 
-            // For internal nodes, accumulate forces from child quadrants.
-            if (quad.length) {
-                for (x = y = i = 0; i < 4; ++i) {
-                    if ((q = quad[i]) && (c = Math.abs(q.value))) {
-                        (strength += q.value), (weight += c), (x += c * q.x), (y += c * q.y);
-                    }
-                }
-                quad.x = x / weight;
-                quad.y = y / weight;
+            cMult = chargeMultiplier(nodes);
+
+            alpha = 1;
+            for (i = 0; i < n; ++i) {
+                node = nodes[i];
+                strengths[node.index] = +strength(node, i, nodes);
+                node.nearest = [];
+                while (node.nearest.length < numNeighbors) addRandomNode(node);
             }
-
-            // For leaf nodes, accumulate forces from coincident quadrants.
-            else {
-                q = quad;
-                q.x = q.data.x;
-                q.y = q.data.y;
-                do strength += strengths[q.data.index];
-                while ((q = q.next));
-            }
-
-            quad.value = strength;
-        }
-
-        function apply(quad, x1, _, x2) {
-            if (!quad.value) return true;
-
-            var x = quad.x - node.x,
-                y = quad.y - node.y,
-                w = x2 - x1,
-                l = x * x + y * y;
-
-            // Apply the Barnes-Hut approximation if possible.
-            // Limit forces for very close nodes; randomize direction if coincident.
-            if ((w * w) / theta2 < l) {
-                if (l < distanceMax2) {
-                    if (x === 0) (x = jiggle()), (l += x * x);
-                    if (y === 0) (y = jiggle()), (l += y * y);
-                    if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
-                    node.vx += (x * quad.value * alpha) / l;
-                    node.vy += (y * quad.value * alpha) / l;
-                }
-                return true;
-            }
-
-            // Otherwise, process points directly.
-            else if (quad.length || l >= distanceMax2) return;
-
-            // Limit forces for very close nodes; randomize direction if coincident.
-            if (quad.data !== node || quad.next) {
-                if (x === 0) (x = jiggle()), (l += x * x);
-                if (y === 0) (y = jiggle()), (l += y * y);
-                if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
-            }
-
-            do
-                if (quad.data !== node) {
-                    // Use the coordinates of the node and not the quad region.
-                    x = quad.data.x - node.x;
-                    y = quad.data.y - node.y;
-                    l = x * x + y * y;
-
-                    // Limit forces for very close nodes; randomize direction if coincident.
-                    if (x === 0) (x = jiggle()), (l += x * x);
-                    if (y === 0) (y = jiggle()), (l += y * y);
-                    if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
-
-                    w = (strengths[quad.data.index] * alpha) / l;
-
-                    node.vx += x * w;
-                    node.vy += y * w;
-                }
-            while ((quad = quad.next));
         }
 
         force.initialize = function (_) {
@@ -3246,14 +2904,34 @@
             return arguments.length ? ((distanceMax2 = _ * _), force) : Math.sqrt(distanceMax2);
         };
 
-        force.theta = function (_) {
-            return arguments.length ? ((theta2 = _ * _), force) : Math.sqrt(theta2);
+        force.neighborSize = function (_) {
+            return arguments.length
+                ? ((neighborSize = typeof _ === 'function' ? _ : constant(+_)), initialize(), force)
+                : neighborSize;
         };
 
-        force.update = function (_) {
+        force.updateSize = function (_) {
             return arguments.length
-                ? ((updateClosure = _), (updateBH = updateClosure()), force)
-                : updateClosure;
+                ? ((updateSize = typeof _ === 'function' ? _ : constant(+_)), initialize(), force)
+                : updateSize;
+        };
+
+        force.sampleSize = function (_) {
+            return arguments.length
+                ? ((sampleSize = typeof _ === 'function' ? _ : constant(+_)), initialize(), force)
+                : sampleSize;
+        };
+
+        force.chargeMultiplier = function (_) {
+            return arguments.length
+                ? ((chargeMultiplier = typeof _ === 'function' ? _ : constant(+_)),
+                  initialize(),
+                  force)
+                : chargeMultiplier;
+        };
+
+        force.source = function (_) {
+            return arguments.length ? ((rand = _), force) : rand;
         };
 
         return force;
@@ -3270,105 +2948,102 @@
             }) // draw bubbles with more state changes last
             .forEach(function (d, i) {
                 _this.containers.canvas.context.beginPath(); // circle
-                //if (this.settings.shape === 'circle') {
-                //if (i % 2) {
 
-                _this.containers.canvas.context.moveTo(d.x + d.r, d.y);
+                if (_this.settings.shape === 'circle') {
+                    _this.containers.canvas.context.moveTo(d.x + d.r, d.y);
 
-                _this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
+                    _this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
 
-                if (_this.settings.fill) {
-                    _this.containers.canvas.context.fillStyle = d.value.fill;
+                    if (_this.settings.fill) {
+                        _this.containers.canvas.context.fillStyle = d.value.fill;
 
-                    _this.containers.canvas.context.fill();
+                        _this.containers.canvas.context.fill();
+                    }
+
+                    _this.containers.canvas.context.strokeStyle = d.value.stroke;
+
+                    _this.containers.canvas.context.stroke();
+                } // square
+                else {
+                    //this.containers.canvas.context.moveTo(d.x + d.r, d.y);
+                    _this.containers.canvas.context.rect(
+                        d.x - d.value.r,
+                        d.y - d.value.r,
+                        d.value.r * 2,
+                        d.value.r * 2
+                    );
+
+                    if (_this.settings.fill) {
+                        _this.containers.canvas.context.fillStyle = d.value.fill;
+
+                        _this.containers.canvas.context.fill();
+                    }
+
+                    _this.containers.canvas.context.strokeStyle = d.value.stroke;
+
+                    _this.containers.canvas.context.stroke();
                 }
-
-                _this.containers.canvas.context.strokeStyle = d.value.stroke;
-
-                _this.containers.canvas.context.stroke(); //}
-                // square
-                //else {
-                //    //this.containers.canvas.context.moveTo(d.x + d.r, d.y);
-                //    this.containers.canvas.context.rect(
-                //        d.x - d.value.r,
-                //        d.y - d.value.r,
-                //        d.value.r * 2,
-                //        d.value.r * 2
-                //    );
-                //    if (this.settings.fill) {
-                //        this.containers.canvas.context.fillStyle = d.value.fill;
-                //        this.containers.canvas.context.fill();
-                //    }
-                //    this.containers.canvas.context.strokeStyle = d.value.stroke;
-                //    this.containers.canvas.context.stroke();
-                //}
             });
         this.containers.canvas.context.restore();
     }
 
-    function addForceSimulation(data, x, y) {
+    function addForceSimulation() {
         // When using D3’s force layout with a disjoint graph, you typically want the positioning
         // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
         // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
         // the viewport.
         //
         // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
-        var forceSimulation = d3
-            .forceSimulation() //.nodes(event.data.filter((d) => !d.value.noStateChange))
-            .nodes(data)
-            .alphaDecay(0.01) //.alphaMin(.75)
-            //.alphaTarget(.8)
+        this.forceSimulation = d3
+            .forceSimulation()
+            .nodes(
+                this.data.nested.filter(function (d) {
+                    return !d.value.noStateChange;
+                })
+            )
+            .alphaDecay(0.01)
             .velocityDecay(0.9)
             .force(
                 'center',
                 d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)
             )
-            .force('x', d3.forceX(x).strength(0.3))
-            .force('y', d3.forceY(y).strength(0.3))
-            .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength)) //.force('charge', forceManyBodySampled().strength(this.settings.chargeStrength*2))
-            .on('tick', tick.bind(this)); //if (event.value !== this.settings.eventCentral)
-
-        forceSimulation.force(
-            'collide', //d3.forceCollide().radius((d) => d.value.r + 0.5)
-            d3.forceCollide().radius(this.settings.minRadius + 1)
-        );
-        return forceSimulation;
+            .force(
+                'x',
+                d3
+                    .forceX()
+                    .x(function (d) {
+                        return d.value.coordinates.x;
+                    })
+                    .strength(0.3)
+            )
+            .force(
+                'y',
+                d3
+                    .forceY()
+                    .y(function (d) {
+                        return d.value.coordinates.y;
+                    })
+                    .strength(0.3)
+            ) //.force('charge', d3.forceManyBody().strength(this.settings.chargeStrength))
+            //.force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
+            .force('charge', forceManyBodySampled().strength(this.settings.chargeStrength * 5))
+            .force(
+                'collide',
+                d3.forceCollide().radius(function (d) {
+                    return d.value.r + 0.5;
+                }) //d3.forceCollide().radius(this.settings.minRadius + 1)
+            )
+            .on('tick', tick.bind(this));
     }
 
     function init() {
-        var _this = this;
+        // Cycle through text that displays over animation.
+        runModal.call(this); // Add a static force layout in the background for individuals that never change state.
 
-        runModal.call(this);
-        addStaticForceSimulation.call(this);
-        this.metadata.event.forEach(function (event) {
-            if (event.foci === undefined) {
-                var forceSimulation = addForceSimulation.call(
-                    _this,
-                    event.data.filter(function (d) {
-                        return !d.value.noStateChange;
-                    }), // data
-                    event.x, // x-coordinate
-                    event.y // y-coordinate
-                );
-                forceSimulation.category = null;
-                forceSimulation.coordinates = [event.x, event.y];
-                event.forceSimulation = [forceSimulation];
-            } else {
-                event.forceSimulation = event.foci.map(function (focus) {
-                    var forceSimulation = addForceSimulation.call(
-                        _this,
-                        event.data.filter(function (d) {
-                            return !d.value.noStateChange && d.value.category === focus.key;
-                        }), // data
-                        focus.x, // x-coordinate
-                        focus.y // y-coordinate
-                    );
-                    forceSimulation.category = focus.key;
-                    forceSimulation.coordinates = [focus.x, focus.y];
-                    return forceSimulation;
-                });
-            }
-        });
+        addStaticForceSimulation.call(this); // Add a dynamic force layout in the middleground.
+
+        addForceSimulation.call(this); // Start the timer.
+
         if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
     }
 

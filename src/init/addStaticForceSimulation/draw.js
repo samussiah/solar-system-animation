@@ -15,16 +15,24 @@ export default function draw(worker, color) {
                 `translate(${main.settings.orbitRadius / 2},${main.settings.height / 2})`
             );
 
-        const circles = g
-            .selectAll('.fdg-static__circle')
+        const marks = g
+            .selectAll('.fdg-static__mark')
             .data(event.data.nodes)
-            .enter()
-            .append('circle')
-            .classed('fdg-static__circle', true)
-            .attr('cx', (d) => d.x)
-            .attr('cy', (d) => d.y)
-            .attr('r', event.data.radius)
+            .join(main.settings.shape === 'circle' ? 'circle' : 'rect')
+            .classed('fdg-static__mark', true)
             .attr('fill', event.data.color)
             .attr('fill-opacity', 0.25);
+
+        if (main.settings.shape === 'circle')
+            marks
+                .attr('cx', (d) => d.x)
+                .attr('cy', (d) => d.y)
+                .attr('r', event.data.radius);
+        else
+            marks
+                .attr('x', (d) => d.x - event.data.radius)
+                .attr('y', (d) => d.y - event.data.radius)
+                .attr('width', event.data.radius * 2)
+                .attr('height', event.data.radius * 2);
     };
 }

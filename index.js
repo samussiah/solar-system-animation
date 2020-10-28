@@ -1382,7 +1382,7 @@
                 // Style static bubbles differently than components.
                 emphasizeComponent.call(
                     this,
-                    this.containers.svgBackground.selectAll('circle.fdg-static__circle'),
+                    this.containers.svgBackground.selectAll('.fdg-static__mark'),
                     'stroke',
                     'rgba(215,25,28,0)',
                     'rgba(215,25,28,.5)'

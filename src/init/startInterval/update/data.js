@@ -10,8 +10,7 @@ export default function data() {
     this.data.nested.forEach((d) => {
         // Update individual to next event.
         d.value.statePrevious = d.value.state;
-        const event = this.metadata.event
-            .find((event) => event.value === d.value.state.event);
+        const event = this.metadata.event.find((event) => event.value === d.value.state.event);
         d.value.coordinates = { x: event.x, y: event.y };
 
         // Calculate Euclidean distance between point and destination.

@@ -24,7 +24,6 @@ onmessage = function (event) {
     if (layout === 'circular')
         simulation
             .force('collide', d3.forceCollide().radius(radius + 0.5)) // collision detection
-            //.force('center', d3.forceCenter(x, y)) // positioning
             //.force('charge', d3.forceManyBody().strength(strength)) // charge
             //.force('charge', d3.forceManyBodyReuse().strength(strength)) // charge
             .force('charge', d3.forceManyBodySampled().strength(strength)) // charge

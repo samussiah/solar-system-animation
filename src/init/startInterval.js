@@ -9,11 +9,10 @@ export const increment = function (arg) {
     // Update animation if the current timepoint is less than duration of animation.
     if (this.settings.timepoint <= this.settings.duration) update.call(this);
     // Otherwise reset animation.
-    else reset.call(this);
+    else if (this.settings.loop === true) reset.call(this);
 
     // Resume the force simulation.
     restartForceSimulation.call(this);
-
 };
 
 // Default returns an interval that runs increment() every time unit.

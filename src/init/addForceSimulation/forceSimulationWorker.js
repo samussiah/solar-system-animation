@@ -11,21 +11,27 @@ onmessage = function (event) {
     console.log(event.data.type);
     const forceSimulation = d3.forceSimulation();
     if (event.data.type === 'initialize') {
-        const {
-            nodes,
-            centerX,
-            centerY,
-            chargeStrength,
-            minRadius,
-        } = event.data;
+        const { nodes, centerX, centerY, chargeStrength, minRadius } = event.data;
 
         forceSimulation
             .nodes(nodes)
             .alphaDecay(0.01)
             .velocityDecay(0.9)
             .force('center', d3.forceCenter(centerX, centerY))
-            .force('x', d3.forceX().x(d => d.value.coordinates.x).strength(0.3))
-            .force('y', d3.forceY().y(d => d.value.coordinates.y).strength(0.3))
+            .force(
+                'x',
+                d3
+                    .forceX()
+                    .x((d) => d.value.coordinates.x)
+                    .strength(0.3)
+            )
+            .force(
+                'y',
+                d3
+                    .forceY()
+                    .y((d) => d.value.coordinates.y)
+                    .strength(0.3)
+            )
             .force('charge', d3.forceManyBody().strength(chargeStrength))
             //.force('charge', forceManyBodyReuse().strength(chargeStrength))
             //.force('charge', forceManyBodySampled().strength(chargeStrength*2))
@@ -38,10 +44,22 @@ onmessage = function (event) {
         //if (this.settings.timepoint === 1) this.forceSimulation.force('center', null);
         forceSimulation
             .alpha(1)
-            .force('x', d3.forceX().x(d => d.value.coordinates.x).strength(0.3))
-            .force('y', d3.forceY().y(d => d.value.coordinates.y).strength(0.3))
+            .force(
+                'x',
+                d3
+                    .forceX()
+                    .x((d) => d.value.coordinates.x)
+                    .strength(0.3)
+            )
+            .force(
+                'y',
+                d3
+                    .forceY()
+                    .y((d) => d.value.coordinates.y)
+                    .strength(0.3)
+            )
             .restart()
-            .on('tick', function() {
+            .on('tick', function () {
                 console.log(forceSimulation.nodes());
             });
     }

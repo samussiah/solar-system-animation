@@ -15,10 +15,12 @@ fetch('./data/data_8000_fixed.csv')
                 fill: true,
                 shape: 'square',
                 //drawStaticSeparately: false,
+                //hideControls: true,
                 //playPause: 'pause',
                 //speed: 'slow',
                 //speed: 'fast',
-                //duration: 10,
+                //duration: 100,
+                //loop: false,
                 //resetDelay: 5000,
                 //modalSpeed: 5000,
                 //information: [

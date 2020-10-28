@@ -38,6 +38,7 @@ const settings = {
     },
     playPause: 'play',
     pulseOrbits: false,
+    loop: true,
 
     // dimensions
     width: null, // defined in ./defineMetadata/coordinates

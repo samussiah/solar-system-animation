@@ -5,7 +5,7 @@ export default function simulate() {
 
     worker.postMessage({
         type: 'initialize',
-        nodes: this.data.nested.filter(d => !d.value.noStateChange),
+        nodes: this.data.nested.filter((d) => !d.value.noStateChange),
         centerX: this.settings.orbitRadius / 2,
         centerY: this.settings.height / 2,
         chargeStrength: this.settings.chargeStrength,

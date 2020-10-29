@@ -1,34 +1,10 @@
-fetch('./data/data_1000.csv')
+//fetch('./data/data_1000.csv')
 //fetch('./data/data_2000_fixed.csv')
 //fetch('./data/data_4000.csv')
-//fetch('./data/data_8000_fixed.csv')
+fetch('./data/data_8000_fixed.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
-        const nest = d3.nest()
-            .key(d => d.id)
-            .rollup(group => {
-                group.forEach((d,i) => {
-                    d.duration = +d.duration;
-                    if (d.event === 'ICU')
-                        d.duration = 3;
-                    d.st = i === 0
-                        ? 1
-                        : group[i-1].en + 1;
-                    d.en = i > 0
-                        ? d.st + d.duration - 1
-                        : d.duration;
-                });
-                return group;
-            })
-            .entries(data);
-        const timepoint = 100;
-        console.table(
-        d3.nest()
-            .key(d => d.event)
-            .rollup(group => group.length)
-            .entries(data.filter(d => d.st <= timepoint && timepoint <= d.en))
-        );
         const fdg = forceDirectedGraph(
             data,
             '#container',
@@ -38,6 +14,7 @@ fetch('./data/data_1000.csv')
                 minRadius: 3,
                 fill: true,
                 shape: 'square',
+                manyBody: 'forceManyBodySampled',
                 //drawStaticSeparately: false,
                 //hideControls: true,
                 //playPause: 'pause',

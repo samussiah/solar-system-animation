@@ -22,7 +22,7 @@ export default function draw(worker, color) {
             .classed('fdg-static__mark', true)
             .attr('fill', event.data.color)
             .attr('fill-opacity', 0.25);
-            //.attr('fill-opacity', 0);
+        //.attr('fill-opacity', 0);
 
         if (main.settings.shape === 'circle')
             marks

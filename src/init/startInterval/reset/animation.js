@@ -19,6 +19,9 @@ export default function resetAnimation() {
         d.value.statePrevious = null;
         d.value.state = getState.call(this, d.value.group, 0);
 
+        const event = this.metadata.event.find((event) => event.value === d.value.state.event);
+        d.value.coordinates = { x: event.x, y: event.y };
+
         const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.statePrevious);
         Object.assign(d.value, datum);
     });

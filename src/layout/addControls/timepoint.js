@@ -1,5 +1,6 @@
 import toggle from './playPause/toggle';
 import { increment } from '../../init/startInterval';
+import restartForceSimulation from '../../init/startInterval/restartForceSimulation';
 
 /**
  * function:

@@ -1,4 +1,5 @@
 import coordinates from '../defineMetadata/coordinates';
+import restartForceSimulation from '../init/startInterval/restartForceSimulation';
 import addStaticForceSimulation from '../init/addStaticForceSimulation';
 import updateData from '../init/startInterval/update/data';
 
@@ -67,21 +68,7 @@ export default function resize() {
 
     // Update the node data.
     updateData.call(this);
-    this.forceSimulation
-        .force(
-            'x',
-            d3
-                .forceX()
-                .x((d) => d.value.coordinates.x)
-                .strength(0.3)
-        )
-        .force(
-            'y',
-            d3
-                .forceY()
-                .y((d) => d.value.coordinates.y)
-                .strength(0.3)
-        );
+    restartForceSimulation.call(this);
 
     // static force simulation
     addStaticForceSimulation.call(this);

@@ -31,8 +31,8 @@ export default function addForceSimulation() {
                 .strength(0.3)
         )
         //.force('charge', d3.forceManyBody().strength(this.settings.chargeStrength))
-        //.force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
-        .force('charge', forceManyBodySampled().strength(this.settings.chargeStrength * 5))
+        .force('charge', forceManyBodyReuse().strength(this.settings.chargeStrength))
+        //.force('charge', forceManyBodySampled().strength(this.settings.chargeStrength * 5))
         .force(
             'collide',
             d3.forceCollide().radius((d) => d.value.r + 0.5)

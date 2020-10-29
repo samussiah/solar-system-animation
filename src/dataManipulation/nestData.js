@@ -31,6 +31,8 @@ export default function nestData() {
                 category,
                 statePrevious,
                 state, // object representing a single record of an individual
+                stateIndex: 0,
+                timeSincePreviousState: 0,
                 noStateChange, // boolean - did individual have any events? used to present those individuals in a static force layout
                 coordinates,
                 ...datum,

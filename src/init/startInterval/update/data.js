@@ -10,26 +10,34 @@ export default function data() {
     this.data.nested.forEach((d) => {
         // Update individual to next event.
         d.value.statePrevious = d.value.state;
-        const event = this.metadata.event.find((event) => event.value === d.value.state.event);
-        d.value.coordinates = { x: event.x, y: event.y };
+        d.value.state = getState.call(this, d.value.group);
+        d.value.stateIndex = d.value.group.findIndex(di => di === d.value.state);
+        const event = this.metadata.event
+            .find((event) => event.value === d.value.state.event);
 
-        // Calculate Euclidean distance between point and destination.
-        d.value.distance = Math.sqrt((event.x - d.x) ** 2 + (event.y - d.y) ** 2);
+        // Count the number of ticks since previous state.
+        //if (d.value.state.event === d.value.statePrevious.event)
+        //    d.value.timeSincePreviousState++;
+        //else if (d.value.timeSincePreviousState > 3)
+        //    d.value.timeSincePreviousState = 0;
+        // Calculate the length of time since previous state.
+        d.value.timeSincePreviousState = this.settings.timepoint - d.value.state.start_timepoint;
+        // update coordinates when:
+        //   - state changes
+        //   &&
+        //   (
+        //     - point has had enough time to reach its previous state
+        //     ||
+        //     - on first state change
+        //   )
 
-        // calculate the Euclidean distance between a bubble and its destination and only until
-        // that distance is below a certain threshold is the bubble allowed to progress to the next
-        // destination.
-
-        // Ensure point reaches a minimum distance from destination
-        // before moving to next destination.
-        if (d.value.distance < this.settings.orbitRadius / 4)
-            d.value.state = getState.call(this, d.value.group);
+        // Update coordinates once time since previous state crosses some threshold.
+        if (!(d.value.state.duration < 5 && d.value.timeSincePreviousState < 5 && d.value.statePrevious.event !== 'Home'))
+            d.value.coordinates = { x: event.x, y: event.y };
 
         const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.statePrevious);
         Object.assign(d.value, datum);
     });
-    //console.table(d3.nest().key(d => d.value.state.event).rollup(group => d3.median(group, d => d.y)).entries(this.data.nested));
-    //console.table(d3.nest().key(d => d.value.coordinates.x).rollup(group => group.length).entries(this.data.nested));
 
     // Record change in number of IDs at each focus at current timepoint.
     this.metadata.event.forEach((event) => {

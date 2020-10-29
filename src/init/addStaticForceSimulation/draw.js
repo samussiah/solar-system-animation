@@ -22,6 +22,7 @@ export default function draw(worker, color) {
             .classed('fdg-static__mark', true)
             .attr('fill', event.data.color)
             .attr('fill-opacity', 0.25);
+            //.attr('fill-opacity', 0);
 
         if (main.settings.shape === 'circle')
             marks
@@ -34,5 +35,10 @@ export default function draw(worker, color) {
                 .attr('y', (d) => d.y - event.data.radius)
                 .attr('width', event.data.radius * 2)
                 .attr('height', event.data.radius * 2);
+
+        //marks
+        //    .transition()
+        //    .duration(5000)
+        //    .attr('fill-opacity', .25);
     };
 }

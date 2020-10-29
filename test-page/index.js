@@ -1,10 +1,34 @@
-//fetch('./data/data_1000.csv')
+fetch('./data/data_1000.csv')
 //fetch('./data/data_2000_fixed.csv')
 //fetch('./data/data_4000.csv')
-fetch('./data/data_8000_fixed.csv')
+//fetch('./data/data_8000_fixed.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
+        const nest = d3.nest()
+            .key(d => d.id)
+            .rollup(group => {
+                group.forEach((d,i) => {
+                    d.duration = +d.duration;
+                    if (d.event === 'ICU')
+                        d.duration = 3;
+                    d.st = i === 0
+                        ? 1
+                        : group[i-1].en + 1;
+                    d.en = i > 0
+                        ? d.st + d.duration - 1
+                        : d.duration;
+                });
+                return group;
+            })
+            .entries(data);
+        const timepoint = 100;
+        console.table(
+        d3.nest()
+            .key(d => d.event)
+            .rollup(group => group.length)
+            .entries(data.filter(d => d.st <= timepoint && timepoint <= d.en))
+        );
         const fdg = forceDirectedGraph(
             data,
             '#container',
@@ -18,11 +42,11 @@ fetch('./data/data_8000_fixed.csv')
                 //hideControls: true,
                 //playPause: 'pause',
                 //speed: 'slow',
-                speed: 'fast',
+                //speed: 'fast',
                 //duration: 100,
-                loop: false,
+                //loop: false,
                 //resetDelay: 5000,
-                modalSpeed: 5000,
+                //modalSpeed: 5000,
                 //information: [
                 //    'Heart disease is the leading cause of death for men, women, and people of most racial and ethnic groups in the United States.',
                 //    'One person dies every 37 seconds in the United States from cardiovascular disease.',

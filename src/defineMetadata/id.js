@@ -17,7 +17,6 @@ export default function id() {
     nest.forEach((d, i) => {
         Object.assign(d, d.value);
         d.value = d.key;
-        d.duration = d.value;
         delete d.key;
     });
 

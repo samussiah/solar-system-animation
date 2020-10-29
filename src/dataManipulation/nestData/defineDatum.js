@@ -2,9 +2,9 @@ import countStateChanges from './defineDatum/countStateChanges';
 import defineRadius from './defineDatum/defineRadius';
 import defineColor from './defineDatum/defineColor';
 
-export default function defineDatum(group, state, statePrevious) {
+export default function defineDatum(group, state) {
     // Count state changes.
-    const nStateChanges = countStateChanges.call(this, group, statePrevious);
+    const nStateChanges = countStateChanges.call(this, group);
 
     // Count state changes.
     const aesthetic =

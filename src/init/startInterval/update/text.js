@@ -39,6 +39,13 @@ export default function text() {
             .selectAll('tspan.fdg-focus-annotation__event-count')
             .text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
 
+    if (this.settings.colorBy.type === 'categorical')
+        this.metadata.event.forEach((event) => {
+            event.fociLabels
+                .selectAll('text')
+                .text((d) => `${d.count} (${d3.format('.1%')(d.count / d.n)})`);
+        });
+
     // Update frequency table.
     this.freqTable.tr
         .selectAll('td')

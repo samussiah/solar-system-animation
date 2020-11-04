@@ -20,6 +20,7 @@ export default function canvas(main) {
     const svgForeground = addElement('svg--foreground', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
+    const focusAnnotations = addElement('focus-annotations', svgForeground, 'g');
 
     // modal
     const modalContainer = addElement('modal', animation);
@@ -42,6 +43,7 @@ export default function canvas(main) {
         svgBackground,
         canvas,
         svgForeground,
+        focusAnnotations,
         modal,
     };
 }

@@ -5,6 +5,11 @@ export default function data() {
     // Count the number of individuals at each focus at previous timepoint.
     this.metadata.event.forEach((event) => {
         event.prevCount = event.count;
+
+        if (event.foci)
+            event.foci.forEach((focus) => {
+                focus.prevCount = focus.count;
+            });
     });
 
     this.data.nested.forEach((d) => {
@@ -16,8 +21,14 @@ export default function data() {
             d.value.state = currentState;
         }
 
-        const event = this.metadata.event.find((event) => event.value === d.value.state.event);
-        d.value.coordinates = { x: event.x, y: event.y };
+        // Determine destination - the focus representing the current state of the individual.
+        const destination =
+            this.settings.colorBy.type === 'categorical'
+                ? this.metadata.event
+                      .find((event) => event.value === d.value.state.event)
+                      .foci.find((focus) => focus.key === d.value.category)
+                : this.metadata.event.find((event) => event.value === d.value.state.event);
+        d.value.coordinates = { x: destination.x, y: destination.y };
 
         const datum = defineDatum.call(this, d.value.group, d.value.state);
         Object.assign(d.value, datum);
@@ -31,5 +42,18 @@ export default function data() {
             (d) => d.event === event.value && d.start_timepoint <= this.settings.timepoint
         ).length;
         event.change = event.count - event.prevCount;
+
+        if (event.foci)
+            event.foci.forEach((focus) => {
+                focus.data = event.data.filter((d, i) => d.value.category === focus.key);
+                focus.count = focus.data.length;
+                focus.cumulative = this.data.filter(
+                    (d) =>
+                        d.event === event.value &&
+                        d.category === focus.key &&
+                        d.start_timepoint <= this.settings.timepoint
+                ).length;
+                focus.change = focus.count - focus.prevCount;
+            });
     });
 }

@@ -71,17 +71,29 @@ export default function defineMetadata() {
         domain = [
             ...new Set(this.data.map((d) => d[this.settings.colorBy.variable])).values(),
         ].sort();
+        const colorSchemes = ['blue', 'orange', 'red', 'purple', 'green'].map(
+            (color) => d3[`scheme${color.substring(0, 1).toUpperCase()}${color.substring(1)}s`]
+        );
         this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10);
 
-        // Define the offset of each cateogry as function of the focus coordinates, the category
+        // Define the offset of each category as function of the focus coordinates, the category
         // sequence, and theta.
         this.settings.colorBy.theta = (2 * Math.PI) / domain.length;
-        metadata.event.forEach((event) => {
-            event.foci = domain.map((category, i) => {
+        metadata.event.forEach((event, i) => {
+            event.foci = domain.map((category, j) => {
+                const angle =
+                    domain.length % 2
+                        ? j * this.settings.colorBy.theta
+                        : j * this.settings.colorBy.theta + Math.PI / domain.length;
                 const focus = {
                     key: category,
-                    x: event.x + 50 * Math.cos(i * this.settings.colorBy.theta),
-                    y: event.y + 50 * Math.sin(i * this.settings.colorBy.theta),
+                    n: metadata.id.filter((d) => d.category === category).length,
+                    x: event.x + 50 * Math.cos(angle),
+                    dx: event.x + (i === 0 ? 75 : 50) * Math.cos(angle),
+                    y: event.y + 50 * Math.sin(angle),
+                    dy: event.y + (i === 0 ? 75 : 50) * Math.sin(angle),
+                    count: 0,
+                    cumulative: 0,
                 };
 
                 return focus;

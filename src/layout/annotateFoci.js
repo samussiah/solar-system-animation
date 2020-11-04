@@ -1,5 +1,6 @@
 import getTextAnchor from './annotateFoci/x/getPosition';
 import getDx from './annotateFoci/x/getRelative';
+import getAlignmentBaseline from './annotateFoci/y/getPosition';
 import getDy from './annotateFoci/y/getRelative';
 
 import addLabel from './annotateFoci/addLabel';
@@ -45,7 +46,8 @@ export default function annotateFoci() {
                     .attr('y', (d) => d.dy)
                     .attr('text-anchor', (d) =>
                         event.value === this.settings.eventCentral ? 'middle' : 'end'
-                    );
+                    )
+                    .attr('alignment-baseline', (d) => getAlignmentBaseline.call(this, d, true));
             });
         });
     }

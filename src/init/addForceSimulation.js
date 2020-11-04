@@ -40,7 +40,7 @@ export default function addForceSimulation() {
         )
         .force(
             'collide',
-            d3.forceCollide().radius((d) => d.value.r + 0.5)
+            d3.forceCollide().radius((d) => d.value.r + 1)
             //d3.forceCollide().radius(this.settings.minRadius + 1)
         )
         .on('tick', tick.bind(this));

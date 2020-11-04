@@ -45,26 +45,24 @@ export default function resize() {
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r);
 
-    // force simulations
-    //this.metadata.event.forEach((event) => {
-    //    // Update coordinates of categorical foci.
-    //    if (this.settings.colorBy.type === 'categorical')
-    //        event.foci.forEach((focus, i) => {
-    //            focus.x = event.x + 50 * Math.cos(i * this.settings.colorBy.theta);
-    //            focus.y = event.y + 50 * Math.sin(i * this.settings.colorBy.theta);
-    //            const forceSimulation = event.forceSimulation.find(
-    //                (forceSimulation) => forceSimulation.category === focus.key
-    //            );
-    //            forceSimulation.force('x', d3.forceX(focus.x).strength(0.3));
-    //            forceSimulation.force('y', d3.forceY(focus.y).strength(0.3));
-    //        });
-    //    else
-    //        event.forceSimulation.forEach((forceSimulation) => {
-    //            forceSimulation
-    //                .force('x', d3.forceX(event.x).strength(0.3))
-    //                .force('y', d3.forceY(event.y).strength(0.3));
-    //        });
-    //});
+    // focus coordinates
+    if (this.settings.colorBy.type === 'categorical') {
+        this.metadata.event.forEach((event, i) => {
+            // Update coordinates of categorical foci.
+            event.foci.forEach((focus, j) => {
+                focus.x = event.x + 50 * Math.cos(j * this.settings.colorBy.theta);
+                focus.dx =
+                    event.x + (i === 0 ? 75 : 50) * Math.cos(j * this.settings.colorBy.theta);
+                focus.y = event.y + 50 * Math.sin(j * this.settings.colorBy.theta);
+                focus.dy =
+                    event.y + (i === 0 ? 75 : 50) * Math.sin(j * this.settings.colorBy.theta);
+            });
+            event.fociLabels
+                .selectAll(`text.fdg-focus-annotation__text`)
+                .attr('x', (d) => d.dx)
+                .attr('y', (d) => d.dy);
+        });
+    }
 
     // Update the node data.
     updateData.call(this);

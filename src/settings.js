@@ -56,6 +56,10 @@ const settings = {
     manyBody: 'forceManyBodyReuse', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
 
     // bubble color settings
+    stratifyBy: {
+        variable: null,
+        label: null,
+    }, // up to five strata
     colorBy: {
         type: 'frequency', // ['frequency', 'continuous', 'categorical']
         variable: null,

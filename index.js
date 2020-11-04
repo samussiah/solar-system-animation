@@ -171,6 +171,11 @@
         manyBody: 'forceManyBodyReuse',
         // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
         // bubble color settings
+        stratifyBy: {
+            variable: null,
+            label: null,
+        },
+        // up to five strata
         colorBy: {
             type: 'frequency',
             // ['frequency', 'continuous', 'categorical']
@@ -785,10 +790,12 @@
     }
 
     function defineColor(value) {
+        var colorScale =
+            arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.colorScale;
         var color =
             this.settings.colorBy.type !== 'frequency' ||
             this.settings.eventChangeCountAesthetic !== 'size'
-                ? d3.rgb(this.colorScale(value)).toString()
+                ? d3.rgb(colorScale(value)).toString()
                 : 'rgb(170,170,170)';
         var fill = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
         var stroke = color.replace('rgb', 'rgba').replace(')', ', 1)');
@@ -907,6 +914,8 @@
     }
 
     function resize() {
+        var _this = this;
+
         var node = this.containers.animation.node();
         this.settings.width = node.clientWidth;
         this.settings.height = this.containers.animation.node().clientHeight; // stopwatch
@@ -950,27 +959,29 @@
             })
             .attr('r', function (d) {
                 return d.r;
-            }); // force simulations
-        //this.metadata.event.forEach((event) => {
-        //    // Update coordinates of categorical foci.
-        //    if (this.settings.colorBy.type === 'categorical')
-        //        event.foci.forEach((focus, i) => {
-        //            focus.x = event.x + 50 * Math.cos(i * this.settings.colorBy.theta);
-        //            focus.y = event.y + 50 * Math.sin(i * this.settings.colorBy.theta);
-        //            const forceSimulation = event.forceSimulation.find(
-        //                (forceSimulation) => forceSimulation.category === focus.key
-        //            );
-        //            forceSimulation.force('x', d3.forceX(focus.x).strength(0.3));
-        //            forceSimulation.force('y', d3.forceY(focus.y).strength(0.3));
-        //        });
-        //    else
-        //        event.forceSimulation.forEach((forceSimulation) => {
-        //            forceSimulation
-        //                .force('x', d3.forceX(event.x).strength(0.3))
-        //                .force('y', d3.forceY(event.y).strength(0.3));
-        //        });
-        //});
-        // Update the node data.
+            }); // focus coordinates
+
+        if (this.settings.colorBy.type === 'categorical') {
+            this.metadata.event.forEach(function (event, i) {
+                // Update coordinates of categorical foci.
+                event.foci.forEach(function (focus, j) {
+                    focus.x = event.x + 50 * Math.cos(j * _this.settings.colorBy.theta);
+                    focus.dx =
+                        event.x + (i === 0 ? 75 : 50) * Math.cos(j * _this.settings.colorBy.theta);
+                    focus.y = event.y + 50 * Math.sin(j * _this.settings.colorBy.theta);
+                    focus.dy =
+                        event.y + (i === 0 ? 75 : 50) * Math.sin(j * _this.settings.colorBy.theta);
+                });
+                event.fociLabels
+                    .selectAll('text.fdg-focus-annotation__text')
+                    .attr('x', function (d) {
+                        return d.dx;
+                    })
+                    .attr('y', function (d) {
+                        return d.dy;
+                    });
+            });
+        } // Update the node data.
 
         data.call(this);
         restartForceSimulation.call(this); // static force simulation
@@ -1191,25 +1202,32 @@
                     })
                 ).values()
             ).sort();
+            var colorSchemes = ['blue', 'orange', 'red', 'purple', 'green'].map(function (color) {
+                return d3[
+                    'scheme'
+                        .concat(color.substring(0, 1).toUpperCase())
+                        .concat(color.substring(1), 's')
+                ];
+            });
             this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10); // Define the offset of each category as function of the focus coordinates, the category
             // sequence, and theta.
 
             this.settings.colorBy.theta = (2 * Math.PI) / domain.length;
             metadata.event.forEach(function (event, i) {
                 event.foci = domain.map(function (category, j) {
+                    var angle =
+                        domain.length % 2
+                            ? j * _this.settings.colorBy.theta
+                            : j * _this.settings.colorBy.theta + Math.PI / domain.length;
                     var focus = {
                         key: category,
                         n: metadata.id.filter(function (d) {
                             return d.category === category;
                         }).length,
-                        x: event.x + 50 * Math.cos(j * _this.settings.colorBy.theta),
-                        dx:
-                            event.x +
-                            (i === 0 ? 75 : 50) * Math.cos(j * _this.settings.colorBy.theta),
-                        y: event.y + 50 * Math.sin(j * _this.settings.colorBy.theta),
-                        dy:
-                            event.y +
-                            (i === 0 ? 75 : 50) * Math.sin(j * _this.settings.colorBy.theta),
+                        x: event.x + 50 * Math.cos(angle),
+                        dx: event.x + (i === 0 ? 75 : 50) * Math.cos(angle),
+                        y: event.y + 50 * Math.sin(angle),
+                        dy: event.y + (i === 0 ? 75 : 50) * Math.sin(angle),
                         count: 0,
                         cumulative: 0,
                     };
@@ -2455,6 +2473,23 @@
         return Math.round(d.y) < Math.round(this.settings.height / 2);
     }
 
+    function getPosition$1(d) {
+        var reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var position = isCenter$1.call(this, d)
+            ? 'middle'
+            : isLessThanCenter$1.call(this, d)
+            ? 'hanging'
+            : 'baseline';
+        if (reverse)
+            position =
+                position === 'hanging'
+                    ? 'baseline'
+                    : position === 'baseline'
+                    ? 'hanging'
+                    : position;
+        return position;
+    }
+
     function getRelative$1(d) {
         return isCenter$1.call(this, d) ? 0 : isLessThanCenter$1.call(this, d) ? '-2em' : '2em';
     }
@@ -2555,6 +2590,9 @@
                         })
                         .attr('text-anchor', function (d) {
                             return event.value === _this.settings.eventCentral ? 'middle' : 'end';
+                        })
+                        .attr('alignment-baseline', function (d) {
+                            return getPosition$1.call(_this, d, true);
                         });
                 });
             });
@@ -3775,7 +3813,7 @@
             .force(
                 'collide',
                 d3.forceCollide().radius(function (d) {
-                    return d.value.r + 0.5;
+                    return d.value.r + 1;
                 }) //d3.forceCollide().radius(this.settings.minRadius + 1)
             )
             .on('tick', tick.bind(this));

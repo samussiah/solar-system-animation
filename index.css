@@ -220,19 +220,22 @@ body {
 
 .fdg-focus-annotation {
 }
-.fdg-focus-annotation__label {
+.fdg-focus-annotation {
     font-weight: bold;
-    font-size: 20px;
+    font-size: 1.25rem;
 }
-.fdg-focus-annotation__background tspan {
+.fdg-focus-annotation__background {
     stroke: white;
     stroke-width: 4px;
 }
 .fdg-focus-annotation__event-count {
     font-weight: bold;
 }
-.fdg-focus-annotation__foreground tspan {
+.fdg-focus-annotation__foreground {
     fill: black;
+}
+.fdg-focus-annotation--categorical text {
+    font-size: 1rem;
 }
 
 /* modal */

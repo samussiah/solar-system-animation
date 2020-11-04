@@ -18,8 +18,13 @@ export default function nestData() {
             // Initial state for the given individual.
             const state = getState.call(this, group, 0);
             const noStateChange = group.length === 1 && state.event === this.settings.eventCentral;
-            const event = this.metadata.event.find((event) => event.value === state.event);
-            const coordinates = { x: event.x, y: event.y };
+            const destination =
+                this.settings.colorBy.type === 'categorical'
+                    ? this.metadata.event
+                          .find((event) => event.value === state.event)
+                          .foci.find((focus) => focus.key === category)
+                    : this.metadata.event.find((event) => event.value === state.event);
+            const coordinates = { x: destination.x, y: destination.y };
 
             // Count number of state changes, define aesthetic, define radius, and define color.
             const datum = defineDatum.call(this, group, state);

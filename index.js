@@ -491,7 +491,8 @@
 
         var svgForeground = addElement('svg--foreground', animation, 'svg')
             .attr('width', this.settings.width)
-            .attr('height', this.settings.height); // modal
+            .attr('height', this.settings.height);
+        var focusAnnotations = addElement('focus-annotations', svgForeground, 'g'); // modal
 
         var modalContainer = addElement('modal', animation); // TODO: add button to clear or hide modal
         //const modalClear = addElement('modal__clear', modalContainer)
@@ -512,6 +513,7 @@
             svgBackground: svgBackground,
             canvas: canvas,
             svgForeground: svgForeground,
+            focusAnnotations: focusAnnotations,
             modal: modal,
         };
     }
@@ -843,6 +845,10 @@
         // Count the number of individuals at each focus at previous timepoint.
         this.metadata.event.forEach(function (event) {
             event.prevCount = event.count;
+            if (event.foci)
+                event.foci.forEach(function (focus) {
+                    focus.prevCount = focus.count;
+                });
         });
         this.data.nested.forEach(function (d) {
             // Update individual to next event.
@@ -851,15 +857,23 @@
             if (d.value.state !== currentState) {
                 d.value.statePrevious = d.value.state;
                 d.value.state = currentState;
-            }
+            } // Determine destination - the focus representing the current state of the individual.
 
-            var event = _this.metadata.event.find(function (event) {
-                return event.value === d.value.state.event;
-            });
-
+            var destination =
+                _this.settings.colorBy.type === 'categorical'
+                    ? _this.metadata.event
+                          .find(function (event) {
+                              return event.value === d.value.state.event;
+                          })
+                          .foci.find(function (focus) {
+                              return focus.key === d.value.category;
+                          })
+                    : _this.metadata.event.find(function (event) {
+                          return event.value === d.value.state.event;
+                      });
             d.value.coordinates = {
-                x: event.x,
-                y: event.y,
+                x: destination.x,
+                y: destination.y,
             };
             var datum = defineDatum.call(_this, d.value.group, d.value.state);
             Object.assign(d.value, datum);
@@ -874,6 +888,21 @@
                 return d.event === event.value && d.start_timepoint <= _this.settings.timepoint;
             }).length;
             event.change = event.count - event.prevCount;
+            if (event.foci)
+                event.foci.forEach(function (focus) {
+                    focus.data = event.data.filter(function (d, i) {
+                        return d.value.category === focus.key;
+                    });
+                    focus.count = focus.data.length;
+                    focus.cumulative = _this.data.filter(function (d) {
+                        return (
+                            d.event === event.value &&
+                            d.category === focus.key &&
+                            d.start_timepoint <= _this.settings.timepoint
+                        );
+                    }).length;
+                    focus.change = focus.count - focus.prevCount;
+                });
         });
     }
 
@@ -1162,16 +1191,27 @@
                     })
                 ).values()
             ).sort();
-            this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10); // Define the offset of each cateogry as function of the focus coordinates, the category
+            this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10); // Define the offset of each category as function of the focus coordinates, the category
             // sequence, and theta.
 
             this.settings.colorBy.theta = (2 * Math.PI) / domain.length;
-            metadata.event.forEach(function (event) {
-                event.foci = domain.map(function (category, i) {
+            metadata.event.forEach(function (event, i) {
+                event.foci = domain.map(function (category, j) {
                     var focus = {
                         key: category,
-                        x: event.x + 50 * Math.cos(i * _this.settings.colorBy.theta),
-                        y: event.y + 50 * Math.sin(i * _this.settings.colorBy.theta),
+                        n: metadata.id.filter(function (d) {
+                            return d.category === category;
+                        }).length,
+                        x: event.x + 50 * Math.cos(j * _this.settings.colorBy.theta),
+                        dx:
+                            event.x +
+                            (i === 0 ? 75 : 50) * Math.cos(j * _this.settings.colorBy.theta),
+                        y: event.y + 50 * Math.sin(j * _this.settings.colorBy.theta),
+                        dy:
+                            event.y +
+                            (i === 0 ? 75 : 50) * Math.sin(j * _this.settings.colorBy.theta),
+                        count: 0,
+                        cumulative: 0,
                     };
                     return focus;
                 });
@@ -1251,7 +1291,13 @@
                     return ''
                         .concat(d.count, ' (')
                         .concat(d3.format('.1%')(d.count / _this.data.nested.length), ')');
-                }); // Update frequency table.
+                });
+        if (this.settings.colorBy.type === 'categorical')
+            this.metadata.event.forEach(function (event) {
+                event.fociLabels.selectAll('text').text(function (d) {
+                    return ''.concat(d.count, ' (').concat(d3.format('.1%')(d.count / d.n), ')');
+                });
+            }); // Update frequency table.
 
         this.freqTable.tr
             .selectAll('td')
@@ -2385,88 +2431,135 @@
         return orbits;
     }
 
+    function isCenter(d) {
+        return Math.round(d.x) === Math.round(this.settings.orbitRadius / 2);
+    }
+
+    function isLessThanCenter(d) {
+        return d.order === 1 || Math.round(d.x) < Math.round(this.settings.width / 2);
+    }
+
+    function getPosition(d) {
+        return isCenter.call(this, d) ? 'middle' : isLessThanCenter.call(this, d) ? 'start' : 'end';
+    }
+
+    function getRelative(d) {
+        return isCenter.call(this, d) ? 0 : isLessThanCenter.call(this, d) ? '2em' : '-2em';
+    }
+
+    function isCenter$1(d) {
+        return Math.round(d.y) === Math.round(this.settings.height / 2);
+    }
+
+    function isLessThanCenter$1(d) {
+        return Math.round(d.y) < Math.round(this.settings.height / 2);
+    }
+
+    function getRelative$1(d) {
+        return isCenter$1.call(this, d) ? 0 : isLessThanCenter$1.call(this, d) ? '-2em' : '2em';
+    }
+
+    function addLabel(text) {
+        var _this = this;
+
+        var label = text
+            .append('tspan')
+            .classed('fdg-focus-annotation__label', true)
+            .attr('x', 0)
+            .attr('text-anchor', function (d) {
+                return getPosition.call(_this, d);
+            })
+            .text(function (d) {
+                return d.value;
+            });
+        return label;
+    }
+
+    function addEventCount(text) {
+        var _this = this;
+
+        var eventCount = text
+            .append('tspan')
+            .classed('fdg-focus-annotation__event-count', true)
+            .classed('fdg-hidden', this.settings.eventCount === false)
+            .attr('x', 0)
+            .attr('dy', '1.3em')
+            .attr('text-anchor', function (d) {
+                return getPosition.call(_this, d);
+            });
+        return eventCount;
+    }
+
+    function categoricallyReposition(text, label, eventCount) {
+        var _this = this;
+
+        if (this.settings.colorBy.type === 'categorical') {
+            text.style('transform', function (d) {
+                return 'translate('.concat(isCenter$1.call(_this, d) ? '-5em,0' : '0,-5em', ')');
+            });
+            label.attr('text-anchor', 'middle');
+            eventCount.attr('text-anchor', 'middle').classed('fdg-hidden', true);
+        }
+    }
+
     function annotateFoci() {
         var _this = this;
 
-        var g = this.containers.svgForeground
-            .append('g')
-            .classed('fdg-g fdg-g--focus-annotations', true);
-        var fociLabels = g
+        var fociLabels = this.containers.focusAnnotations
             .selectAll('g.fdg-focus-annotation')
             .data(this.metadata.event)
             .join('g')
             .classed('fdg-focus-annotation', true)
             .attr('transform', function (d) {
                 return 'translate('.concat(d.x, ',').concat(d.y, ')');
-            }); // Position annotation relative to focus along the x-axis.
-
-        var isCenterX = function isCenterX(d) {
-            return Math.round(d.x) === Math.round(_this.settings.orbitRadius / 2);
-        };
-
-        var isLessThanCenterX = function isLessThanCenterX(d) {
-            return d.order === 1 || Math.round(d.x) < Math.round(_this.settings.width / 2);
-        };
-
-        var getTextAnchor = function getTextAnchor(d) {
-            return isCenterX(d) ? 'middle' : isLessThanCenterX(d) ? 'start' : 'end';
-        };
-
-        var getDx = function getDx(d) {
-            return isCenterX(d) ? 0 : isLessThanCenterX(d) ? '2em' : '-2em';
-        }; // Position annotation relative to focus along the y-axis.
-
-        var isCenterY = function isCenterY(d) {
-            return Math.round(d.y) === Math.round(_this.settings.height / 2);
-        };
-
-        var isLessThanCenterY = function isLessThanCenterY(d) {
-            return Math.round(d.y) < Math.round(_this.settings.height / 2);
-        };
-
-        var getDy = function getDy(d) {
-            return isCenterY(d) ? 0 : isLessThanCenterY(d) ? '-2em' : '2em';
-        }; // background - white annotation highlight
+            }); // background - white annotation highlight
         // foreground - black annotation text
 
         ['background', 'foreground'].forEach(function (pos) {
             var text = fociLabels
                 .append('text')
-                .classed('fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos), true);
-            text.style('transform', function (d) {
-                return 'translate('.concat(getDx(d), ',').concat(getDy(d), ')');
-            });
-            var label = text
-                .append('tspan')
-                .classed('fdg-focus-annotation__label', true)
-                .attr('x', 0)
-                .attr('text-anchor', function (d) {
-                    return getTextAnchor(d);
-                })
-                .text(function (d) {
-                    return d.value;
+                .classed('fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos), true)
+                .style('transform', function (d) {
+                    return 'translate('
+                        .concat(getRelative.call(_this, d), ',')
+                        .concat(getRelative$1.call(_this, d), ')');
                 });
-            var eventCount = text
-                .append('tspan')
-                .classed('fdg-focus-annotation__event-count', true)
-                .classed('fdg-hidden', _this.settings.eventCount === false)
-                .attr('x', 0)
-                .attr('dy', '1.3em')
-                .attr('text-anchor', function (d) {
-                    return getTextAnchor(d);
-                }); // Position annotations differently in categorical layout.
+            var label = addLabel.call(_this, text);
+            var eventCount = addEventCount.call(_this, text); // Position annotations differently in categorical layout.
 
-            if (_this.settings.colorBy.type === 'categorical') {
-                text.style('transform', function (d) {
-                    return 'translate(0,'.concat(
-                        isCenterY(d) ? '0' : isLessThanCenterY(d) ? '5em' : '-5em',
-                        ')'
-                    );
-                });
-                label.attr('text-anchor', 'middle');
-                eventCount.attr('text-anchor', 'middle');
-            }
+            categoricallyReposition.call(_this, text, label, eventCount);
         });
+
+        if (this.settings.colorBy.type === 'categorical') {
+            this.metadata.event.forEach(function (event) {
+                event.fociLabels = _this.containers.focusAnnotations
+                    .append('g')
+                    .classed('fdg-focus-annotation fdg-focus-annotation--categorical', true);
+                ['background', 'foreground'].forEach(function (pos) {
+                    var text = event.fociLabels
+                        .selectAll('text.fdg-focus-annotation__'.concat(pos))
+                        .data(event.foci)
+                        .join('text')
+                        .classed(
+                            'fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos),
+                            true
+                        )
+                        .attr('x', function (d) {
+                            return d.dx;
+                        })
+                        .attr('dx', function (d) {
+                            return event.value === _this.settings.eventCentral ? null : '-1em';
+                        })
+                        .attr('y', function (d) {
+                            return d.dy;
+                        })
+                        .attr('text-anchor', function (d) {
+                            return event.value === _this.settings.eventCentral ? 'middle' : 'end';
+                        });
+                });
+            });
+        }
+
         return fociLabels;
     }
 
@@ -2635,14 +2728,21 @@
                 var state = getState.call(_this, group, 0);
                 var noStateChange =
                     group.length === 1 && state.event === _this.settings.eventCentral;
-
-                var event = _this.metadata.event.find(function (event) {
-                    return event.value === state.event;
-                });
-
+                var destination =
+                    _this.settings.colorBy.type === 'categorical'
+                        ? _this.metadata.event
+                              .find(function (event) {
+                                  return event.value === state.event;
+                              })
+                              .foci.find(function (focus) {
+                                  return focus.key === category;
+                              })
+                        : _this.metadata.event.find(function (event) {
+                              return event.value === state.event;
+                          });
                 var coordinates = {
-                    x: event.x,
-                    y: event.y,
+                    x: destination.x,
+                    y: destination.y,
                 }; // Count number of state changes, define aesthetic, define radius, and define color.
 
                 var datum = defineDatum.call(_this, group, state);

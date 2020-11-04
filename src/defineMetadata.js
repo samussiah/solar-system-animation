@@ -73,15 +73,20 @@ export default function defineMetadata() {
         ].sort();
         this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10);
 
-        // Define the offset of each cateogry as function of the focus coordinates, the category
+        // Define the offset of each category as function of the focus coordinates, the category
         // sequence, and theta.
         this.settings.colorBy.theta = (2 * Math.PI) / domain.length;
-        metadata.event.forEach((event) => {
-            event.foci = domain.map((category, i) => {
+        metadata.event.forEach((event, i) => {
+            event.foci = domain.map((category, j) => {
                 const focus = {
                     key: category,
-                    x: event.x + 50 * Math.cos(i * this.settings.colorBy.theta),
-                    y: event.y + 50 * Math.sin(i * this.settings.colorBy.theta),
+                    n: metadata.id.filter((d) => d.category === category).length,
+                    x: event.x + 50 * Math.cos(j * this.settings.colorBy.theta),
+                    dx: event.x + (i === 0 ? 75 : 50) * Math.cos(j * this.settings.colorBy.theta),
+                    y: event.y + 50 * Math.sin(j * this.settings.colorBy.theta),
+                    dy: event.y + (i === 0 ? 75 : 50) * Math.sin(j * this.settings.colorBy.theta),
+                    count: 0,
+                    cumulative: 0,
                 };
 
                 return focus;

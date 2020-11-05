@@ -2,13 +2,15 @@ import countStateChanges from './defineDatum/countStateChanges';
 import defineRadius from './defineDatum/defineRadius';
 import defineColor from './defineDatum/defineColor';
 
-export default function defineDatum(group, state) {
+export default function defineDatum(group, state, colorScale) {
     // Count state changes.
     const nStateChanges = countStateChanges.call(this, group);
 
     // Count state changes.
+    // TODO: add a setting that controls the recurrence of event aesthetic alongside a
+    // continuous or categorical color scheme
     const aesthetic =
-        this.settings.colorBy.type === 'frequency'
+        this.settings.colorBy.type !== 'continuous'
             ? nStateChanges
             : state[this.settings.colorBy.variable];
 
@@ -16,7 +18,8 @@ export default function defineDatum(group, state) {
     const r = defineRadius.call(this, nStateChanges);
 
     // Define color.
-    const color = defineColor.call(this, aesthetic);
+    // TODO: define a category-specific color scale that captures event recurrence
+    const color = defineColor.call(this, aesthetic, colorScale);
 
     return {
         nStateChanges, // number of state changes the indivdual has experienced a thus far

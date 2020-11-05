@@ -1,7 +1,7 @@
-export default function both(svg, legendDimensions) {
+export default function size(svg, legendDimensions) {
     const marks = svg
         .selectAll('circle.legend-mark')
-        .data(this.settings.colors())
+        .data(d3.range(this.settings.nColors))
         .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
         .classed('legend-mark', true)
         .attr('fill', (d) => '#aaa')
@@ -14,18 +14,18 @@ export default function both(svg, legendDimensions) {
             .attr(
                 'cx',
                 (d, i) =>
-                    i * (legendDimensions[0] / this.settings.colors().length) +
-                    legendDimensions[0] / this.settings.colors().length / 2
+                    i * (legendDimensions[0] / this.settings.nColors) +
+                    legendDimensions[0] / this.settings.nColors / 2
             )
             .attr('cy', legendDimensions[1] / 4)
             .attr('r', (d, i) => i + this.settings.minRadius);
-    else
+    else if (this.settings.shape === 'square')
         marks
             .attr(
                 'x',
                 (d, i) =>
-                    i * (legendDimensions[0] / this.settings.colors().length) +
-                    legendDimensions[0] / this.settings.colors().length / 2 -
+                    i * (legendDimensions[0] / this.settings.nColors) +
+                    legendDimensions[0] / this.settings.nColors / 2 -
                     (i + this.settings.minRadius)
             )
             .attr('y', (d, i) => legendDimensions[1] / 4 - (i + this.settings.minRadius))

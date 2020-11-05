@@ -1,13 +1,13 @@
 export default function color(svg, legendDimensions) {
     const marks = svg
         .selectAll('rect.legend-mark')
-        .data(this.settings.colors())
+        .data(this.colorScale.range())
         .enter()
         .append('rect')
         .classed('legend-mark', true)
-        .attr('x', (d, i) => i * (legendDimensions[0] / this.settings.colors().length))
+        .attr('x', (d, i) => i * (legendDimensions[0] / this.settings.nColors))
         .attr('y', 0)
-        .attr('width', legendDimensions[0] / this.settings.colors().length)
+        .attr('width', legendDimensions[0] / this.settings.nColors)
         .attr('height', legendDimensions[1] / 3)
         .attr('fill', (d) => d)
         .attr('fill-opacity', 0.5)

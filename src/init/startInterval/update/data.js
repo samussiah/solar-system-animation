@@ -30,7 +30,7 @@ export default function data() {
                 : this.metadata.event.find((event) => event.value === d.value.state.event);
         d.value.coordinates = { x: destination.x, y: destination.y };
 
-        const datum = defineDatum.call(this, d.value.group, d.value.state);
+        const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.colorScale);
         Object.assign(d.value, datum);
     });
 

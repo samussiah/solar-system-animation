@@ -65,10 +65,20 @@
         csv: csv,
     };
 
+    // TODO: setting checks
     function update() {
         var _this = this;
 
-        // Update explanation text with appropriate shape.
+        if (!['frequency', 'continuous', 'categorical'].includes(this.settings.colorBy.type)) {
+            alert(
+                '[ '.concat(
+                    colorBy,
+                    ' ] is not a valid option.  Please choose one of [ frequency ], [ continuous ], or [ categorical ].  Defaulting to  [ frequency ].'
+                )
+            );
+            this.settings.colorBy.type = 'frequency';
+        } // Update explanation text with appropriate shape.
+
         this.settings.explanation = this.settings.explanation.map(function (text) {
             return text.replace(/bubble/g, _this.settings.shape);
         }); // Define array of modal text.
@@ -83,34 +93,6 @@
             .filter(function (text) {
                 return typeof text === 'string';
             });
-    }
-
-    function colors() {
-        var colors = [
-            '#a50026', //'#d73027',
-            '#f46d43',
-            '#fdae61', //'#fee08b',
-            //'#ffffbf',
-            //'#d9ef8b',
-            '#a6d96a',
-            '#66bd63', //'#1a9850',
-            '#006837',
-        ].reverse();
-        return colors;
-    }
-
-    function colorScale() {
-        var colors$1 = colors();
-        var colorScale = d3
-            .scaleLinear()
-            .domain(d3.range(colors$1.length))
-            .range(colors$1)
-            .clamp(true);
-        return colorScale;
-    }
-
-    function color(value) {
-        return colorScale()(Math.min(value, colorScale().domain().length));
     }
 
     var settings = {
@@ -170,6 +152,7 @@
         staticLayout: 'circular',
         manyBody: 'forceManyBodyReuse',
         // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
+        collisionPadding: 1,
         // bubble color settings
         stratifyBy: {
             variable: null,
@@ -181,10 +164,13 @@
             // ['frequency', 'continuous', 'categorical']
             variable: null,
             label: null,
+            mirror: true,
         },
-        colors: colors,
-        colorScale: colorScale,
-        color: color,
+        colorScheme: 'schemeRdYlGn',
+        nColors: 6,
+        // min: 3, max: 9
+        colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'],
+        // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
         fill: null,
         // defined in ./defineMetadata/dataDrivenSettings
         // bubble size settings
@@ -271,24 +257,6 @@
         return target;
     }
 
-    function _toConsumableArray(arr) {
-        return (
-            _arrayWithoutHoles(arr) ||
-            _iterableToArray(arr) ||
-            _unsupportedIterableToArray(arr) ||
-            _nonIterableSpread()
-        );
-    }
-
-    function _arrayWithoutHoles(arr) {
-        if (Array.isArray(arr)) return _arrayLikeToArray(arr);
-    }
-
-    function _iterableToArray(iter) {
-        if (typeof Symbol !== 'undefined' && Symbol.iterator in Object(iter))
-            return Array.from(iter);
-    }
-
     function _unsupportedIterableToArray(o, minLen) {
         if (!o) return;
         if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -305,12 +273,6 @@
         for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
         return arr2;
-    }
-
-    function _nonIterableSpread() {
-        throw new TypeError(
-            'Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.'
-        );
     }
 
     function _createForOfIteratorHelper(o, allowArrayLike) {
@@ -789,9 +751,7 @@
         return r;
     }
 
-    function defineColor(value) {
-        var colorScale =
-            arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.colorScale;
+    function defineColor(value, colorScale) {
         var color =
             this.settings.colorBy.type !== 'frequency' ||
             this.settings.eventChangeCountAesthetic !== 'size'
@@ -806,18 +766,21 @@
         };
     }
 
-    function defineDatum(group, state) {
+    function defineDatum(group, state, colorScale) {
         // Count state changes.
         var nStateChanges = countStateChanges.call(this, group); // Count state changes.
+        // TODO: add a setting that controls the recurrence of event aesthetic alongside a
+        // continuous or categorical color scheme
 
         var aesthetic =
-            this.settings.colorBy.type === 'frequency'
+            this.settings.colorBy.type !== 'continuous'
                 ? nStateChanges
                 : state[this.settings.colorBy.variable]; // Define radius.
 
         var r = defineRadius.call(this, nStateChanges); // Define color.
+        // TODO: define a category-specific color scale that captures event recurrence
 
-        var color = defineColor.call(this, aesthetic);
+        var color = defineColor.call(this, aesthetic, colorScale);
         return _objectSpread2(
             {
                 nStateChanges: nStateChanges,
@@ -882,7 +845,7 @@
                 x: destination.x,
                 y: destination.y,
             };
-            var datum = defineDatum.call(_this, d.value.group, d.value.state);
+            var datum = defineDatum.call(_this, d.value.group, d.value.state, d.value.colorScale);
             Object.assign(d.value, datum);
         }); // Record change in number of IDs at each focus at current timepoint.
 
@@ -914,8 +877,6 @@
     }
 
     function resize() {
-        var _this = this;
-
         var node = this.containers.animation.node();
         this.settings.width = node.clientWidth;
         this.settings.height = this.containers.animation.node().clientHeight; // stopwatch
@@ -965,12 +926,10 @@
             this.metadata.event.forEach(function (event, i) {
                 // Update coordinates of categorical foci.
                 event.foci.forEach(function (focus, j) {
-                    focus.x = event.x + 50 * Math.cos(j * _this.settings.colorBy.theta);
-                    focus.dx =
-                        event.x + (i === 0 ? 75 : 50) * Math.cos(j * _this.settings.colorBy.theta);
-                    focus.y = event.y + 50 * Math.sin(j * _this.settings.colorBy.theta);
-                    focus.dy =
-                        event.y + (i === 0 ? 75 : 50) * Math.sin(j * _this.settings.colorBy.theta);
+                    focus.x = event.x + 50 * Math.cos(focus.angle);
+                    focus.dx = event.x + (i === 0 ? 75 : 50) * Math.cos(focus.angle);
+                    focus.y = event.y + 50 * Math.sin(focus.angle);
+                    focus.dy = event.y + (i === 0 ? 75 : 50) * Math.sin(focus.angle);
                 });
                 event.fociLabels
                     .selectAll('text.fdg-focus-annotation__text')
@@ -1046,6 +1005,52 @@
         return nest;
     }
 
+    function updateIdDependentSettings(metadata) {
+        var _this = this;
+
+        this.settings.duration =
+            this.settings.duration ||
+            d3.max(metadata.id, function (id) {
+                return id.duration;
+            });
+        this.settings.text = this.settings.text
+            .filter(function (text) {
+                return (
+                    // Remove if:
+                    //   - text contains static
+                    //   - there are no static IDs
+                    //   - static IDs are drawn separately
+                    !(
+                        /static/i.test(text) &&
+                        (metadata.id.every(function (id) {
+                            return id['static'] === false;
+                        }) ||
+                            _this.settings.drawStaticSeparately === false)
+                    )
+                );
+            })
+            .map(function (text) {
+                return text.replace('[duration]', d3.format(',d')(_this.settings.duration));
+            });
+        this.settings.minRadius =
+            this.settings.minRadius ||
+            3000 /
+                metadata.id.filter(function (d) {
+                    return !(_this.settings.drawStaticSeparately && d['static']);
+                }).length;
+        this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
+        this.settings.maxRadius =
+            this.settings.maxRadius || this.settings.minRadius + this.settings.nColors;
+        this.settings.chargeStrength = -(
+            2000 /
+            metadata.id.filter(function (d) {
+                return !(_this.settings.drawStaticSeparately && d['static']);
+            }).length
+        );
+        this.settings.staticChargeStrength = -(2000 / metadata.id.length);
+        this.settings.fill = this.settings.fill || metadata.id.length <= 2500;
+    }
+
     function event() {
         var nest = d3
             .nest()
@@ -1094,74 +1099,7 @@
         return nest;
     }
 
-    function orbit(event) {
-        var _this = this;
-
-        var nest = d3
-            .nest()
-            .key(function (d) {
-                return d.order;
-            })
-            .entries(
-                event.filter(function (event) {
-                    return event.value !== _this.settings.eventCentral;
-                })
-            );
-        return nest;
-    }
-
-    function defineMetadata() {
-        var _this = this;
-
-        // Define sets.
-        var metadata = {}; // Add additional metadata to ID set.
-
-        metadata.id = id.call(this); // Settings dependent on the ID set.
-
-        this.settings.duration =
-            this.settings.duration ||
-            d3.max(metadata.id, function (id) {
-                return id.duration;
-            });
-        this.settings.text = this.settings.text
-            .filter(function (text) {
-                return (
-                    // Remove if:
-                    //   - text contains static
-                    //   - there are no static IDs
-                    //   - static IDs are drawn separately
-                    !(
-                        /static/i.test(text) &&
-                        (metadata.id.every(function (id) {
-                            return id['static'] === false;
-                        }) ||
-                            _this.settings.drawStaticSeparately === false)
-                    )
-                );
-            })
-            .map(function (text) {
-                return text.replace('[duration]', d3.format(',d')(_this.settings.duration));
-            });
-        this.settings.minRadius =
-            this.settings.minRadius ||
-            3000 /
-                metadata.id.filter(function (d) {
-                    return !(_this.settings.drawStaticSeparately && d['static']);
-                }).length;
-        this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
-        this.settings.maxRadius =
-            this.settings.maxRadius || this.settings.minRadius + this.settings.colors().length;
-        this.settings.chargeStrength = -(
-            2000 /
-            metadata.id.filter(function (d) {
-                return !(_this.settings.drawStaticSeparately && d['static']);
-            }).length
-        );
-        this.settings.staticChargeStrength = -(2000 / metadata.id.length);
-        this.settings.fill = this.settings.fill || metadata.id.length <= 2500; // Add additional metadata to event set.
-
-        metadata.event = event.call(this); // Update settings that depend on event set.
-
+    function updateEventDependentSettings(metadata) {
         this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].value;
         this.settings.nFoci =
             this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral; // number of event types minus one
@@ -1170,73 +1108,155 @@
             this.settings.eventChangeCount ||
             metadata.event.slice(1).map(function (event) {
                 return event.value;
-            }); // Define orbits.
-
-        metadata.orbit = orbit.call(this, metadata.event); // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
-
-        coordinates.call(this, metadata); // Define color scale.
-
-        var colors = this.settings.colors();
-        var domain;
-
-        if (this.settings.colorBy.type === 'frequency') {
-            domain = d3.range(colors.length);
-            this.colorScale = d3.scaleLinear().domain(domain).range(colors).clamp(true);
-        } else if (this.settings.colorBy.type === 'continuous') {
-            domain = d3.extent(this.data, function (d) {
-                return d[_this.settings.colorBy.variable];
             });
-            this.colorScale = d3.scaleSequential(d3.interpolateRdYlGn).domain(domain);
-            var interpolator = this.colorScale.interpolator(); // read the color scale's interpolator
+    }
+
+    function orbit(metadata) {
+        var _this = this;
+
+        var nest = d3
+            .nest()
+            .key(function (d) {
+                return d.order;
+            })
+            .entries(
+                metadata.event.filter(function (event) {
+                    return event.value !== _this.settings.eventCentral;
+                })
+            );
+        return nest;
+    }
+
+    function strata(metadata) {
+        var _this = this;
+
+        var nest;
+
+        if (this.settings.colorBy.type === 'categorical') {
+            nest = d3
+                .nest()
+                .key(function (d) {
+                    return d[_this.settings.colorBy.variable];
+                })
+                .entries(this.data)
+                .sort(function (a, b) {
+                    return a.key < b.key ? -1 : 1;
+                });
+            this.settings.colorBy.nStrata = nest.length;
+            this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
+            nest.forEach(function (stratum, i) {
+                var colorScheme = _this.settings.colorSchemes[i];
+                stratum.colorScheme =
+                    d3[
+                        'scheme'
+                            .concat(colorScheme.substring(0, 1).toUpperCase())
+                            .concat(colorScheme.substring(1), 's')
+                    ]; // domain: number of recurrent events
+                //  range: sequential, single-hue color scheme of the same length
+
+                stratum.colorScale = d3
+                    .scaleLinear()
+                    .domain(d3.range(_this.settings.nColors))
+                    .range(
+                        stratum.colorScheme[9].reverse().slice(0, _this.settings.nColors).reverse()
+                    )
+                    .clamp(true);
+                stratum.n = stratum.values.length; // TODO: figure out how to shift the foci to match the order in the legend
+
+                stratum.angle =
+                    _this.settings.colorBy.nStrata % 2
+                        ? i * _this.settings.colorBy.theta
+                        : i * _this.settings.colorBy.theta +
+                          Math.PI / _this.settintgs.colorBy.nStrata;
+            });
+        }
+
+        return nest;
+    }
+
+    function colorScale(metadata) {
+        var colorBy = this.settings.colorBy;
+        var domain =
+            colorBy.type === 'frequency'
+                ? d3.range(this.settings.nColors)
+                : colorBy.type === 'continuous'
+                ? d3.extent(this.data, function (d) {
+                      return d[colorBy.variable];
+                  })
+                : colorBy.type === 'categorical'
+                ? metadata.strata.map(function (d) {
+                      return d.key;
+                  })
+                : null;
+        var colorScale =
+            colorBy.type === 'frequency'
+                ? d3
+                      .scaleLinear()
+                      .domain(domain)
+                      .range(
+                          colorBy.mirror
+                              ? d3[this.settings.colorScheme][this.settings.nColors].reverse()
+                              : d3[this.settings.colorScheme][this.settings.nColors]
+                      )
+                      .clamp(true)
+                : colorBy.type === 'continuous'
+                ? d3.scaleSequential(d3.interpolateRdYlGn).domain(domain)
+                : colorBy.type === 'categorical'
+                ? d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10)
+                : null; // Invert color scale.
+
+        if (colorBy.type === 'continuous' && colorBy.mirror) {
+            var interpolator = colorScale.interpolator(); // read the color scale's interpolator
 
             var mirror = function mirror(t) {
                 return interpolator(1 - t);
             }; // returns the mirror image of the interpolator
 
-            if (this.settings.colorBy.mirror) this.colorScale.interpolator(mirror); // updates the scale's interpolator
-        } else if (this.settings.colorBy.type === 'categorical') {
-            domain = _toConsumableArray(
-                new Set(
-                    this.data.map(function (d) {
-                        return d[_this.settings.colorBy.variable];
-                    })
-                ).values()
-            ).sort();
-            var colorSchemes = ['blue', 'orange', 'red', 'purple', 'green'].map(function (color) {
-                return d3[
-                    'scheme'
-                        .concat(color.substring(0, 1).toUpperCase())
-                        .concat(color.substring(1), 's')
-                ];
-            });
-            this.colorScale = d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10); // Define the offset of each category as function of the focus coordinates, the category
-            // sequence, and theta.
+            colorScale.interpolator(mirror); // updates the scale's interpolator
+        }
 
-            this.settings.colorBy.theta = (2 * Math.PI) / domain.length;
+        return colorScale;
+    }
+
+    function defineMetadata() {
+        var metadata = {}; // Define ID set and update settings that depend on the ID set.
+
+        metadata.id = id.call(this);
+        updateIdDependentSettings.call(this, metadata); // Define event set and update settings that depend on event set.
+
+        metadata.event = event.call(this);
+        updateEventDependentSettings.call(this, metadata); // Define orbit set.
+
+        metadata.orbit = orbit.call(this, metadata); // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
+
+        coordinates.call(this, metadata); // Define strata set.
+
+        metadata.strata = strata.call(this, metadata); // Define color scale.
+
+        this.colorScale = colorScale.call(this, metadata); // Define the offset of each stratum as function of the focus coordinates, the stratum
+        // sequence, and theta.
+
+        if (this.settings.colorBy.type === 'categorical') {
             metadata.event.forEach(function (event, i) {
-                event.foci = domain.map(function (category, j) {
-                    var angle =
-                        domain.length % 2
-                            ? j * _this.settings.colorBy.theta
-                            : j * _this.settings.colorBy.theta + Math.PI / domain.length;
-                    var focus = {
-                        key: category,
-                        n: metadata.id.filter(function (d) {
-                            return d.category === category;
-                        }).length,
-                        x: event.x + 50 * Math.cos(angle),
-                        dx: event.x + (i === 0 ? 75 : 50) * Math.cos(angle),
-                        y: event.y + 50 * Math.sin(angle),
-                        dy: event.y + (i === 0 ? 75 : 50) * Math.sin(angle),
-                        count: 0,
-                        cumulative: 0,
-                    };
+                event.foci = metadata.strata.map(function (stratum, j) {
+                    var focus = _objectSpread2(
+                        _objectSpread2({}, stratum),
+                        {},
+                        {
+                            x: event.x + 50 * Math.cos(stratum.angle),
+                            dx: event.x + (i === 0 ? 75 : 50) * Math.cos(stratum.angle),
+                            y: event.y + 50 * Math.sin(stratum.angle),
+                            dy: event.y + (i === 0 ? 75 : 50) * Math.sin(stratum.angle),
+                            count: 0,
+                            cumulative: 0,
+                        }
+                    );
+
                     return focus;
                 });
             });
         }
 
-        this.domain = domain;
         return metadata;
     }
 
@@ -1387,18 +1407,26 @@
             arguments.length > 3 && arguments[3] !== undefined
                 ? arguments[3]
                 : 'thick groove rgba(215,25,28,.5)';
-        component
-            .style(style, value1)
-            .transition()
-            .duration(this.settings.modalSpeed / 15)
-            .style(style, value2)
-            .transition()
-            .duration(this.settings.modalSpeed / 15)
-            .delay(this.settings.modalSpeed - (this.settings.modalSpeed / 15) * 2)
-            .style(style, value1)
-            .on('end', function () {
-                return component.style(style, null);
-            });
+        var duration = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+        if (duration)
+            component
+                .style(style, value1)
+                .transition()
+                .duration(this.settings.modalSpeed / 15)
+                .style(style, value2)
+                .transition()
+                .duration(this.settings.modalSpeed / 15)
+                .delay(this.settings.modalSpeed - (this.settings.modalSpeed / 15) * 2)
+                .style(style, value1)
+                .on('end', function () {
+                    return component.style(style, null);
+                });
+        else {
+            component.style(style, value2);
+            d3.timeout(function () {
+                component.style(style, null);
+            }, this.settings.modalSpeed);
+        }
     }
 
     function update$2() {
@@ -1424,7 +1452,8 @@
                     this.containers.svgBackground.selectAll('.fdg-static__mark'),
                     'stroke',
                     'rgba(215,25,28,0)',
-                    'rgba(215,25,28,.5)'
+                    'rgba(215,25,28,.5)',
+                    false
                 );
                 break;
 
@@ -2120,20 +2149,20 @@
         return svg.node();
     }
 
-    function color$1(svg, legendDimensions) {
+    function color(svg, legendDimensions) {
         var _this = this;
 
         var marks = svg
             .selectAll('rect.legend-mark')
-            .data(this.settings.colors())
+            .data(this.colorScale.range())
             .enter()
             .append('rect')
             .classed('legend-mark', true)
             .attr('x', function (d, i) {
-                return i * (legendDimensions[0] / _this.settings.colors().length);
+                return i * (legendDimensions[0] / _this.settings.nColors);
             })
             .attr('y', 0)
-            .attr('width', legendDimensions[0] / this.settings.colors().length)
+            .attr('width', legendDimensions[0] / this.settings.nColors)
             .attr('height', legendDimensions[1] / 3)
             .attr('fill', function (d) {
                 return d;
@@ -2146,12 +2175,12 @@
         return marks;
     }
 
-    function both(svg, legendDimensions) {
+    function size(svg, legendDimensions) {
         var _this = this;
 
         var marks = svg
             .selectAll('circle.legend-mark')
-            .data(this.settings.colors())
+            .data(d3.range(this.settings.nColors))
             .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
             .classed('legend-mark', true)
             .attr('fill', function (d) {
@@ -2166,20 +2195,20 @@
             marks
                 .attr('cx', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.colors().length) +
-                        legendDimensions[0] / _this.settings.colors().length / 2
+                        i * (legendDimensions[0] / _this.settings.nColors) +
+                        legendDimensions[0] / _this.settings.nColors / 2
                     );
                 })
                 .attr('cy', legendDimensions[1] / 4)
                 .attr('r', function (d, i) {
                     return i + _this.settings.minRadius;
                 });
-        else
+        else if (this.settings.shape === 'square')
             marks
                 .attr('x', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.colors().length) +
-                        legendDimensions[0] / _this.settings.colors().length / 2 -
+                        i * (legendDimensions[0] / _this.settings.nColors) +
+                        legendDimensions[0] / _this.settings.nColors / 2 -
                         (i + _this.settings.minRadius)
                     );
                 })
@@ -2195,12 +2224,12 @@
         return marks;
     }
 
-    function both$1(svg, legendDimensions) {
+    function both(svg, legendDimensions) {
         var _this = this;
 
         var marks = svg
             .selectAll('circle.legend-mark')
-            .data(this.settings.colors())
+            .data(this.colorScale.range())
             .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
             .classed('legend-mark', true)
             .attr('fill', function (d) {
@@ -2215,20 +2244,20 @@
             marks
                 .attr('cx', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.colors().length) +
-                        legendDimensions[0] / _this.settings.colors().length / 2
+                        i * (legendDimensions[0] / _this.settings.nColors) +
+                        legendDimensions[0] / _this.settings.nColors / 2
                     );
                 })
                 .attr('cy', legendDimensions[1] / 4)
                 .attr('r', function (d, i) {
                     return i + _this.settings.minRadius;
                 });
-        else
+        else if (this.settings.shape === 'square')
             marks
                 .attr('x', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.colors().length) +
-                        legendDimensions[0] / _this.settings.colors().length / 2 -
+                        i * (legendDimensions[0] / _this.settings.nColors) +
+                        legendDimensions[0] / _this.settings.nColors / 2 -
                         (i + _this.settings.minRadius)
                     );
                 })
@@ -2245,9 +2274,9 @@
     }
 
     var makeLegendMarks = {
-        color: color$1,
-        size: both,
-        both: both$1,
+        color: color,
+        size: size,
+        both: both,
     };
 
     function makeLegend(type) {
@@ -2282,20 +2311,17 @@
 
         var lower = svg
             .append('text')
-            .attr('x', legendDimensions[0] / this.settings.colors().length / 2)
+            .attr('x', legendDimensions[0] / this.settings.nColors / 2)
             .attr('y', legendDimensions[1] / 2 + 16)
             .attr('text-anchor', 'middle')
             .text('0'); // upper end of scale
 
         var upper = svg
             .append('text')
-            .attr(
-                'x',
-                legendDimensions[0] - legendDimensions[0] / this.settings.colors().length / 2
-            )
+            .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.nColors / 2)
             .attr('y', legendDimensions[1] / 2 + 16)
             .attr('text-anchor', 'middle')
-            .text(''.concat(this.settings.colors().length - 1, '+'));
+            .text(''.concat(this.settings.nColors - 1, '+'));
         return {
             container: container,
             label: label,
@@ -2506,6 +2532,10 @@
             })
             .text(function (d) {
                 return d.value;
+            });
+        if (this.settings.colorBy.type === 'categorical')
+            label.attr('alignment-baseline', function (d) {
+                return getPosition$1.call(_this, d, true);
             });
         return label;
     }
@@ -2783,7 +2813,13 @@
                     y: destination.y,
                 }; // Count number of state changes, define aesthetic, define radius, and define color.
 
-                var datum = defineDatum.call(_this, group, state);
+                var colorScale =
+                    _this.settings.colorBy.type === 'categorical'
+                        ? _this.metadata.strata.find(function (stratum) {
+                              return stratum.key === category;
+                          }).colorScale
+                        : _this.colorScale;
+                var datum = defineDatum.call(_this, group, state, colorScale);
                 return _objectSpread2(
                     {
                         group: group,
@@ -2797,6 +2833,7 @@
                         noStateChange: noStateChange,
                         // boolean - did individual have any events? used to present those individuals in a static force layout
                         coordinates: coordinates,
+                        colorScale: colorScale,
                     },
                     datum
                 );
@@ -3765,12 +3802,8 @@
     }
 
     function addForceSimulation() {
-        // When using D3’s force layout with a disjoint graph, you typically want the positioning
-        // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
-        // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
-        // the viewport.
-        //
-        // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
+        var _this = this;
+
         this.forceSimulation = d3
             .forceSimulation()
             .nodes(
@@ -3783,7 +3816,7 @@
             .force(
                 'center',
                 d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)
-            )
+            ) // cleared after first interval
             .force(
                 'x',
                 d3
@@ -3807,16 +3840,23 @@
                 this.settings.manyBody === 'forceManyBodyReuse'
                     ? forceManyBodyReuse().strength(this.settings.chargeStrength)
                     : this.settings.manyBody === 'forceManyBodySampled'
-                    ? forceManyBodySampled().strength(this.settings.chargeStrength * 5)
+                    ? forceManyBodySampled().strength(
+                          (this.settings.chargeStrength * this.metadata.id.length) / 1000
+                      )
                     : d3.forceManyBody().strength(this.settings.chargeStrength)
             )
             .force(
                 'collide',
                 d3.forceCollide().radius(function (d) {
-                    return d.value.r + 1;
-                }) //d3.forceCollide().radius(this.settings.minRadius + 1)
+                    return d.value.r + _this.settings.collisionPadding;
+                })
             )
-            .on('tick', tick.bind(this));
+            .on('tick', tick.bind(this)); // When using D3’s force layout with a disjoint graph, you typically want the positioning
+        // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
+        // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
+        // the viewport.
+        //
+        // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
     }
 
     function init() {

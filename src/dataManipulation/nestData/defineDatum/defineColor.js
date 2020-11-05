@@ -1,4 +1,4 @@
-export default function defineColor(value, colorScale = this.colorScale) {
+export default function defineColor(value, colorScale) {
     const color =
         this.settings.colorBy.type !== 'frequency' ||
         this.settings.eventChangeCountAesthetic !== 'size'

@@ -24,7 +24,8 @@ export default function update() {
                 this.containers.svgBackground.selectAll('.fdg-static__mark'),
                 'stroke',
                 'rgba(215,25,28,0)',
-                'rgba(215,25,28,.5)'
+                'rgba(215,25,28,.5)',
+                false
             );
             break;
         case /controls/i.test(this.modalText):

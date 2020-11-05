@@ -7,12 +7,14 @@ fetch('../data/data_2000_fixed.csv')
             data,
             '#container',
             {
-                eventChangeCountAesthetic: 'size',
                 colorBy: {
                     type: 'categorical',
                     variable: 'category',
                     label: 'Categories',
                 },
+                eventChangeCountAesthetic: 'size',
+                //collisionPadding: 3,
+                //manyBody: 'forceManyBodySampled',
             }
         );
     });

@@ -50,12 +50,10 @@ export default function resize() {
         this.metadata.event.forEach((event, i) => {
             // Update coordinates of categorical foci.
             event.foci.forEach((focus, j) => {
-                focus.x = event.x + 50 * Math.cos(j * this.settings.colorBy.theta);
-                focus.dx =
-                    event.x + (i === 0 ? 75 : 50) * Math.cos(j * this.settings.colorBy.theta);
-                focus.y = event.y + 50 * Math.sin(j * this.settings.colorBy.theta);
-                focus.dy =
-                    event.y + (i === 0 ? 75 : 50) * Math.sin(j * this.settings.colorBy.theta);
+                focus.x = event.x + 50 * Math.cos(focus.angle);
+                focus.dx = event.x + (i === 0 ? 75 : 50) * Math.cos(focus.angle);
+                focus.y = event.y + 50 * Math.sin(focus.angle);
+                focus.dy = event.y + (i === 0 ? 75 : 50) * Math.sin(focus.angle);
             });
             event.fociLabels
                 .selectAll(`text.fdg-focus-annotation__text`)

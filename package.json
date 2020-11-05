@@ -1,5 +1,5 @@
 {
-  "TODO": "make stratified foci work better",
+  "TODO": "",
   "name": "force-directed-graph",
   "version": "1.6.1",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",

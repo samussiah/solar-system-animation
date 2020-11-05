@@ -1,7 +1,4 @@
 import update from './settings/update';
-import colors from './settings/colors';
-import colorScale from './settings/colorScale';
-import color from './settings/color';
 
 const settings = {
     update,
@@ -54,6 +51,7 @@ const settings = {
     chargeStrength: null, // defined in ./defineMetadata
     staticLayout: 'circular',
     manyBody: 'forceManyBodyReuse', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
+    collisionPadding: 1,
 
     // bubble color settings
     stratifyBy: {
@@ -64,10 +62,11 @@ const settings = {
         type: 'frequency', // ['frequency', 'continuous', 'categorical']
         variable: null,
         label: null,
+        mirror: true,
     },
-    colors,
-    colorScale,
-    color,
+    colorScheme: 'schemeRdYlGn',
+    nColors: 6, // min: 3, max: 9
+    colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'], // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
     fill: null, // defined in ./defineMetadata/dataDrivenSettings
 
     // bubble size settings

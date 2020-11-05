@@ -27,7 +27,11 @@ export default function nestData() {
             const coordinates = { x: destination.x, y: destination.y };
 
             // Count number of state changes, define aesthetic, define radius, and define color.
-            const datum = defineDatum.call(this, group, state);
+            const colorScale =
+                this.settings.colorBy.type === 'categorical'
+                    ? this.metadata.strata.find((stratum) => stratum.key === category).colorScale
+                    : this.colorScale;
+            const datum = defineDatum.call(this, group, state, colorScale);
 
             return {
                 group, // array of data representing all records for an individual
@@ -37,6 +41,7 @@ export default function nestData() {
                 state, // object representing a single record of an individual
                 noStateChange, // boolean - did individual have any events? used to present those individuals in a static force layout
                 coordinates,
+                colorScale,
                 ...datum,
             };
         })

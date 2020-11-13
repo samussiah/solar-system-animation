@@ -16,7 +16,7 @@ onmessage = function (event) {
         x,
         y, // coordinates
         radius,
-        color, // aesthetics
+        id,
     } = event.data;
 
     const simulation = d3.forceSimulation().nodes(nodes);
@@ -48,5 +48,5 @@ onmessage = function (event) {
     }
 
     // return updated nodes array to be drawn and rendered
-    postMessage({ nodes, radius, color });
+    postMessage({ nodes, radius, id });
 };

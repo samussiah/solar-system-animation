@@ -2,7 +2,7 @@ export default function draw(worker, color) {
     const main = this;
 
     worker.onmessage = function (event) {
-        const className = `fdg-static--${event.data.color.replace(/[^0-9_a-z]/gi, '-')}`;
+        const className = `fdg-static--${event.data.id.replace(/[^0-9_a-z]/gi, '-')}`;
         main.containers.svgBackground.selectAll(`.${className}`).remove();
         const g = main.containers.svgBackground
             .insert('g', ':first-child')
@@ -20,9 +20,8 @@ export default function draw(worker, color) {
             .data(event.data.nodes)
             .join(main.settings.shape === 'circle' ? 'circle' : 'rect')
             .classed('fdg-static__mark', true)
-            .attr('fill', event.data.color)
+            .attr('fill', (d) => d.color)
             .attr('fill-opacity', 0.25);
-        //.attr('fill-opacity', 0);
 
         if (main.settings.shape === 'circle')
             marks
@@ -35,10 +34,5 @@ export default function draw(worker, color) {
                 .attr('y', (d) => d.y - event.data.radius)
                 .attr('width', event.data.radius * 2)
                 .attr('height', event.data.radius * 2);
-
-        //marks
-        //    .transition()
-        //    .duration(5000)
-        //    .attr('fill-opacity', .25);
     };
 }

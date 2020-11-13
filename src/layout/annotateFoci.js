@@ -29,7 +29,7 @@ export default function annotateFoci() {
         categoricallyReposition.call(this, text, label, eventCount);
     });
 
-    if (this.settings.colorBy.type === 'categorical') {
+    if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
         this.metadata.event.forEach((event) => {
             event.fociLabels = this.containers.focusAnnotations
                 .append('g')

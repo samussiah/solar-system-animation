@@ -8,7 +8,7 @@ export default function addLabel(text) {
         .attr('x', 0)
         .attr('text-anchor', (d) => getTextAnchor.call(this, d))
         .text((d) => d.value);
-    if (this.settings.colorBy.type === 'categorical')
+    if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
         label.attr('alignment-baseline', (d) => getAlignmentBaseline.call(this, d, true));
 
     return label;

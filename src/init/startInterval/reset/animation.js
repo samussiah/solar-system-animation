@@ -22,7 +22,7 @@ export default function resetAnimation() {
         const event = this.metadata.event.find((event) => event.value === d.value.state.event);
         d.value.coordinates = { x: event.x, y: event.y };
 
-        const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.statePrevious);
+        const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.colorScale);
         Object.assign(d.value, datum);
     });
 

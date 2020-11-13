@@ -19,7 +19,7 @@ export default function nestData() {
             const state = getState.call(this, group, 0);
             const noStateChange = group.length === 1 && state.event === this.settings.eventCentral;
             const destination =
-                this.settings.colorBy.type === 'categorical'
+                this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify
                     ? this.metadata.event
                           .find((event) => event.value === state.event)
                           .foci.find((focus) => focus.key === category)

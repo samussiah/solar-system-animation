@@ -39,7 +39,7 @@ export default function text() {
             .selectAll('tspan.fdg-focus-annotation__event-count')
             .text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
 
-    if (this.settings.colorBy.type === 'categorical')
+    if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
         this.metadata.event.forEach((event) => {
             event.fociLabels
                 .selectAll('text')

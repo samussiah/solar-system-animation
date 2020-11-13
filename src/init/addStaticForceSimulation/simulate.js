@@ -1,6 +1,6 @@
 import forceSimulationWorker from 'web-worker:./forceSimulationWorker';
 
-export default function simulate(data, x, y, color) {
+export default function simulate(data, x, y, id) {
     const worker = new forceSimulationWorker();
 
     worker.postMessage({
@@ -18,7 +18,9 @@ export default function simulate(data, x, y, color) {
 
         // aesthetics
         radius: this.settings.minRadius,
-        color,
+
+        // miscellaneous
+        id,
     });
 
     return worker;

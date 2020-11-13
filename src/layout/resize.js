@@ -46,7 +46,7 @@ export default function resize() {
         .attr('r', (d) => d.r);
 
     // focus coordinates
-    if (this.settings.colorBy.type === 'categorical') {
+    if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
         this.metadata.event.forEach((event, i) => {
             // Update coordinates of categorical foci.
             event.foci.forEach((focus, j) => {

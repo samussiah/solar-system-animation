@@ -135,24 +135,6 @@
         return target;
     }
 
-    function _toConsumableArray(arr) {
-        return (
-            _arrayWithoutHoles(arr) ||
-            _iterableToArray(arr) ||
-            _unsupportedIterableToArray(arr) ||
-            _nonIterableSpread()
-        );
-    }
-
-    function _arrayWithoutHoles(arr) {
-        if (Array.isArray(arr)) return _arrayLikeToArray(arr);
-    }
-
-    function _iterableToArray(iter) {
-        if (typeof Symbol !== 'undefined' && Symbol.iterator in Object(iter))
-            return Array.from(iter);
-    }
-
     function _unsupportedIterableToArray(o, minLen) {
         if (!o) return;
         if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -169,12 +151,6 @@
         for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
         return arr2;
-    }
-
-    function _nonIterableSpread() {
-        throw new TypeError(
-            'Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.'
-        );
     }
 
     function _createForOfIteratorHelper(o, allowArrayLike) {
@@ -267,7 +243,7 @@
                 var oVal = obj[key];
 
                 if (Array.isArray(pVal) && Array.isArray(oVal)) {
-                    prev[key] = pVal.concat.apply(pVal, _toConsumableArray(oVal));
+                    prev[key] = oVal; //pVal.concat(...oVal);
                 } else if (isObject(pVal) && isObject(oVal)) {
                     prev[key] = mergeDeep(pVal, oVal);
                 } else {
@@ -296,22 +272,27 @@
                 )
             );
             this.settings.colorBy.type = 'frequency';
-        } // Update explanation text with appropriate shape.
+        } // Define array of modal text.
 
-        this.settings.explanation = this.settings.explanation.map(function (text) {
-            return text.replace(/bubble/g, _this.settings.shape);
-        }); // Define array of modal text.
+        var texts = [];
 
-        this.settings.text = []
-            .concat(
+        if (Array.isArray(this.settings.explanation)) {
+            // Update explanation text with appropriate shape.
+            this.settings.explanation = this.settings.explanation.map(function (text) {
+                return text.replace(/bubble/g, _this.settings.shape);
+            });
+            texts = texts.concat(
                 this.settings.explanation.filter(function (el) {
                     return !(_this.settings.hideControls && el.includes('controls'));
                 })
-            )
-            .concat(this.settings.information)
-            .filter(function (text) {
-                return typeof text === 'string';
-            });
+            );
+        }
+
+        if (Array.isArray(this.settings.information))
+            texts = texts.concat(this.settings.information);
+        this.settings.text = texts.filter(function (text) {
+            return typeof text === 'string';
+        });
     }
 
     var settings = {
@@ -1511,7 +1492,8 @@
 
     function update$2() {
         this.modalText = this.settings.text[this.settings.modalIndex];
-        if (this.settings.modalIndex === this.settings.text.length - 1) this.modal.stop(); // Update modal text.
+        if (this.settings.modalIndex === this.settings.text.length - 1 && this.modal)
+            this.modal.stop(); // Update modal text.
 
         this.containers.modal.html(this.modalText).call(fadeIn, this.settings.modalSpeed); // Highlight referenced component.
 

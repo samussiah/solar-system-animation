@@ -3,7 +3,7 @@ import emphasizeComponent from './emphasizeComponent';
 
 export default function update() {
     this.modalText = this.settings.text[this.settings.modalIndex];
-    if (this.settings.modalIndex === this.settings.text.length - 1) this.modal.stop();
+    if (this.settings.modalIndex === this.settings.text.length - 1 && this.modal) this.modal.stop();
 
     // Update modal text.
     this.containers.modal.html(this.modalText).call(fadeIn, this.settings.modalSpeed);

@@ -10,7 +10,7 @@ export default function forceDirectedGraph(data, element = 'body', settings = {}
     const fdg = {
         data,
         element,
-        settings: Object.assign(defaults, settings),
+        settings: util.mergeDeep(defaults, settings),
         util,
     };
 

@@ -23,7 +23,7 @@ export default function data() {
 
         // Determine destination - the focus representing the current state of the individual.
         const destination =
-            this.settings.colorBy.type === 'categorical'
+            this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify
                 ? this.metadata.event
                       .find((event) => event.value === d.value.state.event)
                       .foci.find((focus) => focus.key === d.value.category)

@@ -63,6 +63,7 @@ const settings = {
         variable: null,
         label: null,
         mirror: true,
+        stratify: true,
     },
     colorScheme: 'schemeRdYlGn',
     nColors: 6, // min: 3, max: 9
@@ -76,7 +77,7 @@ const settings = {
         label: null,
     },
     minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
-    maxRadius: null, // defined in ./defineMetadata/dataDrivenSettings
+    maxRadius: 10, // defined in ./defineMetadata/dataDrivenSettings
     shape: 'circle',
 
     // modals

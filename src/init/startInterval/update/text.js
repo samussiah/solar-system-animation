@@ -49,7 +49,7 @@ export default function text() {
     // Update frequency table.
     this.freqTable.tr
         .selectAll('td')
-        .data((event) => [event.value, event.cumulative])
+        .data((event) => [event.value, event.count, event.cumulative])
         .join('td')
         .text((d) => (typeof d === 'number' ? d3.format(',d')(d) : d));
 }

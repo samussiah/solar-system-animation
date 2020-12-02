@@ -12,6 +12,7 @@ export default function strata(metadata) {
         this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
 
         nest.forEach((stratum, i) => {
+            stratum.value = stratum.key;
             const colorScheme = this.settings.colorSchemes[i];
             stratum.colorScheme =
                 d3[

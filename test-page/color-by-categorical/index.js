@@ -11,6 +11,7 @@ fetch('../data/data_2000_fixed.csv')
                     type: 'categorical',
                     variable: 'category',
                     label: 'Categories',
+                    //stratify: false,
                 },
                 eventChangeCountAesthetic: 'size',
                 //collisionPadding: 3,

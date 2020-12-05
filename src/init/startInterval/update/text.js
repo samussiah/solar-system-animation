@@ -37,19 +37,24 @@ export default function text() {
     if (this.settings.eventCount)
         this.focusAnnotations
             .selectAll('tspan.fdg-focus-annotation__event-count')
-            .text((d) => `${d.count} (${d3.format('.1%')(d.count / this.data.nested.length)})`);
+            .text((d) => d.countProportionFmt);
 
     if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
         this.metadata.event.forEach((event) => {
-            event.fociLabels
-                .selectAll('text')
-                .text((d) => `${d.count} (${d3.format('.1%')(d.count / d.n)})`);
+            event.fociLabels.selectAll('text').text((d) => d.countProportionFmt);
         });
 
     // Update frequency table.
-    this.freqTable.tr
-        .selectAll('td')
-        .data((event) => [event.value, event.count, event.cumulative])
-        .join('td')
-        .text((d) => (typeof d === 'number' ? d3.format(',d')(d) : d));
+    this.freqTable.tr.each(function (d) {
+        const tr = d3.select(this);
+        tr.selectAll('td')
+            .data(d.cells)
+            .join('td')
+            .style('background', (di, i) =>
+                i === 1
+                    ? `linear-gradient(to right, #bbb 0, #bbb ${d.proportionFmt}, transparent ${d.proportionFmt})`
+                    : null
+            )
+            .text((d) => d);
+    });
 }

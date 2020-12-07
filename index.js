@@ -331,7 +331,7 @@
         sequence_var: 'seq',
         // time settings
         timepoint: 0,
-        timeUnit: 'days since randomization',
+        timeUnit: 'days',
         duration: null,
         // defined in ./defineMetadata/dataDrivenSettings
         resetDelay: 15000,
@@ -378,11 +378,6 @@
         // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
         collisionPadding: 1,
         // bubble color settings
-        stratifyBy: {
-            variable: null,
-            label: null,
-        },
-        // up to five strata
         colorBy: {
             type: 'frequency',
             // ['frequency', 'continuous', 'categorical']
@@ -409,7 +404,12 @@
         // defined in ./defineMetadata/dataDrivenSettings
         maxRadius: 10,
         // defined in ./defineMetadata/dataDrivenSettings
+        // bubble shape settings
         shape: 'circle',
+        shapeBy: {
+            variable: null,
+            label: null,
+        },
         // modals
         modal: true,
         // display modals?
@@ -534,7 +534,10 @@
     function canvas(main) {
         var animation = addElement('animation', main);
         this.settings.width = animation.node().clientWidth;
-        this.settings.height = animation.node().clientHeight; // background SVG
+        this.settings.height = animation.node().clientHeight; // progress bar at top
+
+        var progressBar = addElement('progress-bar', animation);
+        var progressDay = addElement('progress-day', animation); // background SVG
 
         var svgBackground = addElement('svg--background', animation, 'svg')
             .attr('width', this.settings.width)
@@ -566,6 +569,8 @@
         var modal = addElement('modal__text', modalContainer);
         return {
             animation: animation,
+            progressBar: progressBar,
+            progressDay: progressDay,
             svgBackground: svgBackground,
             canvas: canvas,
             svgForeground: svgForeground,
@@ -1052,7 +1057,7 @@
     }
 
     function layout() {
-        var main = addElement('main', d3.select(this.element)); // controls on top
+        var main = addElement('main', d3.select(this.element)); // controls positioned absolutely
 
         var controls$1 = controls.call(this, main); // sidebar to the left
 
@@ -1360,10 +1365,15 @@
     //   - nParticipants (%)
     //   - nEvents
     function freqTable(metadata) {
+        var _this = this;
+
         var freqTable = d3.merge(
             metadata.event.map(function (event) {
                 // One record per event per focus plus an overall event record.
-                var rowGroup = [event].concat(_toConsumableArray(event.foci));
+                var rowGroup =
+                    _this.settings.colorBy.type === 'categorical'
+                        ? [event].concat(_toConsumableArray(event.foci))
+                        : [event];
                 rowGroup.forEach(function (d) {
                     d.state = event.value; // state
 
@@ -1432,13 +1442,18 @@
     }
 
     function text() {
-        this.settings.progress = this.settings.timepoint / this.settings.duration; // Update timepoint control.
+        this.settings.progress = this.settings.timepoint / this.settings.duration; // Update progress bar.
+
+        this.containers.progressBar.style('width', ''.concat(this.settings.progress * 100, '%'));
+        this.containers.progressDay
+            .style('right', ''.concat(100 - this.settings.progress * 100, '%'))
+            .text('Day '.concat(this.settings.timepoint)); // Update timepoint control.
 
         this.controls.timepoint.inputs.property('value', this.settings.timepoint); // Update timer.
 
         this.containers.timer.text(
             ''.concat(this.settings.timepoint, ' ').concat(this.settings.timeUnit)
-        ); // Update progress bar.
+        ); // Update progress pie.
 
         this.containers.progress.attr(
             'title',

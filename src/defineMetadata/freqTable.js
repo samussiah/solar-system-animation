@@ -16,7 +16,8 @@ export default function freqTable(metadata) {
     const freqTable = d3.merge(
         metadata.event.map((event) => {
             // One record per event per focus plus an overall event record.
-            const rowGroup = [event, ...event.foci];
+            const rowGroup =
+                this.settings.colorBy.type === 'categorical' ? [event, ...event.foci] : [event];
 
             rowGroup.forEach((d) => {
                 d.state = event.value; // state

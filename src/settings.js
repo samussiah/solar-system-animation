@@ -14,7 +14,7 @@ const settings = {
 
     // time settings
     timepoint: 0,
-    timeUnit: 'days since randomization',
+    timeUnit: 'days',
     duration: null, // defined in ./defineMetadata/dataDrivenSettings
     resetDelay: 15000,
 
@@ -54,10 +54,6 @@ const settings = {
     collisionPadding: 1,
 
     // bubble color settings
-    stratifyBy: {
-        variable: null,
-        label: null,
-    }, // up to five strata
     colorBy: {
         type: 'frequency', // ['frequency', 'continuous', 'categorical']
         variable: null,
@@ -78,7 +74,13 @@ const settings = {
     },
     minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
     maxRadius: 10, // defined in ./defineMetadata/dataDrivenSettings
+
+    // bubble shape settings
     shape: 'circle',
+    shapeBy: {
+        variable: null,
+        label: null,
+    },
 
     // modals
     modal: true, // display modals?

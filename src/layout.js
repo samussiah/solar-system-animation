@@ -7,7 +7,7 @@ import resize from './layout/resize';
 export default function layout() {
     const main = addElement('main', d3.select(this.element));
 
-    // controls on top
+    // controls positioned absolutely
     const controls = layoutControls.call(this, main);
 
     // sidebar to the left

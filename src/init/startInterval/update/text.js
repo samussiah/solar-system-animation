@@ -1,13 +1,19 @@
 export default function text() {
     this.settings.progress = this.settings.timepoint / this.settings.duration;
 
+    // Update progress bar.
+    this.containers.progressBar.style('width', `${this.settings.progress * 100}%`);
+    this.containers.progressDay
+        .style('right', `${100 - this.settings.progress * 100}%`)
+        .text(`Day ${this.settings.timepoint}`);
+
     // Update timepoint control.
     this.controls.timepoint.inputs.property('value', this.settings.timepoint);
 
     // Update timer.
     this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
 
-    // Update progress bar.
+    // Update progress pie.
     this.containers.progress.attr(
         'title',
         `The animation is ${d3.format('.1%')(this.settings.progress)} complete with ${

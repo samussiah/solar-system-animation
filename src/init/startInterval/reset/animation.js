@@ -1,7 +1,7 @@
 import runModal from '../../runModal';
 import getState from '../../../dataManipulation/nestData/getState';
-import defineDatum from '../../../dataManipulation/nestData/defineDatum';
 
+// TODO: reset data as in nestData and update/data
 export default function resetAnimation() {
     this.settings.timepoint = 0;
     this.settings.modalIndex = 0;

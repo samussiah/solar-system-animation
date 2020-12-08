@@ -22,7 +22,7 @@ export default function updateIdDependentSettings(metadata) {
             this.settings.maxRadius
         );
     this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
-    this.settings.maxRadius = this.settings.minRadius + this.settings.nColors;
+    this.settings.maxRadius = this.settings.minRadius + this.settings.colorBy.nColors;
     this.settings.chargeStrength = -(
         2000 / metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length
     );

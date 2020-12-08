@@ -1,7 +1,7 @@
 export default function strata(metadata) {
     let nest;
 
-    if (this.settings.colorBy.type === 'categorical') {
+    if (this.settings.stratify) {
         nest = d3
             .nest()
             .key((d) => d[this.settings.colorBy.variable])

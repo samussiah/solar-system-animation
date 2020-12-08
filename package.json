@@ -1,5 +1,5 @@
 {
-  "TODO": "fix non-stratified version",
+  "TODO": "add shape legend",
   "name": "force-directed-graph",
   "version": "1.7.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",

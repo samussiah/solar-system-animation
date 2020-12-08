@@ -7,6 +7,12 @@ export default function update() {
         this.settings.colorBy.type = 'frequency';
     }
 
+    // aesthetics
+    this.settings.stratify = this.settings.colorBy.type === 'categorical';
+    this.settings.sizify = this.settings.sizeBy.type === 'frequency'
+        || (this.settings.sizeBy.type === 'continuous' && this.settings.sizeBy.variable !== null);
+    this.settings.shapify = this.settings.shapeBy.variable !== null;
+
     // Define array of modal text.
     let texts = [];
 

@@ -33,7 +33,7 @@ export default function addFreqTable() {
     freqTable.tbody = freqTable.table.append('tbody').classed('fdg-freq-table__tbody', true);
     freqTable.tr = freqTable.tbody
         .selectAll('tr')
-        .data(this.metadata.freqTable) //.filter(d => d.state !== this.settings.eventCentral))
+        .data(this.data.freqTable) //.filter(d => d.state !== this.settings.eventCentral))
         .join('tr')
         .attr('class', (d) => (d.state !== d.value ? 'fdg-freq-table__tr--subgroup' : null))
         .classed('fdg-freq-table__tr', true)

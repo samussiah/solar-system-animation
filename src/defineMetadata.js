@@ -1,14 +1,20 @@
 import id from './defineMetadata/id';
 import updateIdDependentSettings from './defineMetadata/updateIdDependentSettings';
+
 import event from './defineMetadata/event';
 import updateEventDependentSettings from './defineMetadata/updateEventDependentSettings';
+
 import orbit from './defineMetadata/orbit';
 import coordinates from './defineMetadata/coordinates';
+
 import strata from './defineMetadata/strata';
-import colorScale from './defineMetadata/colorScale';
+import shape from './defineMetadata/shape';
+
+import scales from './defineMetadata/scales';
 import focus from './defineMetadata/focus';
 import freqTable from './defineMetadata/freqTable';
 
+// TODO: moves sets into their own function (id, event, orbit, strata (rename to colorStratum), shape (rename to shapeStratum)
 export default function defineMetadata() {
     const metadata = {};
 
@@ -29,15 +35,18 @@ export default function defineMetadata() {
     // Define strata set.
     metadata.strata = strata.call(this, metadata);
 
+    // Define shape set.
+    metadata.shape = shape.call(this, metadata);
+
     // Define color scale.
-    this.colorScale = colorScale.call(this, metadata);
+    this.scales = scales.call(this, metadata);
 
     // Define the offset of each stratum as function of the focus coordinates, the stratum
     // sequence, and theta.
     focus.call(this, metadata);
 
     // Calculate frequencies and percentages to populate annotation foci and frequency table.
-    metadata.freqTable = freqTable.call(this, metadata);
+    this.data.freqTable = freqTable.call(this, metadata);
 
     return metadata;
 }

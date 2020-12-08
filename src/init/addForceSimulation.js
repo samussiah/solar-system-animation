@@ -5,7 +5,7 @@ import tick from './addForceSimulation/tick';
 export default function addForceSimulation() {
     this.forceSimulation = d3
         .forceSimulation()
-        .nodes(this.data.nested.filter((d) => !d.value.noStateChange))
+        .nodes(this.data.nested)
         .alphaDecay(0.01)
         .velocityDecay(0.9)
         .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)) // cleared after first interval
@@ -35,7 +35,7 @@ export default function addForceSimulation() {
         )
         .force(
             'collide',
-            d3.forceCollide().radius((d) => d.value.r + this.settings.collisionPadding)
+            d3.forceCollide().radius((d) => d.value.size + this.settings.collisionPadding)
         )
         .on('tick', tick.bind(this));
 

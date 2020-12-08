@@ -1,48 +1,35 @@
 import getState from './nestData/getState';
-//import countStateChanges from './nestData/countStateChanges';
-//import defineRadius from './nestData/defineRadius';
-//import defineColor from './nestData/defineColor';
-import defineDatum from './nestData/defineDatum';
+import getAestheticValues from './nestData/getAestheticValues';
+import getCoordinates from './nestData/getCoordinates';
+import getColorScale from './nestData/getColorScale';
+import getAesthetics from './nestData/getAesthetics';
 
 export default function nestData() {
     const nestedData = d3
         .nest()
         .key((d) => d.id)
         .rollup((group) => {
+            // individual-level values - calculated once
             const duration = d3.sum(group, (d) => d.duration);
-            const category =
-                this.settings.colorBy.type === 'categorical'
-                    ? group[0][this.settings.colorBy.variable]
-                    : null;
+            const noStateChange = group.length === 1;
 
-            // Initial state for the given individual.
+            // state-level values - calculated once per timepoint
             const state = getState.call(this, group, 0);
-            const noStateChange = group.length === 1 && state.event === this.settings.eventCentral;
-            const destination =
-                this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify
-                    ? this.metadata.event
-                          .find((event) => event.value === state.event)
-                          .foci.find((focus) => focus.key === category)
-                    : this.metadata.event.find((event) => event.value === state.event);
-            const coordinates = { x: destination.x, y: destination.y };
-
-            // Count number of state changes, define aesthetic, define radius, and define color.
-            const colorScale =
-                this.settings.colorBy.type === 'categorical'
-                    ? this.metadata.strata.find((stratum) => stratum.key === category).colorScale
-                    : this.colorScale;
-            const datum = defineDatum.call(this, group, state, colorScale);
+            const aestheticValues = getAestheticValues.call(this, group, state);
+            const coordinates = getCoordinates.call(this, state, aestheticValues.colorValue);
+            const colorScale = getColorScale.call(this, aestheticValues.colorValue);
+            const aesthetics = getAesthetics.call(this, aestheticValues, colorScale);
 
             return {
-                group, // array of data representing all records for an individual
-                duration, // full duration of individual in data
-                category,
-                stateprevious: null,
-                state, // object representing a single record of an individual
-                noStateChange, // boolean - did individual have any events? used to present those individuals in a static force layout
-                coordinates,
-                colorScale,
-                ...datum,
+                group, // array: data
+                duration, // number: total duration of individual
+                noStateChange, // boolean: did individual ever change state?
+                stateprevious: null, // object: datum at previous timepoint
+                state, // object: datum at current timepoint
+                ...aestheticValues, // number/string, number, string: colorValue, sizeValue, shapeValue
+                coordinates, // object: { x, y }
+                colorScale, // function: returns color given value
+                ...aesthetics, // string, number, string: color, size, shape
             };
         })
         .entries(this.data);

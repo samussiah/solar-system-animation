@@ -13,14 +13,14 @@ export default function addLegends() {
             .classed('fdg-legend fdg-legend--continuous', true);
         container.node().appendChild(
             continuous({
-                color: this.colorScale,
+                color: this.scales.color,
                 title: this.settings.colorBy.label,
                 width: 200,
                 height: 50,
                 tickValues: [
-                    this.colorScale.domain()[0],
-                    (this.colorScale.domain()[1] - this.colorScale.domain()[0]) / 2,
-                    this.colorScale.domain()[1],
+                    this.scales.color.domain()[0],
+                    (this.scales.color.domain()[1] - this.scales.color.domain()[0]) / 2,
+                    this.scales.color.domain()[1],
                 ],
             })
         );
@@ -35,16 +35,16 @@ export default function addLegends() {
         const legendItems = container
             .append('svg')
             .attr('width', 200)
-            .attr('height', 20 * this.colorScale.domain().length)
+            .attr('height', 20 * this.scales.color.domain().length)
             .selectAll('g')
-            .data(this.colorScale.domain())
+            .data(this.scales.color.domain())
             .join('g');
         legendItems
             .append('circle')
             .attr('cx', 20)
             .attr('cy', (d, i) => i * 20 + 10)
             .attr('r', 7)
-            .attr('fill', (d) => this.colorScale(d));
+            .attr('fill', (d) => this.scales.color(d));
         legendItems
             .append('text')
             .attr('font-size', '1rem')

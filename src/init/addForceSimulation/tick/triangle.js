@@ -2,13 +2,13 @@
 export default function triangle(d) {
     const ctx = this.containers.canvas.context;
 
-    const side = d.value.size * 2;// * Math.sqrt(3)/6;
+    const side = d.value.size * 2; // * Math.sqrt(3)/6;
     const dist = side / Math.sqrt(3);
 
-    const centroid = [d.x       ,d.y       ];
-    const top =      [d.x       ,d.y - dist];
-    const left =     [d.x - dist,d.y + dist];
-    const right =    [d.x + dist,d.y + dist];
+    const centroid = [d.x, d.y];
+    const top = [d.x, d.y - dist];
+    const left = [d.x - dist, d.y + dist];
+    const right = [d.x + dist, d.y + dist];
 
     ctx.moveTo(...top);
     ctx.lineTo(...left);

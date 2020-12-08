@@ -1,19 +1,18 @@
 export default function shape(metadata) {
-    const shapeBy = this.settings.shapeBy;
+    let scale;
 
-    // scale domain
-    const domain = shapeBy.type === 'categorical'
-            ? metadata.shape.map((d) => d.key)
-            : null;
+    if (this.settings.shapify) {
+        const shapeBy = this.settings.shapeBy;
 
-    // scale range
-    const range = shapeBy.shapes;
+        // scale domain
+        const domain = shapeBy.type === 'categorical' ? metadata.shape.map((d) => d.key) : null;
 
-    // scale
-    const scale = d3
-        .scaleOrdinal()
-        .domain(domain)
-        .range(range);
+        // scale range
+        const range = shapeBy.shapes;
+
+        // scale
+        scale = d3.scaleOrdinal().domain(domain).range(range);
+    }
 
     return scale;
 }

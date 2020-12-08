@@ -1,0 +1,9 @@
+export default function circle(legendItem, i, spacing, radius) {
+    legendItem
+        .append('circle')
+        .attr('cx', spacing)
+        .attr('cy', i * spacing + 10)
+        .attr('r', radius)
+        .attr('fill', 'none')
+        .attr('stroke', '#444');
+}

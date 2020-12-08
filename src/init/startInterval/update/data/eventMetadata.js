@@ -16,14 +16,14 @@ export default function eventMetadata() {
 
         if (event.foci)
             event.foci.forEach((focus) => {
-                focus.data = event.data.filter((d, i) => d.value.category === focus.key);
+                focus.data = event.data.filter((d, i) => d.value.colorValue === focus.key);
                 focus.count = focus.data.length;
                 focus.proportion = focus.count / focus.denominator;
                 focus.proportionFmt = d3.format('.1%')(focus.proportion);
                 focus.cumulative = this.data.filter(
                     (d) =>
                         d.event === event.value &&
-                        d.category === focus.key &&
+                        d.colorValue === focus.key &&
                         d.start_timepoint <= this.settings.timepoint
                 ).length;
                 focus.countFmt = d3.format(',d')(focus.count);

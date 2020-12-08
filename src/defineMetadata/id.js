@@ -6,9 +6,13 @@ export default function id() {
             return {
                 duration: d3.sum(group, (d) => +d.duration),
                 static: group.length === 1,
-                category:
+                colorStratum:
                     this.settings.colorBy.type === 'categorical'
                         ? group[0][this.settings.colorBy.variable]
+                        : null,
+                shapeStratum:
+                    this.settings.shapeBy.type === 'categorical'
+                        ? group[0][this.settings.shapeBy.variable]
                         : null,
             };
         })

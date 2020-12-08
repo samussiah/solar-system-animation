@@ -1,5 +1,9 @@
 import runModal from '../../runModal';
 import getState from '../../../dataManipulation/nestData/getState';
+import getAestheticValues from '../../../dataManipulation/nestData/getAestheticValues';
+import getCoordinates from '../../../dataManipulation/nestData/getCoordinates';
+import getColorScale from '../../../dataManipulation/nestData/getColorScale';
+import getAesthetics from '../../../dataManipulation/nestData/getAesthetics';
 
 // TODO: reset data as in nestData and update/data
 export default function resetAnimation() {
@@ -15,15 +19,15 @@ export default function resetAnimation() {
     });
 
     this.data.nested.forEach((d) => {
-        // Initial event for the given individual.
         d.value.statePrevious = null;
-        d.value.state = getState.call(this, d.value.group, 0);
+        d.value.state = getState.call(this, d.value.group);
 
-        const event = this.metadata.event.find((event) => event.value === d.value.state.event);
-        d.value.coordinates = { x: event.x, y: event.y };
+        const aestheticValues = getAestheticValues.call(this, d.value.group, d.value.state);
+        d.value.coordinates = getCoordinates.call(this, d.value.state, aestheticValues.colorValue);
+        d.value.colorScale = getColorScale.call(this, aestheticValues.colorValue);
+        const aesthetics = getAesthetics.call(this, aestheticValues, d.value.colorScale);
 
-        const datum = defineDatum.call(this, d.value.group, d.value.state, d.value.colorScale);
-        Object.assign(d.value, datum);
+        Object.assign(d.value, aestheticValues, aesthetics);
     });
 
     if (this.modal) this.modal.stop();

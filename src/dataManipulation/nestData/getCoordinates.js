@@ -2,8 +2,8 @@ export default function getCoordinates(state, colorValue) {
     const destination =
         this.settings.stratify && this.settings.colorBy.stratify
             ? this.metadata.event
-                    .find((event) => event.value === state.event)
-                    .foci.find((focus) => focus.key === colorValue)
+                  .find((event) => event.value === state.event)
+                  .foci.find((focus) => focus.key === colorValue)
             : this.metadata.event.find((event) => event.value === state.event);
     const coordinates = { x: destination.x, y: destination.y };
 

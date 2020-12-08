@@ -1,4 +1,4 @@
-fetch('../data/data_2000_fixed.csv')
+fetch('../../data/data_1000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -6,11 +6,10 @@ fetch('../data/data_2000_fixed.csv')
             data,
             '#container',
             {
-                colorBy: {
-                    type: 'continuous',
-                    variable: 'outcome',
-                    label: 'Random number',
-                    mirror: true,
+                shapeBy: {
+                    type: 'categorical',
+                    variable: 'category',
+                    label: 'Shape Stratum',
                 },
             }
         );

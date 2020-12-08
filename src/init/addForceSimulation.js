@@ -5,7 +5,11 @@ import tick from './addForceSimulation/tick';
 export default function addForceSimulation() {
     this.forceSimulation = d3
         .forceSimulation()
-        .nodes(this.data.nested)
+        .nodes(
+            this.data.nested.filter(
+                (d) => !(this.settings.drawStaticSeparately && d.value.noStateChange)
+            )
+        )
         .alphaDecay(0.01)
         .velocityDecay(0.9)
         .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)) // cleared after first interval

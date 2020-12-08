@@ -13,7 +13,7 @@ export default function strata(metadata) {
 
         nest.forEach((stratum, i) => {
             stratum.value = stratum.key;
-            const colorScheme = this.settings.colorSchemes[i];
+            const colorScheme = this.settings.colorBy.colorSchemes[i];
             stratum.colorScheme =
                 d3[
                     `scheme${colorScheme.substring(0, 1).toUpperCase()}${colorScheme.substring(1)}s`
@@ -26,7 +26,9 @@ export default function strata(metadata) {
                 .domain(d3.range(this.settings.nColors))
                 .range(stratum.colorScheme[9].reverse().slice(0, this.settings.nColors).reverse())
                 .clamp(true);
-            stratum.nParticipants = metadata.id.filter((d) => d.category === stratum.value).length;
+            stratum.nParticipants = metadata.id.filter(
+                (d) => d.colorStratum === stratum.value
+            ).length;
             stratum.nEvents = stratum.values.length;
 
             // TODO: figure out how to shift the foci to match the order in the legend

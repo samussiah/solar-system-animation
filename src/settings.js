@@ -23,43 +23,38 @@ const settings = {
       Aesthetics
     \-------------------------------------------------------------------------------------------**/
 
-        // bubble color settings
-        colorBy: {
-            type: 'frequency', // ['frequency', 'continuous', 'categorical']
-            variable: null,
-            label: null,
-            mirror: true, // reverse color scheme?
-            stratify: true, // present categories separately at each focus?
-            colorScheme: 'RdYlGn',
-            colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'], // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
-            nColors: 6, // min: 3, max: 9
-        },
-        color: 'rgb(170,170,170)',
-        fill: null, // defined in ./defineMetadata/defineIdDependentSettings
+    // bubble color settings
+    colorBy: {
+        type: 'frequency', // ['frequency', 'continuous', 'categorical']
+        variable: null,
+        label: null,
+        mirror: true, // reverse color scheme?
+        stratify: true, // present categories separately at each focus?
+        colorScheme: 'RdYlGn',
+        colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'], // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
+        nColors: 6, // min: 3, max: 9
+    },
+    color: 'rgb(170,170,170)',
+    fill: null, // defined in ./defineMetadata/defineIdDependentSettings
 
-        // bubble size settings
-        sizeBy: {
-            type: 'frequency', // ['frequency', 'continuous']
-            variable: null,
-            label: null,
-        },
-        minRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
-        maxRadius: 10, // defined in ./defineMetadata/updateIdDependentSettings
-        staticRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
+    // bubble size settings
+    sizeBy: {
+        type: 'frequency', // ['frequency', 'continuous']
+        variable: null,
+        label: null,
+    },
+    minRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
+    maxRadius: 10, // defined in ./defineMetadata/updateIdDependentSettings
+    staticRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
 
-        // bubble shape settings
-        shapeBy: {
-            type: 'categorical', // ['categorical']
-            variable: null,
-            label: null,
-            shapes: [
-                'cicle',
-                'square',
-                'triangle',
-                'diamond'
-            ],
-        },
-        shape: 'circle',
+    // bubble shape settings
+    shapeBy: {
+        type: 'categorical', // ['categorical']
+        variable: null,
+        label: null,
+        shapes: ['circle', 'square', 'triangle', 'diamond'],
+    },
+    shape: 'circle',
 
     // time settings
     timepoint: 0,

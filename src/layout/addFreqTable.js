@@ -2,7 +2,7 @@ export default function addFreqTable() {
     const main = this;
 
     const freqTable = {
-        container: this.containers.freqTable,
+        container: this.containers.freqTable.classed('fdg-hidden', this.settings.hideFreqTable),
     };
 
     freqTable.table = freqTable.container.append('table').classed('fdg-freq-table__table', true);

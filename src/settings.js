@@ -82,6 +82,7 @@ const settings = {
     nFoci: null, // defined in ./defineMetadata/updateEventDependentSettings
     translate: false,
     hideControls: false,
+    hideFreqTable: false,
 
     // force simulation settings
     manyBody: 'forceManyBodyReuse', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']

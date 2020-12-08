@@ -39,6 +39,7 @@ fetch('./data/data_1000.csv')
                     label: 'Shape Stratum',
                 },
                 collisionPadding: 2,
+                hideFreqTable: true,
             }
         );
     });

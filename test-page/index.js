@@ -15,18 +15,18 @@ fetch('./data/data_1000.csv')
                     variable: 'category',
                     label: 'Color Stratum',
                     colorScheme: 'Tableau10',
-                    //stratify: false,
+                    stratify: false,
                 },
-                colorBy: {
-                    type: 'continuous',
-                    variable: 'outcome',
-                    label: 'Outcome',
-                    //mirror: false,
-                },
+                //colorBy: {
+                //    type: 'continuous',
+                //    variable: 'outcome',
+                //    label: 'Outcome',
+                //    //mirror: false,
+                //},
                 //sizeBy: null,
-                sizeBy: {
-                    type: 'frequency',
-                },
+                //sizeBy: {
+                //    type: 'frequency',
+                //},
                 //sizeBy: {
                 //    type: 'continuous',
                 //    variable: 'outcome',

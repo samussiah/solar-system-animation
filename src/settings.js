@@ -3,7 +3,10 @@ import update from './settings/update';
 const settings = {
     update,
 
-    // data mappings
+    /**-------------------------------------------------------------------------------------------\
+      data mapping
+    \-------------------------------------------------------------------------------------------**/
+
     id_var: 'id',
     event_var: 'event',
     event_order_var: 'event_order',
@@ -12,18 +15,11 @@ const settings = {
     duration_var: 'duration',
     sequence_var: 'seq',
 
-    // event settings
-    events: null, // defined in ./defineMetadata
-    eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
-    eventCount: true, // display [ n (%) ] beneath focus labels?
-    eventChangeCount: null, // defined in ./defineMetadata/updateEventDependentSettings
-    eventChangeCountAesthetic: 'color',
-
     /**-------------------------------------------------------------------------------------------\
-      Aesthetics
+      aesthetics
     \-------------------------------------------------------------------------------------------**/
 
-    // bubble color settings
+    // color
     colorBy: {
         type: 'frequency', // ['frequency', 'continuous', 'categorical']
         variable: null,
@@ -37,7 +33,7 @@ const settings = {
     color: 'rgb(170,170,170)',
     fill: null, // defined in ./defineMetadata/defineIdDependentSettings
 
-    // bubble size settings
+    // size
     sizeBy: {
         type: 'frequency', // ['frequency', 'continuous']
         variable: null,
@@ -47,7 +43,7 @@ const settings = {
     maxRadius: 10, // defined in ./defineMetadata/updateIdDependentSettings
     staticRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
 
-    // bubble shape settings
+    // shape
     shapeBy: {
         type: 'categorical', // ['categorical']
         variable: null,
@@ -56,11 +52,9 @@ const settings = {
     },
     shape: 'circle',
 
-    // time settings
-    timepoint: 0,
-    timeUnit: 'days',
-    duration: null, // defined in ./defineMetadata/updateIdDependentSettings
-    resetDelay: 15000,
+    /**-------------------------------------------------------------------------------------------\
+      animation
+    \-------------------------------------------------------------------------------------------**/
 
     // animation settings
     speed: 'medium',
@@ -73,18 +67,24 @@ const settings = {
     pulseOrbits: false,
     loop: true,
 
-    // dimensions
+    // time settings
+    timepoint: 0, // initial timepoint
+    timeUnit: 'days', // time unit that appears in labels
+    duration: null, // defined in ./defineMetadata/updateIdDependentSettings
+    resetDelay: 15000,
+
+    /**-------------------------------------------------------------------------------------------\
+      dimensions
+    \-------------------------------------------------------------------------------------------**/
+
     width: null, // defined in ./defineMetadata/coordinates
     height: null, // defined in ./defineMetadata/coordinates
-    padding: 1,
-    nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
     orbitRadius: null, // defined in ./defineMetadata/coordinates
-    nFoci: null, // defined in ./defineMetadata/updateEventDependentSettings
-    translate: false,
-    hideControls: false,
-    hideFreqTable: false,
 
-    // force simulation settings
+    /**-------------------------------------------------------------------------------------------\
+      force simulation
+    \-------------------------------------------------------------------------------------------**/
+
     manyBody: 'forceManyBodyReuse', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
     chargeStrength: null, // defined in ./defineMetadata/updateIdDependentSettings
     collisionPadding: 1,
@@ -92,7 +92,10 @@ const settings = {
     drawStaticSeparately: false, // draw static bubbles in a static force simulation to improve performance
     staticLayout: 'circular', // ['circular', 'radial']
 
-    // modals
+    /**-------------------------------------------------------------------------------------------\
+      modal
+    \-------------------------------------------------------------------------------------------**/
+
     modal: true, // display modals?
     modalSpeed: 15000, // amount of time for which each modal appears
     modalIndex: 0,
@@ -105,6 +108,26 @@ const settings = {
         'Continue watching to learn how these individuals progress over the course of [duration] days.',
     ], // array of strings
     information: null, // array of strings
+
+    /**-------------------------------------------------------------------------------------------\
+      event/state
+    \-------------------------------------------------------------------------------------------**/
+
+    events: null, // defined in ./defineMetadata
+    eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
+    eventCount: true, // display [ n (%) ] beneath focus labels?
+    eventChangeCount: null, // defined in ./defineMetadata/updateEventDependentSettings
+    eventChangeCountAesthetic: 'color',
+
+    /**-------------------------------------------------------------------------------------------\
+      miscellaneous
+    \-------------------------------------------------------------------------------------------**/
+
+    nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
+    nFoci: null, // defined in ./defineMetadata/updateEventDependentSettings
+    hideControls: false,
+    hideFreqTable: false,
+    eventCentralInFreqTable: false,
 };
 
 export default settings;

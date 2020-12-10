@@ -2,6 +2,8 @@ import drawCircle from './tick/circle';
 import drawSquare from './tick/square';
 import drawTriangle from './tick/triangle';
 import drawDiamond from './tick/diamond';
+import drawStar from './tick/star';
+import drawTriangleDown from './tick/triangleDown';
 
 export default function tick() {
     this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
@@ -24,6 +26,12 @@ export default function tick() {
                     break;
                 case 'diamond':
                     drawDiamond.call(this, d);
+                    break;
+                case 'star':
+                    drawStar.call(this, d);
+                    break;
+                case 'triangleDown':
+                    drawTriangleDown.call(this, d);
                     break;
                 default:
                     drawCircle.call(this, d);

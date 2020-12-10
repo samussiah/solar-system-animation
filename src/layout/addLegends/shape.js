@@ -2,6 +2,8 @@ import circle from './shape/circle';
 import square from './shape/square';
 import triangle from './shape/triangle';
 import diamond from './shape/diamond';
+import star from './shape/star';
+import triangleDown from './shape/triangleDown';
 
 export default function shape() {
     const main = this;
@@ -10,6 +12,8 @@ export default function shape() {
         square,
         triangle,
         diamond,
+        star,
+        triangleDown,
     };
     const container = this.legends.container
         .append('div')

@@ -48,7 +48,7 @@ const settings = {
         type: 'categorical', // ['categorical']
         variable: null,
         label: null,
-        shapes: ['circle', 'square', 'triangle', 'diamond'],
+        shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
     },
     shape: 'circle',
 

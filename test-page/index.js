@@ -2,6 +2,10 @@ fetch('./data/data_1000.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
+        data.forEach((d,i) => {
+            if (!(i%5)) d.shape = 'Shape 5';
+            if (!(i%7)) d.shape = 'Shape 6';
+        });
         const fdg = forceDirectedGraph(
             data,
             '#container',

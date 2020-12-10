@@ -1,29 +1,35 @@
 export default function star(d) {
     const ctx = this.containers.canvas.context;
 
+    const spikes = 5;
+    const step = Math.PI / spikes;
+    const innerRadius = d.value.size * 0.75;
+    const outerRadius = d.value.size * 1.5;
+
     let rot = (Math.PI / 2) * 3;
-    let x = cx;
-    let y = cy;
-    let step = Math.PI / spikes;
+    let x = d.x;
+    let y = d.y;
 
     ctx.beginPath();
-    ctx.moveTo(cx, cy - outerRadius);
-    for (i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
+    ctx.moveTo(d.x, d.y - outerRadius);
+
+    for (let i = 0; i < spikes; i++) {
+        x = d.x + Math.cos(rot) * outerRadius;
+        y = d.y + Math.sin(rot) * outerRadius;
         ctx.lineTo(x, y);
         rot += step;
 
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
+        x = d.x + Math.cos(rot) * innerRadius;
+        y = d.y + Math.sin(rot) * innerRadius;
         ctx.lineTo(x, y);
         rot += step;
     }
-    ctx.lineTo(cx, cy - outerRadius);
+
+    ctx.lineTo(d.x, d.y - outerRadius);
     ctx.closePath();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = 'blue';
+    //ctx.lineWidth = 5;
+    ctx.strokeStyle = d.value.stroke;
     ctx.stroke();
-    ctx.fillStyle = 'skyblue';
+    ctx.fillStyle = d.value.fill;
     ctx.fill();
 }

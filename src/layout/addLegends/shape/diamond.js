@@ -6,8 +6,8 @@ export default function diamond(legendItem, i, spacing, radius) {
         .attr('transform', `rotate(45 ${x} ${y})`)
         .attr('x', x)
         .attr('y', y)
-        .attr('width', radius * 2)
-        .attr('height', radius * 2)
+        .attr('width', radius * 1.5)
+        .attr('height', radius * 1.5)
         .attr('fill', 'none')
         .attr('stroke', '#444');
 }

@@ -379,7 +379,7 @@
             // ['categorical']
             variable: null,
             label: null,
-            shapes: ['circle', 'square', 'triangle', 'diamond'],
+            shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
         },
         shape: 'circle',
 
@@ -1658,7 +1658,29 @@
         this.controls.timepoint.inputs.property('value', this.settings.timepoint);
     }
 
-    function legends() {}
+    // TODO: make color legend reactive
+    function legends() {
+        var shapeCounts = d3
+            .nest()
+            .key(function (d) {
+                return d.value.shapeValue;
+            })
+            .rollup(function (group) {
+                return group.length;
+            })
+            .entries(this.data.nested);
+        this.containers.legends
+            .selectAll('.fdg-legend--shape')
+            .selectAll('text')
+            .text(function (d) {
+                return ''.concat(d, ' (n=').concat(
+                    shapeCounts.find(function (di) {
+                        return di.key === d;
+                    }).value,
+                    ')'
+                );
+            });
+    }
 
     // Update focus percentages.
     function counts() {
@@ -2698,7 +2720,7 @@
             .append('circle')
             .attr('cx', spacing)
             .attr('cy', i * spacing + 10)
-            .attr('r', radius)
+            .attr('r', radius - 1)
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
@@ -2706,28 +2728,25 @@
     function square(legendItem, i, spacing, radius) {
         legendItem
             .append('rect')
-            .attr('x', spacing - radius)
-            .attr('y', i * spacing + radius / 2)
-            .attr('width', radius * 2)
-            .attr('height', radius * 2)
+            .attr('x', spacing - radius + 1.5)
+            .attr('y', i * spacing + radius / 2 + 1)
+            .attr('width', radius * 1.5)
+            .attr('height', radius * 1.5)
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
 
     function triangle(legendItem, i, spacing, radius) {
-        var side = radius * 2;
+        var side = radius * 1.5;
         var dist = side / Math.sqrt(3);
         var x = spacing;
-        var y = i * spacing + dist;
+        var y = i * spacing + dist + 3;
         var top = [x, y - dist];
         var left = [x - dist, y + dist];
         var right = [x + dist, y + dist];
         legendItem
             .append('polygon')
-            .attr('points', [top, left, right]) //.attr('x', spacing - radius)
-            //.attr('y', i * spacing)
-            //.attr('width', radius * 2)
-            //.attr('height', radius * 2)
+            .attr('points', [top, left, right])
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
@@ -2740,8 +2759,57 @@
             .attr('transform', 'rotate(45 '.concat(x, ' ').concat(y, ')'))
             .attr('x', x)
             .attr('y', y)
-            .attr('width', radius * 2)
-            .attr('height', radius * 2)
+            .attr('width', radius * 1.5)
+            .attr('height', radius * 1.5)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    //<svg height="210" width="500">
+    //  <polygon points="100,10 40,198 190,78 10,78 160,198"
+    //  style="fill:lime;stroke:purple;stroke-width:5;fill-rule:nonzero;" />
+    //</svg>
+    function star(legendItem, i, spacing, radius) {
+        var spikes = 5;
+        var step = Math.PI / spikes;
+        var innerRadius = radius * 0.6;
+        var outerRadius = radius * 1.2;
+        var dist = (radius * 2) / Math.sqrt(3);
+        var rot = (Math.PI / 2) * 3;
+        var x = spacing;
+        var y = i * spacing + dist;
+        var centroid = [x, y];
+        var coordinates = [];
+
+        for (var _i = 0; _i < spikes; _i++) {
+            x = centroid[0] + Math.cos(rot) * outerRadius;
+            y = centroid[1] + Math.sin(rot) * outerRadius;
+            coordinates.push([x, y]);
+            rot += step;
+            x = centroid[0] + Math.cos(rot) * innerRadius;
+            y = centroid[1] + Math.sin(rot) * innerRadius;
+            coordinates.push([x, y]);
+            rot += step;
+        }
+
+        legendItem
+            .append('polygon')
+            .attr('points', coordinates)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function triangleDown(legendItem, i, spacing, radius) {
+        var side = radius * 1.5;
+        var dist = side / Math.sqrt(3);
+        var x = spacing;
+        var y = i * spacing + dist + 3;
+        var top = [x, y + dist];
+        var left = [x - dist, y - dist];
+        var right = [x + dist, y - dist];
+        legendItem
+            .append('polygon')
+            .attr('points', [top, left, right])
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
@@ -2755,6 +2823,8 @@
             square: square,
             triangle: triangle,
             diamond: diamond,
+            star: star,
+            triangleDown: triangleDown,
         };
         var container = this.legends.container
             .append('div')
@@ -4273,6 +4343,62 @@
         this.containers.canvas.context.stroke();
     }
 
+    function star$1(d) {
+        var ctx = this.containers.canvas.context;
+        var spikes = 5;
+        var step = Math.PI / spikes;
+        var innerRadius = d.value.size * 0.75;
+        var outerRadius = d.value.size * 1.5;
+        var rot = (Math.PI / 2) * 3;
+        var x = d.x;
+        var y = d.y;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y - outerRadius);
+
+        for (var i = 0; i < spikes; i++) {
+            x = d.x + Math.cos(rot) * outerRadius;
+            y = d.y + Math.sin(rot) * outerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+            x = d.x + Math.cos(rot) * innerRadius;
+            y = d.y + Math.sin(rot) * innerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+        }
+
+        ctx.lineTo(d.x, d.y - outerRadius);
+        ctx.closePath(); //ctx.lineWidth = 5;
+
+        ctx.strokeStyle = d.value.stroke;
+        ctx.stroke();
+        ctx.fillStyle = d.value.fill;
+        ctx.fill();
+    }
+
+    // TODO: use some kind of cos/sin shit to make a perfect equilateral triangle
+    function triangle$2(d) {
+        var ctx = this.containers.canvas.context;
+        var side = d.value.size * 2; // * Math.sqrt(3)/6;
+
+        var dist = side / Math.sqrt(3);
+        var centroid = [d.x, d.y];
+        var top = [d.x, d.y + dist];
+        var left = [d.x - dist, d.y - dist];
+        var right = [d.x + dist, d.y - dist];
+        ctx.moveTo.apply(ctx, top);
+        ctx.lineTo.apply(ctx, left);
+        ctx.lineTo.apply(ctx, right);
+        ctx.lineTo.apply(ctx, top);
+
+        if (this.settings.fill) {
+            this.containers.canvas.context.fillStyle = d.value.fill;
+            this.containers.canvas.context.fill();
+        }
+
+        this.containers.canvas.context.strokeStyle = d.value.stroke;
+        this.containers.canvas.context.stroke();
+    }
+
     function tick() {
         var _this = this;
 
@@ -4300,6 +4426,14 @@
 
                     case 'diamond':
                         diamond$1.call(_this, d);
+                        break;
+
+                    case 'star':
+                        star$1.call(_this, d);
+                        break;
+
+                    case 'triangleDown':
+                        triangle$2.call(_this, d);
                         break;
 
                     default:

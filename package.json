@@ -1,5 +1,5 @@
 {
-  "TODO": "make legends reactive",
+  "TODO": "add a setting to display cumulative count at foci",
   "name": "force-directed-graph",
   "version": "1.7.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",

@@ -6,18 +6,12 @@ export default function makeLegend(type) {
     // container
     const container = this.legends.container
         .append('div')
-        .classed(`fdg-legend fdg-legend--${type}`, true)
-        .classed(
-            'fdg-hidden',
-            this.settings.eventChangeCountAesthetic !== type ||
-                this.settings.eventChangeCount.length === 0
-        );
+        .classed(`fdg-legend fdg-legend--${type}`, true);
 
     // label
     const label = container
         .append('div')
         .classed('fdg-sidebar__label fdg-legend__label', true)
-        //.style('width', legendDimensions[0] + 'px')
         .html(
             `Number of <span class = "fdg-measure">${this.util.csv(
                 this.settings.eventChangeCount

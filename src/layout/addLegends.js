@@ -8,6 +8,7 @@ export default function addLegends() {
         container: this.containers.legends,
     };
 
+    // Color legend
     switch (this.settings.colorBy.type) {
         case 'frequency':
             frequency.call(this);
@@ -22,5 +23,8 @@ export default function addLegends() {
             return;
     }
 
+    // TODO: size legend
+
+    // Shape legend
     if (this.settings.shapify) shape.call(this);
 }

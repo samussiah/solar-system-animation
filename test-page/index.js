@@ -10,6 +10,7 @@ fetch('./data/data_1000.csv')
             data,
             '#container',
             {
+                eventCountType: 'cumulative-id',
                 //colorBy: null,
                 //colorBy: {
                 //    type: 'frequency',
@@ -19,7 +20,7 @@ fetch('./data/data_1000.csv')
                     variable: 'category',
                     label: 'Color Stratum',
                     colorScheme: 'Tableau10',
-                    stratify: false,
+                    //stratify: false,
                 },
                 //colorBy: {
                 //    type: 'continuous',
@@ -42,7 +43,7 @@ fetch('./data/data_1000.csv')
                     variable: 'shape',
                     label: 'Shape Stratum',
                 },
-                collisionPadding: 2,
+                //collisionPadding: 2,
                 //hideFreqTable: true,
                 //eventCentralInFreqTable: true,
             }

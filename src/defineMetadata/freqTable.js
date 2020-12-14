@@ -22,7 +22,13 @@ export default function freqTable(metadata) {
             rowGroup.forEach((d) => {
                 d.state = event.value; // state
                 d.label = d.value; // state or stratum
-                d.denominator = d.label !== d.state ? d.nParticipants : metadata.id.length;
+                d.denominator = d.label !== d.state
+                    ? d.nParticipants
+                    : ['current-id', 'cumulative-id'].includes(this.settings.eventCountType)
+                    ? metadata.id.length
+                    : this.settings.eventChangeType === 'cumulative-event'
+                    ? event.nEvents
+                    : console.warn('Unable to determine [ event.denominator ] in [ eventMetadata ].');
                 d.proportion = d.count / d.denominator;
                 d.proportionFmt = d3.format('.1%')(d.proportion);
 

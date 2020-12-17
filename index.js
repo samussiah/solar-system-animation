@@ -1373,10 +1373,15 @@
 
     // Update frequency table.
     function freqTable$1() {
+      var maxProportion = d3.max(this.freqTable.tr.data(), function (d) {
+        return d.proportion;
+      });
       this.freqTable.tr.each(function (d) {
+        var relativeProportion = d.proportion / maxProportion;
+        var relativeProportionFmt = d3.format('.1%')(relativeProportion);
         var tr = d3.select(this);
         tr.selectAll('td').data(d.cells).join('td').style('background', function (di, i) {
-          return i === 1 ? "linear-gradient(to right, #bbb 0, #bbb ".concat(d.proportionFmt, ", transparent ").concat(d.proportionFmt, ")") : null;
+          return i === 1 ? "linear-gradient(to right, #bbb 0, #bbb ".concat(relativeProportionFmt, ", transparent ").concat(relativeProportionFmt, ")") : null;
         }).text(function (d) {
           return d;
         });

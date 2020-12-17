@@ -233,6 +233,9 @@ body {
     text-overflow: ellipsis;
     text-align: left;
 }
+.fdg-freq-table__tr--subgroup {
+    background: white;
+}
 .fdg-freq-table__tr--subgroup .fdg-freq-table__td--label {
     padding-left: 1rem;
 }

@@ -1,31 +1,34 @@
-// Record change in number of IDs at each focus at current timepoint.
+import filterData from './eventMetadata/filterData';
+import updateIdSet from './eventMetadata/updateIdSet';
+import countCumulative from './eventMetadata/countCumulative';
+import getNumerator from './eventMetadata/getNumerator';
+
+// Update states and strata at each timepoint.
 export default function eventMetadata() {
     this.metadata.event.forEach((event) => {
-        // Capture IDs in the given state.
-        event.data = this.data.nested
-            .filter((d, i) => d.value.state.event === event.value);
+        // Filter data.
+        event.data = filterData(
+            this.data.nested,
+            ['value', 'state', 'event'],
+            event.value
+        );
 
-        // Maintain a set of any IDs that have existed in the given state.
-        event.data.forEach(id => {
-            event.cumulativeIds.add(id.key);
-        });
-
-        // Count the IDs in the given state.
+        // Count.
         event.count = event.data.length;
-
-        // Count the number of events, i.e. the number of times any ID has existed in the given state.
-        event.cumulative = this.data.filter(
-            (d) => d.event === event.value && d.start_timepoint <= this.settings.timepoint
-        ).length;
-
-        // Determine the numerator.
-        event.numerator = this.settings.eventCountType === 'current-id'
-            ? event.count
-            : this.settings.eventCountType === 'cumulative-id'
-            ? event.cumulativeIds.size
-            : this.settings.eventCountType === 'cumulative-event'
-            ? event.cumulative
-            : console.warn('Unable to determine [ event.numerator ] in [ eventMetadata ].');
+        updateIdSet(event.data, event.cumulativeIds);
+        event.cumulative = countCumulative(
+            this.data,
+            this.settings.timepoint,
+            {key: 'event', value: event.value}
+        );
+        event.numerator = getNumerator(
+            this.settings.eventCountType,
+            {
+                ids: event.count,
+                cumulativeIds: event.cumulativeIds.size,
+                events: event.cumulative
+            }
+        );
 
         // Calculate the proportion.
         event.proportion = event.numerator / event.denominator;
@@ -44,19 +47,37 @@ export default function eventMetadata() {
 
         if (event.foci)
             event.foci.forEach((focus) => {
-                focus.data = event.data.filter((d, i) => d.value.colorValue === focus.key);
+                // Filter data.
+                focus.data = filterData(
+                    event.data,
+                    ['value', 'colorValue'],
+                    focus.key
+                );
+
+                // Count.
                 focus.count = focus.data.length;
-                focus.cumulative = this.data.filter(
-                    (d) =>
-                        d.event === event.value &&
-                        d.colorValue === focus.key &&
-                        d.start_timepoint <= this.settings.timepoint
-                ).length;
-                focus.proportion = focus.count / focus.denominator;
+                updateIdSet(focus.data, focus.cumulativeIds);
+                focus.cumulative = countCumulative(
+                    this.data,
+                    this.settings.timepoint,
+                    {key: 'event', value: event.value},
+                    {key: this.settings.colorBy.variable, value: focus.key}
+                );
+                focus.numerator = getNumerator(
+                    this.settings.eventCountType,
+                    {
+                        ids: focus.count,
+                        cumulativeIds: focus.cumulativeIds.size,
+                        events: focus.cumulative
+                    }
+                );
+
+                // Calculate the proportion.
+                focus.proportion = focus.numerator / focus.denominator;
 
                 // fmt
                 focus.proportionFmt = d3.format('.1%')(focus.proportion);
-                focus.countFmt = d3.format(',d')(focus.count);
+                focus.countFmt = d3.format(',d')(focus.numerator);
                 focus.countProportionFmt = `${focus.countFmt} (${focus.proportionFmt})`;
                 focus.cumulativeFmt = d3.format(',d')(focus.cumulative);
 

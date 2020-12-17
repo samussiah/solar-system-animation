@@ -564,6 +564,8 @@
     }
 
     function restartForceSimulation() {
+      var _this = this;
+
       // Remove centering force after first interval.
       if (this.settings.timepoint > 0 && !!this.forceSimulation) this.forceSimulation.force('center', null); // Reheat the simulation (alpha(1)) and update the coordinates of the x- and y- forces.
 
@@ -571,7 +573,9 @@
         return d.value.coordinates.x;
       }).strength(0.3)).force('y', d3.forceY().y(function (d) {
         return d.value.coordinates.y;
-      }).strength(0.3)).restart();
+      }).strength(0.3)).force('collide', d3.forceCollide().radius(function (d) {
+        return d.value.size + _this.settings.collisionPadding;
+      })).restart();
     }
 
     function decodeBase64(base64, enableUnicode) {
@@ -795,27 +799,56 @@
       });
     }
 
-    // Record change in number of IDs at each focus at current timepoint.
+    // Capture IDs in the given state.
+    function filterData() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ['value'];
+      var value = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+      return data.filter(function (d, i) {
+        return props.reduce(function (value, prop) {
+          return value[prop];
+        }, d) === value;
+      });
+    }
+
+    // Maintain a set of any IDs that have existed in the given state.
+    function updateIdSet(data, set) {
+      data.forEach(function (id) {
+        set.add(id.key);
+      });
+    }
+
+    // Count the number of events, i.e. the number of times any ID has existed in the given state.
+    function countCumulative(data, timepoint, event, stratum) {
+      return data.filter(function (d) {
+        return d.start_timepoint <= timepoint && d[event.key] === event.value && (stratum === undefined || d[stratum.key] === stratum.value);
+      }).length;
+    }
+
+    // Determine the numerator of the state proportions.
+    function getNumerator(eventCountType, n) {
+      var numerator = eventCountType === 'current-id' ? n.ids : eventCountType === 'cumulative-id' ? n.cumulativeIds : eventCountType === 'cumulative-event' ? n.events : console.warn('Unable to determine [ numerator ] in [ getNumerator() ].');
+      return numerator;
+    }
+
     function eventMetadata() {
       var _this = this;
 
       this.metadata.event.forEach(function (event) {
-        // Capture IDs in the given state.
-        event.data = _this.data.nested.filter(function (d, i) {
-          return d.value.state.event === event.value;
-        }); // Maintain a set of any IDs that have existed in the given state.
+        // Filter data.
+        event.data = filterData(_this.data.nested, ['value', 'state', 'event'], event.value); // Count.
 
-        event.data.forEach(function (id) {
-          event.cumulativeIds.add(id.key);
-        }); // Count the IDs in the given state.
-
-        event.count = event.data.length; // Count the number of events, i.e. the number of times any ID has existed in the given state.
-
-        event.cumulative = _this.data.filter(function (d) {
-          return d.event === event.value && d.start_timepoint <= _this.settings.timepoint;
-        }).length; // Determine the numerator.
-
-        event.numerator = _this.settings.eventCountType === 'current-id' ? event.count : _this.settings.eventCountType === 'cumulative-id' ? event.cumulativeIds.size : _this.settings.eventCountType === 'cumulative-event' ? event.cumulative : console.warn('Unable to determine [ event.numerator ] in [ eventMetadata ].'); // Calculate the proportion.
+        event.count = event.data.length;
+        updateIdSet(event.data, event.cumulativeIds);
+        event.cumulative = countCumulative(_this.data, _this.settings.timepoint, {
+          key: 'event',
+          value: event.value
+        });
+        event.numerator = getNumerator(_this.settings.eventCountType, {
+          ids: event.count,
+          cumulativeIds: event.cumulativeIds.size,
+          events: event.cumulative
+        }); // Calculate the proportion.
 
         event.proportion = event.numerator / event.denominator; // Format the counts and proportions.
 
@@ -828,17 +861,28 @@
 
         event.change = event.count - event.prevCount;
         if (event.foci) event.foci.forEach(function (focus) {
-          focus.data = event.data.filter(function (d, i) {
-            return d.value.colorValue === focus.key;
-          });
+          // Filter data.
+          focus.data = filterData(event.data, ['value', 'colorValue'], focus.key); // Count.
+
           focus.count = focus.data.length;
-          focus.cumulative = _this.data.filter(function (d) {
-            return d.event === event.value && d.colorValue === focus.key && d.start_timepoint <= _this.settings.timepoint;
-          }).length;
-          focus.proportion = focus.count / focus.denominator; // fmt
+          updateIdSet(focus.data, focus.cumulativeIds);
+          focus.cumulative = countCumulative(_this.data, _this.settings.timepoint, {
+            key: 'event',
+            value: event.value
+          }, {
+            key: _this.settings.colorBy.variable,
+            value: focus.key
+          });
+          focus.numerator = getNumerator(_this.settings.eventCountType, {
+            ids: focus.count,
+            cumulativeIds: focus.cumulativeIds.size,
+            events: focus.cumulative
+          }); // Calculate the proportion.
+
+          focus.proportion = focus.numerator / focus.denominator; // fmt
 
           focus.proportionFmt = d3.format('.1%')(focus.proportion);
-          focus.countFmt = d3.format(',d')(focus.count);
+          focus.countFmt = d3.format(',d')(focus.numerator);
           focus.countProportionFmt = "".concat(focus.countFmt, " (").concat(focus.proportionFmt, ")");
           focus.cumulativeFmt = d3.format(',d')(focus.cumulative); // freq table
 
@@ -1069,7 +1113,7 @@
           }).length;
           stratum.nEvents = stratum.values.length; // TODO: figure out how to shift the foci to match the order in the legend
 
-          stratum.angle = _this.settings.colorBy.nStrata % 2 ? i * _this.settings.colorBy.theta : i * _this.settings.colorBy.theta + Math.PI / _this.settings.colorBy.nStrata;
+          stratum.angle = _this.settings.colorBy.nStrata % 2 ? (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta : (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta + Math.PI / _this.settings.colorBy.nStrata;
         });
       }
 
@@ -1195,6 +1239,7 @@
               y: event.y + 50 * Math.sin(stratum.angle),
               dy: event.y + (i === 0 ? 75 : 50) * Math.sin(stratum.angle),
               count: 0,
+              cumulativeIds: new Set(),
               cumulative: 0
             });
 

@@ -165,6 +165,9 @@ body {
 }
 .fdg-legend__label {
 }
+.fdg-legend svg {
+    width: 100%;
+}
 
 /* progress */
 

@@ -10,6 +10,7 @@ fetch('./data/data_1000.csv')
             data,
             '#container',
             {
+                //playPause: 'pause',
                 eventCountType: 'cumulative-id',
                 //colorBy: null,
                 //colorBy: {

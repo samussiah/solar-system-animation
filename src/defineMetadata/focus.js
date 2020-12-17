@@ -9,6 +9,7 @@ export default function focus(metadata) {
                     y: event.y + 50 * Math.sin(stratum.angle),
                     dy: event.y + (i === 0 ? 75 : 50) * Math.sin(stratum.angle),
                     count: 0,
+                    cumulativeIds: new Set(),
                     cumulative: 0,
                 };
 

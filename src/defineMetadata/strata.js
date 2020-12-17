@@ -34,8 +34,8 @@ export default function strata(metadata) {
             // TODO: figure out how to shift the foci to match the order in the legend
             stratum.angle =
                 this.settings.colorBy.nStrata % 2
-                    ? i * this.settings.colorBy.theta
-                    : i * this.settings.colorBy.theta + Math.PI / this.settings.colorBy.nStrata;
+                    ? (this.settings.colorBy.nStrata - i - 1) * this.settings.colorBy.theta
+                    : (this.settings.colorBy.nStrata - i - 1) * this.settings.colorBy.theta + Math.PI / this.settings.colorBy.nStrata;
         });
     }
 

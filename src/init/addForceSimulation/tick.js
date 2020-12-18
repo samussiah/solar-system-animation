@@ -1,3 +1,10 @@
+import drawCircle from './tick/circle';
+import drawSquare from './tick/square';
+import drawTriangle from './tick/triangle';
+import drawDiamond from './tick/diamond';
+import drawStar from './tick/star';
+import drawTriangleDown from './tick/triangleDown';
+
 export default function tick() {
     this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
     this.containers.canvas.context.save();
@@ -7,32 +14,27 @@ export default function tick() {
         .forEach((d, i) => {
             this.containers.canvas.context.beginPath();
 
-            // circle
-            if (this.settings.shape === 'circle') {
-                this.containers.canvas.context.moveTo(d.x + d.r, d.y);
-                this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
-                if (this.settings.fill) {
-                    this.containers.canvas.context.fillStyle = d.value.fill;
-                    this.containers.canvas.context.fill();
-                }
-                this.containers.canvas.context.strokeStyle = d.value.stroke;
-                this.containers.canvas.context.stroke();
-            }
-            // square
-            else {
-                //this.containers.canvas.context.moveTo(d.x + d.r, d.y);
-                this.containers.canvas.context.rect(
-                    d.x - d.value.r,
-                    d.y - d.value.r,
-                    d.value.r * 2,
-                    d.value.r * 2
-                );
-                if (this.settings.fill) {
-                    this.containers.canvas.context.fillStyle = d.value.fill;
-                    this.containers.canvas.context.fill();
-                }
-                this.containers.canvas.context.strokeStyle = d.value.stroke;
-                this.containers.canvas.context.stroke();
+            switch (d.value.shape) {
+                case 'circle':
+                    drawCircle.call(this, d);
+                    break;
+                case 'square':
+                    drawSquare.call(this, d);
+                    break;
+                case 'triangle':
+                    drawTriangle.call(this, d);
+                    break;
+                case 'diamond':
+                    drawDiamond.call(this, d);
+                    break;
+                case 'star':
+                    drawStar.call(this, d);
+                    break;
+                case 'triangleDown':
+                    drawTriangleDown.call(this, d);
+                    break;
+                default:
+                    drawCircle.call(this, d);
             }
         });
 

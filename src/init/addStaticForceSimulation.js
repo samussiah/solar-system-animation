@@ -11,15 +11,15 @@ export default function addStaticForceSimulation() {
             .map((d) => {
                 return {
                     key: d.key,
-                    category: d.value.category,
+                    colorValue: d.value.colorValue,
                     color: d.value.color,
                 };
             });
 
-        // Simulate and render force layout separately for individuals within each category.
+        // Simulate and render force layout separately for individuals within each color stratum.
         if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
             this.metadata.event[0].foci.forEach((focus) => {
-                const data = noStateChange.filter((d) => d.category === focus.key);
+                const data = noStateChange.filter((d) => d.colorValue === focus.key);
 
                 // Pass data, coordinates, and color to web worker.
                 const worker = simulate.call(this, data, focus.x, focus.y, focus.key);

@@ -135,6 +135,24 @@
         return target;
     }
 
+    function _toConsumableArray(arr) {
+        return (
+            _arrayWithoutHoles(arr) ||
+            _iterableToArray(arr) ||
+            _unsupportedIterableToArray(arr) ||
+            _nonIterableSpread()
+        );
+    }
+
+    function _arrayWithoutHoles(arr) {
+        if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+    }
+
+    function _iterableToArray(iter) {
+        if (typeof Symbol !== 'undefined' && Symbol.iterator in Object(iter))
+            return Array.from(iter);
+    }
+
     function _unsupportedIterableToArray(o, minLen) {
         if (!o) return;
         if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -151,6 +169,12 @@
         for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
         return arr2;
+    }
+
+    function _nonIterableSpread() {
+        throw new TypeError(
+            'Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.'
+        );
     }
 
     function _createForOfIteratorHelper(o, allowArrayLike) {
@@ -272,7 +296,13 @@
                 )
             );
             this.settings.colorBy.type = 'frequency';
-        } // Define array of modal text.
+        } // aesthetics
+
+        this.settings.stratify = this.settings.colorBy.type === 'categorical';
+        this.settings.sizify =
+            this.settings.sizeBy.type === 'frequency' ||
+            (this.settings.sizeBy.type === 'continuous' && this.settings.sizeBy.variable !== null);
+        this.settings.shapify = this.settings.shapeBy.variable !== null; // Define array of modal text.
 
         var texts = [];
 
@@ -297,7 +327,10 @@
 
     var settings = {
         update: update,
-        // data mappings
+
+        /**-------------------------------------------------------------------------------------------\
+        data mapping
+      \-------------------------------------------------------------------------------------------**/
         id_var: 'id',
         event_var: 'event',
         event_order_var: 'event_order',
@@ -305,24 +338,54 @@
         end_timepoint_var: 'endy',
         duration_var: 'duration',
         sequence_var: 'seq',
-        // time settings
-        timepoint: 0,
-        timeUnit: 'days since randomization',
-        duration: null,
-        // defined in ./defineMetadata/dataDrivenSettings
-        resetDelay: 15000,
-        // event settings
-        events: null,
-        // defined in ./defineMetadata
-        eventCentral: null,
-        // defined in ./defineMetadata/dataDrivenSettings
-        eventCount: true,
-        // display count (percentage) beneath focus labels?
-        eventChangeCount: null,
-        // defined in ./defineMetadata/dataDrivenSettings
-        eventChangeCountAesthetic: 'color',
-        drawStaticSeparately: true,
-        // draw static bubbles in a static force simulation to improve performance
+
+        /**-------------------------------------------------------------------------------------------\
+        aesthetics
+      \-------------------------------------------------------------------------------------------**/
+        // color
+        colorBy: {
+            type: 'frequency',
+            // ['frequency', 'continuous', 'categorical']
+            variable: null,
+            label: null,
+            mirror: true,
+            // reverse color scheme?
+            stratify: true,
+            // present categories separately at each focus?
+            colorScheme: 'RdYlGn',
+            colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'],
+            // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
+            nColors: 6, // min: 3, max: 9
+        },
+        color: 'rgb(170,170,170)',
+        fill: null,
+        // defined in ./defineMetadata/defineIdDependentSettings
+        // size
+        sizeBy: {
+            type: 'frequency',
+            // ['frequency', 'continuous']
+            variable: null,
+            label: null,
+        },
+        minRadius: null,
+        // defined in ./defineMetadata/updateIdDependentSettings
+        maxRadius: 10,
+        // defined in ./defineMetadata/updateIdDependentSettings
+        staticRadius: null,
+        // defined in ./defineMetadata/updateIdDependentSettings
+        // shape
+        shapeBy: {
+            type: 'categorical',
+            // ['categorical']
+            variable: null,
+            label: null,
+            shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
+        },
+        shape: 'circle',
+
+        /**-------------------------------------------------------------------------------------------\
+        animation
+      \-------------------------------------------------------------------------------------------**/
         // animation settings
         speed: 'medium',
         speeds: {
@@ -333,60 +396,43 @@
         playPause: 'play',
         pulseOrbits: false,
         loop: true,
-        // dimensions
+        // time settings
+        timepoint: 0,
+        // initial timepoint
+        timeUnit: 'days',
+        // time unit that appears in labels
+        duration: null,
+        // defined in ./defineMetadata/updateIdDependentSettings
+        resetDelay: 15000,
+
+        /**-------------------------------------------------------------------------------------------\
+        dimensions
+      \-------------------------------------------------------------------------------------------**/
         width: null,
         // defined in ./defineMetadata/coordinates
         height: null,
         // defined in ./defineMetadata/coordinates
-        padding: 1,
-        nOrbits: null,
-        // defined in ./defineMetadata/dataDrivenSettings/orbits
-        orbitRadius: 150,
-        nFoci: null,
-        // defined in ./defineMetadata/dataDrivenSettings/event
-        translate: false,
-        hideControls: false,
-        // force simulation settings
-        chargeStrength: null,
-        // defined in ./defineMetadata
-        staticLayout: 'circular',
+        orbitRadius: null,
+        // defined in ./defineMetadata/coordinates
+
+        /**-------------------------------------------------------------------------------------------\
+        force simulation
+      \-------------------------------------------------------------------------------------------**/
         manyBody: 'forceManyBodyReuse',
         // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
+        chargeStrength: null,
+        // defined in ./defineMetadata/updateIdDependentSettings
         collisionPadding: 1,
-        // bubble color settings
-        stratifyBy: {
-            variable: null,
-            label: null,
-        },
-        // up to five strata
-        colorBy: {
-            type: 'frequency',
-            // ['frequency', 'continuous', 'categorical']
-            variable: null,
-            label: null,
-            mirror: true,
-            stratify: true,
-        },
-        colorScheme: 'schemeRdYlGn',
-        nColors: 6,
-        // min: 3, max: 9
-        colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'],
-        // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
-        fill: null,
-        // defined in ./defineMetadata/dataDrivenSettings
-        // bubble size settings
-        sizeBy: {
-            type: 'frequency',
-            // ['frequency', 'continuous']
-            variable: null,
-            label: null,
-        },
-        minRadius: null,
-        // defined in ./defineMetadata/dataDrivenSettings
-        maxRadius: 10,
-        // defined in ./defineMetadata/dataDrivenSettings
-        shape: 'circle',
-        // modals
+        staticChargeStrength: null,
+        // defined in ./defineMetadata/updateIdDependentSettings
+        drawStaticSeparately: false,
+        // draw static bubbles in a static force simulation to improve performance
+        staticLayout: 'circular',
+        // ['circular', 'radial']
+
+        /**-------------------------------------------------------------------------------------------\
+        modal
+      \-------------------------------------------------------------------------------------------**/
         modal: true,
         // display modals?
         modalSpeed: 15000,
@@ -401,7 +447,33 @@
             'Continue watching to learn how these individuals progress over the course of [duration] days.',
         ],
         // array of strings
-        information: null, // array of strings
+        information: null,
+        // array of strings
+
+        /**-------------------------------------------------------------------------------------------\
+        event/state
+      \-------------------------------------------------------------------------------------------**/
+        events: null,
+        // defined in ./defineMetadata
+        eventCentral: null,
+        // defined in ./defineMetadata/updateEventDependentSettings
+        eventCount: true,
+        // display [ n (%) ] beneath focus labels?
+        eventCountType: 'current-id',
+        // ['current-id', 'cumulative-id', 'cumulative-event']
+        eventChangeCount: null,
+        // defined in ./defineMetadata/updateEventDependentSettings
+
+        /**-------------------------------------------------------------------------------------------\
+        miscellaneous
+      \-------------------------------------------------------------------------------------------**/
+        nOrbits: null,
+        // defined in ./defineMetadata/dataDrivenSettings/orbits
+        nFoci: null,
+        // defined in ./defineMetadata/updateEventDependentSettings
+        hideControls: false,
+        hideFreqTable: false,
+        eventCentralInFreqTable: false,
     };
 
     function addElement(name, parent) {
@@ -510,7 +582,10 @@
     function canvas(main) {
         var animation = addElement('animation', main);
         this.settings.width = animation.node().clientWidth;
-        this.settings.height = animation.node().clientHeight; // background SVG
+        this.settings.height = animation.node().clientHeight; // progress bar at top
+
+        var progressBar = addElement('progress-bar', animation);
+        var progressDay = addElement('progress-day', animation); // background SVG
 
         var svgBackground = addElement('svg--background', animation, 'svg')
             .attr('width', this.settings.width)
@@ -542,6 +617,8 @@
         var modal = addElement('modal__text', modalContainer);
         return {
             animation: animation,
+            progressBar: progressBar,
+            progressDay: progressDay,
             svgBackground: svgBackground,
             canvas: canvas,
             svgForeground: svgForeground,
@@ -556,8 +633,10 @@
         // Dimensions of canvas.
         this.settings.orbitRadius = this.settings.width / (metadata.orbit.length + 1); // Calculate coordinates of event focus.
 
-        var centerX = this.settings.orbitRadius / 2;
-        var centerY = this.settings.height / 2;
+        this.settings.center = {
+            x: this.settings.orbitRadius / 2,
+            y: this.settings.height / 2,
+        };
         var theta =
             (2 * Math.PI) /
             (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
@@ -569,27 +648,31 @@
 
             event.x =
                 event.order === 0
-                    ? centerX
-                    : centerX +
+                    ? _this.settings.center.x
+                    : _this.settings.center.x +
                       event.radius * // number of orbit radii from the center
                           Math.cos(event.theta); // position along the circle at the given orbit along which
 
             event.y =
                 event.order === 0
-                    ? centerY
-                    : centerY +
+                    ? _this.settings.center.y
+                    : _this.settings.center.y +
                       event.radius * // number of orbit radii from the center
                           Math.sin(event.theta); // y-position of the along the given orbit at which the focus circle at the
         }); // Calculate dimensions of orbits.
 
         metadata.orbit.forEach(function (d, i) {
-            d.cx = centerX;
-            d.cy = centerY;
+            d.cx = _this.settings.center.x;
+            d.cy = _this.settings.center.y;
             d.r = (i + 1) * _this.settings.orbitRadius;
+            d.rAdj = d.r;
+            d.rAdjPrev = d.r;
         });
     }
 
     function restartForceSimulation() {
+        var _this = this;
+
         // Remove centering force after first interval.
         if (this.settings.timepoint > 0 && !!this.forceSimulation)
             this.forceSimulation.force('center', null); // Reheat the simulation (alpha(1)) and update the coordinates of the x- and y- forces.
@@ -613,6 +696,12 @@
                         return d.value.coordinates.y;
                     })
                     .strength(0.3)
+            )
+            .force(
+                'collide',
+                d3.forceCollide().radius(function (d) {
+                    return d.value.size + _this.settings.collisionPadding;
+                })
             )
             .restart();
     }
@@ -735,15 +824,15 @@
                 .map(function (d) {
                     return {
                         key: d.key,
-                        category: d.value.category,
+                        colorValue: d.value.colorValue,
                         color: d.value.color,
                     };
-                }); // Simulate and render force layout separately for individuals within each category.
+                }); // Simulate and render force layout separately for individuals within each color stratum.
 
             if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
                 this.metadata.event[0].foci.forEach(function (focus) {
                     var data = noStateChange.filter(function (d) {
-                        return d.category === focus.key;
+                        return d.colorValue === focus.key;
                     }); // Pass data, coordinates, and color to web worker.
 
                     var worker = simulate.call(_this, data, focus.x, focus.y, focus.key); // Pass web worker to draw function.
@@ -802,20 +891,64 @@
         return nStateChanges;
     }
 
-    function defineRadius(stateChanges) {
-        var r =
-            this.settings.eventChangeCountAesthetic !== 'color'
-                ? Math.min(this.settings.minRadius + stateChanges, this.settings.maxRadius)
-                : this.settings.minRadius;
-        return r;
+    function getAestheticValues(group, state) {
+        var colorValue =
+            this.settings.colorBy.type === 'frequency'
+                ? countStateChanges.call(this, group)
+                : this.settings.colorBy.variable !== null
+                ? state[this.settings.colorBy.variable]
+                : null;
+        var sizeValue =
+            this.settings.sizeBy.type === 'frequency'
+                ? countStateChanges.call(this, group)
+                : this.settings.sizeBy.variable !== null
+                ? state[this.settings.sizeBy.variable]
+                : null;
+        var shapeValue =
+            this.settings.shapeBy.type === 'frequency'
+                ? countStateChanges.call(this, group)
+                : this.settings.shapeBy.variable !== null
+                ? state[this.settings.shapeBy.variable]
+                : null;
+        return {
+            colorValue: colorValue,
+            sizeValue: sizeValue,
+            shapeValue: shapeValue,
+        };
     }
 
-    function defineColor(value, colorScale) {
-        var color =
-            this.settings.colorBy.type !== 'frequency' ||
-            this.settings.eventChangeCountAesthetic !== 'size'
-                ? d3.rgb(colorScale(value)).toString()
-                : 'rgb(170,170,170)';
+    function getCoordinates(state, colorValue) {
+        var destination =
+            this.settings.stratify && this.settings.colorBy.stratify
+                ? this.metadata.event
+                      .find(function (event) {
+                          return event.value === state.event;
+                      })
+                      .foci.find(function (focus) {
+                          return focus.key === colorValue;
+                      })
+                : this.metadata.event.find(function (event) {
+                      return event.value === state.event;
+                  });
+        var coordinates = {
+            x: destination.x,
+            y: destination.y,
+        };
+        return coordinates;
+    }
+
+    function getColorScale(colorValue) {
+        var colorScale =
+            this.settings.stratify && this.settings.sizeBy.type === 'frequency'
+                ? this.metadata.strata.find(function (stratum) {
+                      return stratum.key === colorValue;
+                  }).colorScale
+                : this.scales.color;
+        return colorScale;
+    }
+
+    function getColor(scale, value) {
+        var color = scale !== undefined ? scale(value) : 'rgb(170,170,170)';
         var fill = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
         var stroke = color.replace('rgb', 'rgba').replace(')', ', 1)');
         return {
@@ -825,52 +958,177 @@
         };
     }
 
-    function defineDatum(group, state, colorScale) {
-        // Count state changes.
-        var nStateChanges = countStateChanges.call(this, group); // Count state changes.
-        // TODO: add a setting that controls the recurrence of event aesthetic alongside a
-        // continuous or categorical color scheme
+    function getSize(scale, value) {
+        var size = scale !== undefined ? scale(value) : this.settings.minRadius;
+        return size;
+    }
 
-        var aesthetic =
-            this.settings.colorBy.type !== 'continuous'
-                ? nStateChanges
-                : state[this.settings.colorBy.variable]; // Define radius.
+    function getShape(scale, value) {
+        var shape = scale !== undefined ? scale(value) : this.settings.shape;
+        return shape;
+    }
 
-        var r = defineRadius.call(this, nStateChanges); // Define color.
-        // TODO: define a category-specific color scale that captures event recurrence
-
-        var color = defineColor.call(this, aesthetic, colorScale);
+    function getAesthetics(aestheticValues, colorScale) {
+        var color = getColor.call(this, this.scales.color, aestheticValues.colorValue);
+        var size = getSize.call(this, this.scales.size, aestheticValues.sizeValue);
+        var shape = getShape.call(this, this.scales.shape, aestheticValues.shapeValue);
         return _objectSpread2(
+            _objectSpread2({}, color),
+            {},
             {
-                nStateChanges: nStateChanges,
-                // number of state changes the indivdual has experienced a thus far
-                aesthetic: aesthetic,
-                // value that controls color
-                r: r,
-            },
-            color
+                // color, fill, stroke
+                size: size,
+                shape: shape,
+            }
         );
     }
-    /*
-        // Define radius input.
-        const rInput = this.settings.
 
-        // Define radius.
-        const r = defineRadius.call(this, rInput);
-
-        // Define color input.
-        const colorInput =
-            this.settings.colorBy.type === 'frequency'
-                ? nStateChanges
-                : state[this.settings.colorBy.variable];
-
-        // Define color.
-        const color = defineColor.call(this, colorInput);
-    */
-
-    function data() {
+    function nestedData() {
         var _this = this;
 
+        this.data.nested.forEach(function (d) {
+            // Update individual to next event.
+            var currentState = getState.call(_this, d.value.group);
+
+            if (d.value.state !== currentState) {
+                d.value.statePrevious = d.value.state;
+                d.value.state = currentState;
+            }
+
+            var aestheticValues = getAestheticValues.call(_this, d.value.group, d.value.state);
+            d.value.coordinates = getCoordinates.call(
+                _this,
+                d.value.state,
+                aestheticValues.colorValue
+            );
+            d.value.distance = Math.sqrt(
+                Math.pow(d.x - _this.settings.center.x, 2) +
+                    Math.pow(d.y - _this.settings.center.y, 2)
+            );
+            d.value.colorScale = getColorScale.call(_this, aestheticValues.colorValue);
+            var aesthetics = getAesthetics.call(_this, aestheticValues, d.value.colorScale);
+            Object.assign(d.value, aestheticValues, aesthetics);
+        });
+    }
+
+    // Capture IDs in the given state.
+    function filterData() {
+        var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+        var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ['value'];
+        var value = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+        return data.filter(function (d, i) {
+            return (
+                props.reduce(function (value, prop) {
+                    return value[prop];
+                }, d) === value
+            );
+        });
+    }
+
+    // Maintain a set of any IDs that have existed in the given state.
+    function updateIdSet(data, set) {
+        data.forEach(function (id) {
+            set.add(id.key);
+        });
+    }
+
+    // Count the number of events, i.e. the number of times any ID has existed in the given state.
+    function countCumulative(data, timepoint, event, stratum) {
+        return data.filter(function (d) {
+            return (
+                d.start_timepoint <= timepoint &&
+                d[event.key] === event.value &&
+                (stratum === undefined || d[stratum.key] === stratum.value)
+            );
+        }).length;
+    }
+
+    // Determine the numerator of the state proportions.
+    function getNumerator(eventCountType, n) {
+        var numerator =
+            eventCountType === 'current-id'
+                ? n.ids
+                : eventCountType === 'cumulative-id'
+                ? n.cumulativeIds
+                : eventCountType === 'cumulative-event'
+                ? n.events
+                : console.warn('Unable to determine [ numerator ] in [ getNumerator() ].');
+        return numerator;
+    }
+
+    function eventMetadata() {
+        var _this = this;
+
+        this.metadata.event.forEach(function (event) {
+            // Filter data.
+            event.data = filterData(_this.data.nested, ['value', 'state', 'event'], event.value); // Count.
+
+            event.count = event.data.length;
+            updateIdSet(event.data, event.cumulativeIds);
+            event.cumulative = countCumulative(_this.data, _this.settings.timepoint, {
+                key: 'event',
+                value: event.value,
+            });
+            event.numerator = getNumerator(_this.settings.eventCountType, {
+                ids: event.count,
+                cumulativeIds: event.cumulativeIds.size,
+                events: event.cumulative,
+            }); // Calculate the proportion.
+
+            event.proportion = event.numerator / event.denominator; // Format the counts and proportions.
+
+            event.proportionFmt = d3.format('.1%')(event.proportion);
+            event.numeratorFmt = d3.format(',d')(event.numerator);
+            event.countProportionFmt = ''
+                .concat(event.numeratorFmt, ' (')
+                .concat(event.proportionFmt, ')');
+            event.cumulativeFmt = d3.format(',d')(event.cumulative); // Define an array for the frequency table.
+
+            event.cells = [event.label, event.countProportionFmt, event.cumulativeFmt]; // Calculate the change in IDs in the given state from the previous timepoint.
+
+            event.change = event.count - event.prevCount;
+            if (event.foci)
+                event.foci.forEach(function (focus) {
+                    // Filter data.
+                    focus.data = filterData(event.data, ['value', 'colorValue'], focus.key); // Count.
+
+                    focus.count = focus.data.length;
+                    updateIdSet(focus.data, focus.cumulativeIds);
+                    focus.cumulative = countCumulative(
+                        _this.data,
+                        _this.settings.timepoint,
+                        {
+                            key: 'event',
+                            value: event.value,
+                        },
+                        {
+                            key: _this.settings.colorBy.variable,
+                            value: focus.key,
+                        }
+                    );
+                    focus.numerator = getNumerator(_this.settings.eventCountType, {
+                        ids: focus.count,
+                        cumulativeIds: focus.cumulativeIds.size,
+                        events: focus.cumulative,
+                    }); // Calculate the proportion.
+
+                    focus.proportion = focus.numerator / focus.denominator; // fmt
+
+                    focus.proportionFmt = d3.format('.1%')(focus.proportion);
+                    focus.countFmt = d3.format(',d')(focus.numerator);
+                    focus.countProportionFmt = ''
+                        .concat(focus.countFmt, ' (')
+                        .concat(focus.proportionFmt, ')');
+                    focus.cumulativeFmt = d3.format(',d')(focus.cumulative); // freq table
+
+                    focus.cells = [focus.label, focus.countProportionFmt, focus.cumulativeFmt]; // change
+
+                    focus.change = focus.count - focus.prevCount;
+                });
+        });
+    }
+
+    function data() {
         // Count the number of individuals at each focus at previous timepoint.
         this.metadata.event.forEach(function (event) {
             event.prevCount = event.count;
@@ -879,60 +1137,8 @@
                     focus.prevCount = focus.count;
                 });
         });
-        this.data.nested.forEach(function (d) {
-            // Update individual to next event.
-            var currentState = getState.call(_this, d.value.group);
-
-            if (d.value.state !== currentState) {
-                d.value.statePrevious = d.value.state;
-                d.value.state = currentState;
-            } // Determine destination - the focus representing the current state of the individual.
-
-            var destination =
-                _this.settings.colorBy.type === 'categorical' && _this.settings.colorBy.stratify
-                    ? _this.metadata.event
-                          .find(function (event) {
-                              return event.value === d.value.state.event;
-                          })
-                          .foci.find(function (focus) {
-                              return focus.key === d.value.category;
-                          })
-                    : _this.metadata.event.find(function (event) {
-                          return event.value === d.value.state.event;
-                      });
-            d.value.coordinates = {
-                x: destination.x,
-                y: destination.y,
-            };
-            var datum = defineDatum.call(_this, d.value.group, d.value.state, d.value.colorScale);
-            Object.assign(d.value, datum);
-        }); // Record change in number of IDs at each focus at current timepoint.
-
-        this.metadata.event.forEach(function (event) {
-            event.data = _this.data.nested.filter(function (d, i) {
-                return d.value.state.event === event.value;
-            });
-            event.count = event.data.length;
-            event.cumulative = _this.data.filter(function (d) {
-                return d.event === event.value && d.start_timepoint <= _this.settings.timepoint;
-            }).length;
-            event.change = event.count - event.prevCount;
-            if (event.foci)
-                event.foci.forEach(function (focus) {
-                    focus.data = event.data.filter(function (d, i) {
-                        return d.value.category === focus.key;
-                    });
-                    focus.count = focus.data.length;
-                    focus.cumulative = _this.data.filter(function (d) {
-                        return (
-                            d.event === event.value &&
-                            d.category === focus.key &&
-                            d.start_timepoint <= _this.settings.timepoint
-                        );
-                    }).length;
-                    focus.change = focus.count - focus.prevCount;
-                });
-        });
+        nestedData.call(this);
+        eventMetadata.call(this);
     }
 
     function resize() {
@@ -1012,7 +1218,7 @@
     }
 
     function layout() {
-        var main = addElement('main', d3.select(this.element)); // controls on top
+        var main = addElement('main', d3.select(this.element)); // controls positioned absolutely
 
         var controls$1 = controls.call(this, main); // sidebar to the left
 
@@ -1049,9 +1255,13 @@
                         return +d.duration;
                     }),
                     static: group.length === 1,
-                    category:
+                    colorStratum:
                         _this.settings.colorBy.type === 'categorical'
                             ? group[0][_this.settings.colorBy.variable]
+                            : null,
+                    shapeStratum:
+                        _this.settings.shapeBy.type === 'categorical'
+                            ? group[0][_this.settings.shapeBy.variable]
                             : null,
                 };
             })
@@ -1101,7 +1311,7 @@
                 this.settings.maxRadius
             );
         this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
-        this.settings.maxRadius = this.settings.minRadius + this.settings.nColors;
+        this.settings.maxRadius = this.settings.minRadius + this.settings.colorBy.nColors;
         this.settings.chargeStrength = -(
             2000 /
             metadata.id.filter(function (d) {
@@ -1130,6 +1340,7 @@
                     count: 0,
                     prevCount: 0,
                     cumulative: 0,
+                    cumulativeIds: new Set(),
                     nEvents: group.length,
                 };
             })
@@ -1193,7 +1404,7 @@
 
         var nest;
 
-        if (this.settings.colorBy.type === 'categorical') {
+        if (this.settings.stratify) {
             nest = d3
                 .nest()
                 .key(function (d) {
@@ -1206,7 +1417,8 @@
             this.settings.colorBy.nStrata = nest.length;
             this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
             nest.forEach(function (stratum, i) {
-                var colorScheme = _this.settings.colorSchemes[i];
+                stratum.value = stratum.key;
+                var colorScheme = _this.settings.colorBy.colorSchemes[i];
                 stratum.colorScheme =
                     d3[
                         'scheme'
@@ -1222,12 +1434,15 @@
                         stratum.colorScheme[9].reverse().slice(0, _this.settings.nColors).reverse()
                     )
                     .clamp(true);
-                stratum.n = stratum.values.length; // TODO: figure out how to shift the foci to match the order in the legend
+                stratum.nParticipants = metadata.id.filter(function (d) {
+                    return d.colorStratum === stratum.value;
+                }).length;
+                stratum.nEvents = stratum.values.length; // TODO: figure out how to shift the foci to match the order in the legend
 
                 stratum.angle =
                     _this.settings.colorBy.nStrata % 2
-                        ? i * _this.settings.colorBy.theta
-                        : i * _this.settings.colorBy.theta +
+                        ? (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta
+                        : (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta +
                           Math.PI / _this.settings.colorBy.nStrata;
             });
         }
@@ -1235,11 +1450,32 @@
         return nest;
     }
 
-    function colorScale(metadata) {
-        var colorBy = this.settings.colorBy;
+    function shape(metadata) {
+        var _this = this;
+
+        var nest;
+
+        if (this.settings.shapify) {
+            nest = d3
+                .nest()
+                .key(function (d) {
+                    return d[_this.settings.shapeBy.variable];
+                })
+                .entries(this.data)
+                .sort(function (a, b) {
+                    return a.key < b.key ? -1 : 1;
+                });
+        }
+
+        return nest;
+    }
+
+    function color(metadata) {
+        var colorBy = this.settings.colorBy; // scale domain
+
         var domain =
             colorBy.type === 'frequency'
-                ? d3.range(this.settings.nColors)
+                ? d3.range(colorBy.nColors)
                 : colorBy.type === 'continuous'
                 ? d3.extent(this.data, function (d) {
                       return d[colorBy.variable];
@@ -1248,35 +1484,187 @@
                 ? metadata.strata.map(function (d) {
                       return d.key;
                   })
-                : null;
-        var colorScale =
-            colorBy.type === 'frequency'
-                ? d3
-                      .scaleLinear()
-                      .domain(domain)
-                      .range(
-                          colorBy.mirror
-                              ? d3[this.settings.colorScheme][this.settings.nColors].reverse()
-                              : d3[this.settings.colorScheme][this.settings.nColors]
-                      )
-                      .clamp(true)
-                : colorBy.type === 'continuous'
-                ? d3.scaleSequential(d3.interpolateRdYlGn).domain(domain)
-                : colorBy.type === 'categorical'
-                ? d3.scaleOrdinal().domain(domain).range(d3.schemeTableau10)
-                : null; // Invert color scale.
+                : null; // scale
 
-        if (colorBy.type === 'continuous' && colorBy.mirror) {
-            var interpolator = colorScale.interpolator(); // read the color scale's interpolator
+        var range;
+        var scale;
 
-            var mirror = function mirror(t) {
-                return interpolator(1 - t);
-            }; // returns the mirror image of the interpolator
+        switch (colorBy.type) {
+            case 'frequency':
+                range = colorBy.mirror
+                    ? d3['scheme'.concat(colorBy.colorScheme)][colorBy.nColors].reverse()
+                    : d3['scheme'.concat(colorBy.colorScheme)][colorBy.nColors];
+                scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+                break;
 
-            colorScale.interpolator(mirror); // updates the scale's interpolator
+            case 'continuous':
+                scale = d3
+                    .scaleSequential(d3['interpolate'.concat(colorBy.colorScheme)])
+                    .domain(domain); // Invert color scale.
+
+                if (colorBy.mirror) {
+                    var interpolator = scale.interpolator(); // read the color scale's interpolator
+
+                    var mirror = function mirror(t) {
+                        return interpolator(1 - t);
+                    }; // returns the mirror image of the interpolator
+
+                    scale.interpolator(mirror); // updates the scale's interpolator
+                }
+
+                break;
+
+            case 'categorical':
+                var scheme = d3['scheme'.concat(colorBy.colorScheme)];
+                range = scheme.every(function (el) {
+                    return typeof el === 'string';
+                })
+                    ? scheme
+                    : scheme[Math.min(Math.max(3, domain.length), 9)];
+                scale = d3
+                    .scaleOrdinal()
+                    .domain(domain)
+                    .range(
+                        range.map(function (color) {
+                            return d3.rgb(color) + '';
+                        })
+                    );
+                break;
+
+            default:
+                scale = null;
         }
 
-        return colorScale;
+        return scale;
+    }
+
+    function size(metadata) {
+        var sizeBy = this.settings.sizeBy; // scale domain
+
+        var domain =
+            sizeBy.type === 'frequency'
+                ? [0, this.settings.colorBy.nColors]
+                : sizeBy.type === 'continuous'
+                ? d3.extent(this.data, function (d) {
+                      return d[sizeBy.variable];
+                  })
+                : null; // scale range
+
+        var range = [this.settings.minRadius, this.settings.maxRadius]; // scale
+
+        var scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+        return scale;
+    }
+
+    function shape$1(metadata) {
+        var scale;
+
+        if (this.settings.shapify) {
+            var shapeBy = this.settings.shapeBy; // scale domain
+
+            var domain =
+                shapeBy.type === 'categorical'
+                    ? metadata.shape.map(function (d) {
+                          return d.key;
+                      })
+                    : null; // scale range
+
+            var range = shapeBy.shapes; // scale
+
+            scale = d3.scaleOrdinal().domain(domain).range(range);
+        }
+
+        return scale;
+    }
+
+    function scales(metadata) {
+        var color$1 = color.call(this, metadata);
+        var size$1 = size.call(this, metadata);
+        var shape = shape$1.call(this, metadata);
+        return {
+            color: color$1,
+            size: size$1,
+            shape: shape,
+        };
+    }
+
+    function focus(metadata) {
+        if (this.settings.colorBy.type === 'categorical') {
+            metadata.event.forEach(function (event, i) {
+                event.foci = metadata.strata.map(function (stratum, j) {
+                    var focus = _objectSpread2(
+                        _objectSpread2({}, stratum),
+                        {},
+                        {
+                            x: event.x + 50 * Math.cos(stratum.angle),
+                            dx: event.x + (i === 0 ? 75 : 50) * Math.cos(stratum.angle),
+                            y: event.y + 50 * Math.sin(stratum.angle),
+                            dy: event.y + (i === 0 ? 75 : 50) * Math.sin(stratum.angle),
+                            count: 0,
+                            cumulativeIds: new Set(),
+                            cumulative: 0,
+                        }
+                    );
+
+                    return focus;
+                });
+            });
+        }
+    }
+
+    // Frequency data structure: one record per event/event-stratum
+    //
+    // - state
+    // - stratum
+    // - label (state or stratum)
+    // - participant denominator (population or stratum total)
+    // - participant numerator (number of participants in a given state)
+    // - participant proportion
+    // - event count
+    // - formatted values
+    //   - label
+    //   - nParticipants (%)
+    //   - nEvents
+    function freqTable(metadata) {
+        var _this = this;
+
+        var freqTable = d3.merge(
+            metadata.event.map(function (event) {
+                // One record per event per focus plus an overall event record.
+                var rowGroup =
+                    _this.settings.colorBy.type === 'categorical'
+                        ? [event].concat(_toConsumableArray(event.foci))
+                        : [event];
+                rowGroup.forEach(function (d) {
+                    d.state = event.value; // state
+
+                    d.label = d.value; // state or stratum
+
+                    d.denominator =
+                        d.label !== d.state
+                            ? d.nParticipants
+                            : ['current-id', 'cumulative-id'].includes(
+                                  _this.settings.eventCountType
+                              )
+                            ? metadata.id.length
+                            : _this.settings.eventChangeType === 'cumulative-event'
+                            ? event.nEvents
+                            : console.warn(
+                                  'Unable to determine [ event.denominator ] in [ eventMetadata ].'
+                              );
+                    d.proportion = d.count / d.denominator;
+                    d.proportionFmt = d3.format('.1%')(d.proportion); // Table cell values.
+
+                    d.countFmt = d3.format(',d')(d.count);
+                    d.countProportionFmt = ''.concat(d.countFmt, ' (').concat(d.proportionFmt, ')');
+                    d.cumulativeFmt = d3.format(',d')(d.cumulative);
+                    d.cells = [d.label, d.countProportionFmt, d.cumulativeFmt];
+                    d.cells.proportion = d.proportion;
+                });
+                return rowGroup;
+            })
+        );
+        return freqTable;
     }
 
     function defineMetadata() {
@@ -1292,67 +1680,60 @@
 
         coordinates.call(this, metadata); // Define strata set.
 
-        metadata.strata = strata.call(this, metadata); // Define color scale.
+        metadata.strata = strata.call(this, metadata); // Define shape set.
 
-        this.colorScale = colorScale.call(this, metadata); // Define the offset of each stratum as function of the focus coordinates, the stratum
+        metadata.shape = shape.call(this, metadata); // Define color scale.
+
+        this.scales = scales.call(this, metadata); // Define the offset of each stratum as function of the focus coordinates, the stratum
         // sequence, and theta.
 
-        if (this.settings.colorBy.type === 'categorical') {
-            metadata.event.forEach(function (event, i) {
-                event.foci = metadata.strata.map(function (stratum, j) {
-                    var focus = _objectSpread2(
-                        _objectSpread2({}, stratum),
-                        {},
-                        {
-                            x: event.x + 50 * Math.cos(stratum.angle),
-                            dx: event.x + (i === 0 ? 75 : 50) * Math.cos(stratum.angle),
-                            y: event.y + 50 * Math.sin(stratum.angle),
-                            dy: event.y + (i === 0 ? 75 : 50) * Math.sin(stratum.angle),
-                            count: 0,
-                            cumulative: 0,
-                        }
-                    );
+        focus.call(this, metadata); // Calculate frequencies and percentages to populate annotation foci and frequency table.
 
-                    return focus;
-                });
-            });
-        }
-
+        this.data.freqTable = freqTable.call(this, metadata);
         return metadata;
     }
 
-    function pulseOrbits() {
-        var fdg = this;
+    function orbits() {
+        var main = this; //if (this.settings.pulseOrbits) {
 
-        if (this.settings.pulseOrbits) {
-            this.orbits.each(function (d) {
-                d.change = d3.sum(d.values, function (di) {
-                    return di.change;
+        this.orbits.each(function (d) {
+            d.rAdjPrev = d.rAdj;
+            var distances = d3
+                .merge(
+                    d.values.map(function (di) {
+                        return di.data;
+                    })
+                )
+                .map(function (d) {
+                    return d.value.distance;
                 });
+            var rAdj = distances.length ? Math.max(d3.median(distances), d.r) : d.r;
+            var diff = rAdj - d.rAdjPrev;
+            d.rAdj = d.rAdjPrev + Math.min(diff / 10, main.settings.orbitRadius / 100); //d.change = d3.sum(d.values, (di) => di.change);
+            //if (d.change > 0) {
 
-                if (d.change > 0) {
-                    d3.select(this)
-                        .transition()
-                        .duration(fdg.settings.speeds[fdg.settings.speed] / 2)
-                        .attr('stroke-width', 0.5 * d.change)
-                        .transition()
-                        .duration(fdg.settings.speeds[fdg.settings.speed] / 2)
-                        .attr('stroke-width', 0.5);
-                }
-            });
-        }
+            d3.select(this)
+                .transition()
+                .duration(main.settings.speeds[main.settings.speed])
+                .attr('r', d.rAdj); //.duration(main.settings.speeds[main.settings.speed] / 2)
+            //.attr('stroke-width', 0.5 * d.change)
+            //.transition()
+            //.duration(main.settings.speeds[main.settings.speed] / 2)
+            //.attr('stroke-width', 0.5);
+            //}
+        }); //}
     }
 
-    function text() {
-        var _this = this;
-
-        this.settings.progress = this.settings.timepoint / this.settings.duration; // Update timepoint control.
-
-        this.controls.timepoint.inputs.property('value', this.settings.timepoint); // Update timer.
+    function progress() {
+        // Update progress bar.
+        this.containers.progressBar.style('width', ''.concat(this.settings.progress * 100, '%'));
+        this.containers.progressDay
+            .style('right', ''.concat(100 - this.settings.progress * 100, '%'))
+            .text('Day '.concat(this.settings.timepoint)); // Update timer.
 
         this.containers.timer.text(
             ''.concat(this.settings.timepoint, ' ').concat(this.settings.timeUnit)
-        ); // Update progress bar.
+        ); // Update progress pie.
 
         this.containers.progress.attr(
             'title',
@@ -1381,39 +1762,91 @@
             this.settings.progress < 0.0095
                 ? d3.format('.1%')(this.settings.progress)
                 : d3.format('.0%')(this.settings.progress)
-        ); // Update focus percentages
+        ); // Update timepoint control.
 
+        this.controls.timepoint.inputs.property('value', this.settings.timepoint);
+    }
+
+    // TODO: make color legend reactive
+    function legends() {
+        var shapeCounts = d3
+            .nest()
+            .key(function (d) {
+                return d.value.shapeValue;
+            })
+            .rollup(function (group) {
+                return group.length;
+            })
+            .entries(this.data.nested);
+        this.containers.legends
+            .selectAll('.fdg-legend--shape')
+            .selectAll('text')
+            .text(function (d) {
+                return ''.concat(d, ' (n=').concat(
+                    shapeCounts.find(function (di) {
+                        return di.key === d;
+                    }).value,
+                    ')'
+                );
+            });
+    }
+
+    // Update focus percentages.
+    function counts() {
         if (this.settings.eventCount)
             this.focusAnnotations
                 .selectAll('tspan.fdg-focus-annotation__event-count')
                 .text(function (d) {
-                    return ''
-                        .concat(d.count, ' (')
-                        .concat(d3.format('.1%')(d.count / _this.data.nested.length), ')');
+                    return d.countProportionFmt;
                 });
         if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
             this.metadata.event.forEach(function (event) {
                 event.fociLabels.selectAll('text').text(function (d) {
-                    return ''.concat(d.count, ' (').concat(d3.format('.1%')(d.count / d.n), ')');
+                    return d.countProportionFmt;
                 });
-            }); // Update frequency table.
-
-        this.freqTable.tr
-            .selectAll('td')
-            .data(function (event) {
-                return [event.value, event.cumulative];
-            })
-            .join('td')
-            .text(function (d) {
-                return typeof d === 'number' ? d3.format(',d')(d) : d;
             });
+    }
+
+    // Update frequency table.
+    function freqTable$1() {
+        var maxProportion = d3.max(this.freqTable.tr.data(), function (d) {
+            return d.proportion;
+        });
+        this.freqTable.tr.each(function (d) {
+            var relativeProportion = d.proportion / maxProportion;
+            var relativeProportionFmt = d3.format('.1%')(relativeProportion);
+            var tr = d3.select(this);
+            tr.selectAll('td')
+                .data(d.cells)
+                .join('td')
+                .style('background', function (di, i) {
+                    return i === 1
+                        ? 'linear-gradient(to right, #bbb 0, #bbb '
+                              .concat(relativeProportionFmt, ', transparent ')
+                              .concat(relativeProportionFmt, ')')
+                        : null;
+                })
+                .text(function (d) {
+                    return d;
+                });
+        });
+    }
+
+    function text() {
+        this.settings.progress = this.settings.timepoint / this.settings.duration;
+        progress.call(this);
+        legends.call(this);
+        counts.call(this);
+        freqTable$1.call(this);
     }
 
     function update$1() {
         // Update the node data.
-        data.call(this); // Accentuate the orbits when an event occurs.
+        data.call(this); // Gradually transition the radius of the orbits to match the median position of the nodes
+        // along each orbit.  As the nodes at each focus influence the position of nodes at other foci,
+        // nodes gradually congregate off their orbit.
 
-        pulseOrbits.call(this); // Update timer, focus labels, and annotations.
+        orbits.call(this); // Update timer, focus labels, and annotations.
 
         text.call(this);
     }
@@ -1550,20 +1983,17 @@
             event.cumulative = 0;
         });
         this.data.nested.forEach(function (d) {
-            // Initial event for the given individual.
             d.value.statePrevious = null;
-            d.value.state = getState.call(_this, d.value.group, 0);
-
-            var event = _this.metadata.event.find(function (event) {
-                return event.value === d.value.state.event;
-            });
-
-            d.value.coordinates = {
-                x: event.x,
-                y: event.y,
-            };
-            var datum = defineDatum.call(_this, d.value.group, d.value.state, d.value.colorScale);
-            Object.assign(d.value, datum);
+            d.value.state = getState.call(_this, d.value.group);
+            var aestheticValues = getAestheticValues.call(_this, d.value.group, d.value.state);
+            d.value.coordinates = getCoordinates.call(
+                _this,
+                d.value.state,
+                aestheticValues.colorValue
+            );
+            d.value.colorScale = getColorScale.call(_this, aestheticValues.colorValue);
+            var aesthetics = getAesthetics.call(_this, aestheticValues, d.value.colorScale);
+            Object.assign(d.value, aestheticValues, aesthetics);
         });
         if (this.modal) this.modal.stop();
         runModal.call(this);
@@ -1874,9 +2304,14 @@
                         ' the list of events that control bubble '
                     )
                     .concat(
-                        _this.settings.eventChangeCountAesthetic === 'both'
+                        _this.settings.colorBy.type === 'frequency' &&
+                            _this.settings.sizeBy.type === 'frequency'
                             ? 'color and size'
-                            : _this.settings.eventChangeCountAesthetic,
+                            : _this.settings.colorBy.type === 'frequency'
+                            ? 'color'
+                            : _this.settings.sizeBy.type === 'frequency'
+                            ? 'size'
+                            : "[ something isn't right here ].",
                         '.'
                     );
             })
@@ -1905,9 +2340,14 @@
                     ' the list of events that control bubble '
                 )
                 .concat(
-                    fdg.settings.eventChangeCountAesthetic === 'both'
+                    fdg.settings.colorBy.type === 'frequency' &&
+                        fdg.settings.sizeBy.type === 'frequency'
                         ? 'color and size'
-                        : fdg.settings.eventChangeCountAesthetic,
+                        : fdg.settings.colorBy.type === 'frequency'
+                        ? 'color'
+                        : fdg.settings.sizeBy.type === 'frequency'
+                        ? 'size'
+                        : "[ something isn't right here ].",
                     '.'
                 ); // Update color-size toggle.
 
@@ -1929,66 +2369,6 @@
         };
     }
 
-    function colorSizeToggle() {
-        var _this = this;
-
-        var fdg = this;
-        var container = this.controls.container
-            .append('div')
-            .classed('fdg-control fdg-control--color-size', true);
-        var inputs = container
-            .selectAll('div')
-            .data(['color', 'size', 'both'])
-            .enter()
-            .append('div')
-            .attr('class', function (d) {
-                return 'fdg-button '
-                    .concat(d, ' ')
-                    .concat(d === _this.settings.eventChangeCountAesthetic ? 'current' : '');
-            })
-            .attr('title', function (d) {
-                return 'Quantify the number of '
-                    .concat(fdg.util.csv(_this.settings.eventChangeCount), ' events by ')
-                    .concat(d !== 'both' ? d : 'color and size');
-            })
-            .text(function (d) {
-                return d;
-            });
-        inputs.on('click', function (d) {
-            inputs.classed('current', function (di) {
-                return di === d;
-            });
-            fdg.settings.eventChangeCountAesthetic = d; // Update tooltips of event list toggles.
-
-            fdg.controls.eventList.inputs.attr('title', function (d) {
-                return ''
-                    .concat(fdg.settings.eventChangeCount.includes(d.value) ? 'Remove' : 'Add', ' ')
-                    .concat(d.value, ' ')
-                    .concat(
-                        fdg.settings.eventChangeCount.includes(d.value) ? 'from' : 'to',
-                        ' the list of events that control bubble '
-                    )
-                    .concat(
-                        fdg.settings.eventChangeCountAesthetic === 'both'
-                            ? 'color and size'
-                            : fdg.settings.eventChangeCountAesthetic,
-                        '.'
-                    );
-            }); // Update legends.
-
-            fdg.legends.container.selectAll('.fdg-legend').classed('fdg-hidden', function () {
-                return !Array.from(this.classList).some(function (value) {
-                    return value.includes(d);
-                });
-            });
-            increment.call(fdg, false);
-        });
-        return {
-            container: container,
-            inputs: inputs,
-        };
-    }
-
     function addControls() {
         this.controls = {
             container: this.containers.controls,
@@ -2000,8 +2380,7 @@
         this.controls.reset = reset$1.call(this);
 
         if (this.settings.colorBy.type === 'frequency') {
-            this.controls.eventList = eventList.call(this);
-            this.controls.colorSizeToggle = colorSizeToggle.call(this);
+            this.controls.eventList = eventList.call(this); //this.controls.colorSizeToggle = colorSizeToggle.call(this);
         }
 
         this.controls.container
@@ -2206,20 +2585,84 @@
         return svg.node();
     }
 
-    function color(svg, legendDimensions) {
+    function continuous$1() {
+        var container = this.legends.container
+            .append('div')
+            .classed('fdg-legend fdg-legend--continuous', true);
+        container.node().appendChild(
+            continuous({
+                color: this.scales.color,
+                title: this.settings.colorBy.label,
+                width: 200,
+                height: 50,
+                tickValues: [
+                    this.scales.color.domain()[0],
+                    (this.scales.color.domain()[1] - this.scales.color.domain()[0]) / 2,
+                    this.scales.color.domain()[1],
+                ],
+            })
+        );
+    }
+
+    function categorical() {
+        var _this = this;
+
+        var container = this.legends.container
+            .append('div')
+            .classed('fdg-legend fdg-legend--categorical', true);
+        container
+            .append('div')
+            .classed('fdg-sidebar__label fdg-legend__label', true)
+            .text(this.settings.colorBy.label);
+        var legendItems = container
+            .append('svg')
+            .attr('width', 200)
+            .attr('height', 20 * this.scales.color.domain().length)
+            .selectAll('g')
+            .data(this.scales.color.domain())
+            .join('g');
+        legendItems
+            .append('circle')
+            .attr('cx', 20)
+            .attr('cy', function (d, i) {
+                return i * 20 + 10;
+            })
+            .attr('r', 7)
+            .attr('fill', function (d) {
+                return _this.scales.color(d);
+            });
+        legendItems
+            .append('text')
+            .attr('font-size', '1rem')
+            .attr('x', 35)
+            .attr('y', function (d, i) {
+                return i * 20 + 12;
+            })
+            .attr('alignment-baseline', 'middle')
+            .text(function (d) {
+                return ''.concat(d, ' (n=').concat(
+                    _this.metadata.id.filter(function (di) {
+                        return di.colorStratum === d;
+                    }).length,
+                    ')'
+                );
+            });
+    }
+
+    function color$1(svg, legendDimensions) {
         var _this = this;
 
         var marks = svg
             .selectAll('rect.legend-mark')
-            .data(this.colorScale.range())
+            .data(this.scales.color.range())
             .enter()
             .append('rect')
             .classed('legend-mark', true)
             .attr('x', function (d, i) {
-                return i * (legendDimensions[0] / _this.settings.nColors);
+                return i * (legendDimensions[0] / _this.settings.colorBy.nColors);
             })
             .attr('y', 0)
-            .attr('width', legendDimensions[0] / this.settings.nColors)
+            .attr('width', legendDimensions[0] / this.settings.colorBy.nColors)
             .attr('height', legendDimensions[1] / 3)
             .attr('fill', function (d) {
                 return d;
@@ -2232,12 +2675,12 @@
         return marks;
     }
 
-    function size(svg, legendDimensions) {
+    function size$1(svg, legendDimensions) {
         var _this = this;
 
         var marks = svg
             .selectAll('circle.legend-mark')
-            .data(d3.range(this.settings.nColors))
+            .data(d3.range(this.settings.colorBy.nColors))
             .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
             .classed('legend-mark', true)
             .attr('fill', function (d) {
@@ -2252,8 +2695,8 @@
             marks
                 .attr('cx', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.nColors) +
-                        legendDimensions[0] / _this.settings.nColors / 2
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2
                     );
                 })
                 .attr('cy', legendDimensions[1] / 4)
@@ -2264,8 +2707,8 @@
             marks
                 .attr('x', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.nColors) +
-                        legendDimensions[0] / _this.settings.nColors / 2 -
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2 -
                         (i + _this.settings.minRadius)
                     );
                 })
@@ -2286,7 +2729,7 @@
 
         var marks = svg
             .selectAll('circle.legend-mark')
-            .data(this.colorScale.range())
+            .data(this.scales.color.range())
             .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
             .classed('legend-mark', true)
             .attr('fill', function (d) {
@@ -2301,8 +2744,8 @@
             marks
                 .attr('cx', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.nColors) +
-                        legendDimensions[0] / _this.settings.nColors / 2
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2
                     );
                 })
                 .attr('cy', legendDimensions[1] / 4)
@@ -2313,8 +2756,8 @@
             marks
                 .attr('x', function (d, i) {
                     return (
-                        i * (legendDimensions[0] / _this.settings.nColors) +
-                        legendDimensions[0] / _this.settings.nColors / 2 -
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2 -
                         (i + _this.settings.minRadius)
                     );
                 })
@@ -2331,8 +2774,8 @@
     }
 
     var makeLegendMarks = {
-        color: color,
-        size: size,
+        color: color$1,
+        size: size$1,
         both: both,
     };
 
@@ -2341,16 +2784,11 @@
 
         var container = this.legends.container
             .append('div')
-            .classed('fdg-legend fdg-legend--'.concat(type), true)
-            .classed(
-                'fdg-hidden',
-                this.settings.eventChangeCountAesthetic !== type ||
-                    this.settings.eventChangeCount.length === 0
-            ); // label
+            .classed('fdg-legend fdg-legend--'.concat(type), true); // label
 
         var label = container
             .append('div')
-            .classed('fdg-sidebar__label fdg-legend__label', true) //.style('width', legendDimensions[0] + 'px')
+            .classed('fdg-sidebar__label fdg-legend__label', true)
             .html(
                 'Number of <span class = "fdg-measure">'.concat(
                     this.util.csv(this.settings.eventChangeCount),
@@ -2368,17 +2806,20 @@
 
         var lower = svg
             .append('text')
-            .attr('x', legendDimensions[0] / this.settings.nColors / 2)
+            .attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2)
             .attr('y', legendDimensions[1] / 2 + 16)
             .attr('text-anchor', 'middle')
             .text('0'); // upper end of scale
 
         var upper = svg
             .append('text')
-            .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.nColors / 2)
+            .attr(
+                'x',
+                legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2
+            )
             .attr('y', legendDimensions[1] / 2 + 16)
             .attr('text-anchor', 'middle')
-            .text(''.concat(this.settings.nColors - 1, '+'));
+            .text(''.concat(this.settings.colorBy.nColors - 1, '+'));
         return {
             container: container,
             label: label,
@@ -2389,106 +2830,270 @@
         };
     }
 
-    function addLegends() {
+    function frequency() {
+        if (this.settings.colorBy.type === 'frequency' && this.settings.sizeBy.type === 'frequency')
+            this.legends.both = makeLegend.call(this, 'both');
+        else if (this.settings.colorBy.type === 'frequency')
+            this.legends.color = makeLegend.call(this, 'color');
+        else if (this.settings.sizeBy.type === 'frequency')
+            this.legends.size = makeLegend.call(this, 'size');
+    }
+
+    function circle(legendItem, i, spacing, radius) {
+        legendItem
+            .append('circle')
+            .attr('cx', spacing)
+            .attr('cy', i * spacing + 10)
+            .attr('r', radius - 1)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function square(legendItem, i, spacing, radius) {
+        legendItem
+            .append('rect')
+            .attr('x', spacing - radius + 1.5)
+            .attr('y', i * spacing + radius / 2 + 1)
+            .attr('width', radius * 1.5)
+            .attr('height', radius * 1.5)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function triangle(legendItem, i, spacing, radius) {
+        var side = radius * 1.5;
+        var dist = side / Math.sqrt(3);
+        var x = spacing;
+        var y = i * spacing + dist + 3;
+        var top = [x, y - dist];
+        var left = [x - dist, y + dist];
+        var right = [x + dist, y + dist];
+        legendItem
+            .append('polygon')
+            .attr('points', [top, left, right])
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function diamond(legendItem, i, spacing, radius) {
+        var x = spacing;
+        var y = i * spacing;
+        legendItem
+            .append('rect')
+            .attr('transform', 'rotate(45 '.concat(x, ' ').concat(y, ')'))
+            .attr('x', x)
+            .attr('y', y)
+            .attr('width', radius * 1.5)
+            .attr('height', radius * 1.5)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    //<svg height="210" width="500">
+    //  <polygon points="100,10 40,198 190,78 10,78 160,198"
+    //  style="fill:lime;stroke:purple;stroke-width:5;fill-rule:nonzero;" />
+    //</svg>
+    function star(legendItem, i, spacing, radius) {
+        var spikes = 5;
+        var step = Math.PI / spikes;
+        var innerRadius = radius * 0.6;
+        var outerRadius = radius * 1.2;
+        var dist = (radius * 2) / Math.sqrt(3);
+        var rot = (Math.PI / 2) * 3;
+        var x = spacing;
+        var y = i * spacing + dist;
+        var centroid = [x, y];
+        var coordinates = [];
+
+        for (var _i = 0; _i < spikes; _i++) {
+            x = centroid[0] + Math.cos(rot) * outerRadius;
+            y = centroid[1] + Math.sin(rot) * outerRadius;
+            coordinates.push([x, y]);
+            rot += step;
+            x = centroid[0] + Math.cos(rot) * innerRadius;
+            y = centroid[1] + Math.sin(rot) * innerRadius;
+            coordinates.push([x, y]);
+            rot += step;
+        }
+
+        legendItem
+            .append('polygon')
+            .attr('points', coordinates)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function triangleDown(legendItem, i, spacing, radius) {
+        var side = radius * 1.5;
+        var dist = side / Math.sqrt(3);
+        var x = spacing;
+        var y = i * spacing + dist + 3;
+        var top = [x, y + dist];
+        var left = [x - dist, y - dist];
+        var right = [x + dist, y - dist];
+        legendItem
+            .append('polygon')
+            .attr('points', [top, left, right])
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function shape$2() {
         var _this = this;
 
+        var main = this;
+        var shapes = {
+            circle: circle,
+            square: square,
+            triangle: triangle,
+            diamond: diamond,
+            star: star,
+            triangleDown: triangleDown,
+        };
+        var container = this.legends.container
+            .append('div')
+            .classed('fdg-legend fdg-legend--shape', true);
+        container
+            .append('div')
+            .classed('fdg-sidebar__label fdg-legend__label', true)
+            .text(this.settings.shapeBy.label);
+        var legendItems = container
+            .append('svg')
+            .attr('width', 200)
+            .attr('height', 20 * this.scales.shape.domain().length)
+            .selectAll('g')
+            .data(this.scales.shape.domain())
+            .join('g');
+        var radius = 7;
+        var spacing = 20;
+        legendItems.each(function (value, i) {
+            shapes[main.scales.shape(value)].call(main, d3.select(this), i, spacing, radius);
+        });
+        legendItems
+            .append('text')
+            .attr('font-size', '1rem')
+            .attr('x', 35)
+            .attr('y', function (d, i) {
+                return i * 20 + 12;
+            })
+            .attr('alignment-baseline', 'middle')
+            .text(function (d) {
+                return ''.concat(d, ' (n=').concat(
+                    _this.metadata.id.filter(function (di) {
+                        return di.shapeStratum === d;
+                    }).length,
+                    ')'
+                );
+            });
+    }
+
+    function addLegends() {
         this.legends = {
             container: this.containers.legends,
-        };
+        }; // Color legend
 
-        if (this.settings.colorBy.type === 'continuous') {
-            var container = this.legends.container
-                .append('div')
-                .classed('fdg-legend fdg-legend--continuous', true);
-            container.node().appendChild(
-                continuous({
-                    color: this.colorScale,
-                    title: this.settings.colorBy.label,
-                    width: 200,
-                    height: 50,
-                    tickValues: [
-                        this.colorScale.domain()[0],
-                        (this.colorScale.domain()[1] - this.colorScale.domain()[0]) / 2,
-                        this.colorScale.domain()[1],
-                    ],
-                })
-            );
-        } else if (this.settings.colorBy.type === 'categorical') {
-            var _container = this.legends.container
-                .append('div')
-                .classed('fdg-legend fdg-legend--categorical', true);
+        switch (this.settings.colorBy.type) {
+            case 'frequency':
+                frequency.call(this);
+                break;
 
-            _container
-                .append('div')
-                .classed('fdg-sidebar__label fdg-legend__label', true)
-                .text(this.settings.colorBy.label);
+            case 'categorical':
+                categorical.call(this);
+                break;
 
-            var legendItems = _container
-                .append('svg')
-                .attr('width', 200)
-                .attr('height', 20 * this.colorScale.domain().length)
-                .selectAll('g')
-                .data(this.colorScale.domain())
-                .join('g');
+            case 'continuous':
+                continuous$1.call(this);
+                break;
 
-            legendItems
-                .append('circle')
-                .attr('cx', 20)
-                .attr('cy', function (d, i) {
-                    return i * 20 + 10;
-                })
-                .attr('r', 7)
-                .attr('fill', function (d) {
-                    return _this.colorScale(d);
-                });
-            legendItems
-                .append('text')
-                .attr('font-size', '1rem')
-                .attr('x', 35)
-                .attr('y', function (d, i) {
-                    return i * 20 + 12;
-                })
-                .attr('alignment-baseline', 'middle')
-                .text(function (d) {
-                    return ''.concat(d, ' (n=').concat(
-                        _this.metadata.id.filter(function (di) {
-                            return di.category === d;
-                        }).length,
-                        ')'
-                    );
-                });
-        } else if (this.settings.colorBy.type === 'frequency') {
-            this.legends.color = makeLegend.call(this, 'color');
-            this.legends.size = makeLegend.call(this, 'size');
-            this.legends.both = makeLegend.call(this, 'both');
-        }
+            default:
+                return;
+        } // TODO: size legend
+        // Shape legend
+
+        if (this.settings.shapify) shape$2.call(this);
     }
 
     function addFreqTable() {
+        var _this = this;
         var freqTable = {
-            container: this.containers.freqTable,
+            container: this.containers.freqTable.classed('fdg-hidden', this.settings.hideFreqTable),
         };
-        freqTable.table = freqTable.container.append('table');
-        freqTable.thead = freqTable.table.append('thead');
+        freqTable.table = freqTable.container
+            .append('table')
+            .classed('fdg-freq-table__table', true);
+        freqTable.thead = freqTable.table.append('thead').classed('fdg-freq-table__thead', true);
         freqTable.th = freqTable.thead
-            .append('th')
-            .classed('fdg-sidebar__label', true)
-            .attr('colspan', 2)
-            .text('Cumulative Number of Events');
-        freqTable.tbody = freqTable.table.append('tbody');
+            .selectAll('th')
+            .data(['', 'Participants', 'Events'])
+            .join('th')
+            .attr('class', function (d, i) {
+                return 'fdg-freq-table__th--'.concat(
+                    i === 0 ? 'label' : i === 1 ? 'participant' : i === 2 ? 'event' : i
+                );
+            })
+            .classed('fdg-freq-table__th', true)
+            .text(function (d) {
+                return d;
+            });
+        freqTable.th
+            .filter(function (d) {
+                return d === 'Participants';
+            })
+            .html(function (d) {
+                return ''
+                    .concat(d, ' <span ', "class = 'fdg-info-icon'", ' ')
+                    .concat(
+                        _this.settings.colorBy.type === 'categorical'
+                            ? "title = 'Gray background represents the percentage of individuals in the given group at the given state'"
+                            : "title = 'Gray background represents the percentage of individuals at the given state'",
+                        '>&#9432;</span>'
+                    );
+            });
+        freqTable.tbody = freqTable.table.append('tbody').classed('fdg-freq-table__tbody', true);
         freqTable.tr = freqTable.tbody
             .selectAll('tr')
-            .data(this.metadata.event.slice(1))
-            .join('tr');
-        freqTable.td = freqTable.tr
-            .selectAll('td')
-            .data(function (event) {
-                return [event.value, event.cumulative];
+            .data(
+                this.data.freqTable.filter(function (d) {
+                    return !(
+                        _this.settings.eventCentralInFreqTable === false &&
+                        d.state === _this.settings.eventCentral
+                    );
+                })
+            )
+            .join('tr')
+            .attr('class', function (d) {
+                return d.state !== d.value ? 'fdg-freq-table__tr--subgroup' : null;
             })
-            .join('td')
-            .text(function (d) {
-                return typeof d === 'number' ? d3.format(',d')(d) : d;
+            .classed('fdg-freq-table__tr', true)
+            .style('font-size', function (d) {
+                return d.group !== d.value ? '1rem' : '1.25rem';
             });
+        freqTable.tr.each(function (d, i) {
+            var tr = d3.select(this);
+            var td = tr
+                .selectAll('td')
+                .data(function (di) {
+                    return d.cells;
+                })
+                .join('td')
+                .attr('class', function (d, i) {
+                    return 'fdg-freq-table__td--'.concat(
+                        i === 0 ? 'label' : i === 1 ? 'participant' : i === 2 ? 'event' : i
+                    );
+                })
+                .classed('fdg-freq-table__td', true)
+                .style('background', function (di, i) {
+                    return i === 1
+                        ? 'linear-gradient(to right, #bbb 0, #bbb '
+                              .concat(d.proportionFmt, ', transparent ')
+                              .concat(d.proportionFmt, ')')
+                        : null;
+                }) // add background to participant cell proportional to the percentage of participants at state or focus
+                .text(function (di) {
+                    return typeof di === 'number' ? d3.format(',d')(di) : di;
+                });
+        });
+        freqTable.td = freqTable.tr.selectAll('td');
         return freqTable;
     }
 
@@ -2842,57 +3447,45 @@
                 return d.id;
             })
             .rollup(function (group) {
+                // individual-level values - calculated once
                 var duration = d3.sum(group, function (d) {
                     return d.duration;
                 });
-                var category =
-                    _this.settings.colorBy.type === 'categorical'
-                        ? group[0][_this.settings.colorBy.variable]
-                        : null; // Initial state for the given individual.
+                var noStateChange = group.length === 1; // state-level values - calculated once per timepoint
 
                 var state = getState.call(_this, group, 0);
-                var noStateChange =
-                    group.length === 1 && state.event === _this.settings.eventCentral;
-                var destination =
-                    _this.settings.colorBy.type === 'categorical' && _this.settings.colorBy.stratify
-                        ? _this.metadata.event
-                              .find(function (event) {
-                                  return event.value === state.event;
-                              })
-                              .foci.find(function (focus) {
-                                  return focus.key === category;
-                              })
-                        : _this.metadata.event.find(function (event) {
-                              return event.value === state.event;
-                          });
-                var coordinates = {
-                    x: destination.x,
-                    y: destination.y,
-                }; // Count number of state changes, define aesthetic, define radius, and define color.
-
-                var colorScale =
-                    _this.settings.colorBy.type === 'categorical'
-                        ? _this.metadata.strata.find(function (stratum) {
-                              return stratum.key === category;
-                          }).colorScale
-                        : _this.colorScale;
-                var datum = defineDatum.call(_this, group, state, colorScale);
+                var aestheticValues = getAestheticValues.call(_this, group, state);
+                var coordinates = getCoordinates.call(_this, state, aestheticValues.colorValue);
+                var distance = Math.sqrt(
+                    Math.pow(coordinates.x - _this.settings.center.x, 2) +
+                        Math.pow(coordinates.y - _this.settings.center.y, 2)
+                );
+                var colorScale = getColorScale.call(_this, aestheticValues.colorValue);
+                var aesthetics = getAesthetics.call(_this, aestheticValues, colorScale);
                 return _objectSpread2(
+                    _objectSpread2(
+                        {
+                            group: group,
+                            // array: data
+                            duration: duration,
+                            // number: total duration of individual
+                            noStateChange: noStateChange,
+                            // boolean: did individual ever change state?
+                            stateprevious: null,
+                            // object: datum at previous timepoint
+                            state: state,
+                        },
+                        aestheticValues
+                    ),
+                    {},
                     {
-                        group: group,
-                        // array of data representing all records for an individual
-                        duration: duration,
-                        // full duration of individual in data
-                        category: category,
-                        stateprevious: null,
-                        state: state,
-                        // object representing a single record of an individual
-                        noStateChange: noStateChange,
-                        // boolean - did individual have any events? used to present those individuals in a static force layout
+                        // number/string, number, string: colorValue, sizeValue, shapeValue
                         coordinates: coordinates,
+                        // object: { x, y }
+                        distance: distance,
                         colorScale: colorScale,
                     },
-                    datum
+                    aesthetics
                 );
             })
             .entries(this.data);
@@ -3808,6 +4401,134 @@
         return force;
     }
 
+    function circle$1(d) {
+        this.containers.canvas.context.moveTo(d.x + d.size, d.y);
+        this.containers.canvas.context.arc(d.x, d.y, d.value.size, 0, 2 * Math.PI);
+
+        if (this.settings.fill) {
+            this.containers.canvas.context.fillStyle = d.value.fill;
+            this.containers.canvas.context.fill();
+        }
+
+        this.containers.canvas.context.strokeStyle = d.value.stroke;
+        this.containers.canvas.context.stroke();
+    }
+
+    function square$1(d) {
+        this.containers.canvas.context.rect(
+            d.x - d.value.size,
+            d.y - d.value.size,
+            d.value.size * 2,
+            d.value.size * 2
+        );
+
+        if (this.settings.fill) {
+            this.containers.canvas.context.fillStyle = d.value.fill;
+            this.containers.canvas.context.fill();
+        }
+
+        this.containers.canvas.context.strokeStyle = d.value.stroke;
+        this.containers.canvas.context.stroke();
+    }
+
+    // TODO: use some kind of cos/sin shit to make a perfect equilateral triangle
+    function triangle$1(d) {
+        var ctx = this.containers.canvas.context;
+        var side = d.value.size * 2; // * Math.sqrt(3)/6;
+
+        var dist = side / Math.sqrt(3);
+        var centroid = [d.x, d.y];
+        var top = [d.x, d.y - dist];
+        var left = [d.x - dist, d.y + dist];
+        var right = [d.x + dist, d.y + dist];
+        ctx.moveTo.apply(ctx, top);
+        ctx.lineTo.apply(ctx, left);
+        ctx.lineTo.apply(ctx, right);
+        ctx.lineTo.apply(ctx, top);
+
+        if (this.settings.fill) {
+            this.containers.canvas.context.fillStyle = d.value.fill;
+            this.containers.canvas.context.fill();
+        }
+
+        this.containers.canvas.context.strokeStyle = d.value.stroke;
+        this.containers.canvas.context.stroke();
+    }
+
+    function diamond$1(d) {
+        var ctx = this.containers.canvas.context;
+        var halfWidth = d.value.size * Math.sqrt(2);
+        ctx.moveTo(d.x, d.y - halfWidth);
+        ctx.lineTo(d.x + halfWidth, d.y);
+        ctx.lineTo(d.x, d.y + halfWidth);
+        ctx.lineTo(d.x - halfWidth, d.y);
+        ctx.lineTo(d.x, d.y - halfWidth);
+
+        if (this.settings.fill) {
+            this.containers.canvas.context.fillStyle = d.value.fill;
+            this.containers.canvas.context.fill();
+        }
+
+        this.containers.canvas.context.strokeStyle = d.value.stroke;
+        this.containers.canvas.context.stroke();
+    }
+
+    function star$1(d) {
+        var ctx = this.containers.canvas.context;
+        var spikes = 5;
+        var step = Math.PI / spikes;
+        var innerRadius = d.value.size * 0.75;
+        var outerRadius = d.value.size * 1.5;
+        var rot = (Math.PI / 2) * 3;
+        var x = d.x;
+        var y = d.y;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y - outerRadius);
+
+        for (var i = 0; i < spikes; i++) {
+            x = d.x + Math.cos(rot) * outerRadius;
+            y = d.y + Math.sin(rot) * outerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+            x = d.x + Math.cos(rot) * innerRadius;
+            y = d.y + Math.sin(rot) * innerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+        }
+
+        ctx.lineTo(d.x, d.y - outerRadius);
+        ctx.closePath(); //ctx.lineWidth = 5;
+
+        ctx.strokeStyle = d.value.stroke;
+        ctx.stroke();
+        ctx.fillStyle = d.value.fill;
+        ctx.fill();
+    }
+
+    // TODO: use some kind of cos/sin shit to make a perfect equilateral triangle
+    function triangle$2(d) {
+        var ctx = this.containers.canvas.context;
+        var side = d.value.size * 2; // * Math.sqrt(3)/6;
+
+        var dist = side / Math.sqrt(3);
+        var centroid = [d.x, d.y];
+        var top = [d.x, d.y + dist];
+        var left = [d.x - dist, d.y - dist];
+        var right = [d.x + dist, d.y - dist];
+        ctx.moveTo.apply(ctx, top);
+        ctx.lineTo.apply(ctx, left);
+        ctx.lineTo.apply(ctx, right);
+        ctx.lineTo.apply(ctx, top);
+
+        if (this.settings.fill) {
+            this.containers.canvas.context.fillStyle = d.value.fill;
+            this.containers.canvas.context.fill();
+        }
+
+        this.containers.canvas.context.strokeStyle = d.value.stroke;
+        this.containers.canvas.context.stroke();
+    }
+
     function tick() {
         var _this = this;
 
@@ -3818,41 +4539,35 @@
                 return a.value.stateChanges - b.value.stateChanges;
             }) // draw bubbles with more state changes last
             .forEach(function (d, i) {
-                _this.containers.canvas.context.beginPath(); // circle
+                _this.containers.canvas.context.beginPath();
 
-                if (_this.settings.shape === 'circle') {
-                    _this.containers.canvas.context.moveTo(d.x + d.r, d.y);
+                switch (d.value.shape) {
+                    case 'circle':
+                        circle$1.call(_this, d);
+                        break;
 
-                    _this.containers.canvas.context.arc(d.x, d.y, d.value.r, 0, 2 * Math.PI);
+                    case 'square':
+                        square$1.call(_this, d);
+                        break;
 
-                    if (_this.settings.fill) {
-                        _this.containers.canvas.context.fillStyle = d.value.fill;
+                    case 'triangle':
+                        triangle$1.call(_this, d);
+                        break;
 
-                        _this.containers.canvas.context.fill();
-                    }
+                    case 'diamond':
+                        diamond$1.call(_this, d);
+                        break;
 
-                    _this.containers.canvas.context.strokeStyle = d.value.stroke;
+                    case 'star':
+                        star$1.call(_this, d);
+                        break;
 
-                    _this.containers.canvas.context.stroke();
-                } // square
-                else {
-                    //this.containers.canvas.context.moveTo(d.x + d.r, d.y);
-                    _this.containers.canvas.context.rect(
-                        d.x - d.value.r,
-                        d.y - d.value.r,
-                        d.value.r * 2,
-                        d.value.r * 2
-                    );
+                    case 'triangleDown':
+                        triangle$2.call(_this, d);
+                        break;
 
-                    if (_this.settings.fill) {
-                        _this.containers.canvas.context.fillStyle = d.value.fill;
-
-                        _this.containers.canvas.context.fill();
-                    }
-
-                    _this.containers.canvas.context.strokeStyle = d.value.stroke;
-
-                    _this.containers.canvas.context.stroke();
+                    default:
+                        circle$1.call(_this, d);
                 }
             });
         this.containers.canvas.context.restore();
@@ -3865,7 +4580,7 @@
             .forceSimulation()
             .nodes(
                 this.data.nested.filter(function (d) {
-                    return !d.value.noStateChange;
+                    return !(_this.settings.drawStaticSeparately && d.value.noStateChange);
                 })
             )
             .alphaDecay(0.01)
@@ -3905,7 +4620,7 @@
             .force(
                 'collide',
                 d3.forceCollide().radius(function (d) {
-                    return d.value.r + _this.settings.collisionPadding;
+                    return d.value.size + _this.settings.collisionPadding;
                 })
             )
             .on('tick', tick.bind(this)); // When using D3’s force layout with a disjoint graph, you typically want the positioning

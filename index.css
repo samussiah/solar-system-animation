@@ -20,8 +20,51 @@ body {
     /*outline: thick solid rgba(215,25,28,.5);*/
     color: rgba(215, 25, 28, 0.5);
 }
+.fdg-info-icon {
+    font-size: 1rem;
+    cursor: help;
+    font-weight: normal;
+}
 .fdg-main > * {
     display: inline-block;
+}
+
+/* progress bar */
+
+.fdg-progress-day {
+    position: absolute;
+    font-size: 16px;
+    font-weight: bold;
+    bottom: 6px;
+    right: 0;
+    white-space: nowrap;
+}
+.fdg-progress-bar {
+    position: absolute;
+    bottom: 0;
+    /*left: -6px;*/
+    width: 0%;
+    height: 2px;
+    background: rgba(215, 25, 28, 0.5);
+}
+.fdg-progress-bar:before,
+.fdg-progress-bar:after {
+    content: '';
+    position: absolute;
+    height: 2px;
+    opacity: 0.6;
+    box-shadow: rgba(215, 25, 28, 0.5) 1px 0 6px 6px;
+    border-radius: 100%;
+}
+.fdg-progress-bar:before {
+    width: 20px;
+    right: 0;
+    clip: rect(-6px, 22px, 14px, 10px);
+}
+.fdg-progress-bar:after {
+    width: 180px;
+    right: -80px;
+    clip: rect(-6px, 90px, 14px, -6px);
 }
 
 /* controls */
@@ -122,14 +165,14 @@ body {
 }
 .fdg-legend__label {
 }
+.fdg-legend svg {
+    width: 100%;
+}
 
 /* progress */
 
 .fdg-progress {
     position: relative;
-}
-.fdg-progress:hover .progressbar-text {
-    font-weight: bold;
 }
 
 .fdg-timing {
@@ -166,37 +209,43 @@ body {
 /* freq table */
 
 .fdg-freq-table {
+    white-space: nowrap;
 }
-.fdg-freq-table table {
+.fdg-freq-table__table {
     width: 100%;
+    table-layout: fixed;
 }
-.fdg-freq-table th {
-    border-bottom: 1px solid #bbb;
-    text-align: center;
-}
-.fdg-freq-table td {
-    width: 50%;
-}
-.fdg-freq-table td:first-child {
+.fdg-freq-table__th {
     text-align: right;
-    padding-right: 10px;
-    width: calc(75% - 10);
 }
-.fdg-freq-table td:last-child {
-    text-align: left;
+.fdg-freq-table__th--label {
+    width: 40%;
+}
+.fdg-freq-table__th--participant {
+    width: 35%;
+    direction: rtl;
+}
+.fdg-freq-table__th--event {
     width: 25%;
 }
-
-.fdg-info {
-    font-weight: lighter;
-    font-size: 2rem;
-    color: black;
-    text-shadow: black 0px 0px 10px;
-    height: 50%;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
+.fdg-freq-table__td--label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+.fdg-freq-table__tr--subgroup {
+    background: white;
+}
+.fdg-freq-table__tr--subgroup .fdg-freq-table__td--label {
+    padding-left: 1rem;
+}
+.fdg-freq-table__td--participant {
+    text-align: right;
+    position: relative;
+    border: 1px solid #bbb;
+}
+.fdg-freq-table__td--event {
+    text-align: right;
 }
 
 /* animation */

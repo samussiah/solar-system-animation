@@ -15,6 +15,7 @@ export default function event() {
                 count: 0,
                 prevCount: 0,
                 cumulative: 0,
+                cumulativeIds: new Set(),
                 nEvents: group.length,
             };
         })

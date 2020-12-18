@@ -1,13 +1,15 @@
 import updateData from './update/data';
-import pulseOrbits from './update/pulseOrbits';
+import updateOrbits from './update/orbits';
 import updateText from './update/text';
 
 export default function update() {
     // Update the node data.
     updateData.call(this);
 
-    // Accentuate the orbits when an event occurs.
-    pulseOrbits.call(this);
+    // Gradually transition the radius of the orbits to match the median position of the nodes
+    // along each orbit.  As the nodes at each focus influence the position of nodes at other foci,
+    // nodes gradually congregate off their orbit.
+    updateOrbits.call(this);
 
     // Update timer, focus labels, and annotations.
     updateText.call(this);

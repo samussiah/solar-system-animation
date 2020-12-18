@@ -20,5 +20,9 @@ export default function restartForceSimulation() {
                 .y((d) => d.value.coordinates.y)
                 .strength(0.3)
         )
+        .force(
+            'collide',
+            d3.forceCollide().radius((d) => d.value.size + this.settings.collisionPadding)
+        )
         .restart();
 }

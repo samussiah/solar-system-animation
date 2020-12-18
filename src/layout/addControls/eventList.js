@@ -23,9 +23,14 @@ export default function eventList() {
                 } ${
                     this.settings.eventChangeCount.includes(d.value) ? 'from' : 'to'
                 } the list of events that control bubble ${
-                    this.settings.eventChangeCountAesthetic === 'both'
+                    this.settings.colorBy.type === 'frequency' &&
+                    this.settings.sizeBy.type === 'frequency'
                         ? 'color and size'
-                        : this.settings.eventChangeCountAesthetic
+                        : this.settings.colorBy.type === 'frequency'
+                        ? 'color'
+                        : this.settings.sizeBy.type === 'frequency'
+                        ? 'size'
+                        : "[ something isn't right here ]."
                 }.`
         )
         .text((d) => d.value);
@@ -47,9 +52,13 @@ export default function eventList() {
         } ${
             fdg.settings.eventChangeCount.includes(d.value) ? 'from' : 'to'
         } the list of events that control bubble ${
-            fdg.settings.eventChangeCountAesthetic === 'both'
+            fdg.settings.colorBy.type === 'frequency' && fdg.settings.sizeBy.type === 'frequency'
                 ? 'color and size'
-                : fdg.settings.eventChangeCountAesthetic
+                : fdg.settings.colorBy.type === 'frequency'
+                ? 'color'
+                : fdg.settings.sizeBy.type === 'frequency'
+                ? 'size'
+                : "[ something isn't right here ]."
         }.`;
 
         // Update color-size toggle.

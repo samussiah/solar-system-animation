@@ -3,7 +3,10 @@ import update from './settings/update';
 const settings = {
     update,
 
-    // data mappings
+    /**-------------------------------------------------------------------------------------------\
+      data mapping
+    \-------------------------------------------------------------------------------------------**/
+
     id_var: 'id',
     event_var: 'event',
     event_order_var: 'event_order',
@@ -12,19 +15,46 @@ const settings = {
     duration_var: 'duration',
     sequence_var: 'seq',
 
-    // time settings
-    timepoint: 0,
-    timeUnit: 'days since randomization',
-    duration: null, // defined in ./defineMetadata/dataDrivenSettings
-    resetDelay: 15000,
+    /**-------------------------------------------------------------------------------------------\
+      aesthetics
+    \-------------------------------------------------------------------------------------------**/
 
-    // event settings
-    events: null, // defined in ./defineMetadata
-    eventCentral: null, // defined in ./defineMetadata/dataDrivenSettings
-    eventCount: true, // display count (percentage) beneath focus labels?
-    eventChangeCount: null, // defined in ./defineMetadata/dataDrivenSettings
-    eventChangeCountAesthetic: 'color',
-    drawStaticSeparately: true, // draw static bubbles in a static force simulation to improve performance
+    // color
+    colorBy: {
+        type: 'frequency', // ['frequency', 'continuous', 'categorical']
+        variable: null,
+        label: null,
+        mirror: true, // reverse color scheme?
+        stratify: true, // present categories separately at each focus?
+        colorScheme: 'RdYlGn',
+        colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'], // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
+        nColors: 6, // min: 3, max: 9
+    },
+    color: 'rgb(170,170,170)',
+    fill: null, // defined in ./defineMetadata/defineIdDependentSettings
+
+    // size
+    sizeBy: {
+        type: 'frequency', // ['frequency', 'continuous']
+        variable: null,
+        label: null,
+    },
+    minRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
+    maxRadius: 10, // defined in ./defineMetadata/updateIdDependentSettings
+    staticRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
+
+    // shape
+    shapeBy: {
+        type: 'categorical', // ['categorical']
+        variable: null,
+        label: null,
+        shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
+    },
+    shape: 'circle',
+
+    /**-------------------------------------------------------------------------------------------\
+      animation
+    \-------------------------------------------------------------------------------------------**/
 
     // animation settings
     speed: 'medium',
@@ -37,50 +67,35 @@ const settings = {
     pulseOrbits: false,
     loop: true,
 
-    // dimensions
+    // time settings
+    timepoint: 0, // initial timepoint
+    timeUnit: 'days', // time unit that appears in labels
+    duration: null, // defined in ./defineMetadata/updateIdDependentSettings
+    resetDelay: 15000,
+
+    /**-------------------------------------------------------------------------------------------\
+      dimensions
+    \-------------------------------------------------------------------------------------------**/
+
     width: null, // defined in ./defineMetadata/coordinates
     height: null, // defined in ./defineMetadata/coordinates
-    padding: 1,
-    nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
-    orbitRadius: 150,
-    nFoci: null, // defined in ./defineMetadata/dataDrivenSettings/event
-    translate: false,
-    hideControls: false,
+    orbitRadius: null, // defined in ./defineMetadata/coordinates
 
-    // force simulation settings
-    chargeStrength: null, // defined in ./defineMetadata
-    staticLayout: 'circular',
+    /**-------------------------------------------------------------------------------------------\
+      force simulation
+    \-------------------------------------------------------------------------------------------**/
+
     manyBody: 'forceManyBodyReuse', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
+    chargeStrength: null, // defined in ./defineMetadata/updateIdDependentSettings
     collisionPadding: 1,
+    staticChargeStrength: null, // defined in ./defineMetadata/updateIdDependentSettings
+    drawStaticSeparately: false, // draw static bubbles in a static force simulation to improve performance
+    staticLayout: 'circular', // ['circular', 'radial']
 
-    // bubble color settings
-    stratifyBy: {
-        variable: null,
-        label: null,
-    }, // up to five strata
-    colorBy: {
-        type: 'frequency', // ['frequency', 'continuous', 'categorical']
-        variable: null,
-        label: null,
-        mirror: true,
-        stratify: true,
-    },
-    colorScheme: 'schemeRdYlGn',
-    nColors: 6, // min: 3, max: 9
-    colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'], // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
-    fill: null, // defined in ./defineMetadata/dataDrivenSettings
+    /**-------------------------------------------------------------------------------------------\
+      modal
+    \-------------------------------------------------------------------------------------------**/
 
-    // bubble size settings
-    sizeBy: {
-        type: 'frequency', // ['frequency', 'continuous']
-        variable: null,
-        label: null,
-    },
-    minRadius: null, // defined in ./defineMetadata/dataDrivenSettings
-    maxRadius: 10, // defined in ./defineMetadata/dataDrivenSettings
-    shape: 'circle',
-
-    // modals
     modal: true, // display modals?
     modalSpeed: 15000, // amount of time for which each modal appears
     modalIndex: 0,
@@ -93,6 +108,26 @@ const settings = {
         'Continue watching to learn how these individuals progress over the course of [duration] days.',
     ], // array of strings
     information: null, // array of strings
+
+    /**-------------------------------------------------------------------------------------------\
+      event/state
+    \-------------------------------------------------------------------------------------------**/
+
+    events: null, // defined in ./defineMetadata
+    eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
+    eventCount: true, // display [ n (%) ] beneath focus labels?
+    eventCountType: 'current-id', // ['current-id', 'cumulative-id', 'cumulative-event']
+    eventChangeCount: null, // defined in ./defineMetadata/updateEventDependentSettings
+
+    /**-------------------------------------------------------------------------------------------\
+      miscellaneous
+    \-------------------------------------------------------------------------------------------**/
+
+    nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
+    nFoci: null, // defined in ./defineMetadata/updateEventDependentSettings
+    hideControls: false,
+    hideFreqTable: false,
+    eventCentralInFreqTable: false,
 };
 
 export default settings;

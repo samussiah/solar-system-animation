@@ -6,18 +6,12 @@ export default function makeLegend(type) {
     // container
     const container = this.legends.container
         .append('div')
-        .classed(`fdg-legend fdg-legend--${type}`, true)
-        .classed(
-            'fdg-hidden',
-            this.settings.eventChangeCountAesthetic !== type ||
-                this.settings.eventChangeCount.length === 0
-        );
+        .classed(`fdg-legend fdg-legend--${type}`, true);
 
     // label
     const label = container
         .append('div')
         .classed('fdg-sidebar__label fdg-legend__label', true)
-        //.style('width', legendDimensions[0] + 'px')
         .html(
             `Number of <span class = "fdg-measure">${this.util.csv(
                 this.settings.eventChangeCount
@@ -37,7 +31,7 @@ export default function makeLegend(type) {
     // lower end of scale
     const lower = svg
         .append('text')
-        .attr('x', legendDimensions[0] / this.settings.nColors / 2)
+        .attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2)
         .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
         .text('0');
@@ -45,10 +39,10 @@ export default function makeLegend(type) {
     // upper end of scale
     const upper = svg
         .append('text')
-        .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.nColors / 2)
+        .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2)
         .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
-        .text(`${this.settings.nColors - 1}+`);
+        .text(`${this.settings.colorBy.nColors - 1}+`);
 
     return {
         container,

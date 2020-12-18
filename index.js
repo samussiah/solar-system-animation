@@ -1709,7 +1709,6 @@
                 });
             var rAdj = distances.length ? Math.max(d3.median(distances), d.r) : d.r;
             var diff = rAdj - d.rAdjPrev;
-            console.log(diff);
             d.rAdj = d.rAdjPrev + Math.min(diff / 10, main.settings.orbitRadius / 100); //d.change = d3.sum(d.values, (di) => di.change);
             //if (d.change > 0) {
 

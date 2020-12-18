@@ -1,11 +1,8 @@
 // Update frequency table.
 export default function freqTable() {
-    const maxProportion = d3.max(
-        this.freqTable.tr.data(),
-        d => d.proportion
-    );
+    const maxProportion = d3.max(this.freqTable.tr.data(), (d) => d.proportion);
     this.freqTable.tr.each(function (d) {
-        const relativeProportion = d.proportion/maxProportion;
+        const relativeProportion = d.proportion / maxProportion;
         const relativeProportionFmt = d3.format('.1%')(relativeProportion);
         const tr = d3.select(this);
         tr.selectAll('td')

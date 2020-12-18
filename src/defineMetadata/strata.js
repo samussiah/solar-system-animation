@@ -35,7 +35,8 @@ export default function strata(metadata) {
             stratum.angle =
                 this.settings.colorBy.nStrata % 2
                     ? (this.settings.colorBy.nStrata - i - 1) * this.settings.colorBy.theta
-                    : (this.settings.colorBy.nStrata - i - 1) * this.settings.colorBy.theta + Math.PI / this.settings.colorBy.nStrata;
+                    : (this.settings.colorBy.nStrata - i - 1) * this.settings.colorBy.theta +
+                      Math.PI / this.settings.colorBy.nStrata;
         });
     }
 

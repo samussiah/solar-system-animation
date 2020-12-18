@@ -17,6 +17,10 @@ export default function nestData() {
             const state = getState.call(this, group, 0);
             const aestheticValues = getAestheticValues.call(this, group, state);
             const coordinates = getCoordinates.call(this, state, aestheticValues.colorValue);
+            const distance = Math.sqrt(
+                (coordinates.x - this.settings.center.x) ** 2 +
+                    (coordinates.y - this.settings.center.y) ** 2
+            );
             const colorScale = getColorScale.call(this, aestheticValues.colorValue);
             const aesthetics = getAesthetics.call(this, aestheticValues, colorScale);
 
@@ -28,6 +32,7 @@ export default function nestData() {
                 state, // object: datum at current timepoint
                 ...aestheticValues, // number/string, number, string: colorValue, sizeValue, shapeValue
                 coordinates, // object: { x, y }
+                distance,
                 colorScale, // function: returns color given value
                 ...aesthetics, // string, number, string: color, size, shape
             };

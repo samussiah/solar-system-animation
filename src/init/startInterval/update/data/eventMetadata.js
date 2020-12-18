@@ -7,28 +7,20 @@ import getNumerator from './eventMetadata/getNumerator';
 export default function eventMetadata() {
     this.metadata.event.forEach((event) => {
         // Filter data.
-        event.data = filterData(
-            this.data.nested,
-            ['value', 'state', 'event'],
-            event.value
-        );
+        event.data = filterData(this.data.nested, ['value', 'state', 'event'], event.value);
 
         // Count.
         event.count = event.data.length;
         updateIdSet(event.data, event.cumulativeIds);
-        event.cumulative = countCumulative(
-            this.data,
-            this.settings.timepoint,
-            {key: 'event', value: event.value}
-        );
-        event.numerator = getNumerator(
-            this.settings.eventCountType,
-            {
-                ids: event.count,
-                cumulativeIds: event.cumulativeIds.size,
-                events: event.cumulative
-            }
-        );
+        event.cumulative = countCumulative(this.data, this.settings.timepoint, {
+            key: 'event',
+            value: event.value,
+        });
+        event.numerator = getNumerator(this.settings.eventCountType, {
+            ids: event.count,
+            cumulativeIds: event.cumulativeIds.size,
+            events: event.cumulative,
+        });
 
         // Calculate the proportion.
         event.proportion = event.numerator / event.denominator;
@@ -48,11 +40,7 @@ export default function eventMetadata() {
         if (event.foci)
             event.foci.forEach((focus) => {
                 // Filter data.
-                focus.data = filterData(
-                    event.data,
-                    ['value', 'colorValue'],
-                    focus.key
-                );
+                focus.data = filterData(event.data, ['value', 'colorValue'], focus.key);
 
                 // Count.
                 focus.count = focus.data.length;
@@ -60,17 +48,14 @@ export default function eventMetadata() {
                 focus.cumulative = countCumulative(
                     this.data,
                     this.settings.timepoint,
-                    {key: 'event', value: event.value},
-                    {key: this.settings.colorBy.variable, value: focus.key}
+                    { key: 'event', value: event.value },
+                    { key: this.settings.colorBy.variable, value: focus.key }
                 );
-                focus.numerator = getNumerator(
-                    this.settings.eventCountType,
-                    {
-                        ids: focus.count,
-                        cumulativeIds: focus.cumulativeIds.size,
-                        events: focus.cumulative
-                    }
-                );
+                focus.numerator = getNumerator(this.settings.eventCountType, {
+                    ids: focus.count,
+                    cumulativeIds: focus.cumulativeIds.size,
+                    events: focus.cumulative,
+                });
 
                 // Calculate the proportion.
                 focus.proportion = focus.numerator / focus.denominator;

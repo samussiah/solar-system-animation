@@ -1,6 +1,7 @@
 // Determine the numerator of the state proportions.
 export default function getNumerator(eventCountType, n) {
-    const numerator = eventCountType === 'current-id'
+    const numerator =
+        eventCountType === 'current-id'
             ? n.ids
             : eventCountType === 'cumulative-id'
             ? n.cumulativeIds

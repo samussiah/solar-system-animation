@@ -16,6 +16,9 @@ export default function nestedData() {
 
         const aestheticValues = getAestheticValues.call(this, d.value.group, d.value.state);
         d.value.coordinates = getCoordinates.call(this, d.value.state, aestheticValues.colorValue);
+        d.value.distance = Math.sqrt(
+            (d.x - this.settings.center.x) ** 2 + (d.y - this.settings.center.y) ** 2
+        );
         d.value.colorScale = getColorScale.call(this, aestheticValues.colorValue);
         const aesthetics = getAesthetics.call(this, aestheticValues, d.value.colorScale);
 

@@ -28,7 +28,8 @@ export default function shape() {
         .attr('height', 20 * this.scales.shape.domain().length)
         .selectAll('g')
         .data(this.scales.shape.domain())
-        .join('g');
+        .join('g')
+        .attr('transform', 'translate(20,0)');
     const radius = 7;
     const spacing = 20;
     legendItems.each(function (value, i) {

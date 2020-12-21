@@ -10,7 +10,7 @@ export default function freqTable() {
             .join('td')
             .style('background', (di, i) =>
                 i === 1
-                    ? `linear-gradient(to right, #bbb 0, #bbb ${relativeProportionFmt}, transparent ${relativeProportionFmt})`
+                    ? `linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) ${relativeProportionFmt}, transparent ${relativeProportionFmt})`
                     : null
             )
             .text((d) => d);

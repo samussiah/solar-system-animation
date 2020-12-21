@@ -10,19 +10,20 @@ fetch('./data/data_1000.csv')
             data,
             '#container',
             {
+                eventLabel: 'HFrEF events',
                 //playPause: 'pause',
-                eventCountType: 'cumulative-id',
+                //eventCountType: 'cumulative-id',
                 ////colorBy: null,
                 //colorBy: {
                 //    type: 'frequency',
                 //},
-                colorBy: {
-                    type: 'categorical',
-                    variable: 'category',
-                    label: 'Color Stratum',
-                    colorScheme: 'Tableau10',
-                    stratify: false,
-                },
+                //colorBy: {
+                //    type: 'categorical',
+                //    variable: 'category',
+                //    label: 'Color Stratum',
+                //    colorScheme: 'Tableau10',
+                //    stratify: false,
+                //},
                 //colorBy: {
                 //    type: 'continuous',
                 //    variable: 'outcome',
@@ -39,11 +40,11 @@ fetch('./data/data_1000.csv')
                 //    label: 'Outcome',
                 //},
                 //shapeBy: null,
-                shapeBy: {
-                    type: 'categorical',
-                    variable: 'shape',
-                    label: 'Shape Stratum',
-                },
+                //shapeBy: {
+                //    type: 'categorical',
+                //    variable: 'shape',
+                //    label: 'Shape Stratum',
+                //},
                 //collisionPadding: 2,
                 //hideFreqTable: true,
                 //eventCentralInFreqTable: true,

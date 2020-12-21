@@ -12,7 +12,8 @@ export default function categorical() {
         .attr('height', 20 * this.scales.color.domain().length)
         .selectAll('g')
         .data(this.scales.color.domain())
-        .join('g');
+        .join('g')
+        .attr('transform', 'translate(20,0)');
     legendItems
         .append('circle')
         .attr('cx', 20)

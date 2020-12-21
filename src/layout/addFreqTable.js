@@ -62,7 +62,7 @@ export default function addFreqTable() {
             .classed('fdg-freq-table__td', true)
             .style('background', (di, i) =>
                 i === 1
-                    ? `linear-gradient(to right, #bbb 0, #bbb ${d.proportionFmt}, transparent ${d.proportionFmt})`
+                    ? `linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) ${d.proportionFmt}, transparent ${d.proportionFmt})`
                     : null
             ) // add background to participant cell proportional to the percentage of participants at state or focus
             .text((di) => (typeof di === 'number' ? d3.format(',d')(di) : di));

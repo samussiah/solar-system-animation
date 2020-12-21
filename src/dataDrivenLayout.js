@@ -11,7 +11,7 @@ export default function dataDrivenLayout() {
 
     // sidebar
     addLegends.call(this);
-    this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
+    this.containers.timepoint.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
     this.freqTable = addFreqTable.call(this);
 
     // Draw concentric circles.

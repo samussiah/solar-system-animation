@@ -64,8 +64,8 @@ const settings = {
         fast: 100,
     },
     playPause: 'play',
-    pulseOrbits: false,
     loop: true,
+    delay: 5000,
 
     // time settings
     timepoint: 0, // initial timepoint
@@ -114,6 +114,7 @@ const settings = {
     \-------------------------------------------------------------------------------------------**/
 
     events: null, // defined in ./defineMetadata
+    eventLabel: 'Events',
     eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
     eventCount: true, // display [ n (%) ] beneath focus labels?
     eventCountType: 'current-id', // ['current-id', 'cumulative-id', 'cumulative-event']

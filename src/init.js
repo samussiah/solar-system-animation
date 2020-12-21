@@ -16,5 +16,5 @@ export default function init() {
     // Start the timer.
     if (this.settings.playPause === 'play') setTimeout(() => {
         this.interval = startInterval.call(this);
-    }, this.settings.modalSpeed);
+    }, this.settings.delay ? this.settings.modalSpeed : 0);
 }

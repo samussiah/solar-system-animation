@@ -129,6 +129,7 @@ const settings = {
     hideControls: false,
     hideFreqTable: false,
     eventCentralInFreqTable: false,
+    focusOffset: 'heuristic', // ['heuristic', 'vertical']
 };
 
 export default settings;

@@ -10,6 +10,7 @@ fetch('./data/data_1000.csv')
             data,
             '#container',
             {
+                delay: false,
                 eventLabel: 'HFrEF events',
                 //playPause: 'pause',
                 //eventCountType: 'cumulative-id',
@@ -17,13 +18,13 @@ fetch('./data/data_1000.csv')
                 //colorBy: {
                 //    type: 'frequency',
                 //},
-                //colorBy: {
-                //    type: 'categorical',
-                //    variable: 'category',
-                //    label: 'Color Stratum',
-                //    colorScheme: 'Tableau10',
-                //    stratify: false,
-                //},
+                colorBy: {
+                    type: 'categorical',
+                    variable: 'category',
+                    label: 'Color Stratum',
+                    colorScheme: 'Tableau10',
+                    stratify: false,
+                },
                 //colorBy: {
                 //    type: 'continuous',
                 //    variable: 'outcome',

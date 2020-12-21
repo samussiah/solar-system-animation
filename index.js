@@ -425,7 +425,9 @@
       // defined in ./defineMetadata/updateEventDependentSettings
       hideControls: false,
       hideFreqTable: false,
-      eventCentralInFreqTable: false
+      eventCentralInFreqTable: false,
+      focusOffset: 'heuristic' // ['heuristic', 'vertical']
+
     };
 
     function addElement(name, parent) {
@@ -2199,60 +2201,42 @@
     }
 
     function isCenter(d) {
-      return Math.round(d.x) === Math.round(this.settings.orbitRadius / 2);
-    }
-
-    function isLessThanCenter(d) {
-      return d.order === 1 || Math.round(d.x) < Math.round(this.settings.width / 2);
-    }
-
-    function getPosition(d) {
-      return isCenter.call(this, d) ? 'middle' : isLessThanCenter.call(this, d) ? 'start' : 'end';
-    }
-
-    function getRelative(d) {
-      return isCenter.call(this, d) ? 0 : isLessThanCenter.call(this, d) ? '2em' : '-2em';
-    }
-
-    function isCenter$1(d) {
       return Math.round(d.y) === Math.round(this.settings.height / 2);
     }
 
-    function isLessThanCenter$1(d) {
+    function isLessThanCenter(d) {
       return Math.round(d.y) < Math.round(this.settings.height / 2);
     }
 
-    function getPosition$1(d) {
+    function getPosition(d) {
       var reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var position = isCenter$1.call(this, d) ? 'middle' : isLessThanCenter$1.call(this, d) ? 'hanging' : 'baseline';
+      var position = isCenter.call(this, d) ? 'middle' : isLessThanCenter.call(this, d) ? 'hanging' : 'baseline';
       if (reverse) position = position === 'hanging' ? 'baseline' : position === 'baseline' ? 'hanging' : position;
       return position;
     }
 
-    function getRelative$1(d) {
-      return isCenter$1.call(this, d) ? 0 : isLessThanCenter$1.call(this, d) ? '-2em' : '2em';
+    function getRelative(d) {
+      console.log(d); //return isCenter.call(this, d) ? 0 : isLessThanCenter.call(this, d) ? '-2.5em' : '2.5em';
+
+      return d.value === this.settings.eventCentral ? 0 : isLessThanCenter.call(this, d) ? '-2.5em' : '2.5em';
     }
 
     function addLabel(text) {
       var _this = this;
 
-      var label = text.append('tspan').classed('fdg-focus-annotation__label', true).attr('x', 0).attr('text-anchor', function (d) {
-        return getPosition.call(_this, d);
-      }).text(function (d) {
+      var label = text.append('tspan').classed('fdg-focus-annotation__label', true).attr('x', 0) //.attr('text-anchor', (d) => getTextAnchor.call(this, d))
+      .attr('text-anchor', 'middle').attr('alignment-baseline', 'middle').text(function (d) {
         return d.value;
       });
       if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) label.attr('alignment-baseline', function (d) {
-        return getPosition$1.call(_this, d, true);
+        return getPosition.call(_this, d, true);
       });
       return label;
     }
 
     function addEventCount(text) {
-      var _this = this;
-
-      var eventCount = text.append('tspan').classed('fdg-focus-annotation__event-count', true).classed('fdg-hidden', this.settings.eventCount === false).attr('x', 0).attr('dy', '1.3em').attr('text-anchor', function (d) {
-        return getPosition.call(_this, d);
-      });
+      var eventCount = text.append('tspan').classed('fdg-focus-annotation__event-count', true).classed('fdg-hidden', this.settings.eventCount === false).attr('x', 0).attr('dy', '1.3em') //.attr('text-anchor', (d) => getTextAnchor.call(this, d));
+      .attr('text-anchor', 'middle').attr('alignment-baseline', 'middle');
       return eventCount;
     }
 
@@ -2261,7 +2245,7 @@
 
       if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
         text.style('transform', function (d) {
-          return "translate(".concat(isCenter$1.call(_this, d) ? '-5em,0' : '0,-5em', ")");
+          return "translate(".concat(isCenter.call(_this, d) ? '-5em,0' : '0,-5em', ")");
         });
         label.attr('text-anchor', 'middle');
         eventCount.attr('text-anchor', 'middle').classed('fdg-hidden', true);
@@ -2277,14 +2261,15 @@
       // foreground - black annotation text
 
       ['background', 'foreground'].forEach(function (pos) {
-        var text = fociLabels.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true).style('transform', function (d) {
-          return "translate(".concat(getRelative.call(_this, d), ",").concat(getRelative$1.call(_this, d), ")");
+        var text = fociLabels.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true) //.style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
+        .style('transform', function (d) {
+          return "translate(0,".concat(getRelative.call(_this, d), ")");
         });
         var label = addLabel.call(_this, text);
         var eventCount = addEventCount.call(_this, text); // Position annotations differently in categorical layout.
 
         categoricallyReposition.call(_this, text, label, eventCount);
-      });
+      }); // Annotate strata at each focus.
 
       if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
         this.metadata.event.forEach(function (event) {
@@ -2299,7 +2284,7 @@
             }).attr('text-anchor', function (d) {
               return event.value === _this.settings.eventCentral ? 'middle' : 'end';
             }).attr('alignment-baseline', function (d) {
-              return getPosition$1.call(_this, d, true);
+              return getPosition.call(_this, d, true);
             });
           });
         });
@@ -3482,7 +3467,7 @@
 
       if (this.settings.playPause === 'play') setTimeout(function () {
         _this.interval = startInterval.call(_this);
-      }, this.settings.modalSpeed);
+      }, this.settings.delay ? this.settings.modalSpeed : 0);
     }
 
     function forceDirectedGraph(data) {

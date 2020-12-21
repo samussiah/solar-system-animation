@@ -1,5 +1,5 @@
 {
-  "TODO": "improve positioning of focus labels",
+  "TODO": "present strata in phases by... calculating the max duration per stratum and hacking the timepoint; grouping and animation each stratum in the ID set sequentially; ...",
   "name": "force-directed-graph",
   "version": "1.8.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",

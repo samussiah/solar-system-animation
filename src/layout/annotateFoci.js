@@ -21,7 +21,8 @@ export default function annotateFoci() {
         const text = fociLabels
             .append('text')
             .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
-            .style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
+            //.style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
+            .style('transform', (d) => `translate(0,${getDy.call(this, d)})`);
         const label = addLabel.call(this, text);
         const eventCount = addEventCount.call(this, text);
 
@@ -29,6 +30,7 @@ export default function annotateFoci() {
         categoricallyReposition.call(this, text, label, eventCount);
     });
 
+    // Annotate strata at each focus.
     if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
         this.metadata.event.forEach((event) => {
             event.fociLabels = this.containers.focusAnnotations

@@ -139,6 +139,7 @@ const settings = {
     hideControls: false,
     focusOffset: 'heuristic', // ['heuristic', 'vertical']
     displayProgressBar: true,
+    stratificationPositioning: 'circular', // ['circular', 'orbital']
 };
 
 export default settings;

@@ -510,6 +510,7 @@
         focusOffset: 'heuristic',
         // ['heuristic', 'vertical']
         displayProgressBar: true,
+        stratificationPositioning: 'circular', // ['circular', 'orbital']
     };
 
     function addElement(name, parent) {
@@ -1202,6 +1203,8 @@
     }
 
     function resize() {
+        var _this = this;
+
         var node = this.containers.animation.node();
         this.settings.width = node.clientWidth;
         this.settings.height = this.containers.animation.node().clientHeight; // timer
@@ -1253,7 +1256,32 @@
                     focus.x = event.x + 50 * Math.cos(focus.angle);
                     focus.dx = event.x + (i === 0 ? 75 : 50) * Math.cos(focus.angle);
                     focus.y = event.y + 50 * Math.sin(focus.angle);
-                    focus.dy = event.y + (i === 0 ? 75 : 50) * Math.sin(focus.angle);
+                    focus.dy = event.y + (i === 0 ? 75 : 50) * Math.sin(focus.angle); // Position stratum foci along orbits rather than on a circle at event focus.
+
+                    if (_this.settings.stratificationPositioning === 'orbital') {
+                        focus.theta =
+                            event.theta +
+                            ((_this.settings.arcLength * _this.settings.offsets[j]) /
+                                (2 * Math.PI * event.radius)) *
+                                360; // Define position along orbit on which the stratum focus will appear.
+
+                        focus.x =
+                            event.order === 0
+                                ? focus.x
+                                : _this.settings.center.x +
+                                  event.radius * // number of orbit radii from the center
+                                      Math.cos(focus.theta); // position along the circle at the given orbit along which
+
+                        focus.dx = focus.x;
+                        focus.y =
+                            event.order === 0
+                                ? focus.y
+                                : _this.settings.center.y +
+                                  event.radius * // number of orbit radii from the center
+                                      Math.sin(focus.theta); // y-position of the along the given orbit at which the focus circle at the
+
+                        focus.dy = focus.y;
+                    }
                 });
                 event.fociLabels
                     .selectAll('text.fdg-focus-annotation__text')
@@ -1649,7 +1677,22 @@
     }
 
     function focus(metadata) {
+        var _this = this;
+
         if (this.settings.colorBy.type === 'categorical') {
+            this.settings.arcLength = this.settings.orbitRadius / 200;
+            this.settings.offsets =
+                this.settings.stratificationPositioning === 'orbital'
+                    ? metadata.strata.length % 2
+                        ? d3.range(
+                              -Math.floor(metadata.strata.length / 2),
+                              Math.floor(metadata.strata.length / 2) + 1
+                          )
+                        : d3.range(
+                              -metadata.strata.length / 2 + 0.5,
+                              metadata.strata.length / 2 + 0.5
+                          )
+                    : null;
             metadata.event.forEach(function (event, i) {
                 event.foci = metadata.strata.map(function (stratum, j) {
                     var focus = _objectSpread2(
@@ -1664,7 +1707,32 @@
                             cumulativeIds: new Set(),
                             cumulative: 0,
                         }
-                    );
+                    ); // Position stratum foci along orbits rather than on a circle at event focus.
+
+                    if (_this.settings.stratificationPositioning === 'orbital') {
+                        focus.theta =
+                            event.theta +
+                            ((_this.settings.arcLength * _this.settings.offsets[j]) /
+                                (2 * Math.PI * event.radius)) *
+                                360; // Define position along orbit on which the stratum focus will appear.
+
+                        focus.x =
+                            event.order === 0
+                                ? focus.x
+                                : _this.settings.center.x +
+                                  event.radius * // number of orbit radii from the center
+                                      Math.cos(focus.theta); // position along the circle at the given orbit along which
+
+                        focus.dx = focus.x;
+                        focus.y =
+                            event.order === 0
+                                ? focus.y
+                                : _this.settings.center.y +
+                                  event.radius * // number of orbit radii from the center
+                                      Math.sin(focus.theta); // y-position of the along the given orbit at which the focus circle at the
+
+                        focus.dy = focus.y;
+                    }
 
                     return focus;
                 });
@@ -3179,9 +3247,9 @@
                             !(
                                 _this.settings.freqTable.includeEventCentral === false &&
                                 d.state === _this.settings.eventCentral
-                            ) && !(_this.settings.freqTable.structure === 'horizontal' && !d.foci) // exclude central event row(s)
+                            ) && !(_this.settings.freqTable.structure === 'horizontal' && !d.foci)
                         );
-                    } // exclude strata rows
+                    } // exclude central event row(s) // exclude strata rows
                 )
             )
             .join('tr')

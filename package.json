@@ -13,7 +13,7 @@
     "build": "npm audit fix && npm run bundle && npm run format && npm run minify",
     "bundle": "rollup -c",
     "bundle-test-page": "html-inline ./test-page/index.html ./test-page/bundle.html",
-    "format": "npm run format-src && npm run format-bundle && npm run format-css",
+    "format": "npm run format-src && npm run format-bundle",
     "format-bundle": "prettier --print-width=100 --tab-width=4 --end-of-line=auto --single-quote --write ./index.js",
     "format-css": "prettier --print-width=100 --tab-width=4 --end-of-line=auto --single-quote --write ./index.css",
     "format-src": "prettier --print-width=100 --tab-width=4 --end-of-line=auto --single-quote --write \"./src/**/*.js\"",

@@ -6,8 +6,14 @@ export default function canvas(main) {
     this.settings.height = animation.node().clientHeight;
 
     // progress bar at top
-    const progressBar = addElement('progress-bar', animation);
-    const progressDay = addElement('progress-day', animation);
+    const progressBar = addElement('progress-bar', animation).classed(
+        'fdg-hidden',
+        !this.settings.displayProgressBar
+    );
+    const progressTimepoint = addElement('progress-timepoint', animation).classed(
+        'fdg-hidden',
+        !this.settings.displayProgressBar
+    );
 
     // background SVG
     const svgBackground = addElement('svg--background', animation, 'svg')
@@ -45,7 +51,7 @@ export default function canvas(main) {
     return {
         animation,
         progressBar,
-        progressDay,
+        progressTimepoint,
         svgBackground,
         canvas,
         svgForeground,

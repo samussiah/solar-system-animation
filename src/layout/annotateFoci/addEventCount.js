@@ -8,8 +8,8 @@ export default function addEventCount(text) {
         .attr('x', 0)
         .attr('dy', '1.3em')
         //.attr('text-anchor', (d) => getTextAnchor.call(this, d));
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('alignment-baseline', 'middle');
 
     return eventCount;
 }

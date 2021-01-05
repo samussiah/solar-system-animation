@@ -26,9 +26,9 @@ export default function strata(metadata) {
                 .domain(d3.range(this.settings.nColors))
                 .range(stratum.colorScheme[9].reverse().slice(0, this.settings.nColors).reverse())
                 .clamp(true);
-            stratum.nParticipants = metadata.id.filter(
-                (d) => d.colorStratum === stratum.value
-            ).length;
+            stratum.individuals = metadata.id.filter((d) => d.colorStratum === stratum.value);
+            stratum.duration = d3.max(stratum.individuals, (d) => d.duration);
+            stratum.nIndividuals = stratum.individuals.length;
             stratum.nEvents = stratum.values.length;
 
             // TODO: figure out how to shift the foci to match the order in the legend

@@ -1,16 +1,22 @@
-// Frequency data structure: one record per event/event-stratum
+// Frequency data structure
 //
-// - state
-// - stratum
-// - label (state or stratum)
-// - participant denominator (population or stratum total)
-// - participant numerator (number of participants in a given state)
-// - participant proportion
-// - event count
-// - formatted values
-//   - label
-//   - nParticipants (%)
-//   - nEvents
+// - Vertical: one record per state and state-stratum
+//   - state
+//   - stratum
+//   - label (state or stratum)
+//   - participant denominator (population or stratum total)
+//   - participant numerator (number of participants in a given state)
+//   - participant proportion
+//   - event count
+//   - formatted values (columns)
+//     - label
+//     - nParticipants (%)
+//     - nEvents
+//
+// - Horizontal: one record per state with columns for each stratum
+//   - columns:
+//     - state
+//     - [...strata]
 
 export default function freqTable(metadata) {
     const freqTable = d3.merge(
@@ -24,7 +30,7 @@ export default function freqTable(metadata) {
                 d.label = d.value; // state or stratum
                 d.denominator =
                     d.label !== d.state
-                        ? d.nParticipants
+                        ? d.nIndividuals
                         : ['current-id', 'cumulative-id'].includes(this.settings.eventCountType)
                         ? metadata.id.length
                         : this.settings.eventChangeType === 'cumulative-event'
@@ -39,13 +45,23 @@ export default function freqTable(metadata) {
                 d.countFmt = d3.format(',d')(d.count);
                 d.countProportionFmt = `${d.countFmt} (${d.proportionFmt})`;
                 d.cumulativeFmt = d3.format(',d')(d.cumulative);
-                d.cells = [d.label, d.countProportionFmt, d.cumulativeFmt];
-                d.cells.proportion = d.proportion;
             });
 
             return rowGroup;
         })
     );
+
+    freqTable.forEach((d) => {
+        d.cells =
+            this.settings.freqTable.structure === 'vertical'
+                ? [d.label, d.countProportionFmt, d.cumulativeFmt]
+                : [
+                      d.label,
+                      d.countProportionFmt,
+                      ...(d.foci ? d.foci.map((focus) => focus.countProportionFmt) : []),
+                  ];
+        d.cells.proportion = d.proportion;
+    });
 
     return freqTable;
 }

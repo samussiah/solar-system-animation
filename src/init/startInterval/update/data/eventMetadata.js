@@ -32,7 +32,14 @@ export default function eventMetadata() {
         event.cumulativeFmt = d3.format(',d')(event.cumulative);
 
         // Define an array for the frequency table.
-        event.cells = [event.label, event.countProportionFmt, event.cumulativeFmt];
+        event.cells =
+            this.settings.freqTable.structure === 'vertical'
+                ? [event.label, event.countProportionFmt, event.cumulativeFmt]
+                : [
+                      event.label,
+                      event.countProportionFmt,
+                      ...(event.foci ? event.foci.map((focus) => focus.countProportionFmt) : []),
+                  ];
 
         // Calculate the change in IDs in the given state from the previous timepoint.
         event.change = event.count - event.prevCount;
@@ -67,7 +74,16 @@ export default function eventMetadata() {
                 focus.cumulativeFmt = d3.format(',d')(focus.cumulative);
 
                 // freq table
-                focus.cells = [focus.label, focus.countProportionFmt, focus.cumulativeFmt];
+                focus.cells =
+                    this.settings.freqTable.structure === 'vertical'
+                        ? [focus.label, focus.countProportionFmt, focus.cumulativeFmt]
+                        : [
+                              focus.label,
+                              focus.countProportionFmt,
+                              ...(focus.foci
+                                  ? focus.foci.map((focus) => focus.countProportionFmt)
+                                  : []),
+                          ];
 
                 // change
                 focus.change = focus.count - focus.prevCount;

@@ -16,15 +16,22 @@ export default function categorical() {
         .attr('transform', 'translate(20,0)');
     legendItems
         .append('circle')
+        .classed('fdg-legend__symbol', true)
         .attr('cx', 20)
         .attr('cy', (d, i) => i * 20 + 10)
         .attr('r', 7)
         .attr('fill', (d) => this.scales.color(d));
     legendItems
         .append('text')
+        .classed('fdg-legend__label', true)
         .attr('font-size', '1rem')
         .attr('x', 35)
         .attr('y', (d, i) => i * 20 + 12)
         .attr('alignment-baseline', 'middle')
-        .text((d) => `${d} (n=${this.metadata.id.filter((di) => di.colorStratum === d).length})`);
+        .text(
+            (d) =>
+                `${d} (n=${d3.format(',d')(
+                    this.metadata.id.filter((di) => di.colorStratum === d).length
+                )})`
+        );
 }

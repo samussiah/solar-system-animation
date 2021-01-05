@@ -33,10 +33,14 @@ export default function shape() {
     const radius = 7;
     const spacing = 20;
     legendItems.each(function (value, i) {
-        shapes[main.scales.shape(value)].call(main, d3.select(this), i, spacing, radius);
+        const shape = shapes[main.scales.shape(value)]
+            .call(main, d3.select(this), i, spacing, radius)
+            .classed('fdg-legend__shape', true)
+            .classed('fdg-legend__symbol', true);
     });
     legendItems
         .append('text')
+        .classed('fdg-legend__label', true)
         .attr('font-size', '1rem')
         .attr('x', 35)
         .attr('y', (d, i) => i * 20 + 12)

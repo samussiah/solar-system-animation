@@ -7,7 +7,7 @@ export default function triangle(legendItem, i, spacing, radius) {
     const top = [x, y - dist];
     const left = [x - dist, y + dist];
     const right = [x + dist, y + dist];
-    legendItem
+    return legendItem
         .append('polygon')
         .attr('points', [top, left, right])
         .attr('fill', 'none')

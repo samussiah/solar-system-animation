@@ -8,5 +8,9 @@ export default function legends() {
     this.containers.legends
         .selectAll('.fdg-legend--shape')
         .selectAll('text')
-        .text((d) => `${d} (n=${shapeCounts.find((di) => di.key === d).value})`);
+        .text((d) => {
+            const shapeCount = shapeCounts.find((di) => di.key === d);
+            const value = shapeCount ? shapeCount.value : 0;
+            return `${d} (n=${d3.format(',d')(value)})`;
+        });
 }

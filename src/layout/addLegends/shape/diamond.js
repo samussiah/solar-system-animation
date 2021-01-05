@@ -1,7 +1,7 @@
 export default function diamond(legendItem, i, spacing, radius) {
     const x = spacing;
     const y = i * spacing;
-    legendItem
+    return legendItem
         .append('rect')
         .attr('transform', `rotate(45 ${x} ${y})`)
         .attr('x', x)

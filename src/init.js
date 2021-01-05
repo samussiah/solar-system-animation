@@ -14,7 +14,11 @@ export default function init() {
     addForceSimulation.call(this);
 
     // Start the timer.
-    if (this.settings.playPause === 'play') setTimeout(() => {
-        this.interval = startInterval.call(this);
-    }, this.settings.delay ? this.settings.modalSpeed : 0);
+    if (this.settings.playPause === 'play')
+        setTimeout(
+            () => {
+                this.interval = startInterval.call(this);
+            },
+            this.settings.delay ? this.settings.modalSpeed : 0
+        );
 }

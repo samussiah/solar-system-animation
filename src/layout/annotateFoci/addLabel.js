@@ -7,8 +7,8 @@ export default function addLabel(text) {
         .classed('fdg-focus-annotation__label', true)
         .attr('x', 0)
         //.attr('text-anchor', (d) => getTextAnchor.call(this, d))
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('alignment-baseline', 'middle')
         .text((d) => d.value);
     if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
         label.attr('alignment-baseline', (d) => getAlignmentBaseline.call(this, d, true));

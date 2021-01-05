@@ -7,7 +7,18 @@ export default function sidebar(main) {
     const events = addElement('events', sidebar).text(this.settings.eventLabel);
     const legends = addElement('legends', sidebar);
     const progress = addElement('progress', sidebar);
-    const timepoint = addElement('timepoint', progress).classed('fdg-sidebar__label', true);
+    const timepoint = addElement('timepoint', progress)
+        .classed('fdg-sidebar__label', true)
+        .text(
+            `${this.settings.timepoint} ${
+                this.settings.timepoint !== 1
+                    ? this.settings.timeUnit + 's'
+                    : this.settings.timeUnit
+            }`
+        );
+    const timeRelative = addElement('time-relative', progress)
+        .classed('fdg-sidebar__sub-label', true)
+        .text(this.settings.timeRelative);
     const timer = addTimer.call(this, progress);
     const countdown = addCountdown.call(this, progress);
     const freqTable = addElement('freq-table', sidebar);
@@ -18,6 +29,7 @@ export default function sidebar(main) {
         legends,
         progress,
         timepoint,
+        timeRelative,
         timer,
         countdown,
         freqTable,

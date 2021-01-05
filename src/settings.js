@@ -53,6 +53,17 @@ const settings = {
     shape: 'circle',
 
     /**-------------------------------------------------------------------------------------------\
+      freq table
+    \-------------------------------------------------------------------------------------------**/
+
+    freqTable: {
+        display: true,
+        bars: true,
+        structure: 'vertical', // ['vertical', 'horizontal']
+        includeEventCentral: false,
+    },
+
+    /**-------------------------------------------------------------------------------------------\
       animation
     \-------------------------------------------------------------------------------------------**/
 
@@ -69,7 +80,8 @@ const settings = {
 
     // time settings
     timepoint: 0, // initial timepoint
-    timeUnit: 'days', // time unit that appears in labels
+    timeUnit: 'day', // time unit that appears in labels
+    timeRelative: null, // e.g. "from baseline"
     duration: null, // defined in ./defineMetadata/updateIdDependentSettings
     resetDelay: 15000,
 
@@ -124,12 +136,9 @@ const settings = {
       miscellaneous
     \-------------------------------------------------------------------------------------------**/
 
-    nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
-    nFoci: null, // defined in ./defineMetadata/updateEventDependentSettings
     hideControls: false,
-    hideFreqTable: false,
-    eventCentralInFreqTable: false,
     focusOffset: 'heuristic', // ['heuristic', 'vertical']
+    displayProgressBar: true,
 };
 
 export default settings;

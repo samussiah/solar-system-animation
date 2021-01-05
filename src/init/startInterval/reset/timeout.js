@@ -6,15 +6,12 @@ export default function timeout(countdown) {
         resetAnimation.call(this);
         this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
         this.settings.progress = 0;
-        this.containers.stopwatch.foreground
+        this.containers.timer.foreground
             .transition()
             .duration(this.settings.speed)
             .attrTween(
                 'd',
-                this.util.arcTween(
-                    this.settings.progress * Math.PI * 2,
-                    this.containers.stopwatch.arc
-                )
+                this.util.arcTween(this.settings.progress * Math.PI * 2, this.containers.timer.arc)
             )
             .style('fill', d3.interpolateRdYlGn(1 - this.settings.progress));
         window.clearInterval(countdown);

@@ -19,13 +19,12 @@ export default function addTimer(progress) {
     timer.background = addElement('timer__path', timer.g, 'path')
         .classed('fdg-timer__path--background', true)
         .datum({ endAngle: 2 * Math.PI })
-        .attr('d', timer.arc)
+        .attr('d', timer.arc);
     timer.foreground = addElement('timer__path', timer.g, 'path')
         .classed('fdg-timer__path--foreground', true)
         .datum({ endAngle: 0 })
-        .attr('d', timer.arc)
-    timer.percentComplete = addElement('timer__percent-complete', timer.g, 'text')
-        .text('0%');
+        .attr('d', timer.arc);
+    timer.percentComplete = addElement('timer__percent-complete', timer.g, 'text').text('0%');
 
     return timer;
 }

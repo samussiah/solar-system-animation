@@ -1,7 +1,10 @@
 export default function progress() {
     // Update timepoint.
-    this.containers.timepoint
-        .text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
+    this.containers.timepoint.text(
+        `${this.settings.timepoint} ${
+            this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit
+        }`
+    );
 
     // Update timer.
     this.containers.progress.attr(
@@ -28,7 +31,11 @@ export default function progress() {
 
     // Update progress bar.
     this.containers.progressBar.style('width', `${this.settings.progress * 100}%`);
-    this.containers.progressDay
+    this.containers.progressTimepoint
         .style('right', `${100 - this.settings.progress * 100}%`)
-        .text(`Day ${this.settings.timepoint}`);
+        .text(
+            `${this.settings.timeUnit.replace(/^(.)/, (letter) => letter.toUpperCase())} ${
+                this.settings.timepoint
+            }`
+        );
 }

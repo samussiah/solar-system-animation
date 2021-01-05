@@ -1,5 +1,6 @@
 // Update frequency table.
 export default function freqTable() {
+    const main = this;
     const maxProportion = d3.max(this.freqTable.tr.data(), (d) => d.proportion);
     this.freqTable.tr.each(function (d) {
         const relativeProportion = d.proportion / maxProportion;
@@ -9,7 +10,7 @@ export default function freqTable() {
             .data(d.cells)
             .join('td')
             .style('background', (di, i) =>
-                i === 1
+                i === 1 && main.settings.freqTable.bars
                     ? `linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) ${relativeProportionFmt}, transparent ${relativeProportionFmt})`
                     : null
             )

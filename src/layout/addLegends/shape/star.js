@@ -27,7 +27,7 @@ export default function star(legendItem, i, spacing, radius) {
         rot += step;
     }
 
-    legendItem
+    return legendItem
         .append('polygon')
         .attr('points', coordinates)
         .attr('fill', 'none')

@@ -42,7 +42,10 @@ export default function annotateFoci() {
                     .selectAll(`text.fdg-focus-annotation__${pos}`)
                     .data(event.foci)
                     .join('text')
-                    .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
+                    .classed(
+                        `fdg-focus-annotation__event-count fdg-focus-annotation__text fdg-focus-annotation__${pos}`,
+                        true
+                    )
                     .attr('x', (d) => d.dx)
                     .attr('dx', (d) => (event.value === this.settings.eventCentral ? null : '-1em'))
                     .attr('y', (d) => d.dy)

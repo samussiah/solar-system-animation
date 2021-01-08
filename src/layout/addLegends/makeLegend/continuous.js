@@ -155,7 +155,7 @@ export default function continuous({
                 .attr('transform', `translate(${width / 2},0)`)
                 .attr('font-weight', 'bold')
                 .attr('font-size', '1.25rem')
-                .text(title)
+                .html(title)
         );
 
     return svg.node();

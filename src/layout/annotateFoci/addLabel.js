@@ -9,7 +9,7 @@ export default function addLabel(text) {
         //.attr('text-anchor', (d) => getTextAnchor.call(this, d))
         .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'middle')
-        .text((d) => d.value);
+        .text((d) => d.key);
     if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
         label.attr('alignment-baseline', (d) => getAlignmentBaseline.call(this, d, true));
 

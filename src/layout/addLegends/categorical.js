@@ -5,7 +5,7 @@ export default function categorical() {
     container
         .append('div')
         .classed('fdg-sidebar__label fdg-legend__label', true)
-        .text(this.settings.colorBy.label);
+        .html(this.settings.colorBy.label);
     const legendItems = container
         .append('svg')
         .attr('width', 200)
@@ -28,7 +28,7 @@ export default function categorical() {
         .attr('x', 35)
         .attr('y', (d, i) => i * 20 + 12)
         .attr('alignment-baseline', 'middle')
-        .text(
+        .html(
             (d) =>
                 `${d} (n=${d3.format(',d')(
                     this.metadata.id.filter((di) => di.colorStratum === d).length

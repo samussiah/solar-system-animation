@@ -1,12 +1,12 @@
 // Determine the numerator of the state proportions.
-export default function getNumerator(eventCountType, n) {
+export default function getNumerator(eventCountType, counts) {
     const numerator =
         eventCountType === 'current-id'
-            ? n.ids
+            ? counts.nIds
             : eventCountType === 'cumulative-id'
-            ? n.cumulativeIds
+            ? counts.nIdsCumulative
             : eventCountType === 'cumulative-event'
-            ? n.events
+            ? counts.nEvents
             : console.warn('Unable to determine [ numerator ] in [ getNumerator() ].');
 
     return numerator;

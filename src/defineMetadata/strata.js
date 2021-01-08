@@ -12,7 +12,13 @@ export default function strata(metadata) {
         this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
 
         nest.forEach((stratum, i) => {
-            stratum.value = stratum.key;
+            //ids: new Set(), // individuals in the state currently 
+            //nIds: 0, // number of individuals in the state currently
+            //idsCumulative: new Set(), // individuals that have ever been in the state
+            //nIdsCumulative: 0, // number of individuals that have ever been in the state
+            //nEvents: 0, // number of times any individual has been in the state up to the current timepoint, i.e. the total number of events that have occurred so far
+            //nEventsTotal: group.length, // total number of events
+
             const colorScheme = this.settings.colorBy.colorSchemes[i];
             stratum.colorScheme =
                 d3[
@@ -26,7 +32,7 @@ export default function strata(metadata) {
                 .domain(d3.range(this.settings.nColors))
                 .range(stratum.colorScheme[9].reverse().slice(0, this.settings.nColors).reverse())
                 .clamp(true);
-            stratum.individuals = metadata.id.filter((d) => d.colorStratum === stratum.value);
+            stratum.individuals = metadata.id.filter((d) => d.colorStratum === stratum.key);
             stratum.duration = d3.max(stratum.individuals, (d) => d.duration);
             stratum.nIndividuals = stratum.individuals.length;
             stratum.nEvents = stratum.values.length;

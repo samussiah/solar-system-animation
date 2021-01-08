@@ -61,7 +61,7 @@ export default function addFreqTable() {
             )
         )
         .join('tr')
-        .attr('class', (d) => (d.state !== d.value ? 'fdg-freq-table__tr--subgroup' : null))
+        .attr('class', (d) => (d.state !== d.label ? 'fdg-freq-table__tr--subgroup' : null))
         .classed('fdg-freq-table__tr', true)
         .style('font-size', (d) => (d.group !== d.value ? '1rem' : '1.25rem'));
 

@@ -18,6 +18,8 @@
 //     - state
 //     - [...strata]
 
+import getNumerator from '../init/startInterval/update/data/eventMetadata/getNumerator';
+
 export default function freqTable(metadata) {
     const freqTable = d3.merge(
         metadata.event.map((event) => {
@@ -26,11 +28,19 @@ export default function freqTable(metadata) {
                 this.settings.colorBy.type === 'categorical' ? [event, ...event.foci] : [event];
 
             rowGroup.forEach((d) => {
-                d.state = event.value; // state
-                d.label = d.value; // state or stratum
+                d.state = event.key; // state
+                d.label = d.key; // state or stratum
+
+                // Determine numerator that appears at each focus.
+                d.numerator = getNumerator(this.settings.eventCountType, {
+                    nIds: d.nIds,
+                    nIdsCumulative: d.nIdsCumulative,
+                    nEvents: d.nEvents,
+                });
+
                 d.denominator =
-                    d.label !== d.state
-                        ? d.nIndividuals
+                    d !== event
+                        ? d.individuals.length
                         : ['current-id', 'cumulative-id'].includes(this.settings.eventCountType)
                         ? metadata.id.length
                         : this.settings.eventChangeType === 'cumulative-event'
@@ -38,13 +48,23 @@ export default function freqTable(metadata) {
                         : console.warn(
                               'Unable to determine [ event.denominator ] in [ eventMetadata ].'
                           );
-                d.proportion = d.count / d.denominator;
-                d.proportionFmt = d3.format('.1%')(d.proportion);
+                // TODO: match this calculation with what's in eventMetadata()
+                // TODO: figure out what to use as the denominator
+                // TODO: modularize this code for use here and in eventMetadata() - does it event need to happen here?
+                //
+                // Calculate the proportion.
+                d.proportion = d.numerator / d.denominator;
 
-                // Table cell values.
-                d.countFmt = d3.format(',d')(d.count);
-                d.countProportionFmt = `${d.countFmt} (${d.proportionFmt})`;
-                d.cumulativeFmt = d3.format(',d')(d.cumulative);
+                // Format the counts and proportions.
+                d.fmt = {
+                    numerator: d3.format(',d')(d.numerator),
+                    percent: d3.format('.1%')(d.proportion),
+                    nEvents: d3.format(',d')(d.nEvents),
+                };
+                d.fmt.numeratorPercent = `${d.fmt.numerator} (${d.fmt.percent})`;
+                d.displayValue = this.settings.freqTable.countType === 'event'
+                    ? d.fmt.nEvents
+                    : d.fmt.numeratorPercent;
             });
 
             return rowGroup;
@@ -54,11 +74,11 @@ export default function freqTable(metadata) {
     freqTable.forEach((d) => {
         d.cells =
             this.settings.freqTable.structure === 'vertical'
-                ? [d.label, d.countProportionFmt, d.cumulativeFmt]
+                ? [d.label, d.fmt.numeratorPercent, d.fmt.nEvents]
                 : [
                       d.label,
-                      d.countProportionFmt,
-                      ...(d.foci ? d.foci.map((focus) => focus.countProportionFmt) : []),
+                      d.displayValue,
+                      ...(d.foci ? d.foci.map((focus) => focus.displayValue) : []),
                   ];
         d.cells.proportion = d.proportion;
     });

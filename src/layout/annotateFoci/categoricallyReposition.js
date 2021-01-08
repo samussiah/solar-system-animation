@@ -8,7 +8,7 @@ export default function categoricallyReposition(text, label, eventCount) {
             (d) => `translate(${isCenterY.call(this, d) ? '-5em,0' : '0,-5em'})`
         );
         label.attr('text-anchor', (d) =>
-            d.value === this.settings.eventCentral ? 'start' : 'middle'
+            d.key === this.settings.eventCentral ? 'start' : 'middle'
         );
         eventCount.attr('text-anchor', 'middle').classed('fdg-hidden', true);
     }

@@ -34,7 +34,7 @@ export default function makeLegend(type) {
         .attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2)
         .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
-        .text('0');
+        .html('0');
 
     // upper end of scale
     const upper = svg
@@ -42,7 +42,7 @@ export default function makeLegend(type) {
         .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2)
         .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
-        .text(`${this.settings.colorBy.nColors - 1}+`);
+        .html(`${this.settings.colorBy.nColors - 1}+`);
 
     return {
         container,

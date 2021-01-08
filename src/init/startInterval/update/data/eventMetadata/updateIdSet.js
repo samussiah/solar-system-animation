@@ -1,6 +1,9 @@
 // Maintain a set of any IDs that have existed in the given state.
-export default function updateIdSet(data, set) {
+export default function updateIdSet(data, set, toggle) {
     data.forEach((id) => {
-        set.add(id.key);
+        if (toggle === true)
+            set.has(id.key) ? set.delete(id.key) : set.add(id.key);
+        else
+            set.add(id.key);
     });
 }

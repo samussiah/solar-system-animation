@@ -28,7 +28,10 @@ export default function update() {
 
     // freq table
     // TODO: add bars to horizontal table view
-    if (this.settings.freqTable.structure === 'horizontal') this.settings.freqTable.bars = false;
+    if (this.settings.freqTable.structure === 'horizontal' && !this.settings.stratify)
+        this.settings.freqTable.structure = 'vertical';
+    if (this.settings.freqTable.structure === 'horizontal')
+        this.settings.freqTable.bars = false;
 
     // Define array of modal text.
     let texts = [];

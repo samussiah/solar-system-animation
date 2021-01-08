@@ -47,10 +47,10 @@ export default function annotateFoci() {
                         true
                     )
                     .attr('x', (d) => d.dx)
-                    .attr('dx', (d) => (event.value === this.settings.eventCentral ? null : '-1em'))
+                    .attr('dx', (d) => (event.key === this.settings.eventCentral ? null : '-1em'))
                     .attr('y', (d) => d.dy)
                     .attr('text-anchor', (d) =>
-                        event.value === this.settings.eventCentral ? 'middle' : 'end'
+                        event.key === this.settings.eventCentral ? 'middle' : 'end'
                     )
                     .attr('alignment-baseline', (d) => getAlignmentBaseline.call(this, d, true));
             });

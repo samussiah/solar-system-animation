@@ -26,12 +26,12 @@ fetch('./data/data_1000.csv')
                 freqTable: {
                     //display: false,
                     //bars: false,
-                    //structure: 'horizontal',
+                    structure: 'horizontal',
                     //includeEventCentral: true,
-                    //countType: 'event',
+                    countType: 'event',
                 },
                 delay: false,
-                //eventCountType: 'cumulative-event',
+                eventCountType: 'cumulative-event',
                 //displayProgressBar: false,
                 //stratificationPositioning: 'orbital',
             }

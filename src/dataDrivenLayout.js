@@ -10,7 +10,7 @@ export default function dataDrivenLayout() {
 
     // sidebar
     addLegends.call(this);
-    this.freqTable = addFreqTable.call(this);
+    this.containers.freqTable = addFreqTable.call(this);
 
     // Draw concentric circles.
     this.orbits = drawOrbits.call(this);

@@ -11,6 +11,15 @@ export default function addFreqTable() {
             ),
     };
 
+    freqTable.label = this.util.addElement('freq-table__label', freqTable.container)
+        .classed('fdg-sidebar__label', true)
+        .text(
+            this.settings.freqTable.structure === 'vertical'
+                ? ''
+                : this.settings.freqTable.countType === 'id'
+                ? 'Number of Individuals'
+                : 'Number of Events'
+        );
     freqTable.table = freqTable.container.append('table').classed('fdg-freq-table__table', true);
     freqTable.thead = freqTable.table.append('thead').classed('fdg-freq-table__thead', true);
 

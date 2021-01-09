@@ -5,7 +5,8 @@ import layoutCanvas from './layout/canvas';
 import resize from './layout/resize';
 
 export default function layout() {
-    const main = addElement('main', d3.select(this.element));
+    const main = addElement('main', d3.select(this.element))
+        .datum(this);
 
     // controls positioned absolutely
     const controls = layoutControls.call(this, main);

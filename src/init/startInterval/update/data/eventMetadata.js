@@ -10,11 +10,11 @@ export default function eventMetadata() {
         event.data = filterData(this.data.nested, ['value', 'state', 'event'], event.key);
 
         // Update current set of individuals.
-        updateIdSet(event.data, event.ids, true);
+        event.ids = updateIdSet(event.data, event.ids);
         event.nIds = event.ids.size;
 
         // Update cumulative set of individuals.
-        updateIdSet(event.data, event.idsCumulative, false);
+        updateIdSet(event.data, event.idsCumulative, true);
         event.nIdsCumulative = event.idsCumulative.size;
 
         // Update cumulative number of events.
@@ -50,11 +50,11 @@ export default function eventMetadata() {
                 focus.data = filterData(event.data, ['value', 'colorValue'], focus.key);
 
                 // Update current set of individuals.
-                updateIdSet(focus.data, focus.ids, true);
+                focus.ids = updateIdSet(focus.data, focus.ids);
                 focus.nIds = focus.ids.size;
 
                 // Update cumulative set of individuals.
-                updateIdSet(focus.data, focus.idsCumulative, false);
+                updateIdSet(focus.data, focus.idsCumulative, true);
                 focus.nIdsCumulative = focus.idsCumulative.size;
 
                 // Update cumulative number of events.
@@ -108,7 +108,7 @@ export default function eventMetadata() {
                 ? [event.key, event.fmt.numeratorPercent, event.fmt.nEvents]
                 : [
                       event.key,
-                      event.displayValue,
+                        this.settings.freqTable.countType === 'id' ? event.displayValue : event.nEvents,
                       ...(event.foci ? event.foci.map((focus) => focus.displayValue) : []),
                   ];
     });

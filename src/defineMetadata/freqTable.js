@@ -30,41 +30,45 @@ export default function freqTable(metadata) {
             rowGroup.forEach((d) => {
                 d.state = event.key; // state
                 d.label = d.key; // state or stratum
+                // TODO: define ID-level and event-level freqency objects
+                // TODO: use the appropriate frequency at each focus and in the frequency table
+                // TODO: this requires an update to init/startInterval/update/data/eventMetadata.js
 
-                // Determine numerator that appears at each focus.
-                d.numerator = getNumerator(this.settings.eventCountType, {
+                // Calculate the current number of individuals and events.
+                d.idNumerator = getNumerator(this.settings.eventCountType, {
+                    nIds: d.nIds,
+                    nIdsCumulative: d.nIdsCumulative,
+                    nEvents: d.nEvents,
+                });
+                d.eventNumerator = getNumerator('cumulative-event', {
                     nIds: d.nIds,
                     nIdsCumulative: d.nIdsCumulative,
                     nEvents: d.nEvents,
                 });
 
-                d.denominator =
+                // Calculate the total number of individuals and events.
+                d.idDenominator =
                     d !== event
-                        ? d.individuals.length
-                        : ['current-id', 'cumulative-id'].includes(this.settings.eventCountType)
-                        ? metadata.id.length
-                        : this.settings.eventChangeType === 'cumulative-event'
-                        ? event.nEvents
-                        : console.warn(
-                              'Unable to determine [ event.denominator ] in [ eventMetadata ].'
-                          );
-                // TODO: match this calculation with what's in eventMetadata()
-                // TODO: figure out what to use as the denominator
-                // TODO: modularize this code for use here and in eventMetadata() - does it event need to happen here?
-                //
+                        ? d.individuals.length // number of individuals in the stratum
+                        : metadata.id.length; // total number of individuals
+                d.eventDenominator =
+                    d !== event
+                        ? event.nEvents // number of events at the given state
+                        : event.nEventsTotal; // total number of events (doesn't really have any use but hey, it's something)
+
                 // Calculate the proportion.
-                d.proportion = d.numerator / d.denominator;
+                d.idProportion = d.idNumerator / d.idDenominator;
+                d.eventProportion = d.eventNumerator / d.eventDenominator;
 
                 // Format the counts and proportions.
                 d.fmt = {
-                    numerator: d3.format(',d')(d.numerator),
-                    percent: d3.format('.1%')(d.proportion),
-                    nEvents: d3.format(',d')(d.nEvents),
+                    idNumerator: d3.format(',d')(d.idNumerator),
+                    idPercent: d3.format('.1%')(d.idProportion),
+                    eventNumerator: d3.format(',d')(d.eventNumerator),
+                    eventPercent: d3.format('.1%')(d.eventProportion),
                 };
-                d.fmt.numeratorPercent = `${d.fmt.numerator} (${d.fmt.percent})`;
-                d.displayValue = this.settings.freqTable.countType === 'event'
-                    ? d.fmt.nEvents
-                    : d.fmt.numeratorPercent;
+                d.fmt.idNumeratorPercent = `${d.fmt.idNumerator} (${d.fmt.idPercent})`;
+                d.fmt.eventNumeratorPercent = `${d.fmt.eventNumerator} (${d.fmt.eventPercent})`;
             });
 
             return rowGroup;

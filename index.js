@@ -4,6 +4,12 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.forceDirectedGraph = factory());
 }(this, (function () { 'use strict';
 
+    function addElement(name, parent) {
+      var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
+      var element = parent.append(tagName).classed("fdg-".concat(tagName), true).classed("fdg-".concat(name), true).classed("fdg-".concat(tagName, "--").concat(name), true);
+      return element;
+    }
+
     // Returns a tween for a transition’s "d" attribute, transitioning any selected
     // arcs from their current angle to the specified new angle.
     function arcTween(newAngle, arc) {
@@ -245,6 +251,7 @@
     }
 
     var util = {
+      addElement: addElement,
       arcTween: arcTween,
       csv: csv,
       mergeDeep: mergeDeep
@@ -456,40 +463,40 @@
 
     };
 
-    function addElement(name, parent) {
+    function addElement$1(name, parent) {
       var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
-      var element = parent.append(tagName).classed("fdg-".concat(name), true);
+      var element = parent.append(tagName).classed("fdg-".concat(tagName), true).classed("fdg-".concat(name), true).classed("fdg-".concat(tagName, "--").concat(name), true);
       return element;
     }
 
     function controls(main) {
-      var controls = addElement('controls', main).classed('fdg-hidden', this.settings.hideControls);
-      var hide = addElement('hide', controls, 'span');
+      var controls = addElement$1('controls', main).classed('fdg-hidden', this.settings.hideControls);
+      var hide = addElement$1('hide', controls, 'span');
       return {
         controls: controls
       };
     }
 
     function addTimer(progress) {
-      var timer = addElement('timer', progress);
+      var timer = addElement$1('timer', progress);
       timer.width = timer.node().clientWidth;
       timer.innerRadius = timer.width / 8;
-      timer.svg = addElement('timer__svg', timer, 'svg').attr('width', timer.width).attr('height', timer.width);
+      timer.svg = addElement$1('timer__svg', timer, 'svg').attr('width', timer.width).attr('height', timer.width);
       timer.arc = d3.arc().innerRadius(timer.width / 2.25).outerRadius(timer.width / 2 - 1).startAngle(0);
-      timer.g = addElement('timer__path', timer.svg, 'g').attr('transform', "translate(".concat(timer.width / 2, ",").concat(timer.width / 2, ")"));
-      timer.background = addElement('timer__path', timer.g, 'path').classed('fdg-timer__path--background', true).datum({
+      timer.g = addElement$1('timer__path', timer.svg, 'g').attr('transform', "translate(".concat(timer.width / 2, ",").concat(timer.width / 2, ")"));
+      timer.background = addElement$1('timer__path', timer.g, 'path').classed('fdg-timer__path--background', true).datum({
         endAngle: 2 * Math.PI
       }).attr('d', timer.arc);
-      timer.foreground = addElement('timer__path', timer.g, 'path').classed('fdg-timer__path--foreground', true).datum({
+      timer.foreground = addElement$1('timer__path', timer.g, 'path').classed('fdg-timer__path--foreground', true).datum({
         endAngle: 0
       }).attr('d', timer.arc);
-      timer.percentComplete = addElement('timer__percent-complete', timer.g, 'text').text('0%');
+      timer.percentComplete = addElement$1('timer__percent-complete', timer.g, 'text').text('0%');
       return timer;
     }
 
     function addCountdown(progress) {
       var resetDelay = this.settings.resetDelay / 1000;
-      return addElement('countdown', progress).classed('fdg-sidebar__label', true).selectAll('div').data(d3.range(-1, resetDelay)).join('div').text(function (d) {
+      return addElement$1('countdown', progress).classed('fdg-sidebar__label', true).selectAll('div').data(d3.range(-1, resetDelay)).join('div').text(function (d) {
         return "Looping in ".concat(d + 1, " second").concat(d === 0 ? '' : 's');
       }).classed('fdg-hidden', function (d) {
         return d !== resetDelay - 1;
@@ -499,15 +506,15 @@
     }
 
     function sidebar(main) {
-      var sidebar = addElement('sidebar', main);
-      var events = addElement('events', sidebar).html(this.settings.eventLabel);
-      var legends = addElement('legends', sidebar);
-      var progress = addElement('progress', sidebar);
-      var timepoint = addElement('timepoint', progress).classed('fdg-sidebar__label', true).html("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit));
-      var timeRelative = addElement('time-relative', progress).classed('fdg-sidebar__sub-label', true).html(this.settings.timeRelative);
+      var sidebar = addElement$1('sidebar', main);
+      var events = addElement$1('events', sidebar).html(this.settings.eventLabel);
+      var legends = addElement$1('legends', sidebar);
+      var progress = addElement$1('progress', sidebar);
+      var timepoint = addElement$1('timepoint', progress).classed('fdg-sidebar__label', true).html("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit));
+      var timeRelative = addElement$1('time-relative', progress).classed('fdg-sidebar__sub-label', true).html(this.settings.timeRelative);
       var timer = addTimer.call(this, progress);
       var countdown = addCountdown.call(this, progress);
-      var freqTable = addElement('freq-table', sidebar);
+      var freqTable = addElement$1('freq-table', sidebar);
       return {
         sidebar: sidebar,
         events: events,
@@ -522,22 +529,22 @@
     }
 
     function canvas(main) {
-      var animation = addElement('animation', main);
+      var animation = addElement$1('animation', main);
       this.settings.width = animation.node().clientWidth;
       this.settings.height = animation.node().clientHeight; // progress bar at top
 
-      var progressBar = addElement('progress-bar', animation).classed('fdg-hidden', !this.settings.displayProgressBar);
-      var progressTimepoint = addElement('progress-timepoint', animation).classed('fdg-hidden', !this.settings.displayProgressBar); // background SVG
+      var progressBar = addElement$1('progress-bar', animation).classed('fdg-hidden', !this.settings.displayProgressBar);
+      var progressTimepoint = addElement$1('progress-timepoint', animation).classed('fdg-hidden', !this.settings.displayProgressBar); // background SVG
 
-      var svgBackground = addElement('svg--background', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height); // canvas
+      var svgBackground = addElement$1('svg--background', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height); // canvas
 
-      var canvas = addElement('canvas', animation, 'canvas').attr('width', this.settings.width).attr('height', this.settings.height);
+      var canvas = addElement$1('canvas', animation, 'canvas').attr('width', this.settings.width).attr('height', this.settings.height);
       canvas.context = canvas.node().getContext('2d'); // SVG
 
-      var svgForeground = addElement('svg--foreground', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height);
-      var focusAnnotations = addElement('focus-annotations', svgForeground, 'g'); // modal
+      var svgForeground = addElement$1('svg--foreground', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height);
+      var focusAnnotations = addElement$1('focus-annotations', svgForeground, 'g'); // modal
 
-      var modalContainer = addElement('modal', animation); // TODO: add button to clear or hide modal
+      var modalContainer = addElement$1('modal', animation); // TODO: add button to clear or hide modal
       //const modalClear = addElement('modal__clear', modalContainer)
       //    //.classed('fdg-hidden', true)
       //    .text('x');
@@ -550,7 +557,7 @@
       //        this.modal.stop();
       //    });
 
-      var modal = addElement('modal__text', modalContainer);
+      var modal = addElement$1('modal__text', modalContainer);
       return {
         animation: animation,
         progressBar: progressBar,
@@ -845,10 +852,13 @@
     }
 
     // Maintain a set of any IDs that have existed in the given state.
-    function updateIdSet(data, set, toggle) {
-      data.forEach(function (id) {
-        if (toggle === true) set.has(id.key) ? set["delete"](id.key) : set.add(id.key);else set.add(id.key);
-      });
+    function updateIdSet(data, set) {
+      var cumulative = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      if (cumulative) data.forEach(function (id) {
+        set.add(id.key);
+      });else return new Set(data.map(function (id) {
+        return id.key;
+      }));
     }
 
     // Count the number of events, i.e. the number of times any ID has existed in the given state.
@@ -871,10 +881,10 @@
         // Subset data on individuals in the given state.
         event.data = filterData(_this.data.nested, ['value', 'state', 'event'], event.key); // Update current set of individuals.
 
-        updateIdSet(event.data, event.ids, true);
+        event.ids = updateIdSet(event.data, event.ids);
         event.nIds = event.ids.size; // Update cumulative set of individuals.
 
-        updateIdSet(event.data, event.idsCumulative, false);
+        updateIdSet(event.data, event.idsCumulative, true);
         event.nIdsCumulative = event.idsCumulative.size; // Update cumulative number of events.
 
         event.nEvents = countCumulative(_this.data, _this.settings.timepoint, event.key); // Determine numerator that appears at each focus.
@@ -900,10 +910,10 @@
           // Subset data on individuals in the given state and stratum.
           focus.data = filterData(event.data, ['value', 'colorValue'], focus.key); // Update current set of individuals.
 
-          updateIdSet(focus.data, focus.ids, true);
+          focus.ids = updateIdSet(focus.data, focus.ids);
           focus.nIds = focus.ids.size; // Update cumulative set of individuals.
 
-          updateIdSet(focus.data, focus.idsCumulative, false);
+          updateIdSet(focus.data, focus.idsCumulative, true);
           focus.nIdsCumulative = focus.idsCumulative.size; // Update cumulative number of events.
 
           focus.nEvents = countCumulative(_this.data, _this.settings.timepoint, event.key, {
@@ -934,7 +944,7 @@
           focus.change = focus.nIds - focus.nIdsPrevious;
         }); // Define an array for the frequency table.
 
-        event.cells = _this.settings.freqTable.structure === 'vertical' ? [event.key, event.fmt.numeratorPercent, event.fmt.nEvents] : [event.key, event.displayValue].concat(_toConsumableArray(event.foci ? event.foci.map(function (focus) {
+        event.cells = _this.settings.freqTable.structure === 'vertical' ? [event.key, event.fmt.numeratorPercent, event.fmt.nEvents] : [event.key, _this.settings.freqTable.countType === 'id' ? event.displayValue : event.nEvents].concat(_toConsumableArray(event.foci ? event.foci.map(function (focus) {
           return focus.displayValue;
         }) : []));
       });
@@ -1023,7 +1033,7 @@
     }
 
     function layout() {
-      var main = addElement('main', d3.select(this.element)); // controls positioned absolutely
+      var main = addElement$1('main', d3.select(this.element)).datum(this); // controls positioned absolutely
 
       var controls$1 = controls.call(this, main); // sidebar to the left
 
@@ -1352,28 +1362,40 @@
           d.state = event.key; // state
 
           d.label = d.key; // state or stratum
-          // Determine numerator that appears at each focus.
+          // TODO: define ID-level and event-level freqency objects
+          // TODO: use the appropriate frequency at each focus and in the frequency table
+          // TODO: this requires an update to init/startInterval/update/data/eventMetadata.js
+          // Calculate the current number of individuals and events.
 
-          d.numerator = getNumerator(_this.settings.eventCountType, {
+          d.idNumerator = getNumerator(_this.settings.eventCountType, {
             nIds: d.nIds,
             nIdsCumulative: d.nIdsCumulative,
             nEvents: d.nEvents
           });
-          d.denominator = d !== event ? d.individuals.length : ['current-id', 'cumulative-id'].includes(_this.settings.eventCountType) ? metadata.id.length : _this.settings.eventChangeType === 'cumulative-event' ? event.nEvents : console.warn('Unable to determine [ event.denominator ] in [ eventMetadata ].'); // TODO: match this calculation with what's in eventMetadata()
-          // TODO: figure out what to use as the denominator
-          // TODO: modularize this code for use here and in eventMetadata() - does it event need to happen here?
-          //
+          d.eventNumerator = getNumerator('cumulative-event', {
+            nIds: d.nIds,
+            nIdsCumulative: d.nIdsCumulative,
+            nEvents: d.nEvents
+          }); // Calculate the total number of individuals and events.
+
+          d.idDenominator = d !== event ? d.individuals.length // number of individuals in the stratum
+          : metadata.id.length; // total number of individuals
+
+          d.eventDenominator = d !== event ? event.nEvents // number of events at the given state
+          : event.nEventsTotal; // total number of events (doesn't really have any use but hey, it's something)
           // Calculate the proportion.
 
-          d.proportion = d.numerator / d.denominator; // Format the counts and proportions.
+          d.idProportion = d.idNumerator / d.idDenominator;
+          d.eventProportion = d.eventNumerator / d.eventDenominator; // Format the counts and proportions.
 
           d.fmt = {
-            numerator: d3.format(',d')(d.numerator),
-            percent: d3.format('.1%')(d.proportion),
-            nEvents: d3.format(',d')(d.nEvents)
+            idNumerator: d3.format(',d')(d.idNumerator),
+            idPercent: d3.format('.1%')(d.idProportion),
+            eventNumerator: d3.format(',d')(d.eventNumerator),
+            eventPercent: d3.format('.1%')(d.eventProportion)
           };
-          d.fmt.numeratorPercent = "".concat(d.fmt.numerator, " (").concat(d.fmt.percent, ")");
-          d.displayValue = _this.settings.freqTable.countType === 'event' ? d.fmt.nEvents : d.fmt.numeratorPercent;
+          d.fmt.idNumeratorPercent = "".concat(d.fmt.idNumerator, " (").concat(d.fmt.idPercent, ")");
+          d.fmt.eventNumeratorPercent = "".concat(d.fmt.eventNumerator, " (").concat(d.fmt.eventPercent, ")");
         });
         return rowGroup;
       }));
@@ -1483,10 +1505,10 @@
     // Update frequency table.
     function freqTable$1() {
       var main = this;
-      var maxProportion = d3.max(this.freqTable.tr.data(), function (d) {
+      var maxProportion = d3.max(this.containers.freqTable.tr.data(), function (d) {
         return d.proportion;
       });
-      this.freqTable.tr.each(function (d) {
+      this.containers.freqTable.tr.each(function (d) {
         var relativeProportion = d.proportion / maxProportion;
         var relativeProportionFmt = d3.format('.1%')(relativeProportion);
         var tr = d3.select(this);
@@ -2240,6 +2262,7 @@
       var freqTable = {
         container: this.containers.freqTable.classed('fdg-hidden', this.settings.freqTable.display === false).classed('fdg-freq-table--vertical', this.settings.freqTable.structure === 'vertical').classed('fdg-freq-table--horizontal', this.settings.freqTable.structure === 'horizontal')
       };
+      freqTable.label = this.util.addElement('freq-table__label', freqTable.container).classed('fdg-sidebar__label', true).text(this.settings.freqTable.structure === 'vertical' ? '' : this.settings.freqTable.countType === 'id' ? 'Number of Individuals' : 'Number of Events');
       freqTable.table = freqTable.container.append('table').classed('fdg-freq-table__table', true);
       freqTable.thead = freqTable.table.append('thead').classed('fdg-freq-table__thead', true); // Add column headers.
 
@@ -2400,7 +2423,7 @@
       addControls.call(this); // sidebar
 
       addLegends.call(this);
-      this.freqTable = addFreqTable.call(this); // Draw concentric circles.
+      this.containers.freqTable = addFreqTable.call(this); // Draw concentric circles.
 
       this.orbits = addOrbits.call(this); // Annotate foci.
 

@@ -23,7 +23,8 @@ export default function makeLegend(type) {
         .append('svg')
         .attr('width', legendDimensions[0])
         .attr('height', legendDimensions[1])
-        .append('g');
+        .append('g')
+        .attr('transform', 'translate(23,0)');
 
     // marks
     const marks = makeLegendMarks[type].call(this, svg, legendDimensions);
@@ -44,12 +45,5 @@ export default function makeLegend(type) {
         .attr('text-anchor', 'middle')
         .html(`${this.settings.colorBy.nColors - 1}+`);
 
-    return {
-        container,
-        label,
-        svg,
-        marks,
-        lower,
-        upper,
-    };
+    return container;
 }

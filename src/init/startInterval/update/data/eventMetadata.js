@@ -1,7 +1,10 @@
 import filterData from './eventMetadata/filterData';
 import updateIdSet from './eventMetadata/updateIdSet';
 import countCumulative from './eventMetadata/countCumulative';
-import getNumerator from './eventMetadata/getNumerator';
+
+import getFreqs from '../../../../defineMetadata/freqTable/getFreqs';
+import formatValues from '../../../../defineMetadata/freqTable/formatValues';
+import defineCellValues from '../../../../defineMetadata/freqTable/defineCellValues';
 
 // Update states and strata at each timepoint.
 export default function eventMetadata() {
@@ -20,26 +23,9 @@ export default function eventMetadata() {
         // Update cumulative number of events.
         event.nEvents = countCumulative(this.data, this.settings.timepoint, event.key);
 
-        // Determine numerator that appears at each focus.
-        event.numerator = getNumerator(this.settings.eventCountType, {
-            nIds: event.nIds,
-            nIdsCumulative: event.nIdsCumulative,
-            nEvents: event.nEvents,
-        });
-
-        // Calculate the proportion.
-        event.proportion = event.numerator / event.denominator;
-
-        // Format the counts and proportions.
-        event.fmt = {
-            numerator: d3.format(',d')(event.numerator),
-            percent: d3.format('.1%')(event.proportion),
-            nEvents: d3.format(',d')(event.nEvents),
-        };
-        event.fmt.numeratorPercent = `${event.fmt.numerator} (${event.fmt.percent})`;
-        event.displayValue = this.settings.freqTable.countType === 'event'
-            ? event.fmt.nEvents
-            : event.fmt.numeratorPercent;
+        // Calculate numerators, denominators, and proportions.
+        event.freqs = getFreqs.call(this, event, event, this.metadata);
+        event.fmt = formatValues.call(this, event);
 
         // Calculate the change in IDs in the given state from the previous timepoint.
         event.change = event.nIds - event.nIdsPrevious;
@@ -65,51 +51,14 @@ export default function eventMetadata() {
                     { key: this.settings.colorBy.variable, value: focus.key }
                 );
 
-                // Determine numerator that appears at each focus.
-                focus.numerator = getNumerator(this.settings.eventCountType, {
-                    nIds: focus.nIds,
-                    nIdsCumulative: focus.nIdsCumulative,
-                    nEvents: focus.nEvents,
-                });
-
-                // Calculate the proportion.
-                focus.proportion = focus.numerator / focus.denominator;
-
-                // fmt
-                focus.fmt = {
-                    numerator: d3.format(',d')(focus.numerator),
-                    percent: d3.format('.1%')(focus.proportion),
-                    nEvents: d3.format(',d')(focus.nEvents),
-                };
-                focus.fmt.numeratorPercent = `${focus.fmt.numerator} (${focus.fmt.percent})`;
-                focus.displayValue = this.settings.countType === 'event'
-                    ? focus.fmt.nEvents
-                    : focus.fmt.numeratorPercent;
-
-                // freq table
-                focus.cells =
-                    this.settings.freqTable.structure === 'vertical'
-                        ? [focus.key, focus.fmt.numeratorPercent, focus.fmt.nEvents]
-                        : [
-                              focus.key,
-                              focus.displayValue,
-                              ...(focus.foci
-                                  ? focus.foci.map((focus) => focus.displayValue)
-                                  : []),
-                          ];
-
-                // change
+                // Calculate numerators, denominators, and proportions.
+                focus.freqs = getFreqs.call(this, focus, event, this.metadata);
+                focus.fmt = formatValues.call(this, focus);
+                focus.cells = defineCellValues.call(this, focus);
                 focus.change = focus.nIds - focus.nIdsPrevious;
             });
 
         // Define an array for the frequency table.
-        event.cells =
-            this.settings.freqTable.structure === 'vertical'
-                ? [event.key, event.fmt.numeratorPercent, event.fmt.nEvents]
-                : [
-                      event.key,
-                        this.settings.freqTable.countType === 'id' ? event.displayValue : event.nEvents,
-                      ...(event.foci ? event.foci.map((focus) => focus.displayValue) : []),
-                  ];
+        event.cells = defineCellValues.call(this, event);
     });
 }

@@ -1,19 +1,23 @@
 export default function size(metadata) {
-    const sizeBy = this.settings.sizeBy;
+    let scale;
 
-    // scale domain
-    const domain =
-        sizeBy.type === 'frequency'
-            ? [0, this.settings.colorBy.nColors]
-            : sizeBy.type === 'continuous'
-            ? d3.extent(this.data, (d) => d[sizeBy.variable])
-            : null;
+    if (this.settings.sizify) {
+        const sizeBy = this.settings.sizeBy;
 
-    // scale range
-    const range = [this.settings.minRadius, this.settings.maxRadius];
+        // scale domain
+        const domain =
+            sizeBy.type === 'frequency'
+                ? [0, this.settings.colorBy.nColors]
+                : sizeBy.type === 'continuous'
+                ? d3.extent(this.data, (d) => d[sizeBy.variable])
+                : null;
 
-    // scale
-    const scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+        // scale range
+        const range = [this.settings.minRadius, this.settings.maxRadius];
+
+        // scale
+        scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+    }
 
     return scale;
 }

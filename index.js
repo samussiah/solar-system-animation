@@ -262,22 +262,23 @@
       var _this = this;
 
       // aesthetics
-      if (!['frequency', 'continuous', 'categorical'].includes(this.settings.colorBy.type)) {
+      if (!['frequency', 'continuous', 'categorical', null].includes(this.settings.colorBy.type)) {
         alert("[ '".concat(this.settings.colorBy.type, "' ] is not a valid [ colorBy.type ] setting.  Please choose one of [ 'frequency' ], [ 'continuous' ], or [ 'categorical' ].  Defaulting to  [ 'frequency' ]."));
         this.settings.colorBy.type = 'frequency';
       }
 
-      if (!['frequency', 'continuous'].includes(this.settings.sizeBy.type)) {
+      if (!['frequency', 'continuous', null].includes(this.settings.sizeBy.type)) {
         alert("[ '".concat(this.settings.sizeBy.type, "' ] is not a valid [ sizeBy.type ] setting.  Please choose one of [ 'frequency' ] or [ 'continuous' ].  Defaulting to  [ 'frequency' ]."));
         this.settings.sizeBy.type = 'frequency';
       }
 
-      if (!['categorical'].includes(this.settings.shapeBy.type)) {
+      if (!['categorical', null].includes(this.settings.shapeBy.type)) {
         alert("[ '".concat(this.settings.shapeBy.type, "' ] is not a valid [ shapeBy.type ] setting.  Please choose [ 'categorical' ].  Defaulting to  [ null ]."));
         this.settings.shapeBy.type = null;
       }
 
       this.settings.stratify = this.settings.colorBy.type === 'categorical';
+      this.settings.colorify = this.settings.colorBy.type !== null;
       this.settings.sizify = this.settings.sizeBy.type === 'frequency' || this.settings.sizeBy.type === 'continuous' && this.settings.sizeBy.variable !== null;
       this.settings.shapify = this.settings.shapeBy.variable !== null; // freq table
       // TODO: add bars to horizontal table view
@@ -288,9 +289,13 @@
       var texts = [];
 
       if (Array.isArray(this.settings.explanation)) {
-        // Update explanation text with appropriate shape.
+        // Update explanation text depending on aesthetics.
         this.settings.explanation = this.settings.explanation.map(function (text) {
-          return text.replace(/bubble/g, _this.settings.shape);
+          // event count type
+          text = text.replace('[event-count-type]', _this.settings.eventCountType === 'current-id' ? 'number of individuals currently experiencing the event' : _this.settings.eventCountType === 'cumulative-id' ? 'number of individuals who have ever experienced the event' : 'total number of events'); // frequency aesthetic
+
+          if (_this.settings.colorBy.type === 'frequency' && _this.settings.sizeBy.type === 'frequency') text = text.replace('[frequency-aesthetic]', 'color and size');else if (_this.settings.colorBy.type === 'frequency') text = text.replace('[frequency-aesthetic]', 'color');else if (_this.settings.sizeBy.type === 'frequency') text = text.replace('[frequency-aesthetic]', 'size');else text = null;
+          return text;
         });
         texts = texts.concat(this.settings.explanation.filter(function (el) {
           return !(_this.settings.hideControls && el.includes('controls'));
@@ -420,7 +425,7 @@
       staticChargeStrength: null,
       // defined in ./defineMetadata/updateIdDependentSettings
       drawStaticSeparately: false,
-      // draw static bubbles in a static force simulation to improve performance
+      // draw static shapes in a static force simulation to improve performance
       staticLayout: 'circular',
       // ['circular', 'radial']
 
@@ -432,7 +437,7 @@
       modalSpeed: 15000,
       // amount of time for which each modal appears
       modalIndex: 0,
-      explanation: ['Each bubble in this animation represents an individual.', 'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their bubble gravitates toward the focus or "planet" representing that event.', 'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the color and/or size of their bubble.', '<span class = "fdg-emphasized">Static bubbles</span> represent individuals who never experience an event.', 'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.', 'Continue watching to learn how these individuals progress over the course of [duration] days.'],
+      explanation: ['Each shape in this animation represents an individual.', 'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.', 'The <span class = "fdg-emphasized">annotations</span> at each focus represent the [event-count-type].', 'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.', '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.', 'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.', 'Continue watching to learn how these individuals progress over the course of [duration] days.'],
       // array of strings
       information: null,
       // array of strings
@@ -458,7 +463,7 @@
       hideControls: false,
       focusOffset: 'heuristic',
       // ['heuristic', 'vertical']
-      displayProgressBar: true,
+      displayProgressBar: false,
       stratificationPositioning: 'circular' // ['circular', 'orbital']
 
     };
@@ -470,7 +475,7 @@
     }
 
     function controls(main) {
-      var controls = addElement$1('controls', main).classed('fdg-hidden', this.settings.hideControls);
+      var controls = addElement$1('controls', main).classed('fdg-hidden', true);
       var hide = addElement$1('hide', controls, 'span');
       return {
         controls: controls
@@ -868,10 +873,55 @@
       }).length;
     }
 
-    // Determine the numerator of the state proportions.
-    function getNumerator(eventCountType, counts) {
-      var numerator = eventCountType === 'current-id' ? counts.nIds : eventCountType === 'cumulative-id' ? counts.nIdsCumulative : eventCountType === 'cumulative-event' ? counts.nEvents : console.warn('Unable to determine [ numerator ] in [ getNumerator() ].');
-      return numerator;
+    function getFreqs(d, event, metadata) {
+      // Calculate the current number of individuals and events.
+      var idNumerator = this.settings.eventCountType === 'cumulative-id' ? d.nIdsCumulative : d.nIds;
+      var eventNumerator = d.nEvents; // Calculate the total number of individuals and events.
+
+      var idDenominator = d !== event ? d.individuals.length // number of individuals in the stratum
+      : metadata.id.length; // total number of individuals
+
+      var eventDenominator = d !== event ? event.nEvents // number of events at the given state
+      : event.nEventsTotal; // total number of events (doesn't really have any use but hey, it's something)
+      // Calculate proportions.
+
+      var idProportion = idNumerator / idDenominator;
+      var eventProportion = eventNumerator / eventDenominator;
+      return {
+        idNumerator: idNumerator,
+        eventNumerator: eventNumerator,
+        idDenominator: idDenominator,
+        eventDenominator: eventDenominator,
+        idProportion: idProportion,
+        eventProportion: eventProportion
+      };
+    }
+
+    function formatValues(d) {
+      // Format the counts and proportions.
+      var idNumerator = d3.format(',d')(d.freqs.idNumerator);
+      var eventNumerator = d3.format(',d')(d.freqs.eventNumerator);
+      var idPercent = d3.format('.1%')(d.freqs.idDenominator > 0 ? d.freqs.idProportion : 0);
+      var eventPercent = d3.format('.1%')(d.freqs.eventDenominator > 0 ? d.freqs.eventProportion : 0);
+      var idNumeratorPercent = "".concat(idNumerator, " (").concat(idPercent, ")");
+      var eventNumeratorPercent = "".concat(eventNumerator, " (").concat(eventPercent, ")");
+      return {
+        idNumerator: idNumerator,
+        eventNumerator: eventNumerator,
+        idPercent: idPercent,
+        eventPercent: eventPercent,
+        idNumeratorPercent: idNumeratorPercent,
+        eventNumeratorPercent: eventNumeratorPercent
+      };
+    }
+
+    function defineCellValues(d) {
+      var _this = this;
+
+      var cells = this.settings.freqTable.structure === 'vertical' ? [d.label, d.fmt.idNumeratorPercent, d.fmt.eventNumerator] : [d.label, this.settings.freqTable.countType === 'id' ? d.fmt.idNumeratorPercent : d.fmt.eventNumerator].concat(_toConsumableArray(d.foci ? d.foci.map(function (focus) {
+        return _this.settings.freqTable.countType === 'id' ? focus.fmt.idNumeratorPercent : focus.fmt.eventNumeratorPercent;
+      }) : []));
+      return cells;
     }
 
     function eventMetadata() {
@@ -887,23 +937,10 @@
         updateIdSet(event.data, event.idsCumulative, true);
         event.nIdsCumulative = event.idsCumulative.size; // Update cumulative number of events.
 
-        event.nEvents = countCumulative(_this.data, _this.settings.timepoint, event.key); // Determine numerator that appears at each focus.
+        event.nEvents = countCumulative(_this.data, _this.settings.timepoint, event.key); // Calculate numerators, denominators, and proportions.
 
-        event.numerator = getNumerator(_this.settings.eventCountType, {
-          nIds: event.nIds,
-          nIdsCumulative: event.nIdsCumulative,
-          nEvents: event.nEvents
-        }); // Calculate the proportion.
-
-        event.proportion = event.numerator / event.denominator; // Format the counts and proportions.
-
-        event.fmt = {
-          numerator: d3.format(',d')(event.numerator),
-          percent: d3.format('.1%')(event.proportion),
-          nEvents: d3.format(',d')(event.nEvents)
-        };
-        event.fmt.numeratorPercent = "".concat(event.fmt.numerator, " (").concat(event.fmt.percent, ")");
-        event.displayValue = _this.settings.freqTable.countType === 'event' ? event.fmt.nEvents : event.fmt.numeratorPercent; // Calculate the change in IDs in the given state from the previous timepoint.
+        event.freqs = getFreqs.call(_this, event, event, _this.metadata);
+        event.fmt = formatValues.call(_this, event); // Calculate the change in IDs in the given state from the previous timepoint.
 
         event.change = event.nIds - event.nIdsPrevious;
         if (event.foci) event.foci.forEach(function (focus) {
@@ -919,34 +956,15 @@
           focus.nEvents = countCumulative(_this.data, _this.settings.timepoint, event.key, {
             key: _this.settings.colorBy.variable,
             value: focus.key
-          }); // Determine numerator that appears at each focus.
+          }); // Calculate numerators, denominators, and proportions.
 
-          focus.numerator = getNumerator(_this.settings.eventCountType, {
-            nIds: focus.nIds,
-            nIdsCumulative: focus.nIdsCumulative,
-            nEvents: focus.nEvents
-          }); // Calculate the proportion.
-
-          focus.proportion = focus.numerator / focus.denominator; // fmt
-
-          focus.fmt = {
-            numerator: d3.format(',d')(focus.numerator),
-            percent: d3.format('.1%')(focus.proportion),
-            nEvents: d3.format(',d')(focus.nEvents)
-          };
-          focus.fmt.numeratorPercent = "".concat(focus.fmt.numerator, " (").concat(focus.fmt.percent, ")");
-          focus.displayValue = _this.settings.countType === 'event' ? focus.fmt.nEvents : focus.fmt.numeratorPercent; // freq table
-
-          focus.cells = _this.settings.freqTable.structure === 'vertical' ? [focus.key, focus.fmt.numeratorPercent, focus.fmt.nEvents] : [focus.key, focus.displayValue].concat(_toConsumableArray(focus.foci ? focus.foci.map(function (focus) {
-            return focus.displayValue;
-          }) : [])); // change
-
+          focus.freqs = getFreqs.call(_this, focus, event, _this.metadata);
+          focus.fmt = formatValues.call(_this, focus);
+          focus.cells = defineCellValues.call(_this, focus);
           focus.change = focus.nIds - focus.nIdsPrevious;
         }); // Define an array for the frequency table.
 
-        event.cells = _this.settings.freqTable.structure === 'vertical' ? [event.key, event.fmt.numeratorPercent, event.fmt.nEvents] : [event.key, _this.settings.freqTable.countType === 'id' ? event.displayValue : event.nEvents].concat(_toConsumableArray(event.foci ? event.foci.map(function (focus) {
-          return focus.displayValue;
-        }) : []));
+        event.cells = defineCellValues.call(_this, event);
       });
     }
 
@@ -1088,10 +1106,10 @@
       }).map(function (text) {
         return text.replace('[duration]', d3.format(',d')(_this.settings.duration));
       });
-      this.settings.minRadius = this.settings.minRadius || Math.min(3000 / metadata.id.filter(function (d) {
+      this.settings.minRadius = this.settings.minRadius || Math.max(Math.min(3000 / metadata.id.filter(function (d) {
         return !(_this.settings.drawStaticSeparately && d["static"]);
-      }).length, this.settings.maxRadius);
-      this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
+      }).length, this.settings.maxRadius), 1);
+      this.settings.staticRadius = this.settings.staticRadius || Math.max(3000 / metadata.id.length, 1);
       this.settings.maxRadius = this.settings.minRadius + this.settings.colorBy.nColors;
       this.settings.chargeStrength = -(2000 / metadata.id.filter(function (d) {
         return !(_this.settings.drawStaticSeparately && d["static"]);
@@ -1213,66 +1231,74 @@
     }
 
     function color(metadata) {
-      var colorBy = this.settings.colorBy; // scale domain
-
-      var domain = colorBy.type === 'frequency' ? d3.range(colorBy.nColors) : colorBy.type === 'continuous' ? d3.extent(this.data, function (d) {
-        return d[colorBy.variable];
-      }) : colorBy.type === 'categorical' ? metadata.strata.map(function (d) {
-        return d.key;
-      }) : null; // scale
-
-      var range;
       var scale;
 
-      switch (colorBy.type) {
-        case 'frequency':
-          range = colorBy.mirror ? d3["scheme".concat(colorBy.colorScheme)][colorBy.nColors].reverse() : d3["scheme".concat(colorBy.colorScheme)][colorBy.nColors];
-          scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
-          break;
+      if (this.settings.colorify) {
+        var colorBy = this.settings.colorBy; // scale domain
 
-        case 'continuous':
-          scale = d3.scaleSequential(d3["interpolate".concat(colorBy.colorScheme)]).domain(domain); // Invert color scale.
+        var domain = colorBy.type === 'frequency' ? d3.range(colorBy.nColors) : colorBy.type === 'continuous' ? d3.extent(this.data, function (d) {
+          return d[colorBy.variable];
+        }) : colorBy.type === 'categorical' ? metadata.strata.map(function (d) {
+          return d.key;
+        }) : null; // scale
 
-          if (colorBy.mirror) {
-            var interpolator = scale.interpolator(); // read the color scale's interpolator
+        var range;
 
-            var mirror = function mirror(t) {
-              return interpolator(1 - t);
-            }; // returns the mirror image of the interpolator
+        switch (colorBy.type) {
+          case 'frequency':
+            range = colorBy.mirror ? d3["scheme".concat(colorBy.colorScheme)][colorBy.nColors].reverse() : d3["scheme".concat(colorBy.colorScheme)][colorBy.nColors];
+            scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+            break;
+
+          case 'continuous':
+            scale = d3.scaleSequential(d3["interpolate".concat(colorBy.colorScheme)]).domain(domain); // Invert color scale.
+
+            if (colorBy.mirror) {
+              var interpolator = scale.interpolator(); // read the color scale's interpolator
+
+              var mirror = function mirror(t) {
+                return interpolator(1 - t);
+              }; // returns the mirror image of the interpolator
 
 
-            scale.interpolator(mirror); // updates the scale's interpolator
-          }
+              scale.interpolator(mirror); // updates the scale's interpolator
+            }
 
-          break;
+            break;
 
-        case 'categorical':
-          var scheme = d3["scheme".concat(colorBy.colorScheme)];
-          range = scheme.every(function (el) {
-            return typeof el === 'string';
-          }) ? scheme : scheme[Math.min(Math.max(3, domain.length), 9)];
-          scale = d3.scaleOrdinal().domain(domain).range(range.map(function (color) {
-            return d3.rgb(color) + '';
-          }));
-          break;
+          case 'categorical':
+            var scheme = d3["scheme".concat(colorBy.colorScheme)];
+            range = scheme.every(function (el) {
+              return typeof el === 'string';
+            }) ? scheme : scheme[Math.min(Math.max(3, domain.length), 9)];
+            scale = d3.scaleOrdinal().domain(domain).range(range.map(function (color) {
+              return d3.rgb(color) + '';
+            }));
+            break;
 
-        default:
-          scale = null;
+          default:
+            scale = null;
+        }
       }
 
       return scale;
     }
 
     function size(metadata) {
-      var sizeBy = this.settings.sizeBy; // scale domain
+      var scale;
 
-      var domain = sizeBy.type === 'frequency' ? [0, this.settings.colorBy.nColors] : sizeBy.type === 'continuous' ? d3.extent(this.data, function (d) {
-        return d[sizeBy.variable];
-      }) : null; // scale range
+      if (this.settings.sizify) {
+        var sizeBy = this.settings.sizeBy; // scale domain
 
-      var range = [this.settings.minRadius, this.settings.maxRadius]; // scale
+        var domain = sizeBy.type === 'frequency' ? [0, this.settings.colorBy.nColors] : sizeBy.type === 'continuous' ? d3.extent(this.data, function (d) {
+          return d[sizeBy.variable];
+        }) : null; // scale range
 
-      var scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+        var range = [this.settings.minRadius, this.settings.maxRadius]; // scale
+
+        scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+      }
+
       return scale;
     }
 
@@ -1356,54 +1382,22 @@
       var _this = this;
 
       var freqTable = d3.merge(metadata.event.map(function (event) {
-        // One record per event per focus plus an overall event record.
-        var rowGroup = _this.settings.colorBy.type === 'categorical' ? [event].concat(_toConsumableArray(event.foci)) : [event];
+        // One row per event per focus plus an overall event record.
+        var rowGroup = _this.settings.colorBy.type === 'categorical' ? [event].concat(_toConsumableArray(event.foci)) : [event]; // For each row calculate numerators, denominators, and proportions.
+
         rowGroup.forEach(function (d) {
           d.state = event.key; // state
 
           d.label = d.key; // state or stratum
-          // TODO: define ID-level and event-level freqency objects
-          // TODO: use the appropriate frequency at each focus and in the frequency table
-          // TODO: this requires an update to init/startInterval/update/data/eventMetadata.js
-          // Calculate the current number of individuals and events.
 
-          d.idNumerator = getNumerator(_this.settings.eventCountType, {
-            nIds: d.nIds,
-            nIdsCumulative: d.nIdsCumulative,
-            nEvents: d.nEvents
-          });
-          d.eventNumerator = getNumerator('cumulative-event', {
-            nIds: d.nIds,
-            nIdsCumulative: d.nIdsCumulative,
-            nEvents: d.nEvents
-          }); // Calculate the total number of individuals and events.
-
-          d.idDenominator = d !== event ? d.individuals.length // number of individuals in the stratum
-          : metadata.id.length; // total number of individuals
-
-          d.eventDenominator = d !== event ? event.nEvents // number of events at the given state
-          : event.nEventsTotal; // total number of events (doesn't really have any use but hey, it's something)
-          // Calculate the proportion.
-
-          d.idProportion = d.idNumerator / d.idDenominator;
-          d.eventProportion = d.eventNumerator / d.eventDenominator; // Format the counts and proportions.
-
-          d.fmt = {
-            idNumerator: d3.format(',d')(d.idNumerator),
-            idPercent: d3.format('.1%')(d.idProportion),
-            eventNumerator: d3.format(',d')(d.eventNumerator),
-            eventPercent: d3.format('.1%')(d.eventProportion)
-          };
-          d.fmt.idNumeratorPercent = "".concat(d.fmt.idNumerator, " (").concat(d.fmt.idPercent, ")");
-          d.fmt.eventNumeratorPercent = "".concat(d.fmt.eventNumerator, " (").concat(d.fmt.eventPercent, ")");
+          d.freqs = getFreqs.call(_this, d, event, metadata);
+          d.fmt = formatValues.call(_this, d);
         });
         return rowGroup;
-      }));
+      })); // Define an array of values to populate the frequency table.
+
       freqTable.forEach(function (d) {
-        d.cells = _this.settings.freqTable.structure === 'vertical' ? [d.label, d.fmt.numeratorPercent, d.fmt.nEvents] : [d.label, d.displayValue].concat(_toConsumableArray(d.foci ? d.foci.map(function (focus) {
-          return focus.displayValue;
-        }) : []));
-        d.cells.proportion = d.proportion;
+        d.cells = defineCellValues.call(_this, d);
       });
       return freqTable;
     }
@@ -1492,12 +1486,14 @@
 
     // Update focus percentages.
     function counts() {
+      var _this = this;
+
       if (this.settings.eventCount) this.focusAnnotations.selectAll('tspan.fdg-focus-annotation__event-count').text(function (d) {
-        return d.fmt.numeratorPercent;
+        return _this.settings.eventCountType === 'cumulative-event' ? d.fmt.eventNumerator : d.fmt.idNumeratorPercent;
       });
       if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) this.metadata.event.forEach(function (event) {
         event.fociLabels.selectAll('text').text(function (d) {
-          return d.fmt.numeratorPercent;
+          return _this.settings.eventCountType === 'cumulative-event' ? d.fmt.eventNumeratorPercent : d.fmt.idNumeratorPercent;
         });
       });
     }
@@ -1506,10 +1502,10 @@
     function freqTable$1() {
       var main = this;
       var maxProportion = d3.max(this.containers.freqTable.tr.data(), function (d) {
-        return d.proportion;
+        return d.freqs.idProportion;
       });
       this.containers.freqTable.tr.each(function (d) {
-        var relativeProportion = d.proportion / maxProportion;
+        var relativeProportion = d.freqs.idProportion / maxProportion;
         var relativeProportionFmt = d3.format('.1%')(relativeProportion);
         var tr = d3.select(this);
         tr.selectAll('td').data(d.cells).join('td').style('background', function (di, i) {
@@ -1595,8 +1591,16 @@
 
           break;
 
-        case /color/i.test(this.modalText):
-          emphasizeComponent.call(this, this.containers.legends);
+        case /annotations/i.test(this.modalText):
+          emphasizeComponent.call(this, this.containers.focusAnnotations.selectAll('.fdg-focus-annotation__event-count'));
+          break;
+
+        case /number of events.*color/i.test(this.modalText):
+          emphasizeComponent.call(this, this.legends.color);
+          break;
+
+        case /number of events.*size/i.test(this.modalText):
+          emphasizeComponent.call(this, this.legends.size);
           break;
 
         case /static/i.test(this.modalText):
@@ -1605,7 +1609,7 @@
           break;
 
         case /controls/i.test(this.modalText):
-          emphasizeComponent.call(this, this.containers.controls);
+          emphasizeComponent.call(this, this.containers.controls.classed('fdg-hidden', this.settings.hideControls));
           break;
       }
     }
@@ -1840,33 +1844,42 @@
     function eventList() {
       var _this = this;
 
-      var fdg = this;
-      var container = this.controls.container.append('div').classed('fdg-control fdg-control--event-list', true);
-      var inputs = container.selectAll('div').data(this.metadata.event).enter().append('div').attr('class', function (d) {
-        return "fdg-button ".concat(_this.settings.eventChangeCount.includes(d.value) ? 'current' : '');
-      }).attr('title', function (d) {
-        return "".concat(_this.settings.eventChangeCount.includes(d.value) ? 'Remove' : 'Add', " ").concat(d.value, " ").concat(_this.settings.eventChangeCount.includes(d.value) ? 'from' : 'to', " the list of events that control bubble ").concat(_this.settings.colorBy.type === 'frequency' && _this.settings.sizeBy.type === 'frequency' ? 'color and size' : _this.settings.colorBy.type === 'frequency' ? 'color' : _this.settings.sizeBy.type === 'frequency' ? 'size' : "[ something isn't right here ].", ".");
-      }).text(function (d) {
-        return d.value;
-      });
-      inputs.on('click', function (d) {
-        var _this2 = this;
+      var container, inputs;
 
-        this.classList.toggle('current'); // Update event array.
+      if (this.settings.colorBy.type === 'frequency' || this.settings.sizeBy.type === 'frequency') {
+        var fdg = this;
+        container = this.controls.container.append('div').classed('fdg-control fdg-control--event-list', true);
+        inputs = container.selectAll('div').data(this.metadata.event).enter().append('div').attr('class', function (d) {
+          return "fdg-button ".concat(_this.settings.eventChangeCount.includes(d.key) ? 'current' : '');
+        }).attr('title', function (d) {
+          return "".concat(_this.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add', " ").concat(d.key, " ").concat(_this.settings.eventChangeCount.includes(d.key) ? 'from' : 'to', " the list of events that control bubble ").concat(_this.settings.colorBy.type === 'frequency' && _this.settings.sizeBy.type === 'frequency' ? 'color and size' : _this.settings.colorBy.type === 'frequency' ? 'color' : _this.settings.sizeBy.type === 'frequency' ? 'size' : "[ something isn't right here ].", ".");
+        }).text(function (d) {
+          return d.key;
+        });
+        inputs.on('click', function (d) {
+          var _this2 = this;
 
-        if (fdg.settings.eventChangeCount.includes(this.textContent)) fdg.settings.eventChangeCount.splice(fdg.settings.eventChangeCount.findIndex(function (event) {
-          return event === _this2.textContent;
-        }), 1);else fdg.settings.eventChangeCount.push(this.textContent); // Update tooltip.
+          this.classList.toggle('current'); // Update event array.
 
-        this.title = "".concat(fdg.settings.eventChangeCount.includes(d.value) ? 'Remove' : 'Add', " ").concat(d.value, " ").concat(fdg.settings.eventChangeCount.includes(d.value) ? 'from' : 'to', " the list of events that control bubble ").concat(fdg.settings.colorBy.type === 'frequency' && fdg.settings.sizeBy.type === 'frequency' ? 'color and size' : fdg.settings.colorBy.type === 'frequency' ? 'color' : fdg.settings.sizeBy.type === 'frequency' ? 'size' : "[ something isn't right here ].", "."); // Update color-size toggle.
+          if (fdg.settings.eventChangeCount.includes(this.textContent)) fdg.settings.eventChangeCount.splice(fdg.settings.eventChangeCount.findIndex(function (event) {
+            return event === _this2.textContent;
+          }), 1);else fdg.settings.eventChangeCount.push(this.textContent); // Update tooltip.
 
-        fdg.controls.colorSizeToggle.inputs.attr('title', function (di) {
-          return "Quantify the number of ".concat(fdg.util.csv(fdg.settings.eventChangeCount), " events by ").concat(di !== 'both' ? di : 'color and size', ".");
-        }); // Update legend label.
+          this.title = "".concat(fdg.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add', " ").concat(d.key, " ").concat(fdg.settings.eventChangeCount.includes(d.key) ? 'from' : 'to', " the list of events that control bubble ").concat(fdg.settings.colorBy.type === 'frequency' && fdg.settings.sizeBy.type === 'frequency' ? 'color and size' : fdg.settings.colorBy.type === 'frequency' ? 'color' : fdg.settings.sizeBy.type === 'frequency' ? 'size' : "[ something isn't right here ].", "."); // Update color-size toggle.
+          //fdg.controls.colorSizeToggle.inputs.attr(
+          //    'title',
+          //    (di) =>
+          //        `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
+          //            di !== 'both' ? di : 'color and size'
+          //        }.`
+          //);
+          // Update legend label.
 
-        fdg.legends.container.classed('fdg-invisible', fdg.settings.eventChangeCount.length === 0).selectAll('span.fdg-measure').text(fdg.util.csv(fdg.settings.eventChangeCount));
-        increment.call(fdg, false);
-      });
+          fdg.legends.container.classed('fdg-invisible', fdg.settings.eventChangeCount.length === 0).selectAll('span.fdg-measure').text(fdg.util.csv(fdg.settings.eventChangeCount));
+          increment.call(fdg, false);
+        });
+      }
+
       return {
         container: container,
         inputs: inputs
@@ -1882,11 +1895,7 @@
       this.controls.step = step.call(this);
       this.controls.timepoint = timepoint.call(this);
       this.controls.reset = reset$1.call(this);
-
-      if (this.settings.colorBy.type === 'frequency') {
-        this.controls.eventList = eventList.call(this); //this.controls.colorSizeToggle = colorSizeToggle.call(this);
-      }
-
+      this.controls.eventList = eventList.call(this);
       this.controls.container.selectAll('.fdg-button').on('mousedown', function () {
         this.classList.toggle('clicked');
       }).on('mouseup', function () {
@@ -1894,6 +1903,117 @@
       }).on('mouseout', function () {
         if (this.classList.contains('clicked')) this.classList.toggle('clicked');
       });
+    }
+
+    function color$1(svg, legendDimensions) {
+      var _this = this;
+
+      var marks = svg.selectAll('rect.legend-mark').data(this.scales.color.range()).enter().append('rect').classed('legend-mark', true).attr('x', function (d, i) {
+        return i * (legendDimensions[0] / _this.settings.colorBy.nColors);
+      }).attr('y', 0).attr('width', legendDimensions[0] / this.settings.colorBy.nColors).attr('height', legendDimensions[1] / 3).attr('fill', function (d) {
+        return d;
+      }).attr('fill-opacity', 0.5).attr('stroke', function (d) {
+        return d;
+      }).attr('stroke-opacity', 1);
+      return marks;
+    }
+
+    function size$1(svg, legendDimensions) {
+      var _this = this;
+
+      var marks = svg.selectAll('circle.legend-mark').data(d3.range(this.settings.colorBy.nColors)).join(this.settings.shape === 'circle' ? 'circle' : 'rect').classed('legend-mark', true).attr('fill', function (d) {
+        return '#aaa';
+      }).attr('fill-opacity', 0.5).attr('stroke', function (d) {
+        return '#aaa';
+      }).attr('stroke-opacity', 1);
+      if (this.settings.shape === 'circle') marks.attr('cx', function (d, i) {
+        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2;
+      }).attr('cy', legendDimensions[1] / 4).attr('r', function (d, i) {
+        return i + _this.settings.minRadius;
+      });else if (this.settings.shape === 'square') marks.attr('x', function (d, i) {
+        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2 - (i + _this.settings.minRadius);
+      }).attr('y', function (d, i) {
+        return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
+      }).attr('width', function (d, i) {
+        return (i + _this.settings.minRadius) * 2;
+      }).attr('height', function (d, i) {
+        return (i + _this.settings.minRadius) * 2;
+      });
+      return marks;
+    }
+
+    function both(svg, legendDimensions) {
+      var _this = this;
+
+      var marks = svg.selectAll('circle.legend-mark').data(this.scales.color.range()).join(this.settings.shape === 'circle' ? 'circle' : 'rect').classed('legend-mark', true).attr('fill', function (d) {
+        return d;
+      }).attr('fill-opacity', 0.5).attr('stroke', function (d) {
+        return d;
+      }).attr('stroke-opacity', 1);
+      if (this.settings.shape === 'circle') marks.attr('cx', function (d, i) {
+        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2;
+      }).attr('cy', legendDimensions[1] / 4).attr('r', function (d, i) {
+        return i + _this.settings.minRadius;
+      });else if (this.settings.shape === 'square') marks.attr('x', function (d, i) {
+        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2 - (i + _this.settings.minRadius);
+      }).attr('y', function (d, i) {
+        return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
+      }).attr('width', function (d, i) {
+        return (i + _this.settings.minRadius) * 2;
+      }).attr('height', function (d, i) {
+        return (i + _this.settings.minRadius) * 2;
+      });
+      return marks;
+    }
+
+    var makeLegendMarks = {
+      color: color$1,
+      size: size$1,
+      both: both
+    };
+
+    function makeLegend(type) {
+      var legendDimensions = [200, 50]; // container
+
+      var container = this.legends.container.append('div').classed("fdg-legend fdg-legend--".concat(type), true); // label
+
+      var label = container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html("Number of <span class = \"fdg-measure\">".concat(this.util.csv(this.settings.eventChangeCount), "</span> events")); // svg
+
+      var svg = container.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g').attr('transform', 'translate(23,0)'); // marks
+
+      var marks = makeLegendMarks[type].call(this, svg, legendDimensions); // lower end of scale
+
+      var lower = svg.append('text').attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').html('0'); // upper end of scale
+
+      var upper = svg.append('text').attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').html("".concat(this.settings.colorBy.nColors - 1, "+"));
+      return container;
+    }
+
+    function frequency() {
+      var container;
+      if (this.settings.colorBy.type === 'frequency' && this.settings.sizeBy.type === 'frequency') container = makeLegend.call(this, 'both');else if (this.settings.colorBy.type === 'frequency') container = makeLegend.call(this, 'color');else if (this.settings.sizeBy.type === 'frequency') container = makeLegend.call(this, 'size');
+      return container;
+    }
+
+    function categorical() {
+      var _this = this;
+
+      var container = this.legends.container.append('div').classed('fdg-legend fdg-legend--categorical', true);
+      container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html(this.settings.colorBy.label);
+      var legendItems = container.append('svg').attr('width', 200).attr('height', 20 * this.scales.color.domain().length).selectAll('g').data(this.scales.color.domain()).join('g').attr('transform', 'translate(20,0)');
+      legendItems.append('circle').classed('fdg-legend__symbol', true).attr('cx', 20).attr('cy', function (d, i) {
+        return i * 20 + 10;
+      }).attr('r', 7).attr('fill', function (d) {
+        return _this.scales.color(d);
+      });
+      legendItems.append('text').classed('fdg-legend__label', true).attr('font-size', '1rem').attr('x', 35).attr('y', function (d, i) {
+        return i * 20 + 12;
+      }).attr('alignment-baseline', 'middle').html(function (d) {
+        return "".concat(d, " (n=").concat(d3.format(',d')(_this.metadata.id.filter(function (di) {
+          return di.colorStratum === d;
+        }).length), ")");
+      });
+      return container;
     }
 
     function ramp(color) {
@@ -2016,121 +2136,42 @@
         height: 50,
         tickValues: [this.scales.color.domain()[0], (this.scales.color.domain()[1] - this.scales.color.domain()[0]) / 2, this.scales.color.domain()[1]]
       }));
+      return container;
     }
 
-    function categorical() {
-      var _this = this;
+    function color$2() {
+      var container;
 
-      var container = this.legends.container.append('div').classed('fdg-legend fdg-legend--categorical', true);
-      container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html(this.settings.colorBy.label);
-      var legendItems = container.append('svg').attr('width', 200).attr('height', 20 * this.scales.color.domain().length).selectAll('g').data(this.scales.color.domain()).join('g').attr('transform', 'translate(20,0)');
-      legendItems.append('circle').classed('fdg-legend__symbol', true).attr('cx', 20).attr('cy', function (d, i) {
-        return i * 20 + 10;
-      }).attr('r', 7).attr('fill', function (d) {
-        return _this.scales.color(d);
-      });
-      legendItems.append('text').classed('fdg-legend__label', true).attr('font-size', '1rem').attr('x', 35).attr('y', function (d, i) {
-        return i * 20 + 12;
-      }).attr('alignment-baseline', 'middle').html(function (d) {
-        return "".concat(d, " (n=").concat(d3.format(',d')(_this.metadata.id.filter(function (di) {
-          return di.colorStratum === d;
-        }).length), ")");
-      });
+      if (this.settings.colorify) {
+        switch (this.settings.colorBy.type) {
+          case 'frequency':
+            container = frequency.call(this);
+            break;
+
+          case 'categorical':
+            container = categorical.call(this);
+            break;
+
+          case 'continuous':
+            container = continuous$1.call(this);
+            break;
+
+          default:
+            return;
+        }
+      }
+
+      return container;
     }
 
-    function color$1(svg, legendDimensions) {
-      var _this = this;
+    function size$2() {
+      var container;
 
-      var marks = svg.selectAll('rect.legend-mark').data(this.scales.color.range()).enter().append('rect').classed('legend-mark', true).attr('x', function (d, i) {
-        return i * (legendDimensions[0] / _this.settings.colorBy.nColors);
-      }).attr('y', 0).attr('width', legendDimensions[0] / this.settings.colorBy.nColors).attr('height', legendDimensions[1] / 3).attr('fill', function (d) {
-        return d;
-      }).attr('fill-opacity', 0.5).attr('stroke', function (d) {
-        return d;
-      }).attr('stroke-opacity', 1);
-      return marks;
-    }
+      if (this.settings.sizify && this.settings.colorBy.type !== 'frequency') {
+        container = makeLegend.call(this, 'size');
+      }
 
-    function size$1(svg, legendDimensions) {
-      var _this = this;
-
-      var marks = svg.selectAll('circle.legend-mark').data(d3.range(this.settings.colorBy.nColors)).join(this.settings.shape === 'circle' ? 'circle' : 'rect').classed('legend-mark', true).attr('fill', function (d) {
-        return '#aaa';
-      }).attr('fill-opacity', 0.5).attr('stroke', function (d) {
-        return '#aaa';
-      }).attr('stroke-opacity', 1);
-      if (this.settings.shape === 'circle') marks.attr('cx', function (d, i) {
-        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2;
-      }).attr('cy', legendDimensions[1] / 4).attr('r', function (d, i) {
-        return i + _this.settings.minRadius;
-      });else if (this.settings.shape === 'square') marks.attr('x', function (d, i) {
-        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2 - (i + _this.settings.minRadius);
-      }).attr('y', function (d, i) {
-        return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
-      }).attr('width', function (d, i) {
-        return (i + _this.settings.minRadius) * 2;
-      }).attr('height', function (d, i) {
-        return (i + _this.settings.minRadius) * 2;
-      });
-      return marks;
-    }
-
-    function both(svg, legendDimensions) {
-      var _this = this;
-
-      var marks = svg.selectAll('circle.legend-mark').data(this.scales.color.range()).join(this.settings.shape === 'circle' ? 'circle' : 'rect').classed('legend-mark', true).attr('fill', function (d) {
-        return d;
-      }).attr('fill-opacity', 0.5).attr('stroke', function (d) {
-        return d;
-      }).attr('stroke-opacity', 1);
-      if (this.settings.shape === 'circle') marks.attr('cx', function (d, i) {
-        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2;
-      }).attr('cy', legendDimensions[1] / 4).attr('r', function (d, i) {
-        return i + _this.settings.minRadius;
-      });else if (this.settings.shape === 'square') marks.attr('x', function (d, i) {
-        return i * (legendDimensions[0] / _this.settings.colorBy.nColors) + legendDimensions[0] / _this.settings.colorBy.nColors / 2 - (i + _this.settings.minRadius);
-      }).attr('y', function (d, i) {
-        return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
-      }).attr('width', function (d, i) {
-        return (i + _this.settings.minRadius) * 2;
-      }).attr('height', function (d, i) {
-        return (i + _this.settings.minRadius) * 2;
-      });
-      return marks;
-    }
-
-    var makeLegendMarks = {
-      color: color$1,
-      size: size$1,
-      both: both
-    };
-
-    function makeLegend(type) {
-      var legendDimensions = [200, 50]; // container
-
-      var container = this.legends.container.append('div').classed("fdg-legend fdg-legend--".concat(type), true); // label
-
-      var label = container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html("Number of <span class = \"fdg-measure\">".concat(this.util.csv(this.settings.eventChangeCount), "</span> events")); // svg
-
-      var svg = container.append('svg').attr('width', legendDimensions[0]).attr('height', legendDimensions[1]).append('g'); // marks
-
-      var marks = makeLegendMarks[type].call(this, svg, legendDimensions); // lower end of scale
-
-      var lower = svg.append('text').attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').html('0'); // upper end of scale
-
-      var upper = svg.append('text').attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2).attr('y', legendDimensions[1] / 2 + 16).attr('text-anchor', 'middle').html("".concat(this.settings.colorBy.nColors - 1, "+"));
-      return {
-        container: container,
-        label: label,
-        svg: svg,
-        marks: marks,
-        lower: lower,
-        upper: upper
-      };
-    }
-
-    function frequency() {
-      if (this.settings.colorBy.type === 'frequency' && this.settings.sizeBy.type === 'frequency') this.legends.both = makeLegend.call(this, 'both');else if (this.settings.colorBy.type === 'frequency') this.legends.color = makeLegend.call(this, 'color');else if (this.settings.sizeBy.type === 'frequency') this.legends.size = makeLegend.call(this, 'size');
+      return container;
     }
 
     function circle(legendItem, i, spacing, radius) {
@@ -2202,57 +2243,45 @@
     function shape$2() {
       var _this = this;
 
-      var main = this;
-      var shapes = {
-        circle: circle,
-        square: square,
-        triangle: triangle,
-        diamond: diamond,
-        star: star,
-        triangleDown: triangleDown
-      };
-      var container = this.legends.container.append('div').classed('fdg-legend fdg-legend--shape', true);
-      container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html(this.settings.shapeBy.label);
-      var legendItems = container.append('svg').attr('width', 200).attr('height', 20 * this.scales.shape.domain().length).selectAll('g').data(this.scales.shape.domain()).join('g').attr('transform', 'translate(20,0)');
-      var radius = 7;
-      var spacing = 20;
-      legendItems.each(function (value, i) {
-        var shape = shapes[main.scales.shape(value)].call(main, d3.select(this), i, spacing, radius).classed('fdg-legend__shape', true).classed('fdg-legend__symbol', true);
-      });
-      legendItems.append('text').classed('fdg-legend__label', true).attr('font-size', '1rem').attr('x', 35).attr('y', function (d, i) {
-        return i * 20 + 12;
-      }).attr('alignment-baseline', 'middle').html(function (d) {
-        return "".concat(d, " (n=").concat(_this.metadata.id.filter(function (di) {
-          return di.shapeStratum === d;
-        }).length, ")");
-      });
+      var container;
+
+      if (this.settings.shapify) {
+        var main = this;
+        var shapes = {
+          circle: circle,
+          square: square,
+          triangle: triangle,
+          diamond: diamond,
+          star: star,
+          triangleDown: triangleDown
+        };
+        container = this.legends.container.append('div').classed('fdg-legend fdg-legend--shape', true);
+        container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html(this.settings.shapeBy.label);
+        var legendItems = container.append('svg').attr('width', 200).attr('height', 20 * this.scales.shape.domain().length).selectAll('g').data(this.scales.shape.domain()).join('g').attr('transform', 'translate(20,0)');
+        var radius = 7;
+        var spacing = 20;
+        legendItems.each(function (value, i) {
+          var shape = shapes[main.scales.shape(value)].call(main, d3.select(this), i, spacing, radius).classed('fdg-legend__shape', true).classed('fdg-legend__symbol', true);
+        });
+        legendItems.append('text').classed('fdg-legend__label', true).attr('font-size', '1rem').attr('x', 35).attr('y', function (d, i) {
+          return i * 20 + 12;
+        }).attr('alignment-baseline', 'middle').html(function (d) {
+          return "".concat(d, " (n=").concat(_this.metadata.id.filter(function (di) {
+            return di.shapeStratum === d;
+          }).length, ")");
+        });
+      }
+
+      return container;
     }
 
     function addLegends() {
       this.legends = {
         container: this.containers.legends
-      }; // Color legend
-
-      switch (this.settings.colorBy.type) {
-        case 'frequency':
-          frequency.call(this);
-          break;
-
-        case 'categorical':
-          categorical.call(this);
-          break;
-
-        case 'continuous':
-          continuous$1.call(this);
-          break;
-
-        default:
-          return;
-      } // TODO: size legend
-      // Shape legend
-
-
-      if (this.settings.shapify) shape$2.call(this);
+      };
+      this.legends.color = color$2.call(this);
+      this.legends.size = size$2.call(this);
+      this.legends.shape = shape$2.call(this);
     }
 
     function addFreqTable() {
@@ -2266,7 +2295,7 @@
       freqTable.table = freqTable.container.append('table').classed('fdg-freq-table__table', true);
       freqTable.thead = freqTable.table.append('thead').classed('fdg-freq-table__thead', true); // Add column headers.
 
-      freqTable.th = freqTable.thead.selectAll('th').data(this.settings.freqTable.structure === 'vertical' ? ['', 'Individuals', 'Events'] : ['', 'Overall'].concat(_toConsumableArray(this.metadata.strata.map(function (stratum) {
+      freqTable.th = freqTable.thead.selectAll('th').data(this.settings.freqTable.structure === 'vertical' ? ['', 'Individuals', 'Events'] : ['', 'Total'].concat(_toConsumableArray(this.metadata.strata.map(function (stratum) {
         return stratum.key;
       })))).join('th').attr('class', function (d, i) {
         return "fdg-freq-table__th--".concat(i === 0 ? 'label' : i === 1 ? 'individual' : i === 2 ? 'event' : i);

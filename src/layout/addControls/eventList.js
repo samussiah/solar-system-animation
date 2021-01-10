@@ -1,83 +1,87 @@
 import { increment as redraw } from '../../init/startInterval';
 
 export default function eventList() {
-    const fdg = this;
+    let container, inputs;
 
-    const container = this.controls.container
-        .append('div')
-        .classed('fdg-control fdg-control--event-list', true);
-    const inputs = container
-        .selectAll('div')
-        .data(this.metadata.event)
-        .enter()
-        .append('div')
-        .attr(
-            'class',
-            (d) => `fdg-button ${this.settings.eventChangeCount.includes(d.value) ? 'current' : ''}`
-        )
-        .attr(
-            'title',
-            (d) =>
-                `${this.settings.eventChangeCount.includes(d.value) ? 'Remove' : 'Add'} ${
-                    d.value
-                } ${
-                    this.settings.eventChangeCount.includes(d.value) ? 'from' : 'to'
-                } the list of events that control bubble ${
-                    this.settings.colorBy.type === 'frequency' &&
-                    this.settings.sizeBy.type === 'frequency'
-                        ? 'color and size'
-                        : this.settings.colorBy.type === 'frequency'
-                        ? 'color'
-                        : this.settings.sizeBy.type === 'frequency'
-                        ? 'size'
-                        : "[ something isn't right here ]."
-                }.`
-        )
-        .text((d) => d.value);
+    if (this.settings.colorBy.type === 'frequency' || this.settings.sizeBy.type === 'frequency') {
+        const fdg = this;
 
-    inputs.on('click', function (d) {
-        this.classList.toggle('current');
+        container = this.controls.container
+            .append('div')
+            .classed('fdg-control fdg-control--event-list', true);
+        inputs = container
+            .selectAll('div')
+            .data(this.metadata.event)
+            .enter()
+            .append('div')
+            .attr(
+                'class',
+                (d) => `fdg-button ${this.settings.eventChangeCount.includes(d.key) ? 'current' : ''}`
+            )
+            .attr(
+                'title',
+                (d) =>
+                    `${this.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add'} ${
+                        d.key
+                    } ${
+                        this.settings.eventChangeCount.includes(d.key) ? 'from' : 'to'
+                    } the list of events that control bubble ${
+                        this.settings.colorBy.type === 'frequency' &&
+                        this.settings.sizeBy.type === 'frequency'
+                            ? 'color and size'
+                            : this.settings.colorBy.type === 'frequency'
+                            ? 'color'
+                            : this.settings.sizeBy.type === 'frequency'
+                            ? 'size'
+                            : "[ something isn't right here ]."
+                    }.`
+            )
+            .text((d) => d.key);
 
-        // Update event array.
-        if (fdg.settings.eventChangeCount.includes(this.textContent))
-            fdg.settings.eventChangeCount.splice(
-                fdg.settings.eventChangeCount.findIndex((event) => event === this.textContent),
-                1
-            );
-        else fdg.settings.eventChangeCount.push(this.textContent);
+        inputs.on('click', function (d) {
+            this.classList.toggle('current');
 
-        // Update tooltip.
-        this.title = `${fdg.settings.eventChangeCount.includes(d.value) ? 'Remove' : 'Add'} ${
-            d.value
-        } ${
-            fdg.settings.eventChangeCount.includes(d.value) ? 'from' : 'to'
-        } the list of events that control bubble ${
-            fdg.settings.colorBy.type === 'frequency' && fdg.settings.sizeBy.type === 'frequency'
-                ? 'color and size'
-                : fdg.settings.colorBy.type === 'frequency'
-                ? 'color'
-                : fdg.settings.sizeBy.type === 'frequency'
-                ? 'size'
-                : "[ something isn't right here ]."
-        }.`;
+            // Update event array.
+            if (fdg.settings.eventChangeCount.includes(this.textContent))
+                fdg.settings.eventChangeCount.splice(
+                    fdg.settings.eventChangeCount.findIndex((event) => event === this.textContent),
+                    1
+                );
+            else fdg.settings.eventChangeCount.push(this.textContent);
 
-        // Update color-size toggle.
-        fdg.controls.colorSizeToggle.inputs.attr(
-            'title',
-            (di) =>
-                `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
-                    di !== 'both' ? di : 'color and size'
-                }.`
-        );
+            // Update tooltip.
+            this.title = `${fdg.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add'} ${
+                d.key
+            } ${
+                fdg.settings.eventChangeCount.includes(d.key) ? 'from' : 'to'
+            } the list of events that control bubble ${
+                fdg.settings.colorBy.type === 'frequency' && fdg.settings.sizeBy.type === 'frequency'
+                    ? 'color and size'
+                    : fdg.settings.colorBy.type === 'frequency'
+                    ? 'color'
+                    : fdg.settings.sizeBy.type === 'frequency'
+                    ? 'size'
+                    : "[ something isn't right here ]."
+            }.`;
 
-        // Update legend label.
-        fdg.legends.container
-            .classed('fdg-invisible', fdg.settings.eventChangeCount.length === 0)
-            .selectAll('span.fdg-measure')
-            .text(fdg.util.csv(fdg.settings.eventChangeCount));
+            // Update color-size toggle.
+            //fdg.controls.colorSizeToggle.inputs.attr(
+            //    'title',
+            //    (di) =>
+            //        `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
+            //            di !== 'both' ? di : 'color and size'
+            //        }.`
+            //);
 
-        redraw.call(fdg, false);
-    });
+            // Update legend label.
+            fdg.legends.container
+                .classed('fdg-invisible', fdg.settings.eventChangeCount.length === 0)
+                .selectAll('span.fdg-measure')
+                .text(fdg.util.csv(fdg.settings.eventChangeCount));
+
+            redraw.call(fdg, false);
+        });
+    }
 
     return {
         container,

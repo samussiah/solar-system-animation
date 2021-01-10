@@ -9,7 +9,7 @@ fetch('./data/data_1000.csv')
             data,
             '#container',
             {
-                eventLabel: 'HFrEF events <small><sup>1</sup></small>',
+                eventLabel: 'HFrEF events',
                 timeRelative: 'since baseline',
                 colorBy: {
                     type: 'categorical',
@@ -18,22 +18,21 @@ fetch('./data/data_1000.csv')
                     colorScheme: 'Tableau10',
                     //stratify: false,
                 },
-                shapeBy: {
-                    type: 'categorical',
-                    variable: 'shape',
-                    label: 'Shape Stratum <small><sup>2</sup></small>',
+                sizeBy: {
+                    type: 'frequency',
                 },
+                //shapeBy: {
+                //    type: 'categorical',
+                //    variable: 'shape',
+                //    label: 'Shape Stratum <small><sup>2</sup></small>',
+                //},
                 freqTable: {
-                    //display: false,
-                    //bars: false,
                     structure: 'horizontal',
-                    //includeEventCentral: true,
                     countType: 'event',
                 },
-                delay: false,
-                eventCountType: 'cumulative-event',
-                //displayProgressBar: false,
-                //stratificationPositioning: 'orbital',
+                eventCountType: 'current-id',
+                stratificationPositioning: 'orbital',
+                modalSpeed: 3000,
             }
         );
     });

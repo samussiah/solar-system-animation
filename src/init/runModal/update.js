@@ -14,8 +14,14 @@ export default function update() {
             emphasizeComponent.call(this, this.containers.progress);
             //emphasizeComponent.call(this, this.focusAnnotations);
             break;
-        case /color/i.test(this.modalText):
-            emphasizeComponent.call(this, this.containers.legends);
+        case /annotations/i.test(this.modalText):
+            emphasizeComponent.call(this, this.containers.focusAnnotations.selectAll('.fdg-focus-annotation__event-count'));
+            break;
+        case /number of events.*color/i.test(this.modalText):
+            emphasizeComponent.call(this, this.legends.color);
+            break;
+        case /number of events.*size/i.test(this.modalText):
+            emphasizeComponent.call(this, this.legends.size);
             break;
         case /static/i.test(this.modalText):
             // Style static bubbles differently than components.
@@ -29,7 +35,7 @@ export default function update() {
             );
             break;
         case /controls/i.test(this.modalText):
-            emphasizeComponent.call(this, this.containers.controls);
+            emphasizeComponent.call(this, this.containers.controls.classed('fdg-hidden', this.settings.hideControls));
             break;
         default:
             break;

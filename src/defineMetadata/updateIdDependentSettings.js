@@ -16,12 +16,15 @@ export default function updateIdDependentSettings(metadata) {
         .map((text) => text.replace('[duration]', d3.format(',d')(this.settings.duration)));
     this.settings.minRadius =
         this.settings.minRadius ||
-        Math.min(
-            3000 /
-                metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length,
-            this.settings.maxRadius
+        Math.max(
+            Math.min(
+                3000 /
+                    metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length,
+                this.settings.maxRadius
+            ),
+            1
         );
-    this.settings.staticRadius = this.settings.staticRadius || 3000 / metadata.id.length;
+    this.settings.staticRadius = this.settings.staticRadius || Math.max(3000 / metadata.id.length, 1);
     this.settings.maxRadius = this.settings.minRadius + this.settings.colorBy.nColors;
     this.settings.chargeStrength = -(
         2000 / metadata.id.filter((d) => !(this.settings.drawStaticSeparately && d.static)).length

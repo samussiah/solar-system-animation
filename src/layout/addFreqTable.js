@@ -29,7 +29,7 @@ export default function addFreqTable() {
         .data(
             this.settings.freqTable.structure === 'vertical'
                 ? ['', 'Individuals', 'Events']
-                : ['', 'Overall', ...this.metadata.strata.map((stratum) => stratum.key)]
+                : ['', 'Total', ...this.metadata.strata.map((stratum) => stratum.key)]
         )
         .join('th')
         .attr(

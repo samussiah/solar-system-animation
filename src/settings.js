@@ -9,11 +9,12 @@ const settings = {
 
     id_var: 'id',
     event_var: 'event',
-    event_order_var: 'event_order',
+    event_order_var: 'event_order', // zero-indexed orbit
+    event_position_var: 'event_position', // angle of event focus on orbit
     start_timepoint_var: 'stdy',
     end_timepoint_var: 'endy',
     duration_var: 'duration',
-    sequence_var: 'seq',
+    sequence_var: 'seq', // one-indexed for some reason - not required - TODO: remove
 
     /**-------------------------------------------------------------------------------------------\
       aesthetics

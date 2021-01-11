@@ -1,4 +1,4 @@
-fetch('./data/data_1000.csv')
+fetch('../data/adverse-event-outcome.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -9,12 +9,12 @@ fetch('./data/data_1000.csv')
             data,
             '#container',
             {
-                eventLabel: 'HFrEF events',
-                timeRelative: 'since baseline',
+                eventLabel: 'Adverse Events',
+                timeRelative: 'since onset',
                 colorBy: {
                     type: 'categorical',
-                    variable: 'category',
-                    label: 'Color Stratum',
+                    variable: 'color',
+                    label: 'Severity',
                     colorScheme: 'Tableau10',
                     stratify: false,
                 },
@@ -24,10 +24,11 @@ fetch('./data/data_1000.csv')
                 shapeBy: {
                     type: 'categorical',
                     variable: 'shape',
-                    label: 'Shape Stratum',
+                    label: 'Treatment',
                 },
                 freqTable: {
                 },
+                speed: 'slow',
                 delay: false,
                 modalSpeed: 5000,
             }

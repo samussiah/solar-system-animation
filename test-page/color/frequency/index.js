@@ -9,6 +9,9 @@ fetch('../../data/data_1000.csv')
                 colorBy: {
                     type: 'frequency',
                 },
+                sizeBy: {
+                    type: null,
+                },
             }
         );
     });

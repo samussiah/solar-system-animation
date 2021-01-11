@@ -50,16 +50,18 @@ export default function update() {
             );
 
             // frequency aesthetic
-            if (
-                this.settings.colorBy.type === 'frequency' &&
-                this.settings.sizeBy.type === 'frequency'
-            )
-                text = text.replace('[frequency-aesthetic]', 'color and size');
-            else if (this.settings.colorBy.type === 'frequency')
-                text = text.replace('[frequency-aesthetic]', 'color');
-            else if (this.settings.sizeBy.type === 'frequency')
-                text = text.replace('[frequency-aesthetic]', 'size');
-            else text = null;
+            if (/\[frequency-aesthetic]/.test(text)) {
+                if (
+                    this.settings.colorBy.type === 'frequency' &&
+                    this.settings.sizeBy.type === 'frequency'
+                )
+                    text = text.replace('[frequency-aesthetic]', 'color and size');
+                else if (this.settings.colorBy.type === 'frequency')
+                    text = text.replace('[frequency-aesthetic]', 'color');
+                else if (this.settings.sizeBy.type === 'frequency')
+                    text = text.replace('[frequency-aesthetic]', 'size');
+                else text = null;
+            }
 
             return text;
         });

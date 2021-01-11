@@ -6,6 +6,9 @@ fetch('../../data/data_1000.csv')
             data,
             '#container',
             {
+                colorBy: {
+                    type: null,
+                },
                 sizeBy: {
                     type: 'frequency',
                 },

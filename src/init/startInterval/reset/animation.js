@@ -8,6 +8,7 @@ import getAesthetics from '../../../dataManipulation/nestData/getAesthetics';
 // TODO: reset data as in nestData and update/data
 export default function resetAnimation() {
     this.settings.timepoint = 0;
+    this.settings.progress = 0;
     this.settings.modalIndex = 0;
     this.controls.timepoint.inputs.attr('value', 0);
 

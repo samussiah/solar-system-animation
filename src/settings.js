@@ -53,6 +53,18 @@ const settings = {
     shape: 'circle',
 
     /**-------------------------------------------------------------------------------------------\
+      freq table
+    \-------------------------------------------------------------------------------------------**/
+
+    freqTable: {
+        display: true,
+        bars: true,
+        structure: 'vertical', // ['vertical', 'horizontal']
+        includeEventCentral: false,
+        countType: 'id', // ['id', 'event'] - applies only when structure = 'horizontal'
+    },
+
+    /**-------------------------------------------------------------------------------------------\
       animation
     \-------------------------------------------------------------------------------------------**/
 
@@ -64,12 +76,13 @@ const settings = {
         fast: 100,
     },
     playPause: 'play',
-    pulseOrbits: false,
     loop: true,
+    delay: 5000,
 
     // time settings
     timepoint: 0, // initial timepoint
-    timeUnit: 'days', // time unit that appears in labels
+    timeUnit: 'day', // time unit that appears in labels
+    timeRelative: null, // e.g. "from baseline"
     duration: null, // defined in ./defineMetadata/updateIdDependentSettings
     resetDelay: 15000,
 
@@ -89,7 +102,7 @@ const settings = {
     chargeStrength: null, // defined in ./defineMetadata/updateIdDependentSettings
     collisionPadding: 1,
     staticChargeStrength: null, // defined in ./defineMetadata/updateIdDependentSettings
-    drawStaticSeparately: false, // draw static bubbles in a static force simulation to improve performance
+    drawStaticSeparately: false, // draw static shapes in a static force simulation to improve performance
     staticLayout: 'circular', // ['circular', 'radial']
 
     /**-------------------------------------------------------------------------------------------\
@@ -100,10 +113,11 @@ const settings = {
     modalSpeed: 15000, // amount of time for which each modal appears
     modalIndex: 0,
     explanation: [
-        'Each bubble in this animation represents an individual.',
-        'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their bubble gravitates toward the focus or "planet" representing that event.',
-        'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the color and/or size of their bubble.',
-        '<span class = "fdg-emphasized">Static bubbles</span> represent individuals who never experience an event.',
+        'Each shape in this animation represents an individual.',
+        'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.',
+        'The <span class = "fdg-emphasized">annotations</span> at each focus represent the [event-count-type].',
+        'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.',
+        '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.',
         'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.',
         'Continue watching to learn how these individuals progress over the course of [duration] days.',
     ], // array of strings
@@ -114,6 +128,7 @@ const settings = {
     \-------------------------------------------------------------------------------------------**/
 
     events: null, // defined in ./defineMetadata
+    eventLabel: 'Events',
     eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
     eventCount: true, // display [ n (%) ] beneath focus labels?
     eventCountType: 'current-id', // ['current-id', 'cumulative-id', 'cumulative-event']
@@ -123,11 +138,10 @@ const settings = {
       miscellaneous
     \-------------------------------------------------------------------------------------------**/
 
-    nOrbits: null, // defined in ./defineMetadata/dataDrivenSettings/orbits
-    nFoci: null, // defined in ./defineMetadata/updateEventDependentSettings
     hideControls: false,
-    hideFreqTable: false,
-    eventCentralInFreqTable: false,
+    focusOffset: 'heuristic', // ['heuristic', 'vertical']
+    displayProgressBar: false,
+    stratificationPositioning: 'circular', // ['circular', 'orbital']
 };
 
 export default settings;

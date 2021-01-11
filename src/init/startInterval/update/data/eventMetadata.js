@@ -1,76 +1,62 @@
 import filterData from './eventMetadata/filterData';
 import updateIdSet from './eventMetadata/updateIdSet';
 import countCumulative from './eventMetadata/countCumulative';
-import getNumerator from './eventMetadata/getNumerator';
+
+import getFreqs from '../../../../defineMetadata/freqTable/getFreqs';
+import formatValues from '../../../../defineMetadata/freqTable/formatValues';
+import defineCellValues from '../../../../defineMetadata/freqTable/defineCellValues';
 
 // Update states and strata at each timepoint.
 export default function eventMetadata() {
     this.metadata.event.forEach((event) => {
-        // Filter data.
-        event.data = filterData(this.data.nested, ['value', 'state', 'event'], event.value);
+        // Subset data on individuals in the given state.
+        event.data = filterData(this.data.nested, ['value', 'state', 'event'], event.key);
 
-        // Count.
-        event.count = event.data.length;
-        updateIdSet(event.data, event.cumulativeIds);
-        event.cumulative = countCumulative(this.data, this.settings.timepoint, {
-            key: 'event',
-            value: event.value,
-        });
-        event.numerator = getNumerator(this.settings.eventCountType, {
-            ids: event.count,
-            cumulativeIds: event.cumulativeIds.size,
-            events: event.cumulative,
-        });
+        // Update current set of individuals.
+        event.ids = updateIdSet(event.data, event.ids);
+        event.nIds = event.ids.size;
 
-        // Calculate the proportion.
-        event.proportion = event.numerator / event.denominator;
+        // Update cumulative set of individuals.
+        updateIdSet(event.data, event.idsCumulative, true);
+        event.nIdsCumulative = event.idsCumulative.size;
 
-        // Format the counts and proportions.
-        event.proportionFmt = d3.format('.1%')(event.proportion);
-        event.numeratorFmt = d3.format(',d')(event.numerator);
-        event.countProportionFmt = `${event.numeratorFmt} (${event.proportionFmt})`;
-        event.cumulativeFmt = d3.format(',d')(event.cumulative);
+        // Update cumulative number of events.
+        event.nEvents = countCumulative(this.data, this.settings.timepoint, event.key);
 
-        // Define an array for the frequency table.
-        event.cells = [event.label, event.countProportionFmt, event.cumulativeFmt];
+        // Calculate numerators, denominators, and proportions.
+        event.freqs = getFreqs.call(this, event, event, this.metadata);
+        event.fmt = formatValues.call(this, event);
 
         // Calculate the change in IDs in the given state from the previous timepoint.
-        event.change = event.count - event.prevCount;
+        event.change = event.nIds - event.nIdsPrevious;
 
         if (event.foci)
             event.foci.forEach((focus) => {
-                // Filter data.
+                // Subset data on individuals in the given state and stratum.
                 focus.data = filterData(event.data, ['value', 'colorValue'], focus.key);
 
-                // Count.
-                focus.count = focus.data.length;
-                updateIdSet(focus.data, focus.cumulativeIds);
-                focus.cumulative = countCumulative(
-                    this.data,
-                    this.settings.timepoint,
-                    { key: 'event', value: event.value },
-                    { key: this.settings.colorBy.variable, value: focus.key }
-                );
-                focus.numerator = getNumerator(this.settings.eventCountType, {
-                    ids: focus.count,
-                    cumulativeIds: focus.cumulativeIds.size,
-                    events: focus.cumulative,
+                // Update current set of individuals.
+                focus.ids = updateIdSet(focus.data, focus.ids);
+                focus.nIds = focus.ids.size;
+
+                // Update cumulative set of individuals.
+                updateIdSet(focus.data, focus.idsCumulative, true);
+                focus.nIdsCumulative = focus.idsCumulative.size;
+
+                // Update cumulative number of events.
+                focus.nEvents = countCumulative(this.data, this.settings.timepoint, event.key, {
+                    key: this.settings.colorBy.variable,
+                    value: focus.key,
                 });
 
-                // Calculate the proportion.
-                focus.proportion = focus.numerator / focus.denominator;
-
-                // fmt
-                focus.proportionFmt = d3.format('.1%')(focus.proportion);
-                focus.countFmt = d3.format(',d')(focus.numerator);
-                focus.countProportionFmt = `${focus.countFmt} (${focus.proportionFmt})`;
-                focus.cumulativeFmt = d3.format(',d')(focus.cumulative);
-
-                // freq table
-                focus.cells = [focus.label, focus.countProportionFmt, focus.cumulativeFmt];
-
-                // change
-                focus.change = focus.count - focus.prevCount;
+                // Calculate numerators, denominators, and proportions.
+                focus.freqs = getFreqs.call(this, focus, event, this.metadata);
+                focus.fmt = formatValues.call(this, focus);
+                focus.cells = defineCellValues.call(this, focus);
+                focus.change = focus.nIds - focus.nIdsPrevious;
             });
+
+        // Define an array for the frequency table.
+        event.cells = defineCellValues.call(this, event);
     });
 }

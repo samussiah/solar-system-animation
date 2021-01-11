@@ -23,7 +23,8 @@ export default function makeLegend(type) {
         .append('svg')
         .attr('width', legendDimensions[0])
         .attr('height', legendDimensions[1])
-        .append('g');
+        .append('g')
+        .attr('transform', 'translate(23,0)');
 
     // marks
     const marks = makeLegendMarks[type].call(this, svg, legendDimensions);
@@ -34,7 +35,7 @@ export default function makeLegend(type) {
         .attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2)
         .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
-        .text('0');
+        .html('0');
 
     // upper end of scale
     const upper = svg
@@ -42,14 +43,7 @@ export default function makeLegend(type) {
         .attr('x', legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2)
         .attr('y', legendDimensions[1] / 2 + 16)
         .attr('text-anchor', 'middle')
-        .text(`${this.settings.colorBy.nColors - 1}+`);
+        .html(`${this.settings.colorBy.nColors - 1}+`);
 
-    return {
-        container,
-        label,
-        svg,
-        marks,
-        lower,
-        upper,
-    };
+    return container;
 }

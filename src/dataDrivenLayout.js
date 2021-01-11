@@ -1,4 +1,3 @@
-//import addExplanation from './layout/addExplanation';
 import addControls from './layout/addControls';
 import addLegends from './layout/addLegends';
 import addFreqTable from './layout/addFreqTable';
@@ -11,8 +10,7 @@ export default function dataDrivenLayout() {
 
     // sidebar
     addLegends.call(this);
-    this.containers.timer.text(`${this.settings.timepoint} ${this.settings.timeUnit}`);
-    this.freqTable = addFreqTable.call(this);
+    this.containers.freqTable = addFreqTable.call(this);
 
     // Draw concentric circles.
     this.orbits = drawOrbits.call(this);

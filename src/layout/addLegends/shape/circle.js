@@ -1,5 +1,5 @@
 export default function circle(legendItem, i, spacing, radius) {
-    legendItem
+    return legendItem
         .append('circle')
         .attr('cx', spacing)
         .attr('cy', i * spacing + 10)

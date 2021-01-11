@@ -3,7 +3,7 @@ export default function countCumulative(data, timepoint, event, stratum) {
     return data.filter(
         (d) =>
             d.start_timepoint <= timepoint &&
-            d[event.key] === event.value &&
+            d.event === event &&
             (stratum === undefined || d[stratum.key] === stratum.value)
     ).length;
 }

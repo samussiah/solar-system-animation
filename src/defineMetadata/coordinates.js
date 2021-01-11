@@ -7,10 +7,6 @@ export default function coordinates(metadata) {
         x: this.settings.orbitRadius / 2,
         y: this.settings.height / 2,
     };
-    const theta =
-        (2 * Math.PI) /
-        (this.settings.nFoci || metadata.event.length - !!this.settings.eventCentral - 1);
-
     metadata.event.forEach((event, i) => {
         // Define radius of the orbit on which the event focus will appear.
         event.radius = event.order * this.settings.orbitRadius;

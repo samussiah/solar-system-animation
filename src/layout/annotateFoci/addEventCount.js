@@ -7,7 +7,9 @@ export default function addEventCount(text) {
         .classed('fdg-hidden', this.settings.eventCount === false)
         .attr('x', 0)
         .attr('dy', '1.3em')
-        .attr('text-anchor', (d) => getTextAnchor.call(this, d));
+        //.attr('text-anchor', (d) => getTextAnchor.call(this, d));
+        .attr('text-anchor', 'middle')
+        .attr('alignment-baseline', 'middle');
 
     return eventCount;
 }

@@ -21,9 +21,8 @@ export default function freqTable(metadata) {
     const freqTable = d3.merge(
         metadata.event.map((event) => {
             // One row per event per focus plus an overall event record.
-            const rowGroup = this.settings.colorBy.type === 'categorical'
-                ? [event, ...event.foci]
-                : [event];
+            const rowGroup =
+                this.settings.colorBy.type === 'categorical' ? [event, ...event.foci] : [event];
 
             // For each row calculate numerators, denominators, and proportions.
             rowGroup.forEach((d) => {

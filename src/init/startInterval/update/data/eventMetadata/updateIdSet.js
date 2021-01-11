@@ -4,6 +4,5 @@ export default function updateIdSet(data, set, cumulative = false) {
         data.forEach((id) => {
             set.add(id.key);
         });
-    else
-        return new Set(data.map(id => id.key));
+    else return new Set(data.map((id) => id.key));
 }

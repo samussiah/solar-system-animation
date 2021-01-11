@@ -16,7 +16,8 @@ export default function eventList() {
             .append('div')
             .attr(
                 'class',
-                (d) => `fdg-button ${this.settings.eventChangeCount.includes(d.key) ? 'current' : ''}`
+                (d) =>
+                    `fdg-button ${this.settings.eventChangeCount.includes(d.key) ? 'current' : ''}`
             )
             .attr(
                 'title',
@@ -55,7 +56,8 @@ export default function eventList() {
             } ${
                 fdg.settings.eventChangeCount.includes(d.key) ? 'from' : 'to'
             } the list of events that control bubble ${
-                fdg.settings.colorBy.type === 'frequency' && fdg.settings.sizeBy.type === 'frequency'
+                fdg.settings.colorBy.type === 'frequency' &&
+                fdg.settings.sizeBy.type === 'frequency'
                     ? 'color and size'
                     : fdg.settings.colorBy.type === 'frequency'
                     ? 'color'

@@ -10,9 +10,7 @@ export default function position(nest) {
             // If the angle is not specified in the data, calculate an angle between -45° and 45°.
             group.forEach((d, i) => {
                 d.position =
-                    d.position === null
-                        ? d3.quantile(range, (i + 1) / (n + 1))
-                        : d.position;
+                    d.position === null ? d3.quantile(range, (i + 1) / (n + 1)) : d.position;
             });
         })
         .entries(nest);

@@ -15,7 +15,10 @@ export default function update() {
             //emphasizeComponent.call(this, this.focusAnnotations);
             break;
         case /annotations/i.test(this.modalText):
-            emphasizeComponent.call(this, this.containers.focusAnnotations.selectAll('.fdg-focus-annotation__event-count'));
+            emphasizeComponent.call(
+                this,
+                this.containers.focusAnnotations.selectAll('.fdg-focus-annotation__event-count')
+            );
             break;
         case /number of events.*color/i.test(this.modalText):
             emphasizeComponent.call(this, this.legends.color);
@@ -35,7 +38,10 @@ export default function update() {
             );
             break;
         case /controls/i.test(this.modalText):
-            emphasizeComponent.call(this, this.containers.controls.classed('fdg-hidden', this.settings.hideControls));
+            emphasizeComponent.call(
+                this,
+                this.containers.controls.classed('fdg-hidden', this.settings.hideControls)
+            );
             break;
         default:
             break;

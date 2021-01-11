@@ -44,12 +44,10 @@ export default function eventMetadata() {
                 focus.nIdsCumulative = focus.idsCumulative.size;
 
                 // Update cumulative number of events.
-                focus.nEvents = countCumulative(
-                    this.data,
-                    this.settings.timepoint,
-                    event.key,
-                    { key: this.settings.colorBy.variable, value: focus.key }
-                );
+                focus.nEvents = countCumulative(this.data, this.settings.timepoint, event.key, {
+                    key: this.settings.colorBy.variable,
+                    value: focus.key,
+                });
 
                 // Calculate numerators, denominators, and proportions.
                 focus.freqs = getFreqs.call(this, focus, event, this.metadata);

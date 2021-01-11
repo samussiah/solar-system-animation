@@ -1,7 +1,6 @@
 export default function focus(metadata) {
     // Stratify only when the color aesthetic is categorical.
     if (this.settings.colorBy.type === 'categorical') {
-
         // Define a consistent arc length when positioning strata along orbit.
         if (this.settings.stratificationPositioning === 'orbital') {
             this.settings.arcLength = this.settings.orbitRadius / 200;
@@ -9,10 +8,13 @@ export default function focus(metadata) {
                 this.settings.stratificationPositioning === 'orbital'
                     ? metadata.strata.length % 2
                         ? d3.range(
-                            -Math.floor(metadata.strata.length / 2),
-                            Math.floor(metadata.strata.length / 2) + 1
-                        )
-                        : d3.range(-metadata.strata.length / 2 + 0.5, metadata.strata.length / 2 + 0.5)
+                              -Math.floor(metadata.strata.length / 2),
+                              Math.floor(metadata.strata.length / 2) + 1
+                          )
+                        : d3.range(
+                              -metadata.strata.length / 2 + 0.5,
+                              metadata.strata.length / 2 + 0.5
+                          )
                     : null;
         }
 

@@ -11,7 +11,8 @@ export default function addFreqTable() {
             ),
     };
 
-    freqTable.label = this.util.addElement('freq-table__label', freqTable.container)
+    freqTable.label = this.util
+        .addElement('freq-table__label', freqTable.container)
         .classed('fdg-sidebar__label', true)
         .text(
             this.settings.freqTable.structure === 'vertical'

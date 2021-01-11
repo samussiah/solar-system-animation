@@ -15,7 +15,7 @@ export default function event() {
             return {
                 order,
                 position,
-                ids: new Set(), // individuals in the state currently 
+                ids: new Set(), // individuals in the state currently
                 nIds: 0, // number of individuals in the state currently
                 nIdsPrevious: 0,
                 idsCumulative: new Set(), // individuals that have ever been in the state
@@ -25,14 +25,15 @@ export default function event() {
             };
         })
         .entries(this.data)
-        .map(event => {
+        .map((event) => {
             Object.assign(event, event.value); // remove nesting
             delete event.value;
             return event;
         })
-        .sort((a, b) => (
-            a.order - b.order || b.nEventsTotal - a.nEventsTotal // ensure events plot in order
-        ));
+        .sort(
+            (a, b) =>
+                a.order - b.order || b.nEventsTotal - a.nEventsTotal // ensure events plot in order
+        );
 
     return nest;
 }

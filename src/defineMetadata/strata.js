@@ -12,7 +12,7 @@ export default function strata(metadata) {
         this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
 
         nest.forEach((stratum, i) => {
-            //ids: new Set(), // individuals in the state currently 
+            //ids: new Set(), // individuals in the state currently
             //nIds: 0, // number of individuals in the state currently
             //idsCumulative: new Set(), // individuals that have ever been in the state
             //nIdsCumulative: 0, // number of individuals that have ever been in the state

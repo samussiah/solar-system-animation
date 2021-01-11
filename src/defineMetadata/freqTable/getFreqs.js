@@ -1,8 +1,7 @@
 export default function getFreqs(d, event, metadata) {
     // Calculate the current number of individuals and events.
-    const idNumerator = this.settings.eventCountType === 'cumulative-id'
-        ? d.nIdsCumulative
-        : d.nIds;
+    const idNumerator =
+        this.settings.eventCountType === 'cumulative-id' ? d.nIdsCumulative : d.nIds;
     const eventNumerator = d.nEvents;
 
     // Calculate the total number of individuals and events.

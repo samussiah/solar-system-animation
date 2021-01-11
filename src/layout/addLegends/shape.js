@@ -48,7 +48,9 @@ export default function shape() {
             .attr('x', 35)
             .attr('y', (d, i) => i * 20 + 12)
             .attr('alignment-baseline', 'middle')
-            .html((d) => `${d} (n=${this.metadata.id.filter((di) => di.shapeStratum === d).length})`);
+            .html(
+                (d) => `${d} (n=${this.metadata.id.filter((di) => di.shapeStratum === d).length})`
+            );
     }
 
     return container;

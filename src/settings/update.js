@@ -31,8 +31,7 @@ export default function update() {
     // TODO: add bars to horizontal table view
     if (this.settings.freqTable.structure === 'horizontal' && !this.settings.stratify)
         this.settings.freqTable.structure = 'vertical';
-    if (this.settings.freqTable.structure === 'horizontal')
-        this.settings.freqTable.bars = false;
+    if (this.settings.freqTable.structure === 'horizontal') this.settings.freqTable.bars = false;
 
     // Define array of modal text.
     let texts = [];
@@ -41,7 +40,8 @@ export default function update() {
         // Update explanation text depending on aesthetics.
         this.settings.explanation = this.settings.explanation.map((text) => {
             // event count type
-            text = text.replace('[event-count-type]',
+            text = text.replace(
+                '[event-count-type]',
                 this.settings.eventCountType === 'current-id'
                     ? 'number of individuals currently experiencing the event'
                     : this.settings.eventCountType === 'cumulative-id'
@@ -50,7 +50,10 @@ export default function update() {
             );
 
             // frequency aesthetic
-            if (this.settings.colorBy.type === 'frequency' && this.settings.sizeBy.type === 'frequency')
+            if (
+                this.settings.colorBy.type === 'frequency' &&
+                this.settings.sizeBy.type === 'frequency'
+            )
                 text = text.replace('[frequency-aesthetic]', 'color and size');
             else if (this.settings.colorBy.type === 'frequency')
                 text = text.replace('[frequency-aesthetic]', 'color');

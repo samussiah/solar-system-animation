@@ -1,41 +1,39 @@
-import addElement from './addElement';
-
 export default function canvas(main) {
-    const animation = addElement('animation', main);
+    const animation = this.util.addElement('animation', main);
     this.settings.width = animation.node().clientWidth;
     this.settings.height = animation.node().clientHeight;
 
     // progress bar at top
-    const progressBar = addElement('progress-bar', animation).classed(
+    const progressBar = this.util.addElement('progress-bar', animation).classed(
         'fdg-hidden',
         !this.settings.displayProgressBar
     );
-    const progressTimepoint = addElement('progress-timepoint', animation).classed(
+    const progressTimepoint = this.util.addElement('progress-timepoint', animation).classed(
         'fdg-hidden',
         !this.settings.displayProgressBar
     );
 
     // background SVG
-    const svgBackground = addElement('svg--background', animation, 'svg')
+    const svgBackground = this.util.addElement('svg--background', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
 
     // canvas
-    const canvas = addElement('canvas', animation, 'canvas')
+    const canvas = this.util.addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
     canvas.context = canvas.node().getContext('2d');
 
     // SVG
-    const svgForeground = addElement('svg--foreground', animation, 'svg')
+    const svgForeground = this.util.addElement('svg--foreground', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
-    const focusAnnotations = addElement('focus-annotations', svgForeground, 'g');
+    const focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');
 
     // modal
-    const modalContainer = addElement('modal', animation);
+    const modalContainer = this.util.addElement('modal', animation);
     // TODO: add button to clear or hide modal
-    //const modalClear = addElement('modal__clear', modalContainer)
+    //const modalClear = this.util.addElement('modal__clear', modalContainer)
     //    //.classed('fdg-hidden', true)
     //    .text('x');
     //modalClear
@@ -46,7 +44,7 @@ export default function canvas(main) {
     //    .on('click', () => {
     //        this.modal.stop();
     //    });
-    const modal = addElement('modal__text', modalContainer);
+    const modal = this.util.addElement('modal__text', modalContainer);
 
     return {
         animation,

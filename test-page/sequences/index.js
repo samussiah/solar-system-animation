@@ -102,6 +102,7 @@ fetch('../data/adverse-event-outcome.csv')
                 speed: 'slow',
                 delay: false,
                 modalSpeed: 5000,
+                explanation: null,
             }
         );
     });

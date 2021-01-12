@@ -1,11 +1,10 @@
-import addElement from './layout/addElement';
 import layoutControls from './layout/controls';
 import layoutSidebar from './layout/sidebar';
 import layoutCanvas from './layout/canvas';
 import resize from './layout/resize';
 
 export default function layout() {
-    const main = addElement('main', d3.select(this.element)).datum(this);
+    const main = this.util.addElement('main', d3.select(this.element)).datum(this);
 
     // controls positioned absolutely
     const controls = layoutControls.call(this, main);

@@ -475,18 +475,39 @@
 
     };
 
+    function addSequences(controls) {
+      var container = this.util.addElement('sequences', controls).classed('fdg-control fdg-control--sequences', true);
+      var inputs = container.selectAll('div').data(this.settings.sequences).join('div').classed('fdg-button', true).attr('title', function (d) {
+        return "View the sequence from ".concat(d.start_state, " to ").concat(d.end_state, ".");
+      }).text(function (d, i) {
+        return "Sequence ".concat(i + 1);
+      });
+      inputs.on('click', function (d) {
+        console.log(d); // 1. Update relative day given start state.
+        // 2. Calculate sequence-level data for each individual.
+        // 3. Run the animation form start to end.
+      });
+      return {
+        container: container,
+        inputs: inputs
+      };
+    }
+
+    function controls(main) {
+      var controls = this.util.addElement('controls', main).classed('fdg-hidden', this.settings.hideControls);
+      var hide = this.util.addElement('hide', controls, 'span');
+      var sequences = addSequences.call(this, controls);
+      return {
+        controls: controls,
+        sequences: sequences,
+        hide: hide
+      };
+    }
+
     function addElement$1(name, parent) {
       var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
       var element = parent.append(tagName).classed("fdg-".concat(tagName), true).classed("fdg-".concat(name), true).classed("fdg-".concat(tagName, "--").concat(name), true);
       return element;
-    }
-
-    function controls(main) {
-      var controls = addElement$1('controls', main).classed('fdg-hidden', true);
-      var hide = addElement$1('hide', controls, 'span');
-      return {
-        controls: controls
-      };
     }
 
     function addTimer(progress) {
@@ -518,15 +539,15 @@
     }
 
     function sidebar(main) {
-      var sidebar = addElement$1('sidebar', main);
-      var events = addElement$1('events', sidebar).html(this.settings.eventLabel);
-      var legends = addElement$1('legends', sidebar);
-      var progress = addElement$1('progress', sidebar);
-      var timepoint = addElement$1('timepoint', progress).classed('fdg-sidebar__label', true).html("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit));
-      var timeRelative = addElement$1('time-relative', progress).classed('fdg-sidebar__sub-label', true).html(this.settings.timeRelative);
+      var sidebar = this.util.addElement('sidebar', main);
+      var events = this.util.addElement('events', sidebar).html(this.settings.eventLabel);
+      var legends = this.util.addElement('legends', sidebar);
+      var progress = this.util.addElement('progress', sidebar);
+      var timepoint = this.util.addElement('timepoint', progress).classed('fdg-sidebar__label', true).html("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit));
+      var timeRelative = this.util.addElement('time-relative', progress).classed('fdg-sidebar__sub-label', true).html(this.settings.timeRelative);
       var timer = addTimer.call(this, progress);
       var countdown = addCountdown.call(this, progress);
-      var freqTable = addElement$1('freq-table', sidebar);
+      var freqTable = this.util.addElement('freq-table', sidebar);
       return {
         sidebar: sidebar,
         events: events,
@@ -541,23 +562,23 @@
     }
 
     function canvas(main) {
-      var animation = addElement$1('animation', main);
+      var animation = this.util.addElement('animation', main);
       this.settings.width = animation.node().clientWidth;
       this.settings.height = animation.node().clientHeight; // progress bar at top
 
-      var progressBar = addElement$1('progress-bar', animation).classed('fdg-hidden', !this.settings.displayProgressBar);
-      var progressTimepoint = addElement$1('progress-timepoint', animation).classed('fdg-hidden', !this.settings.displayProgressBar); // background SVG
+      var progressBar = this.util.addElement('progress-bar', animation).classed('fdg-hidden', !this.settings.displayProgressBar);
+      var progressTimepoint = this.util.addElement('progress-timepoint', animation).classed('fdg-hidden', !this.settings.displayProgressBar); // background SVG
 
-      var svgBackground = addElement$1('svg--background', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height); // canvas
+      var svgBackground = this.util.addElement('svg--background', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height); // canvas
 
-      var canvas = addElement$1('canvas', animation, 'canvas').attr('width', this.settings.width).attr('height', this.settings.height);
+      var canvas = this.util.addElement('canvas', animation, 'canvas').attr('width', this.settings.width).attr('height', this.settings.height);
       canvas.context = canvas.node().getContext('2d'); // SVG
 
-      var svgForeground = addElement$1('svg--foreground', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height);
-      var focusAnnotations = addElement$1('focus-annotations', svgForeground, 'g'); // modal
+      var svgForeground = this.util.addElement('svg--foreground', animation, 'svg').attr('width', this.settings.width).attr('height', this.settings.height);
+      var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g'); // modal
 
-      var modalContainer = addElement$1('modal', animation); // TODO: add button to clear or hide modal
-      //const modalClear = addElement('modal__clear', modalContainer)
+      var modalContainer = this.util.addElement('modal', animation); // TODO: add button to clear or hide modal
+      //const modalClear = this.util.addElement('modal__clear', modalContainer)
       //    //.classed('fdg-hidden', true)
       //    .text('x');
       //modalClear
@@ -569,7 +590,7 @@
       //        this.modal.stop();
       //    });
 
-      var modal = addElement$1('modal__text', modalContainer);
+      var modal = this.util.addElement('modal__text', modalContainer);
       return {
         animation: animation,
         progressBar: progressBar,
@@ -1058,7 +1079,7 @@
     }
 
     function layout() {
-      var main = addElement$1('main', d3.select(this.element)).datum(this); // controls positioned absolutely
+      var main = this.util.addElement('main', d3.select(this.element)).datum(this); // controls positioned absolutely
 
       var controls$1 = controls.call(this, main); // sidebar to the left
 
@@ -1616,7 +1637,7 @@
           break;
 
         case /controls/i.test(this.modalText):
-          emphasizeComponent.call(this, this.containers.controls.classed('fdg-hidden', this.settings.hideControls));
+          if (this.settings.hideControls === false) emphasizeComponent.call(this, this.containers.controls.classed('fdg-hidden', this.settings.hideControls));
           break;
       }
     }

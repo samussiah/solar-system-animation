@@ -38,10 +38,11 @@ export default function update() {
             );
             break;
         case /controls/i.test(this.modalText):
-            emphasizeComponent.call(
-                this,
-                this.containers.controls.classed('fdg-hidden', this.settings.hideControls)
-            );
+            if (this.settings.hideControls === false)
+                emphasizeComponent.call(
+                    this,
+                    this.containers.controls.classed('fdg-hidden', this.settings.hideControls)
+                );
             break;
         default:
             break;

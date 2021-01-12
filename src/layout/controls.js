@@ -1,10 +1,14 @@
-import addElement from './addElement';
+import addSequences from './controls/addSequences';
 
 export default function controls(main) {
-    const controls = addElement('controls', main).classed('fdg-hidden', true);
-    const hide = addElement('hide', controls, 'span');
+    const controls = this.util.addElement('controls', main)
+        .classed('fdg-hidden', this.settings.hideControls);
+    const hide = this.util.addElement('hide', controls, 'span');
+    const sequences = addSequences.call(this, controls);
 
     return {
         controls,
+        sequences,
+        hide
     };
 }

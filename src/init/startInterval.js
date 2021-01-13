@@ -14,14 +14,20 @@ export const increment = function (data, increment) {
         if (this.settings.loop === true)
             reset.call(this, data);
         // Run next sequence.
-        else if (this.sequence && this.settings.sequence_index < this.settings.sequences.length - 1) {
+        else if (
+            this.sequence &&
+            (this.settings.sequence_index < this.settings.sequences.length - 1 ||
+            this.sequence.event_index < this.sequence.events.length - 1)
+        ) {
             if (this.interval)
                 this.interval.stop();
-            this.settings.sequence_index++;
+            if (this.sequence.event_index === this.sequence.events.length - 1) {
+                this.settings.sequence_index++;
+                this.sequence = this.settings.sequences[this.settings.sequence_index];
+            } else
+                this.sequence.event_index++;
             setTimeout(
                 () => {
-                    // Stop the current animation
-                    this.sequence = this.settings.sequences[this.settings.sequence_index];
                     this.controls.sequences.inputs
                         .classed('current', d => d.label === this.sequence.label);
                     runSequence.call(this, this.sequence);
@@ -34,7 +40,7 @@ export const increment = function (data, increment) {
     // Resume the force simulation.
     restartForceSimulation.call(this, data);
 };
-// TODO: 1. figure out why sequences aren't playing consecutively
+
 // TODO: 2. once sequences are in an acceptable place, run events one at a time
 // TODO: 3. add sequence-level modals
 

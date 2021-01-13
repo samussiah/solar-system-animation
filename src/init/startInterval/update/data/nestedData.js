@@ -9,7 +9,7 @@ export default function nestedData(data) {
         // Update individual to next event.
         const currentState = getState.call(this, d.value.group);
 
-        if (d.value.state !== currentState) {
+        if (d.value.state !== currentState && !d.value.locked) {
             d.value.statePrevious = d.value.state;
             d.value.state = currentState;
         }

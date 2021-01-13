@@ -12,6 +12,7 @@ export default function nestData(data) {
             // individual-level values - calculated once
             const duration = d3.sum(group, (d) => d.duration);
             const noStateChange = group.length === 1;
+            const locked = false; // used to anchor individuals at a focus
 
             // state-level values - calculated once per timepoint
             const state = getState.call(this, group, 0);

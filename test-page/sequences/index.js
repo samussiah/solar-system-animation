@@ -12,6 +12,12 @@ fetch('../data/adverse-event-outcome.csv')
             {
                 eventLabel: 'Adverse Events',
                 timeRelative: 'since onset',
+                orbitLabels: [
+                    'Severity',
+                    'Treatment',
+                    'Outcome',
+                    'Efficacy Endpoint' ,
+                ],
                 sequences: [
                     {
                         label: 'Severity to Treatment',
@@ -65,9 +71,9 @@ fetch('../data/adverse-event-outcome.csv')
                 freqTable: {
                     display: false,
                 },
-                speed: 'medium',
+                speed: 'fast',
                 delay: false,
-                modalSpeed: 3000,
+                modalSpeed: 1000,
                 explanation: null,
                 runSequences: true,
                 eventCountType: 'cumulative-id',

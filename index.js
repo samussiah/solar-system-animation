@@ -848,7 +848,7 @@
         // Update individual to next event.
         var currentState = getState.call(_this, d.value.group);
 
-        if (d.value.state !== currentState) {
+        if (d.value.state !== currentState && !d.value.locked) {
           d.value.statePrevious = d.value.state;
           d.value.state = currentState;
         }
@@ -1188,6 +1188,12 @@
       }).entries(metadata.event.filter(function (event) {
         return event.key !== _this.settings.eventCentral;
       }));
+      nest.forEach(function (orbit, i) {
+        orbit.label = Array.isArray(_this.settings.orbitLabels) && _this.settings.orbitLabels.length === nest.length ? _this.settings.orbitLabels[i] : "Orbit ".concat(i + 1);
+        orbit.values.sort(function (a, b) {
+          return a.position - b.position;
+        });
+      });
       return nest;
     }
 
@@ -1456,7 +1462,8 @@
         var duration = d3.sum(group, function (d) {
           return d.duration;
         });
-        var noStateChange = group.length === 1; // state-level values - calculated once per timepoint
+        var noStateChange = group.length === 1;
+        // state-level values - calculated once per timepoint
 
         var state = getState.call(_this, group, 0);
         var aestheticValues = getAestheticValues.call(_this, group, state);
@@ -2714,13 +2721,15 @@
       if (this.settings.timepoint <= this.settings.duration) update$1.call(this, data); // Otherwise reset animation.
       else {
           if (this.settings.loop === true) reset.call(this, data); // Run next sequence.
-          else if (this.sequence && this.settings.sequence_index < this.settings.sequences.length - 1) {
+          else if (this.sequence && (this.settings.sequence_index < this.settings.sequences.length - 1 || this.sequence.event_index < this.sequence.events.length - 1)) {
               if (this.interval) this.interval.stop();
-              this.settings.sequence_index++;
-              setTimeout(function () {
-                // Stop the current animation
-                _this.sequence = _this.settings.sequences[_this.settings.sequence_index];
 
+              if (this.sequence.event_index === this.sequence.events.length - 1) {
+                this.settings.sequence_index++;
+                this.sequence = this.settings.sequences[this.settings.sequence_index];
+              } else this.sequence.event_index++;
+
+              setTimeout(function () {
                 _this.controls.sequences.inputs.classed('current', function (d) {
                   return d.label === _this.sequence.label;
                 });
@@ -2731,8 +2740,7 @@
         } // Resume the force simulation.
 
       restartForceSimulation.call(this, data);
-    }; // TODO: 1. figure out why sequences aren't playing consecutively
-    // TODO: 2. once sequences are in an acceptable place, run events one at a time
+    }; // TODO: 2. once sequences are in an acceptable place, run events one at a time
     // TODO: 3. add sequence-level modals
     // Default returns an interval that runs increment() every time unit.
 
@@ -2744,7 +2752,8 @@
     function runSequence(sequence, event) {
       var _this = this;
 
-      console.log(sequence);
+      console.log(sequence.label);
+      console.log(sequence.event_index);
       var start_orbit = this.metadata.orbit.find(function (orbit) {
         return +orbit.key === sequence.start_order;
       });
@@ -2753,46 +2762,53 @@
         return i === sequence.event_index;
       }); // Update progress text.
 
-      this.containers.sequence.classed('fdg-hidden', false).html(sequence.label);
+      this.settings.timepoint = 0;
+      if (this.sequence.event_index === 0) this.containers.sequence.classed('fdg-hidden', false);
+      this.containers.sequence.html("".concat(sequence.label, "<br><small>").concat(start_orbit.label, ": ").concat(sequence.event.key, "</small>"));
       this.containers.timepoint.html('0 days');
-      this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);
+      if (this.sequence.event_index === 0) this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);
       this.containers.timer.percentComplete.html('0%'); // Subset data to the specified set of states.
 
-      sequence.data = this.data.filter(function (d) {
+      if (this.sequence.event_index === 0) sequence.data = this.data.filter(function (d) {
         return sequence.start_order <= d.event_order && d.event_order <= sequence.end_order;
       }).map(function (d) {
         return _objectSpread2({}, d);
-      }); // Track maximum duration of states prior to the final state in the sequence.
+      });
 
-      var maxDuration = 0; // Re-calculate start and end timepoints from first state in sequence.
+      if (this.sequence.event_index === 0) {
+        // Track maximum duration of states prior to the final state in the sequence.
+        var maxDuration = 0; // Re-calculate start and end timepoints from first state in sequence.
 
-      d3.nest().key(function (d) {
-        return d.id;
-      }).rollup(function (group) {
-        var baseline = group[0]; // first state in sequence
-        // Track cumulative duration to send individuals to the final state in the sequence prematurely.
+        d3.nest().key(function (d) {
+          return d.id;
+        }).rollup(function (group) {
+          var baseline = group[0]; // first state in sequence
+          // Track cumulative duration to send individuals to the final state in the sequence prematurely.
 
-        var duration_cumulative = 0;
-        group.forEach(function (d, i) {
-          duration_cumulative += d.duration;
-          d.duration_cumulative = duration_cumulative; // Adjust start timepoint.
+          var duration_cumulative = 0;
+          group.forEach(function (d, i) {
+            duration_cumulative += d.duration;
+            d.duration_cumulative = duration_cumulative; // Adjust start timepoint.
 
-          if (d === baseline) d.start_timepoint = 1;else d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration ? d.start_timepoint - baseline.start_timepoint + 1 : sequence.duration; // Adjust end timepoint.
+            if (d === baseline) d.start_timepoint = 1;else d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration ? d.start_timepoint - baseline.start_timepoint + 1 : sequence.duration; // Adjust end timepoint.
 
-          d.end_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration ? d.start_timepoint + d.duration - 1 : d.start_timepoint;
-        }); // Track maximum duration of states prior to the final state in the sequence.
+            d.end_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration ? d.start_timepoint + d.duration - 1 : d.start_timepoint;
+          }); // Track maximum duration of states prior to the final state in the sequence.
 
-        maxDuration = Math.max(maxDuration, d3.sum(group.slice(0, group.length - 1), function (d) {
-          return d.duration;
-        }));
-        return group;
-      }).entries(sequence.data); // Update settings.
+          maxDuration = Math.max(maxDuration, d3.sum(group.slice(0, group.length - 1), function (d) {
+            return d.duration;
+          }));
+          return group;
+        }).entries(sequence.data); // Update settings.
 
-      this.settings.timepoint = 0;
-      this.settings.duration = sequence.duration || maxDuration + 1; // Re-define nested data with sequence subset.
+        this.settings.duration = sequence.duration || maxDuration + 1;
+      } // Re-define nested data with sequence subset.
 
-      sequence.data.nested = nestData.call(this, sequence.data);
-      sequence.data.nested.forEach(function (d) {}); // Re-define force simulation.
+
+      if (this.sequence.event_index === 0) sequence.data.nested = nestData.call(this, sequence.data);
+      sequence.data.nested.forEach(function (d) {
+        d.value.locked = d.value.state.event !== sequence.event.key;
+      }); // Re-define force simulation.
 
       if (this.forceSimulation) this.forceSimulation.stop();
       this.forceSimulation = addForceSimulation.call(this, sequence.data);

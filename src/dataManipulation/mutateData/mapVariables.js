@@ -7,7 +7,6 @@ export default function mapVariables() {
                 'start_timepoint',
                 'end_timepoint',
                 'duration',
-                'sequence',
             ].includes(variable)
                 ? +d[this.settings[setting]]
                 : d[this.settings[setting]];

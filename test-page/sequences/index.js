@@ -14,68 +14,33 @@ fetch('../data/adverse-event-outcome.csv')
                 timeRelative: 'since onset',
                 sequences: [
                     {
-                        // sequence start
-                        start_event: [
-                            'Mild',
-                            'Moderate',
-                            'Severe',
-                        ], // or
-                        start_order: 1, // or
-
-                        // sequence end
-                        end_event: [
-                            'Standard of Care',
-                            'Rescues Meds',
-                        ], // or
+                        label: 'Severity to Treatment',
+                        timeRelative: 'since onset',
+                        start_order: 1,
                         end_order: 2,
-
-                        duration: 28,
+                        //duration: 28,
                         information: [
                             'Event onset by severity',
                             'Event treatment',
                         ],
                     },
                     {
-                        // sequence start
-                        start_event: [
-                            'Standard of Care',
-                            'Rescue Meds',
-                        ], // or
-                        start_order: 2, // or
-
-                        // sequence end
-                        end_event: [
-                            'Resolved',
-                            'Resolved w/ Sequelae',
-                            'Not Resolved',
-                        ], // or
+                        label: 'Treatment to Outcome',
+                        timeRelative: 'since beginning of treatment',
+                        start_order: 2, 
                         end_order: 3,
-
-                        duration: 28,
+                        //duration: 28,
                         information: [
                             'Event treatment',
                             'Event outcome',
                         ],
                     },
                     {
-                        // sequence start
-                        start_event: [
-                            'Resolved',
-                            'Resolved w/ Sequelae',
-                            'Not Resolved',
-                        ], // or
-                        start_order: 3, // or
-
-                        // sequence end
-                        end_event: [
-                            'Major Gain',
-                            'Minor Gain',
-                            'Minor Loss',
-                            'Major Loss',
-                        ], // or
+                        label: 'Outcome to Efficacy Endpoint',
+                        timeRelative: 'since outcome',
+                        start_order: 3, 
                         end_order: 4,
-
-                        duration: 28,
+                        //duration: 28,
                         information: [
                             'Event outcome',
                             'Efficacy endpoint',
@@ -98,10 +63,14 @@ fetch('../data/adverse-event-outcome.csv')
                     label: 'Treatment',
                 },
                 freqTable: {
+                    display: false,
                 },
-                speed: 'slow',
+                speed: 'medium',
                 delay: false,
-                modalSpeed: 5000,
+                modalSpeed: 3000,
+                explanation: null,
+                runSequences: true,
+                eventCountType: 'cumulative-id',
             }
         );
     });

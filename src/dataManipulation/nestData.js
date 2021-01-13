@@ -4,7 +4,7 @@ import getCoordinates from './nestData/getCoordinates';
 import getColorScale from './nestData/getColorScale';
 import getAesthetics from './nestData/getAesthetics';
 
-export default function nestData() {
+export default function nestData(data) {
     const nestedData = d3
         .nest()
         .key((d) => d.id)
@@ -37,7 +37,7 @@ export default function nestData() {
                 ...aesthetics, // string, number, string: color, size, shape
             };
         })
-        .entries(this.data);
+        .entries(data);
 
     return nestedData;
 }

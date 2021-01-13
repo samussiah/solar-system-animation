@@ -12,7 +12,7 @@ export default function reset() {
         .html('&#x21ba;');
 
     inputs.on('click', () => {
-        resetAnimation.call(this);
+        resetAnimation.call(this, this.data);
         if (this.settings.playPause !== 'play') toggle.call(this);
     });
 

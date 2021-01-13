@@ -14,7 +14,6 @@ const settings = {
     start_timepoint_var: 'stdy',
     end_timepoint_var: 'endy',
     duration_var: 'duration',
-    sequence_var: 'seq', // one-indexed for some reason - not required - TODO: remove
 
     /**-------------------------------------------------------------------------------------------\
       aesthetics
@@ -143,6 +142,8 @@ const settings = {
     focusOffset: 'heuristic', // ['heuristic', 'vertical']
     displayProgressBar: false,
     stratificationPositioning: 'circular', // ['circular', 'orbital']
+    sequences: null,
+    runSequences: false,
 };
 
 export default settings;

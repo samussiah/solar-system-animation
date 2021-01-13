@@ -34,8 +34,8 @@ state2 <- state1 %>%
         event_order = 2,
         event = sample(c('Not Treated', 'Standard of Care', 'Rescue Meds'), n, T),
         event_position = case_when(
-            event == 'Standard of Care' ~ -15,
-            event == 'Not Treated' ~ 0,
+            event == 'Not Treated' ~ -15,
+            event == 'Standard of Care' ~ 0,
             event == 'Rescue Meds' ~ 15,
             TRUE ~ NaN
         ),

@@ -55,7 +55,7 @@ state3 <- state2 %>%
             TRUE ~ NaN
         ),
         stdy = endy,
-        endy = stdy + 13
+        endy = stdy + sample(0:13, n, T)
     )
 
 state4 <- state3 %>%
@@ -70,12 +70,12 @@ state4 <- state3 %>%
             TRUE ~ NaN
         ),
         stdy = endy,
-        endy = stdy + 13
+        endy = stdy
     )
 
 states <- state0 %>%
     bind_rows(state1) %>%
-    bind_rows(state2 %>% filter(event != 'Not Treated')) %>%
+    bind_rows(state2) %>% #filter(event != 'Not Treated')) %>%
     bind_rows(state3) %>%
     bind_rows(state4) %>%
     arrange(id, event_order) %>%

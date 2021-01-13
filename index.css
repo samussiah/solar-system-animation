@@ -350,6 +350,8 @@ body {
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                transition: width 1s;
+                float: right;
             }
             .fdg-button:not(:last-child) {
             }
@@ -360,6 +362,9 @@ body {
             }
             .fdg-button.clicked {
                 background: var(--background-lighter);
+            }
+            .fdg-button--sequence:hover {
+                width: max-content;
             }
             .fdg-button input {
                 text-align: right;

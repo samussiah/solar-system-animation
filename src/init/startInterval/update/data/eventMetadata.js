@@ -7,10 +7,10 @@ import formatValues from '../../../../defineMetadata/freqTable/formatValues';
 import defineCellValues from '../../../../defineMetadata/freqTable/defineCellValues';
 
 // Update states and strata at each timepoint.
-export default function eventMetadata() {
+export default function eventMetadata(data) {
     this.metadata.event.forEach((event) => {
         // Subset data on individuals in the given state.
-        event.data = filterData(this.data.nested, ['value', 'state', 'event'], event.key);
+        event.data = filterData(data.nested, ['value', 'state', 'event'], event.key);
 
         // Update current set of individuals.
         event.ids = updateIdSet(event.data, event.ids);
@@ -21,7 +21,7 @@ export default function eventMetadata() {
         event.nIdsCumulative = event.idsCumulative.size;
 
         // Update cumulative number of events.
-        event.nEvents = countCumulative(this.data, this.settings.timepoint, event.key);
+        event.nEvents = countCumulative(data, this.settings.timepoint, event.key);
 
         // Calculate numerators, denominators, and proportions.
         event.freqs = getFreqs.call(this, event, event, this.metadata);
@@ -44,7 +44,7 @@ export default function eventMetadata() {
                 focus.nIdsCumulative = focus.idsCumulative.size;
 
                 // Update cumulative number of events.
-                focus.nEvents = countCumulative(this.data, this.settings.timepoint, event.key, {
+                focus.nEvents = countCumulative(data, this.settings.timepoint, event.key, {
                     key: this.settings.colorBy.variable,
                     value: focus.key,
                 });

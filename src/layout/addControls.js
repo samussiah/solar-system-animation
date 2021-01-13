@@ -1,21 +1,23 @@
-import speed from './addControls/speed';
-import playPause from './addControls/playPause';
-import step from './addControls/step';
-import timepoint from './addControls/timepoint';
-import reset from './addControls/reset';
-import eventList from './addControls/eventList';
+import addSequences from './addControls/sequences';
+import addSpeed from './addControls/speed';
+import addPlayPause from './addControls/playPause';
+import addStep from './addControls/step';
+import addTimepoint from './addControls/timepoint';
+import addReset from './addControls/reset';
+import addEventList from './addControls/eventList';
 
 export default function addControls() {
     this.controls = {
         container: this.containers.controls,
     };
 
-    this.controls.speed = speed.call(this);
-    this.controls.playPause = playPause.call(this);
-    this.controls.step = step.call(this);
-    this.controls.timepoint = timepoint.call(this);
-    this.controls.reset = reset.call(this);
-    this.controls.eventList = eventList.call(this);
+    this.controls.sequences = addSequences.call(this);
+    this.controls.speed = addSpeed.call(this);
+    this.controls.playPause = addPlayPause.call(this);
+    this.controls.step = addStep.call(this);
+    this.controls.timepoint = addTimepoint.call(this);
+    this.controls.reset = addReset.call(this);
+    this.controls.eventList = addEventList.call(this);
 
     this.controls.container
         .selectAll('.fdg-button')

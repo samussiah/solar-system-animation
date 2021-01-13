@@ -6,7 +6,7 @@ import getColorScale from '../../../dataManipulation/nestData/getColorScale';
 import getAesthetics from '../../../dataManipulation/nestData/getAesthetics';
 
 // TODO: reset data as in nestData and update/data
-export default function resetAnimation() {
+export default function resetAnimation(data) {
     this.settings.timepoint = 0;
     this.settings.progress = 0;
     this.settings.modalIndex = 0;
@@ -19,7 +19,7 @@ export default function resetAnimation() {
         event.cumulative = 0;
     });
 
-    this.data.nested.forEach((d) => {
+    data.nested.forEach((d) => {
         d.value.statePrevious = null;
         d.value.state = getState.call(this, d.value.group);
 

@@ -1,7 +1,7 @@
 import updateNestedData from './data/nestedData';
 import updateEventMetadata from './data/eventMetadata';
 
-export default function data() {
+export default function data(data) {
     // Count the number of individuals at each focus at previous timepoint.
     this.metadata.event.forEach((event) => {
         event.prevCount = event.count;
@@ -12,6 +12,6 @@ export default function data() {
             });
     });
 
-    updateNestedData.call(this);
-    updateEventMetadata.call(this);
+    updateNestedData.call(this, data);
+    updateEventMetadata.call(this, data);
 }

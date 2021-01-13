@@ -81,7 +81,7 @@ export default function eventList() {
                 .selectAll('span.fdg-measure')
                 .text(fdg.util.csv(fdg.settings.eventChangeCount));
 
-            redraw.call(fdg, false);
+            redraw.call(fdg, fdg.data, false);
         });
     }
 

@@ -35,7 +35,7 @@ export default function timepoint() {
         if (fdg.settings.playPause !== 'pause') toggle.call(fdg);
         fdg.settings.timepoint = +this.value - 1;
 
-        increment.call(fdg, true);
+        increment.call(fdg, fdg.sequence ? fdg.sequence.data : fdg.data, true);
     });
 
     return {

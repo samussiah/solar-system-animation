@@ -2,11 +2,18 @@ import { forceManyBodyReuse } from 'd3-force-reuse';
 import { forceManyBodySampled } from 'd3-force-sampled';
 import tick from './addForceSimulation/tick';
 
-export default function addForceSimulation() {
-    this.forceSimulation = d3
+// When using D3’s force layout with a disjoint graph, you typically want the positioning
+// forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
+// positioning forces, unlike the centering force, prevent detached subgraphs from escaping
+// the viewport.
+//
+// https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
+
+export default function addForceSimulation(data) {
+    const forceSimulation = d3
         .forceSimulation()
         .nodes(
-            this.data.nested.filter(
+            data.nested.filter(
                 (d) => !(this.settings.drawStaticSeparately && d.value.noStateChange)
             )
         )
@@ -41,12 +48,7 @@ export default function addForceSimulation() {
             'collide',
             d3.forceCollide().radius((d) => d.value.size + this.settings.collisionPadding)
         )
-        .on('tick', tick.bind(this));
+        .on('tick', tick.bind(this, data));
 
-    // When using D3’s force layout with a disjoint graph, you typically want the positioning
-    // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
-    // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
-    // the viewport.
-    //
-    // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
+    return forceSimulation;
 }

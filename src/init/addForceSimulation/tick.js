@@ -5,11 +5,11 @@ import drawDiamond from './tick/diamond';
 import drawStar from './tick/star';
 import drawTriangleDown from './tick/triangleDown';
 
-export default function tick() {
+export default function tick(data) {
     this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
     this.containers.canvas.context.save();
 
-    this.data.nested
+    data.nested
         .sort((a, b) => a.value.stateChanges - b.value.stateChanges) // draw bubbles with more state changes last
         .forEach((d, i) => {
             this.containers.canvas.context.beginPath();

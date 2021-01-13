@@ -4,10 +4,10 @@ import startInterval from '../../init/startInterval';
 import resetAnimation from '../../init/startInterval/reset/animation';
 import toggle from '../addControls/playPause/toggle';
 
-export default function addSequences(controls) {
+export default function sequences(controls) {
     if (!!this.settings.sequences) {
         const main = this;
-        const container = this.util.addElement('sequences', controls)
+        const container = this.util.addElement('sequences', this.containers.controls)
             .classed('fdg-control fdg-control--sequences', true);
 
         const inputs = container
@@ -20,7 +20,7 @@ export default function addSequences(controls) {
             .classed('fdg-button fdg-button--sequence', true)
             .attr(
                 'title',
-                (d) => `View the sequence from ${d.start_state} to ${d.end_state}.`
+                (d) => `View ${d !== this ? `sequence ${d.label}` : 'full animation'}.`
             )
             .text((d,i) => d.label ? d.label : d === this ? 'Full Animation' : `Sequence ${i + 1}`);
 

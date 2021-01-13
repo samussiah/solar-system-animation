@@ -30,7 +30,7 @@ export default function speed() {
         inputs.classed('current', (di) => di.label === d.label);
         if (fdg.settings.playPause === 'play') {
             fdg.interval.stop();
-            fdg.interval = startInterval.call(fdg);
+            fdg.interval = startInterval.call(fdg, fdg.data);
         }
     });
 

@@ -31,15 +31,15 @@ export default function addVariables(has) {
             });
 
             // Define sequence
-            if (!has.sequence) {
-                group
-                    .sort((a, b) => a.start_timepoint - b.start_timepoint)
-                    .forEach((d, i) => {
-                        d.seq = i;
-                    });
-            } else {
-                group.sort((a, b) => a.seq - b.seq);
-            }
+            //if (!has.sequence) {
+            //    group
+            //        .sort((a, b) => a.start_timepoint - b.start_timepoint)
+            //        .forEach((d, i) => {
+            //            d.seq = i;
+            //        });
+            //} else {
+            //    group.sort((a, b) => a.seq - b.seq);
+            //}
         })
         .entries(this.data);
 }

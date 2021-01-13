@@ -4,8 +4,8 @@ import getCoordinates from '../../../../dataManipulation/nestData/getCoordinates
 import getColorScale from '../../../../dataManipulation/nestData/getColorScale';
 import getAesthetics from '../../../../dataManipulation/nestData/getAesthetics';
 
-export default function nestedData() {
-    this.data.nested.forEach((d) => {
+export default function nestedData(data) {
+    data.nested.forEach((d) => {
         // Update individual to next event.
         const currentState = getState.call(this, d.value.group);
 

@@ -76,4 +76,13 @@ export default function update() {
     if (Array.isArray(this.settings.information)) texts = texts.concat(this.settings.information);
 
     this.settings.text = texts.filter((text) => typeof text === 'string');
+
+    // sequences
+    if (this.settings.sequences) {
+        this.settings.loop = false;
+        this.settings.runSequences = true;
+        this.settings.sequences.forEach(sequence => {
+            sequence.event_index = 0;
+        });
+    }
 }

@@ -51,17 +51,17 @@ export default function runSequence(sequence, event) {
                     d.duration_cumulative = duration_cumulative;
 
                     // Adjust start timepoint.
-                    if (d === baseline)
+                    //if (d === baseline)
                         d.start_timepoint = 1;
-                    else
-                        d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
-                            ? d.start_timepoint - baseline.start_timepoint + 1
-                            : sequence.duration;
+                    //else
+                    //    d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
+                    //        ? d.start_timepoint - baseline.start_timepoint + 1
+                    //        : ;
 
                     // Adjust end timepoint.
                     d.end_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
                         ? d.start_timepoint + d.duration - 1
-                        : d.start_timepoint;
+                        : sequence.duration;
                 }); 
 
                 // Track maximum duration of states prior to the final state in the sequence.

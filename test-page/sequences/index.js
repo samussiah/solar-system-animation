@@ -24,7 +24,7 @@ fetch('../data/adverse-event-outcome.csv')
                         timeRelative: 'since onset',
                         start_order: 1,
                         end_order: 2,
-                        //duration: 28,
+                        duration: 10,
                         information: [
                             'Event onset by severity',
                             'Event treatment',

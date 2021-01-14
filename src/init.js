@@ -15,6 +15,7 @@ export default function init() {
 
     // Add a dynamic force layout in the middleground.
     this.forceSimulation = addForceSimulation.call(this, this.data);
+    this.nodes = this.forceSimulation.nodes();
 
     // Start the timer.
     if (this.settings.playPause === 'play') {

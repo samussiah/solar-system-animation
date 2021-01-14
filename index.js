@@ -2805,13 +2805,26 @@
       } // Re-define nested data with sequence subset.
 
 
-      if (this.sequence.event_index === 0) sequence.data.nested = nestData.call(this, sequence.data);
+      if (this.sequence.event_index === 0) {
+        sequence.data.nested = nestData.call(this, sequence.data);
+        sequence.data.nested.forEach(function (d) {
+          var node = _this.nodes.find(function (node) {
+            return node.key === d.key;
+          });
+
+          for (var prop in node) {
+            if (['key', 'value'].includes(prop) === false) d[prop] = node[prop];
+          }
+        });
+      }
+
       sequence.data.nested.forEach(function (d) {
         d.value.locked = d.value.state.event !== sequence.event.key;
       }); // Re-define force simulation.
 
       if (this.forceSimulation) this.forceSimulation.stop();
       this.forceSimulation = addForceSimulation.call(this, sequence.data);
+      this.nodes = this.forceSimulation.nodes();
       this.forceSimulation.force('center', null); //this.forceSimulation
       //    .nodes(sequence.data.nested)
       //    .on('tick', tick.bind(this, sequence.data));
@@ -3756,7 +3769,8 @@
 
       addStaticForceSimulation.call(this); // Add a dynamic force layout in the middleground.
 
-      this.forceSimulation = addForceSimulation.call(this, this.data); // Start the timer.
+      this.forceSimulation = addForceSimulation.call(this, this.data);
+      this.nodes = this.forceSimulation.nodes(); // Start the timer.
 
       if (this.settings.playPause === 'play') {
         if (this.settings.runSequences === false) setTimeout(function () {

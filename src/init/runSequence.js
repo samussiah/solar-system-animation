@@ -51,17 +51,17 @@ export default function runSequence(sequence, event) {
                     d.duration_cumulative = duration_cumulative;
 
                     // Adjust start timepoint.
-                    //if (d === baseline)
+                    if (d === baseline)
                         d.start_timepoint = 1;
-                    //else
-                    //    d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
-                    //        ? d.start_timepoint - baseline.start_timepoint + 1
-                    //        : ;
+                    else
+                        d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
+                            ? d.start_timepoint - baseline.start_timepoint + 1
+                            : sequence.duration;
 
                     // Adjust end timepoint.
                     d.end_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
                         ? d.start_timepoint + d.duration - 1
-                        : sequence.duration;
+                        : d.start_timepoint;
                 }); 
 
                 // Track maximum duration of states prior to the final state in the sequence.
@@ -76,8 +76,15 @@ export default function runSequence(sequence, event) {
     }
 
     // Re-define nested data with sequence subset.
-    if (this.sequence.event_index === 0)
-        sequence.data.nested = nestData.call(this, sequence.data);
+    if (this.sequence.event_index === 0) {
+        sequence.data.nested = nestData.call(this, sequence.data)
+        sequence.data.nested.forEach(d => {
+            const node = this.nodes.find(node => node.key === d.key);
+            for (const prop in node)
+                if (['key', 'value'].includes(prop) === false)
+                    d[prop] = node[prop];
+        });
+    }
 
     sequence.data.nested.forEach(d => {
         d.value.locked = d.value.state.event !== sequence.event.key;
@@ -87,6 +94,7 @@ export default function runSequence(sequence, event) {
     if (this.forceSimulation)
         this.forceSimulation.stop();
     this.forceSimulation = addForceSimulation.call(this, sequence.data);
+    this.nodes = this.forceSimulation.nodes();
     this.forceSimulation.force('center', null);
     //this.forceSimulation
     //    .nodes(sequence.data.nested)

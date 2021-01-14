@@ -80,10 +80,13 @@ export default function runSequence(sequence, event) {
         d.value.locked = d.value.state.event !== sequence.event.key;
     });
 
-    this.settings.duration = sequence.duration || d3.max(
+    const duration = d3.max(
         sequence.data.nested.filter(d => d.value.locked === false),
         d => d.value.state.duration
     ) + 1;
+    this.settings.duration = sequence.duration
+        ? Math.min(sequence.duration, duration)
+        : duration;
 
     // Re-define force simulation.
     if (this.forceSimulation)

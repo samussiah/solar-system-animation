@@ -25,7 +25,12 @@ state1 <- state0 %>%
             TRUE ~ NaN
         ),
         stdy = endy,
-        endy = stdy + sample(0:6, n, T),
+        endy = case_when(
+            event == 'Mild' ~ stdy + sample(0:6, n, T),
+            event == 'Moderate' ~ stdy + sample(0:13, n, T),
+            event == 'Severe' ~ stdy + sample(0:21, n, T),
+            TRUE ~ stdy
+        ),
         color = event
     )
 

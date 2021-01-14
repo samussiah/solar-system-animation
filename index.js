@@ -2752,8 +2752,6 @@
     function runSequence(sequence, event) {
       var _this = this;
 
-      console.log(sequence.label);
-      console.log(sequence.event_index);
       var start_orbit = this.metadata.orbit.find(function (orbit) {
         return +orbit.key === sequence.start_order;
       });
@@ -2776,9 +2774,7 @@
       });
 
       if (this.sequence.event_index === 0) {
-        // Track maximum duration of states prior to the final state in the sequence.
-        var maxDuration = 0; // Re-calculate start and end timepoints from first state in sequence.
-
+        // Re-calculate start and end timepoints from first state in sequence.
         d3.nest().key(function (d) {
           return d.id;
         }).rollup(function (group) {
@@ -2793,15 +2789,9 @@
             if (d === baseline) d.start_timepoint = 1;else d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration ? d.start_timepoint - baseline.start_timepoint + 1 : sequence.duration; // Adjust end timepoint.
 
             d.end_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration ? d.start_timepoint + d.duration - 1 : d.start_timepoint;
-          }); // Track maximum duration of states prior to the final state in the sequence.
-
-          maxDuration = Math.max(maxDuration, d3.sum(group.slice(0, group.length - 1), function (d) {
-            return d.duration;
-          }));
+          });
           return group;
-        }).entries(sequence.data); // Update settings.
-
-        this.settings.duration = sequence.duration || maxDuration + 1;
+        }).entries(sequence.data);
       } // Re-define nested data with sequence subset.
 
 
@@ -2816,11 +2806,17 @@
             if (['key', 'value'].includes(prop) === false) d[prop] = node[prop];
           }
         });
-      }
+      } // Lock nodes in place while another event sequence runs.
+
 
       sequence.data.nested.forEach(function (d) {
         d.value.locked = d.value.state.event !== sequence.event.key;
-      }); // Re-define force simulation.
+      });
+      this.settings.duration = sequence.duration || d3.max(sequence.data.nested.filter(function (d) {
+        return d.value.locked === false;
+      }), function (d) {
+        return d.value.state.duration;
+      }) + 1; // Re-define force simulation.
 
       if (this.forceSimulation) this.forceSimulation.stop();
       this.forceSimulation = addForceSimulation.call(this, sequence.data);

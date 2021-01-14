@@ -5,7 +5,6 @@ fetch('../data/adverse-event-outcome.csv')
         data.forEach(d => {
         });
 
-        // TODO: figure out why bubbles ares moving from the fourth ring to the third ring
         const fdg = forceDirectedGraph(
             data,
             '#container',
@@ -71,9 +70,9 @@ fetch('../data/adverse-event-outcome.csv')
                 freqTable: {
                     display: false,
                 },
-                speed: 'medium',
+                speed: 'fast',
                 delay: true,
-                modalSpeed: 5000,
+                modalSpeed: 1000,
                 explanation: null,
                 runSequences: true,
                 eventCountType: 'cumulative-id',

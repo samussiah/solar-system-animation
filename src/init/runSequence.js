@@ -6,8 +6,6 @@ import startInterval from './startInterval';
 
 // TODO: separate mid-sequence updates from new sequence updates
 export default function runSequence(sequence, event) {
-    console.log(sequence.label);
-    console.log(sequence.event_index);
     const start_orbit = this.metadata.orbit
         .find(orbit => +orbit.key === sequence.start_order);
     sequence.events = start_orbit.values;
@@ -34,9 +32,6 @@ export default function runSequence(sequence, event) {
             .map(d => ({...d}));
 
     if (this.sequence.event_index === 0) {
-        // Track maximum duration of states prior to the final state in the sequence.
-        let maxDuration = 0;
-
         // Re-calculate start and end timepoints from first state in sequence.
         d3.nest()
             .key(d => d.id)
@@ -64,15 +59,9 @@ export default function runSequence(sequence, event) {
                         : d.start_timepoint;
                 }); 
 
-                // Track maximum duration of states prior to the final state in the sequence.
-                maxDuration = Math.max(maxDuration, d3.sum(group.slice(0, group.length - 1), d => d.duration));
-
                 return group;
             })
             .entries(sequence.data);
-
-        // Update settings.
-        this.settings.duration = sequence.duration || maxDuration + 1;
     }
 
     // Re-define nested data with sequence subset.
@@ -86,9 +75,15 @@ export default function runSequence(sequence, event) {
         });
     }
 
+    // Lock nodes in place while another event sequence runs.
     sequence.data.nested.forEach(d => {
         d.value.locked = d.value.state.event !== sequence.event.key;
     });
+
+    this.settings.duration = sequence.duration || d3.max(
+        sequence.data.nested.filter(d => d.value.locked === false),
+        d => d.value.state.duration
+    ) + 1;
 
     // Re-define force simulation.
     if (this.forceSimulation)

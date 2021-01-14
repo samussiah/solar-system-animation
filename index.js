@@ -1206,7 +1206,11 @@
         nest = d3.nest().key(function (d) {
           return d[_this.settings.colorBy.variable];
         }).entries(this.data).sort(function (a, b) {
-          return a.key < b.key ? -1 : 1;
+          var aOrder = Array.isArray(_this.settings.colorBy.order) ? _this.settings.colorBy.order.indexOf(a.key) : null;
+          var bOrder = Array.isArray(_this.settings.colorBy.order) ? _this.settings.colorBy.order.indexOf(b.key) : null;
+          var orderSort = aOrder - bOrder;
+          var alphaSort = a.key < b.key ? -1 : 1;
+          return orderSort ? orderSort : alphaSort;
         });
         this.settings.colorBy.nStrata = nest.length;
         this.settings.colorBy.theta = 2 * Math.PI / this.settings.colorBy.nStrata;
@@ -1247,7 +1251,11 @@
         nest = d3.nest().key(function (d) {
           return d[_this.settings.shapeBy.variable];
         }).entries(this.data).sort(function (a, b) {
-          return a.key < b.key ? -1 : 1;
+          var aOrder = Array.isArray(_this.settings.shapeBy.order) ? _this.settings.shapeBy.order.indexOf(a.key) : null;
+          var bOrder = Array.isArray(_this.settings.shapeBy.order) ? _this.settings.shapeBy.order.indexOf(b.key) : null;
+          var orderSort = aOrder - bOrder;
+          var alphaSort = a.key < b.key ? -1 : 1;
+          return orderSort ? orderSort : alphaSort;
         });
       }
 
@@ -2482,6 +2490,30 @@
       return forceSimulation;
     }
 
+    function orbits() {
+      var main = this; //if (this.settings.pulseOrbits) {
+
+      this.orbits.each(function (d) {
+        d.rAdjPrev = d.rAdj;
+        var distances = d3.merge(d.values.map(function (di) {
+          return di.data;
+        })).map(function (d) {
+          return d.value.distance;
+        });
+        var rAdj = distances.length ? Math.max(d3.median(distances), d.r) : d.r;
+        var diff = rAdj - d.rAdjPrev;
+        d.rAdj = d.rAdjPrev + Math.min(diff / 10, main.settings.orbitRadius / 100); //d.change = d3.sum(d.values, (di) => di.change);
+        //if (d.change > 0) {
+
+        d3.select(this).transition().duration(main.settings.speeds[main.settings.speed]).attr('r', d.rAdj); //.duration(main.settings.speeds[main.settings.speed] / 2)
+        //.attr('stroke-width', 0.5 * d.change)
+        //.transition()
+        //.duration(main.settings.speeds[main.settings.speed] / 2)
+        //.attr('stroke-width', 0.5);
+        //}
+      }); //}
+    }
+
     function progress() {
       // Update timepoint.
       this.containers.timepoint.text("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit)); // Update timer.
@@ -2498,13 +2530,26 @@
       }), " ").concat(this.settings.timepoint));
     }
 
-    // TODO: make color legend reactive
-    function legends() {
+    function legends(data) {
+      // color legend
+      var colorCounts = d3.nest().key(function (d) {
+        return d.value.colorValue;
+      }).rollup(function (group) {
+        return group.length;
+      }).entries(data.nested);
+      this.containers.legends.selectAll('.fdg-legend--color').selectAll('text').text(function (d) {
+        var colorCount = colorCounts.find(function (di) {
+          return di.key === d;
+        });
+        var value = colorCount ? colorCount.value : 0;
+        return "".concat(d, " (n=").concat(d3.format(',d')(value), ")");
+      }); // shape legend
+
       var shapeCounts = d3.nest().key(function (d) {
         return d.value.shapeValue;
       }).rollup(function (group) {
         return group.length;
-      }).entries(this.data.nested);
+      }).entries(data.nested);
       this.containers.legends.selectAll('.fdg-legend--shape').selectAll('text').text(function (d) {
         var shapeCount = shapeCounts.find(function (di) {
           return di.key === d;
@@ -2546,10 +2591,10 @@
       });
     }
 
-    function text() {
+    function text(data) {
       this.settings.progress = this.settings.timepoint / this.settings.duration;
       progress.call(this);
-      legends.call(this);
+      legends.call(this, data);
       counts.call(this);
       freqTable$1.call(this);
     }
@@ -2559,10 +2604,10 @@
       data.call(this, data$1); // Gradually transition the radius of the orbits to match the median position of the nodes
       // along each orbit.  As the nodes at each focus influence the position of nodes at other foci,
       // nodes gradually congregate off their orbit.
-      //updateOrbits.call(this);
-      // Update timer, focus labels, and annotations.
 
-      text.call(this);
+      orbits.call(this); // Update timer, focus labels, and annotations.
+
+      text.call(this, data$1);
     }
 
     function countdown() {
@@ -2740,8 +2785,7 @@
         } // Resume the force simulation.
 
       restartForceSimulation.call(this, data);
-    }; // TODO: 2. once sequences are in an acceptable place, run events one at a time
-    // TODO: 3. add sequence-level modals
+    }; // TODO: 3. add sequence-level modals
     // Default returns an interval that runs increment() every time unit.
 
     function startInterval(data) {
@@ -2762,7 +2806,10 @@
 
       this.settings.timepoint = 0;
       if (this.sequence.event_index === 0) this.containers.sequence.classed('fdg-hidden', false);
-      this.containers.sequence.html("".concat(sequence.label, "<br><small>").concat(start_orbit.label, ": ").concat(sequence.event.key, "</small>"));
+      this.containers.sequence.style('outline', 'thick groove rgba(215,25,28,0)').transition().duration(this.settings.modalSpeed / 10).style('outline', 'thick groove rgba(215,25,28,.5)').transition().duration(this.settings.modalSpeed / 10).style('outline', 'thick groove rgba(215,25,28,0)').on('end', function () {
+        return _this.containers.sequence.style('outline', null);
+      });
+      this.containers.sequence.html("Sequence: ".concat(sequence.label, "<br><small>").concat(start_orbit.label, ": ").concat(sequence.event.key, "</small>"));
       this.containers.timepoint.html('0 days');
       if (this.sequence.event_index === 0) this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);
       this.containers.timer.percentComplete.html('0%'); // Subset data to the specified set of states.
@@ -2812,11 +2859,12 @@
       sequence.data.nested.forEach(function (d) {
         d.value.locked = d.value.state.event !== sequence.event.key;
       });
-      this.settings.duration = sequence.duration || d3.max(sequence.data.nested.filter(function (d) {
+      var duration = d3.max(sequence.data.nested.filter(function (d) {
         return d.value.locked === false;
       }), function (d) {
         return d.value.state.duration;
-      }) + 1; // Re-define force simulation.
+      }) + 1;
+      this.settings.duration = sequence.duration ? Math.min(sequence.duration, duration) : duration; // Re-define force simulation.
 
       if (this.forceSimulation) this.forceSimulation.stop();
       this.forceSimulation = addForceSimulation.call(this, sequence.data);
@@ -2879,6 +2927,11 @@
           });
 
           if (d !== main) {
+            if (main.interval) main.interval.stop();
+            main.settings.sequence_index = main.settings.sequences.map(function (di) {
+              return di.label;
+            }).indexOf(d.label);
+            d.event_index = 0;
             runSequence.call(main, d);
           } else {
             delete main.sequence; // Update settings.
@@ -3154,7 +3207,7 @@
     function makeLegend(type) {
       var legendDimensions = [200, 50]; // container
 
-      var container = this.legends.container.append('div').classed("fdg-legend fdg-legend--".concat(type), true); // label
+      var container = this.legends.container.append('div'); // label
 
       var label = container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html("Number of <span class = \"fdg-measure\">".concat(this.util.csv(this.settings.eventChangeCount), "</span> events")); // svg
 
@@ -3177,7 +3230,7 @@
     function categorical() {
       var _this = this;
 
-      var container = this.legends.container.append('div').classed('fdg-legend fdg-legend--categorical', true);
+      var container = this.legends.container.append('div');
       container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html(this.settings.colorBy.label);
       var legendItems = container.append('svg').attr('width', 200).attr('height', 20 * this.scales.color.domain().length).selectAll('g').data(this.scales.color.domain()).join('g').attr('transform', 'translate(20,0)');
       legendItems.append('circle').classed('fdg-legend__symbol', true).attr('cx', 20).attr('cy', function (d, i) {
@@ -3307,7 +3360,7 @@
     }
 
     function continuous$1() {
-      var container = this.legends.container.append('div').classed('fdg-legend fdg-legend--continuous', true);
+      var container = this.legends.container.append('div');
       container.node().appendChild(continuous({
         color: this.scales.color,
         title: this.settings.colorBy.label,
@@ -3338,6 +3391,8 @@
           default:
             return;
         }
+
+        container.classed("fdg-legend fdg-legend--color fdg-legend--".concat(this.settings.colorBy.type), true);
       }
 
       return container;
@@ -3347,7 +3402,7 @@
       var container;
 
       if (this.settings.sizify && this.settings.colorBy.type !== 'frequency') {
-        container = makeLegend.call(this, 'size');
+        container = makeLegend.call(this, 'size').classed("fdg-legend fdg-legend--size fdg-legend--".concat(this.settings.sizeBy.type), true);
       }
 
       return container;
@@ -3434,7 +3489,7 @@
           star: star$1,
           triangleDown: triangleDown
         };
-        container = this.legends.container.append('div').classed('fdg-legend fdg-legend--shape', true);
+        container = this.legends.container.append('div').classed("fdg-legend fdg-legend--shape fdg-legend--".concat(this.settings.shapeBy.type), true);
         container.append('div').classed('fdg-sidebar__label fdg-legend__label', true).html(this.settings.shapeBy.label);
         var legendItems = container.append('svg').attr('width', 200).attr('height', 20 * this.scales.shape.domain().length).selectAll('g').data(this.scales.shape.domain()).join('g').attr('transform', 'translate(20,0)');
         var radius = 7;
@@ -3766,7 +3821,8 @@
       addStaticForceSimulation.call(this); // Add a dynamic force layout in the middleground.
 
       this.forceSimulation = addForceSimulation.call(this, this.data);
-      this.nodes = this.forceSimulation.nodes(); // Start the timer.
+      this.nodes = this.forceSimulation.nodes();
+      increment.call(this, this.data, false); // Start the timer.
 
       if (this.settings.playPause === 'play') {
         if (this.settings.runSequences === false) setTimeout(function () {

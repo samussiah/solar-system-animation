@@ -16,7 +16,16 @@ export default function runSequence(sequence, event) {
     if (this.sequence.event_index === 0)
         this.containers.sequence.classed('fdg-hidden', false);
     this.containers.sequence
-        .html(`${sequence.label}<br><small>${start_orbit.label}: ${sequence.event.key}</small>`);
+        .style('outline', 'thick groove rgba(215,25,28,0)')
+        .transition()
+        .duration(this.settings.modalSpeed/10)
+        .style('outline', 'thick groove rgba(215,25,28,.5)')
+        .transition()
+        .duration(this.settings.modalSpeed/10)
+        .style('outline', 'thick groove rgba(215,25,28,0)')
+        .on('end', () => this.containers.sequence.style('outline', null));
+    this.containers.sequence
+        .html(`Sequence: ${sequence.label}<br><small>${start_orbit.label}: ${sequence.event.key}</small>`);
     this.containers.timepoint.html('0 days');
     if (this.sequence.event_index === 0)
         this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);

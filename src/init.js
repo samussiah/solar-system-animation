@@ -1,6 +1,7 @@
 import runModal from './init/runModal';
 import addStaticForceSimulation from './init/addStaticForceSimulation';
 import addForceSimulation from './init/addForceSimulation';
+import { increment } from './init/startInterval';
 import startInterval from './init/startInterval';
 import runSequence from './init/runSequence';
 
@@ -16,6 +17,7 @@ export default function init() {
     // Add a dynamic force layout in the middleground.
     this.forceSimulation = addForceSimulation.call(this, this.data);
     this.nodes = this.forceSimulation.nodes();
+    increment.call(this, this.data, false);
 
     // Start the timer.
     if (this.settings.playPause === 'play') {

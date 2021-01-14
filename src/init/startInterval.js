@@ -41,7 +41,6 @@ export const increment = function (data, increment) {
     restartForceSimulation.call(this, data);
 };
 
-// TODO: 2. once sequences are in an acceptable place, run events one at a time
 // TODO: 3. add sequence-level modals
 
 // Default returns an interval that runs increment() every time unit.

@@ -1,7 +1,5 @@
 export default function categorical() {
-    const container = this.legends.container
-        .append('div')
-        .classed('fdg-legend fdg-legend--categorical', true);
+    const container = this.legends.container.append('div');
     container
         .append('div')
         .classed('fdg-sidebar__label fdg-legend__label', true)

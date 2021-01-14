@@ -19,11 +19,11 @@ fetch('../data/adverse-event-outcome.csv')
                 ],
                 sequences: [
                     {
-                        label: 'Severity to Treatment',
+                        label: 'Onset to Treatment',
                         timeRelative: 'since onset',
                         start_order: 1,
                         end_order: 2,
-                        //duration: 10,
+                        //duration: 14,
                         information: [
                             'Event onset by severity',
                             'Event treatment',
@@ -34,7 +34,7 @@ fetch('../data/adverse-event-outcome.csv')
                         timeRelative: 'since beginning of treatment',
                         start_order: 2, 
                         end_order: 3,
-                        //duration: 28,
+                        //duration: 14,
                         information: [
                             'Event treatment',
                             'Event outcome',
@@ -45,7 +45,7 @@ fetch('../data/adverse-event-outcome.csv')
                         timeRelative: 'since outcome',
                         start_order: 3, 
                         end_order: 4,
-                        //duration: 28,
+                        //duration: 14,
                         information: [
                             'Event outcome',
                             'Efficacy endpoint',
@@ -58,6 +58,12 @@ fetch('../data/adverse-event-outcome.csv')
                     label: 'Severity',
                     colorScheme: 'Tableau10',
                     stratify: false,
+                    order: [
+                        'Mild',
+                        'Moderate',
+                        'Severe',
+                        'Pre-onset',
+                    ],
                 },
                 sizeBy: {
                     type: null,
@@ -66,13 +72,18 @@ fetch('../data/adverse-event-outcome.csv')
                     type: 'categorical',
                     variable: 'shape',
                     label: 'Treatment',
+                    order: [
+                        'Not Treated',
+                        'Standard of Care',
+                        'Rescue Meds',
+                    ],
                 },
                 freqTable: {
                     display: false,
                 },
                 speed: 'fast',
                 delay: true,
-                modalSpeed: 1000,
+                modalSpeed: 5000,
                 explanation: null,
                 runSequences: true,
                 eventCountType: 'cumulative-id',

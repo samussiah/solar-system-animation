@@ -28,6 +28,12 @@ export default function sequences(controls) {
             main.sequence = d;
             inputs.classed('current', (di) => di.label === d.label);
             if (d !== main) {
+                if (main.interval)
+                    main.interval.stop();
+                main.settings.sequence_index = main.settings.sequences
+                    .map(di => di.label)
+                    .indexOf(d.label);
+                d.event_index = 0;
                 runSequence.call(main, d);
             } else {
                 delete main.sequence;

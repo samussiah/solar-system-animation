@@ -11,34 +11,30 @@ export const increment = function (data, increment) {
     if (this.settings.timepoint <= this.settings.duration) update.call(this, data);
     // Otherwise reset animation.
     else {
-        if (this.settings.loop === true)
-            reset.call(this, data);
+        if (this.settings.loop === true) reset.call(this, data);
         // Run next sequence.
         else if (
             this.sequence &&
             (this.settings.sequence_index < this.settings.sequences.length - 1 ||
-            this.sequence.event_index < this.sequence.events.length - 1)
+                this.sequence.event_index < this.sequence.events.length - 1)
         ) {
-            if (this.interval)
-                this.interval.stop();
+            if (this.interval) this.interval.stop();
             if (this.sequence.event_index === this.sequence.events.length - 1) {
                 this.settings.sequence_index++;
                 this.sequence = this.settings.sequences[this.settings.sequence_index];
-            } else
-                this.sequence.event_index++;
-            setTimeout(
-                () => {
-                    this.controls.sequences.inputs
-                        .classed('current', d => d.label === this.sequence.label);
-                    runSequence.call(this, this.sequence);
-                },
-                this.settings.modalSpeed
-            );
+            } else this.sequence.event_index++;
+            setTimeout(() => {
+                this.controls.sequences.inputs.classed(
+                    'current',
+                    (d) => d.label === this.sequence.label
+                );
+                runSequence.call(this, this.sequence);
+            }, this.settings.modalSpeed);
         }
     }
 
     // Resume the force simulation.
-    restartForceSimulation.call(this, data);
+    restartForceSimulation.call(this);
 };
 
 // TODO: 3. add sequence-level modals

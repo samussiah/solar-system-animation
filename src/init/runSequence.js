@@ -6,26 +6,25 @@ import startInterval from './startInterval';
 
 // TODO: separate mid-sequence updates from new sequence updates
 export default function runSequence(sequence, event) {
-    const start_orbit = this.metadata.orbit
-        .find(orbit => +orbit.key === sequence.start_order);
+    const start_orbit = this.metadata.orbit.find((orbit) => +orbit.key === sequence.start_order);
     sequence.events = start_orbit.values;
-    sequence.event = sequence.events.find((event,i) => i === sequence.event_index);
+    sequence.event = sequence.events.find((event, i) => i === sequence.event_index);
 
     // Update progress text.
     this.settings.timepoint = 0;
-    if (this.sequence.event_index === 0)
-        this.containers.sequence.classed('fdg-hidden', false);
+    if (this.sequence.event_index === 0) this.containers.sequence.classed('fdg-hidden', false);
     this.containers.sequence
         .style('outline', 'thick groove rgba(215,25,28,0)')
         .transition()
-        .duration(this.settings.modalSpeed/10)
+        .duration(this.settings.modalSpeed / 10)
         .style('outline', 'thick groove rgba(215,25,28,.5)')
         .transition()
-        .duration(this.settings.modalSpeed/10)
+        .duration(this.settings.modalSpeed / 10)
         .style('outline', 'thick groove rgba(215,25,28,0)')
         .on('end', () => this.containers.sequence.style('outline', null));
-    this.containers.sequence
-        .html(`Sequence: ${sequence.label}<br><small>${start_orbit.label}: ${sequence.event.key}</small>`);
+    this.containers.sequence.html(
+        `Sequence: ${sequence.label}<br><small>${start_orbit.label}: ${sequence.event.key}</small>`
+    );
     this.containers.timepoint.html('0 days');
     if (this.sequence.event_index === 0)
         this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);
@@ -34,39 +33,39 @@ export default function runSequence(sequence, event) {
     // Subset data to the specified set of states.
     if (this.sequence.event_index === 0)
         sequence.data = this.data
-            .filter(d => (
-                sequence.start_order <= d.event_order &&
-                d.event_order <= sequence.end_order
-            ))
-            .map(d => ({...d}));
+            .filter(
+                (d) => sequence.start_order <= d.event_order && d.event_order <= sequence.end_order
+            )
+            .map((d) => ({ ...d }));
 
     if (this.sequence.event_index === 0) {
         // Re-calculate start and end timepoints from first state in sequence.
         d3.nest()
-            .key(d => d.id)
-            .rollup(group => {
+            .key((d) => d.id)
+            .rollup((group) => {
                 const baseline = group[0]; // first state in sequence
 
                 // Track cumulative duration to send individuals to the final state in the sequence prematurely.
                 let duration_cumulative = 0;
 
-                group.forEach((d,i) => {
+                group.forEach((d, i) => {
                     duration_cumulative += d.duration;
                     d.duration_cumulative = duration_cumulative;
 
                     // Adjust start timepoint.
-                    if (d === baseline)
-                        d.start_timepoint = 1;
+                    if (d === baseline) d.start_timepoint = 1;
                     else
-                        d.start_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
-                            ? d.start_timepoint - baseline.start_timepoint + 1
-                            : sequence.duration;
+                        d.start_timepoint =
+                            d.duration_cumulative < sequence.duration || !sequence.duration
+                                ? d.start_timepoint - baseline.start_timepoint + 1
+                                : sequence.duration;
 
                     // Adjust end timepoint.
-                    d.end_timepoint = d.duration_cumulative < sequence.duration || !sequence.duration
-                        ? d.start_timepoint + d.duration - 1
-                        : d.start_timepoint;
-                }); 
+                    d.end_timepoint =
+                        d.duration_cumulative < sequence.duration || !sequence.duration
+                            ? d.start_timepoint + d.duration - 1
+                            : d.start_timepoint;
+                });
 
                 return group;
             })
@@ -75,31 +74,28 @@ export default function runSequence(sequence, event) {
 
     // Re-define nested data with sequence subset.
     if (this.sequence.event_index === 0) {
-        sequence.data.nested = nestData.call(this, sequence.data)
-        sequence.data.nested.forEach(d => {
-            const node = this.nodes.find(node => node.key === d.key);
+        sequence.data.nested = nestData.call(this, sequence.data);
+        sequence.data.nested.forEach((d) => {
+            const node = this.nodes.find((node) => node.key === d.key);
             for (const prop in node)
-                if (['key', 'value'].includes(prop) === false)
-                    d[prop] = node[prop];
+                if (['key', 'value'].includes(prop) === false) d[prop] = node[prop];
         });
     }
 
     // Lock nodes in place while another event sequence runs.
-    sequence.data.nested.forEach(d => {
+    sequence.data.nested.forEach((d) => {
         d.value.locked = d.value.state.event !== sequence.event.key;
     });
 
-    const duration = d3.max(
-        sequence.data.nested.filter(d => d.value.locked === false),
-        d => d.value.state.duration
-    ) + 1;
-    this.settings.duration = sequence.duration
-        ? Math.min(sequence.duration, duration)
-        : duration;
+    const duration =
+        d3.max(
+            sequence.data.nested.filter((d) => d.value.locked === false),
+            (d) => d.value.state.duration
+        ) + 1;
+    this.settings.duration = sequence.duration ? Math.min(sequence.duration, duration) : duration;
 
     // Re-define force simulation.
-    if (this.forceSimulation)
-        this.forceSimulation.stop();
+    if (this.forceSimulation) this.forceSimulation.stop();
     this.forceSimulation = addForceSimulation.call(this, sequence.data);
     this.nodes = this.forceSimulation.nodes();
     this.forceSimulation.force('center', null);
@@ -108,16 +104,12 @@ export default function runSequence(sequence, event) {
     //    .on('tick', tick.bind(this, sequence.data));
 
     // Stop the current animation
-    if (this.interval)
-        this.interval.stop();
+    if (this.interval) this.interval.stop();
 
     //increment.call(this, sequence.data, false);
 
     // Start the sequence animation.
-    setTimeout(
-        () => {
-            this.interval = startInterval.call(this, sequence.data);
-        },
-        this.settings.modalSpeed
-    );
+    setTimeout(() => {
+        this.interval = startInterval.call(this, sequence.data);
+    }, this.settings.modalSpeed);
 }

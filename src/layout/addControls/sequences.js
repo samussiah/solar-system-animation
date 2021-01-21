@@ -7,31 +7,27 @@ import toggle from '../addControls/playPause/toggle';
 export default function sequences(controls) {
     if (!!this.settings.sequences) {
         const main = this;
-        const container = this.util.addElement('sequences', this.containers.controls)
+        const container = this.util
+            .addElement('sequences', this.containers.controls)
             .classed('fdg-control fdg-control--sequences', true);
 
         const inputs = container
             .selectAll('div')
-            .data([
-                this,
-                ...this.settings.sequences
-            ])
+            .data([this, ...this.settings.sequences])
             .join('div')
             .classed('fdg-button fdg-button--sequence', true)
-            .attr(
-                'title',
-                (d) => `View ${d !== this ? `sequence ${d.label}` : 'full animation'}.`
-            )
-            .text((d,i) => d.label ? d.label : d === this ? 'Full Animation' : `Sequence ${i + 1}`);
+            .attr('title', (d) => `View ${d !== this ? `sequence ${d.label}` : 'full animation'}.`)
+            .text((d, i) =>
+                d.label ? d.label : d === this ? 'Full Animation' : `Sequence ${i + 1}`
+            );
 
         inputs.on('click', function (d) {
             main.sequence = d;
             inputs.classed('current', (di) => di.label === d.label);
             if (d !== main) {
-                if (main.interval)
-                    main.interval.stop();
+                if (main.interval) main.interval.stop();
                 main.settings.sequence_index = main.settings.sequences
-                    .map(di => di.label)
+                    .map((di) => di.label)
                     .indexOf(d.label);
                 d.event_index = 0;
                 runSequence.call(main, d);
@@ -42,10 +38,8 @@ export default function sequences(controls) {
                 main.settings.loop = main.settings_initial.loop;
                 main.containers.sequence.classed('fdg-hidden', true).html(null);
                 main.containers.timeRelative.html(main.settings_initial.timeRelative);
-                if (main.interval)
-                    main.interval.stop();
-                if (main.forceSimulation)
-                    main.forceSimulation.stop();
+                if (main.interval) main.interval.stop();
+                if (main.forceSimulation) main.forceSimulation.stop();
                 main.forceSimulation = addForceSimulation.call(main, main.data);
                 resetAnimation.call(main, main.data);
                 main.interval = startInterval.call(main, main.data);

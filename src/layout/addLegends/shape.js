@@ -20,7 +20,10 @@ export default function shape() {
         };
         container = this.legends.container
             .append('div')
-            .classed(`fdg-legend fdg-legend--shape fdg-legend--${this.settings.shapeBy.type}`, true);
+            .classed(
+                `fdg-legend fdg-legend--shape fdg-legend--${this.settings.shapeBy.type}`,
+                true
+            );
         container
             .append('div')
             .classed('fdg-sidebar__label fdg-legend__label', true)

@@ -7,7 +7,8 @@ export default function sidebar(main) {
     const sequence = this.util.addElement('sequences', sidebar).classed('fdg-hidden', true);
     const legends = this.util.addElement('legends', sidebar);
     const progress = this.util.addElement('progress', sidebar);
-    const timepoint = this.util.addElement('timepoint', progress)
+    const timepoint = this.util
+        .addElement('timepoint', progress)
         .classed('fdg-sidebar__label', true)
         .html(
             `${this.settings.timepoint} ${
@@ -16,7 +17,8 @@ export default function sidebar(main) {
                     : this.settings.timeUnit
             }`
         );
-    const timeRelative = this.util.addElement('time-relative', progress)
+    const timeRelative = this.util
+        .addElement('time-relative', progress)
         .classed('fdg-sidebar__sub-label', true)
         .html(this.settings.timeRelative);
     const timer = addTimer.call(this, progress);

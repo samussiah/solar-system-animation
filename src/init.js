@@ -6,7 +6,7 @@ import startInterval from './init/startInterval';
 import runSequence from './init/runSequence';
 
 export default function init() {
-    this.settings_initial = {...this.settings};
+    this.settings_initial = { ...this.settings };
 
     // Cycle through text that displays over animation.
     runModal.call(this);
@@ -18,6 +18,7 @@ export default function init() {
     this.forceSimulation = addForceSimulation.call(this, this.data);
     this.nodes = this.forceSimulation.nodes();
     increment.call(this, this.data, false);
+    this.settings.removeCenterForce = true;
 
     // Start the timer.
     if (this.settings.playPause === 'play') {
@@ -33,8 +34,10 @@ export default function init() {
                 () => {
                     this.settings.sequence_index = 0;
                     this.sequence = this.settings.sequences[this.settings.sequence_index];
-                    this.controls.sequences.inputs
-                        .classed('current', d => d.label === this.sequence.label);
+                    this.controls.sequences.inputs.classed(
+                        'current',
+                        (d) => d.label === this.sequence.label
+                    );
                     runSequence.call(this, this.sequence);
                 },
                 this.settings.delay ? this.settings.modalSpeed : 0

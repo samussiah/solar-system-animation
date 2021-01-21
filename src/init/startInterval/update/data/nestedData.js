@@ -5,7 +5,7 @@ import getColorScale from '../../../../dataManipulation/nestData/getColorScale';
 import getAesthetics from '../../../../dataManipulation/nestData/getAesthetics';
 
 export default function nestedData(data) {
-    data.nested.forEach((d) => {
+    data.nested.forEach((d, i) => {
         // Update individual to next event.
         const currentState = getState.call(this, d.value.group);
 

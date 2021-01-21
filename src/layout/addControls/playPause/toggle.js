@@ -20,6 +20,7 @@ export default function toggle() {
         .html(playPause.find((value) => value.action !== this.settings.playPause).html);
 
     // Pause or play animation.
-    if (this.settings.playPause === 'play') this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
+    if (this.settings.playPause === 'play')
+        this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
     else this.interval.stop();
 }

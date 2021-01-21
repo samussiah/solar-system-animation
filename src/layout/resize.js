@@ -3,6 +3,7 @@ import restartForceSimulation from '../init/startInterval/restartForceSimulation
 import addStaticForceSimulation from '../init/addStaticForceSimulation';
 import updateData from '../init/startInterval/update/data';
 
+// TODO: modularize this function with declaritive subfunctions
 export default function resize() {
     const node = this.containers.animation.node();
     this.settings.width = node.clientWidth;
@@ -87,7 +88,7 @@ export default function resize() {
     }
 
     // Update the node data.
-    updateData.call(this);
+    updateData.call(this, this.data);
     restartForceSimulation.call(this);
 
     // static force simulation

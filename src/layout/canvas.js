@@ -4,28 +4,29 @@ export default function canvas(main) {
     this.settings.height = animation.node().clientHeight;
 
     // progress bar at top
-    const progressBar = this.util.addElement('progress-bar', animation).classed(
-        'fdg-hidden',
-        !this.settings.displayProgressBar
-    );
-    const progressTimepoint = this.util.addElement('progress-timepoint', animation).classed(
-        'fdg-hidden',
-        !this.settings.displayProgressBar
-    );
+    const progressBar = this.util
+        .addElement('progress-bar', animation)
+        .classed('fdg-hidden', !this.settings.displayProgressBar);
+    const progressTimepoint = this.util
+        .addElement('progress-timepoint', animation)
+        .classed('fdg-hidden', !this.settings.displayProgressBar);
 
     // background SVG
-    const svgBackground = this.util.addElement('svg--background', animation, 'svg')
+    const svgBackground = this.util
+        .addElement('svg--background', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
 
     // canvas
-    const canvas = this.util.addElement('canvas', animation, 'canvas')
+    const canvas = this.util
+        .addElement('canvas', animation, 'canvas')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
     canvas.context = canvas.node().getContext('2d');
 
     // SVG
-    const svgForeground = this.util.addElement('svg--foreground', animation, 'svg')
+    const svgForeground = this.util
+        .addElement('svg--foreground', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
     const focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');

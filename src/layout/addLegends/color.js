@@ -20,8 +20,10 @@ export default function color() {
                 return;
         }
 
-        container
-            .classed(`fdg-legend fdg-legend--color fdg-legend--${this.settings.colorBy.type}`, true);
+        container.classed(
+            `fdg-legend fdg-legend--color fdg-legend--${this.settings.colorBy.type}`,
+            true
+        );
     }
 
     return container;

@@ -14,7 +14,7 @@ export default function shape(metadata) {
                     ? this.settings.shapeBy.order.indexOf(b.key)
                     : null;
                 const orderSort = aOrder - bOrder;
-                const alphaSort = a.key < b.key ? -1 : 1
+                const alphaSort = a.key < b.key ? -1 : 1;
 
                 return orderSort ? orderSort : alphaSort;
             });

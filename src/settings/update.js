@@ -81,7 +81,7 @@ export default function update() {
     if (this.settings.sequences) {
         this.settings.loop = false;
         this.settings.runSequences = true;
-        this.settings.sequences.forEach(sequence => {
+        this.settings.sequences.forEach((sequence) => {
             sequence.event_index = 0;
         });
     }

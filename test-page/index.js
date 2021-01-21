@@ -30,6 +30,7 @@ fetch('./data/data_1000.csv')
                 //},
                 //delay: false,
                 //modalSpeed: 5000,
+                //playPause: 'pause',
             }
         );
     });

@@ -31,8 +31,7 @@ export default function event() {
             return event;
         })
         .sort(
-            (a, b) =>
-                a.order - b.order || b.nEventsTotal - a.nEventsTotal // ensure events plot in order
+            (a, b) => a.order - b.order || b.nEventsTotal - a.nEventsTotal // ensure events plot in order
         );
 
     return nest;

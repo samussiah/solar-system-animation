@@ -4,6 +4,7 @@ import addStaticForceSimulation from '../init/addStaticForceSimulation';
 import updateData from '../init/startInterval/update/data';
 
 // TODO: modularize this function with declaritive subfunctions
+// TODO: make resize work with sequenced animation
 export default function resize() {
     const node = this.containers.animation.node();
     this.settings.width = node.clientWidth;
@@ -88,7 +89,7 @@ export default function resize() {
     }
 
     // Update the node data.
-    updateData.call(this, this.data);
+    updateData.call(this, this.sequence ? this.sequence.data : this.data);
     restartForceSimulation.call(this);
 
     // static force simulation

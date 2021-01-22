@@ -10,14 +10,14 @@ import restartForceSimulation from '../../init/startInterval/restartForceSimulat
  */
 
 export default function timepoint() {
-    const fdg = this;
+    const main = this;
 
     const container = this.controls.container
         .append('div')
-        .classed('fdg-control fdg-control--timepoint', true);
+        .classed('main-control main-control--timepoint', true);
     const inputs = container
         .append('div')
-        .classed(`fdg-button fdg-input`, true)
+        .classed(`main-button main-input`, true)
         .append('input')
         .attr('type', 'number')
         .attr('title', `Choose a timepoint.`)
@@ -32,10 +32,10 @@ export default function timepoint() {
 
     inputs.on('change', function () {
         // Pause simulation.
-        if (fdg.settings.playPause !== 'pause') toggle.call(fdg);
-        fdg.settings.timepoint = +this.value - 1;
+        if (main.settings.playPause !== 'pause') toggle.call(main);
+        main.settings.timepoint = +this.value - 1;
 
-        increment.call(fdg, fdg.sequence ? fdg.sequence.data : fdg.data, true);
+        increment.call(main, main.sequence ? main.sequence.data : main.data, true);
     });
 
     return {

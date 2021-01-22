@@ -9,7 +9,8 @@ fetch('../data/adverse-event-outcome.csv')
             data,
             '#container',
             {
-                eventLabel: 'Adverse Events',
+                individualUnit: 'adverse event',
+                individualLabel: 'Adverse Events <sup><small>1</small></sup>',
                 timeRelative: 'since onset',
                 orbitLabels: [
                     'Severity',
@@ -23,7 +24,7 @@ fetch('../data/adverse-event-outcome.csv')
                         timeRelative: 'since onset',
                         start_order: 1,
                         end_order: 2,
-                        //duration: 14,
+                        //duration: 10,
                         information: [
                             'Event onset by severity',
                             'Event treatment',
@@ -81,8 +82,8 @@ fetch('../data/adverse-event-outcome.csv')
                 freqTable: {
                     display: false,
                 },
-                speed: 'fast',
-                delay: true,
+                speed: 'medium',
+                //delay: false,
                 modalSpeed: 5000,
                 explanation: null,
                 runSequences: true,

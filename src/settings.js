@@ -128,7 +128,8 @@ const settings = {
     \-------------------------------------------------------------------------------------------**/
 
     events: null, // defined in ./defineMetadata
-    eventLabel: 'Events',
+    individualUnit: 'individual',
+    individualLabel: 'Individuals',
     eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
     eventCount: true, // display [ n (%) ] beneath focus labels?
     eventCountType: 'current-id', // ['current-id', 'cumulative-id', 'cumulative-event']

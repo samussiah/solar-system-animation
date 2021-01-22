@@ -1,9 +1,9 @@
+import fadeIn from './runSequence/fadeIn';
 import nestData from '../dataManipulation/nestData';
 import addForceSimulation from './addForceSimulation';
-import tick from './addForceSimulation/tick';
-import { increment } from './startInterval';
 import startInterval from './startInterval';
 
+// TODO: modularize this function with declaritive subfunctions
 // TODO: separate mid-sequence updates from new sequence updates
 export default function runSequence(sequence, event) {
     const start_orbit = this.metadata.orbit.find((orbit) => +orbit.key === sequence.start_order);
@@ -12,23 +12,25 @@ export default function runSequence(sequence, event) {
 
     // Update progress text.
     this.settings.timepoint = 0;
-    if (this.sequence.event_index === 0) this.containers.sequence.classed('fdg-hidden', false);
-    this.containers.sequence
-        .style('outline', 'thick groove rgba(215,25,28,0)')
-        .transition()
-        .duration(this.settings.modalSpeed / 10)
-        .style('outline', 'thick groove rgba(215,25,28,.5)')
-        .transition()
-        .duration(this.settings.modalSpeed / 10)
-        .style('outline', 'thick groove rgba(215,25,28,0)')
-        .on('end', () => this.containers.sequence.style('outline', null));
-    this.containers.sequence.html(
-        `Sequence: ${sequence.label}<br><small>${start_orbit.label}: ${sequence.event.key}</small>`
-    );
     this.containers.timepoint.html('0 days');
-    if (this.sequence.event_index === 0)
-        this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);
     this.containers.timer.percentComplete.html('0%');
+
+    // TODO: transition text in and out
+    if (this.sequence.event_index === 0) {
+        this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);
+
+        // fade in
+        sequence.backgroundSequence = fadeIn
+            .call(this, this.containers.sequenceOverlay.background.sequence, this.sequence.label);
+        sequence.foregroundSequence = fadeIn
+            .call(this, this.containers.sequenceOverlay.foreground.sequence, this.sequence.label);
+    }
+
+    // fade in
+    sequence.backgroundEvent = fadeIn
+        .call(this, this.containers.sequenceOverlay.background.event, `${this.settings.individualUnit.replace(/^(.)/, char => char.toUpperCase())}s: ${this.sequence.event.key}`);
+    sequence.foregroundEvent = fadeIn
+        .call(this, this.containers.sequenceOverlay.foreground.event, `${this.settings.individualUnit.replace(/^(.)/, char => char.toUpperCase())}s: ${this.sequence.event.key}`);
 
     // Subset data to the specified set of states.
     if (this.sequence.event_index === 0)
@@ -44,6 +46,7 @@ export default function runSequence(sequence, event) {
             .key((d) => d.id)
             .rollup((group) => {
                 const baseline = group[0]; // first state in sequence
+                const timeShift = baseline.start_timepoint;
 
                 // Track cumulative duration to send individuals to the final state in the sequence prematurely.
                 let duration_cumulative = 0;
@@ -52,19 +55,19 @@ export default function runSequence(sequence, event) {
                     duration_cumulative += d.duration;
                     d.duration_cumulative = duration_cumulative;
 
-                    // Adjust start timepoint.
-                    if (d === baseline) d.start_timepoint = 1;
-                    else
-                        d.start_timepoint =
-                            d.duration_cumulative < sequence.duration || !sequence.duration
-                                ? d.start_timepoint - baseline.start_timepoint + 1
-                                : sequence.duration;
+                    // Adjust start and end timepoint.
+                    d.start_timepoint = d === baseline
+                        ? 1
+                        : d.start_timepoint - timeShift + 1;
+                    d.end_timepoint = d.start_timepoint + d.duration - 1;
 
-                    // Adjust end timepoint.
-                    d.end_timepoint =
-                        d.duration_cumulative < sequence.duration || !sequence.duration
-                            ? d.start_timepoint + d.duration - 1
-                            : d.start_timepoint;
+                    // Set start timepoint to sequence duration if start timepoint is greater than sequence duration.
+                    if (!!sequence.duration && d.start_timepoint > sequence.duration)
+                        d.start_timepoint = sequence.duration;
+
+                    // Set end timepoint to sequence duration if end timepoint is greater than sequence duration.
+                    if (!!sequence.duration && d.end_timepoint > sequence.duration)
+                        d.end_timepoint = sequence.duration;
                 });
 
                 return group;
@@ -99,14 +102,9 @@ export default function runSequence(sequence, event) {
     this.forceSimulation = addForceSimulation.call(this, sequence.data);
     this.nodes = this.forceSimulation.nodes();
     this.forceSimulation.force('center', null);
-    //this.forceSimulation
-    //    .nodes(sequence.data.nested)
-    //    .on('tick', tick.bind(this, sequence.data));
 
     // Stop the current animation
     if (this.interval) this.interval.stop();
-
-    //increment.call(this, sequence.data, false);
 
     // Start the sequence animation.
     setTimeout(() => {

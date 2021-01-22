@@ -22,29 +22,48 @@ export default function sequences(controls) {
             );
 
         inputs.on('click', function (d) {
-            main.sequence = d;
-            inputs.classed('current', (di) => di.label === d.label);
-            if (d !== main) {
-                if (main.interval) main.interval.stop();
-                main.settings.sequence_index = main.settings.sequences
-                    .map((di) => di.label)
-                    .indexOf(d.label);
-                d.event_index = 0;
-                runSequence.call(main, d);
-            } else {
-                delete main.sequence;
-                // Update settings.
-                main.settings.duration = main.settings_initial.duration;
-                main.settings.loop = main.settings_initial.loop;
-                main.containers.sequence.classed('fdg-hidden', true).html(null);
-                main.containers.timeRelative.html(main.settings_initial.timeRelative);
-                if (main.interval) main.interval.stop();
-                if (main.forceSimulation) main.forceSimulation.stop();
-                main.forceSimulation = addForceSimulation.call(main, main.data);
-                resetAnimation.call(main, main.data);
-                main.interval = startInterval.call(main, main.data);
-                if (main.settings.playPause !== 'play') toggle.call(main);
-            }
+            inputs.classed('current', false);
+            this.classList.toggle('current');
+            if (main.interval) main.interval.stop();
+            if (main.forceSimulation) main.forceSimulation.stop();
+            delete main.sequence;
+            main.sequence = d !== main
+                ? d
+                : null;
+            //setTimeout(() => {
+                if (d !== main) {
+                    main.containers.sequenceOverlay.classed('fdg-hidden', false);
+                    main.settings.sequence_index = main.settings.sequences
+                        .map((di) => di.label)
+                        .indexOf(d.label);
+                    d.event_index = 0;
+                    runSequence.call(main, d);
+                } else {
+                    // Update settings.
+                    main.settings.duration = main.settings_initial.duration;
+                    main.settings.loop = main.settings_initial.loop;
+
+                    // Update text.
+                    main.containers.sequenceOverlay.classed('fdg-hidden', true);
+                    main.containers.timeRelative.html(main.settings_initial.timeRelative);
+
+                    // Stop current interval and force simulation.
+                    if (main.interval) main.interval.stop();
+                    if (main.forceSimulation) main.forceSimulation.stop();
+
+                    // Restart force simulation.
+                    main.forceSimulation = addForceSimulation.call(main, main.data);
+
+                    // Reset animation.
+                    resetAnimation.call(main, main.data);
+
+                    // Restart interval.
+                    main.interval = startInterval.call(main, main.data);
+
+                    // Play animation.
+                    if (main.settings.playPause !== 'play') toggle.call(main);
+                }
+            //}, main.settings.modalSpeed);
         });
 
         return {

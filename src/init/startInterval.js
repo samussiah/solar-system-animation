@@ -1,35 +1,62 @@
 import update from './startInterval/update';
 import reset from './startInterval/reset';
+import fadeOut from './runSequence/fadeOut';
 import restartForceSimulation from './startInterval/restartForceSimulation';
 import runSequence from './runSequence';
 
 export const increment = function (data, increment) {
-    // Increment the timepoint.
+    // Increment timepoint.
     this.settings.timepoint += !!increment;
 
-    // Update animation if the current timepoint is less than duration of animation.
+    // Update animation if current timepoint is less than full duration of animation.
     if (this.settings.timepoint <= this.settings.duration) update.call(this, data);
-    // Otherwise reset animation.
+    // Otherwise restart animation.
     else {
+        // Restart animation.
         if (this.settings.loop === true) reset.call(this, data);
         // Run next sequence.
-        else if (
-            this.sequence &&
-            (this.settings.sequence_index < this.settings.sequences.length - 1 ||
-                this.sequence.event_index < this.sequence.events.length - 1)
-        ) {
-            if (this.interval) this.interval.stop();
-            if (this.sequence.event_index === this.sequence.events.length - 1) {
-                this.settings.sequence_index++;
-                this.sequence = this.settings.sequences[this.settings.sequence_index];
-            } else this.sequence.event_index++;
-            setTimeout(() => {
-                this.controls.sequences.inputs.classed(
-                    'current',
-                    (d) => d.label === this.sequence.label
-                );
-                runSequence.call(this, this.sequence);
-            }, this.settings.modalSpeed);
+        else if (this.sequence) {
+            if (
+                (
+                    this.settings.sequence_index < this.settings.sequences.length - 1 ||
+                    (
+                            this.sequence.events && this.sequence.event_index < this.sequence.events.length - 1
+                    )
+                )
+            ) {
+                if (this.interval) this.interval.stop();
+
+                // get next sequence
+                if (this.sequence.event_index === this.sequence.events.length - 1) {
+                    this.settings.sequence_index++;
+                    fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
+                    fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
+                    fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+                    fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+                    this.sequence = this.settings.sequences[this.settings.sequence_index];
+                }
+                // get next event in sequence
+                else {
+                    this.sequence.event_index++;
+                    fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+                    fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+                }
+
+                setTimeout(() => {
+                    this.controls.sequences.inputs.classed(
+                        'current',
+                        (d) => d.label === this.sequence.label
+                    );
+                    runSequence.call(this, this.sequence);
+                }, this.settings.modalSpeed);
+            } else {
+                if (this.interval)
+                    this.interval.stop();
+                fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
+                fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
+                fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+                fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+            }
         }
     }
 

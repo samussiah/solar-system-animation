@@ -3,8 +3,7 @@ import addCountdown from './sidebar/addCountdown';
 
 export default function sidebar(main) {
     const sidebar = this.util.addElement('sidebar', main);
-    const events = this.util.addElement('events', sidebar).html(this.settings.eventLabel);
-    const sequence = this.util.addElement('sequences', sidebar).classed('fdg-hidden', true);
+    const events = this.util.addElement('events', sidebar).html(this.settings.individualLabel);
     const legends = this.util.addElement('legends', sidebar);
     const progress = this.util.addElement('progress', sidebar);
     const timepoint = this.util
@@ -28,7 +27,6 @@ export default function sidebar(main) {
     return {
         sidebar,
         events,
-        sequence,
         legends,
         progress,
         timepoint,

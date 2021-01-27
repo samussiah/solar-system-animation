@@ -81,8 +81,12 @@ export default function update() {
     if (this.settings.sequences) {
         this.settings.loop = false;
         this.settings.runSequences = true;
+        this.settings.animationTrack = 'sequence';
         this.settings.sequences.forEach((sequence) => {
-            sequence.event_index = 0;
+            sequence.eventIndex = 0;
         });
+    } else {
+        this.settings.runSequences = false;
+        this.settings.animationTrack = 'full';
     }
 }

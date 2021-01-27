@@ -6,10 +6,10 @@ export const playPause = [
 ];
 
 export default function toggle() {
-    // Update setting.
+    // Toggle setting.
     this.settings.playPause = playPause.find(
         (value) => value.action !== this.settings.playPause
-    ).action; // toggle playPause setting
+    ).action;
 
     // Update tooltip and display text.
     this.controls.playPause.inputs
@@ -19,8 +19,16 @@ export default function toggle() {
         )
         .html(playPause.find((value) => value.action !== this.settings.playPause).html);
 
-    // Pause or play animation.
+    // Stop animation.
+    if (this.interval)
+        this.interval.stop();
+
+    // Restart animation.
     if (this.settings.playPause === 'play')
-        this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
-    else this.interval.stop();
+        this.interval = startInterval.call(
+            this,
+            this.sequence
+                ? this.sequence.data
+                : this.data
+        );
 }

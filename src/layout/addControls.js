@@ -1,7 +1,6 @@
 import addSequences from './addControls/sequences';
 import addSpeed from './addControls/speed';
 import addPlayPause from './addControls/playPause';
-import addStep from './addControls/step';
 import addTimepoint from './addControls/timepoint';
 import addReset from './addControls/reset';
 import addEventList from './addControls/eventList';
@@ -14,7 +13,6 @@ export default function addControls() {
     this.controls.sequences = addSequences.call(this);
     this.controls.speed = addSpeed.call(this);
     this.controls.playPause = addPlayPause.call(this);
-    this.controls.step = addStep.call(this);
     this.controls.timepoint = addTimepoint.call(this);
     this.controls.reset = addReset.call(this);
     this.controls.eventList = addEventList.call(this);

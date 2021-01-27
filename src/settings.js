@@ -31,7 +31,7 @@ const settings = {
         nColors: 6, // min: 3, max: 9
     },
     color: 'rgb(170,170,170)',
-    fill: null, // defined in ./defineMetadata/defineIdDependentSettings
+    fill: null, // boolean - defined in ./defineMetadata/defineIdDependentSettings
 
     // size
     sizeBy: {
@@ -50,7 +50,7 @@ const settings = {
         label: null,
         shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
     },
-    shape: 'circle',
+    shape: 'circle', // string - default shape
 
     /**-------------------------------------------------------------------------------------------\
       freq table
@@ -136,6 +136,16 @@ const settings = {
     eventChangeCount: null, // defined in ./defineMetadata/updateEventDependentSettings
 
     /**-------------------------------------------------------------------------------------------\
+      sequences
+    \-------------------------------------------------------------------------------------------**/
+
+    runSequences: false,
+    sequences: null,
+    sequenceIndex: 0,
+    eventIndex: 0,
+    animationTrack: 'full', // ['full', 'sequence']
+
+    /**-------------------------------------------------------------------------------------------\
       miscellaneous
     \-------------------------------------------------------------------------------------------**/
 
@@ -143,8 +153,6 @@ const settings = {
     focusOffset: 'heuristic', // ['heuristic', 'vertical']
     displayProgressBar: false,
     stratificationPositioning: 'circular', // ['circular', 'orbital']
-    sequences: null,
-    runSequences: false,
 };
 
 export default settings;

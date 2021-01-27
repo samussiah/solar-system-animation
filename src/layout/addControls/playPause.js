@@ -1,7 +1,7 @@
 import toggle, { playPause as playPauseData } from './playPause/toggle';
 
 export default function playPause() {
-    const fdg = this;
+    const main = this;
 
     const container = this.controls.container
         .append('div')

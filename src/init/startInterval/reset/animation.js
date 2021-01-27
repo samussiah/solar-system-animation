@@ -1,16 +1,22 @@
-import runModal from '../../runModal';
+import getNextSequence from '../runNextSequence/getNextSequence';
 import getState from '../../../dataManipulation/nestData/getState';
 import getAestheticValues from '../../../dataManipulation/nestData/getAestheticValues';
 import getCoordinates from '../../../dataManipulation/nestData/getCoordinates';
 import getColorScale from '../../../dataManipulation/nestData/getColorScale';
 import getAesthetics from '../../../dataManipulation/nestData/getAesthetics';
+import runModal from '../../runModal';
 
-// TODO: reset data as in nestData and update/data
 export default function resetAnimation(data) {
     this.settings.timepoint = 0;
     this.settings.progress = 0;
     this.settings.modalIndex = 0;
     this.controls.timepoint.inputs.attr('value', 0);
+
+    if (this.settings.runSequences) {
+        this.settings.sequenceIndex = 0;
+        this.settings.eventIndex = 0;
+        this.sequence = getNextSequence.call(this, false);
+    }
 
     // Update the event object of the population.
     this.metadata.event.forEach((event) => {

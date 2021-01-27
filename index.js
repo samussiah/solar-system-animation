@@ -313,9 +313,13 @@
       if (this.settings.sequences) {
         this.settings.loop = false;
         this.settings.runSequences = true;
+        this.settings.animationTrack = 'sequence';
         this.settings.sequences.forEach(function (sequence) {
-          sequence.event_index = 0;
+          sequence.eventIndex = 0;
         });
+      } else {
+        this.settings.runSequences = false;
+        this.settings.animationTrack = 'full';
       }
     }
 
@@ -356,7 +360,7 @@
       },
       color: 'rgb(170,170,170)',
       fill: null,
-      // defined in ./defineMetadata/defineIdDependentSettings
+      // boolean - defined in ./defineMetadata/defineIdDependentSettings
       // size
       sizeBy: {
         type: 'frequency',
@@ -379,6 +383,7 @@
         shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown']
       },
       shape: 'circle',
+      // string - default shape
 
       /**-------------------------------------------------------------------------------------------\
         freq table
@@ -472,16 +477,24 @@
       // defined in ./defineMetadata/updateEventDependentSettings
 
       /**-------------------------------------------------------------------------------------------\
+        sequences
+      \-------------------------------------------------------------------------------------------**/
+      runSequences: false,
+      sequences: null,
+      sequenceIndex: 0,
+      eventIndex: 0,
+      animationTrack: 'full',
+      // ['full', 'sequence']
+
+      /**-------------------------------------------------------------------------------------------\
         miscellaneous
       \-------------------------------------------------------------------------------------------**/
       hideControls: false,
       focusOffset: 'heuristic',
       // ['heuristic', 'vertical']
       displayProgressBar: false,
-      stratificationPositioning: 'circular',
-      // ['circular', 'orbital']
-      sequences: null,
-      runSequences: false
+      stratificationPositioning: 'circular' // ['circular', 'orbital']
+
     };
 
     function controls(main) {
@@ -1014,8 +1027,6 @@
       eventMetadata.call(this, data);
     }
 
-    // TODO: make resize work with sequenced animation
-
     function resize() {
       var _this = this;
 
@@ -1476,6 +1487,25 @@
 
       this.data.freqTable = freqTable.call(this, metadata);
       return metadata;
+    }
+
+    function fadeOut(selection) {
+      return selection.transition().duration(this.settings.modalSpeed).style('opacity', 0);
+    }
+
+    function getNextSequence() {
+      var increment = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      if (increment) this.settings.sequenceIndex++;
+      var sequence = this.settings.sequences[this.settings.sequenceIndex];
+      var start_orbit = this.metadata.orbit.find(function (orbit) {
+        return +orbit.key === sequence.start_order;
+      });
+      sequence.events = start_orbit.values;
+      fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
+      fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
+      fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+      fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+      return sequence;
     }
 
     function fadeIn(selection, html) {
@@ -2644,7 +2674,7 @@
       this.containers.countdown.classed('fdg-invisible', false).classed('fdg-hidden', function (d) {
         return d !== counter;
       });
-      var interval = window.setInterval(function () {
+      var interval = d3.interval(function () {
         counter--;
 
         _this.containers.countdown.classed('fdg-hidden', function (d) {
@@ -2654,7 +2684,7 @@
       return interval;
     }
 
-    function fadeOut(modalSpeed) {
+    function fadeOut$1(modalSpeed) {
       // Transition text from full opacity to zero opacity to create fade-out effect.
       d3.select(this).transition().duration(modalSpeed / 15).delay(modalSpeed - modalSpeed / 15 * 2).style('opacity', 0);
     }
@@ -2662,7 +2692,7 @@
     function fadeIn$1(selection, modalSpeed) {
       // Transition text from zero opacity to full opacity to create fade-in effect.
       selection.style('opacity', 0).transition().duration(modalSpeed / 15).style('opacity', 1).on('end', function () {
-        fadeOut.call(this, modalSpeed);
+        fadeOut$1.call(this, modalSpeed);
       });
     }
 
@@ -2734,7 +2764,14 @@
       this.settings.timepoint = 0;
       this.settings.progress = 0;
       this.settings.modalIndex = 0;
-      this.controls.timepoint.inputs.attr('value', 0); // Update the event object of the population.
+      this.controls.timepoint.inputs.attr('value', 0);
+
+      if (this.settings.runSequences) {
+        this.settings.sequenceIndex = 0;
+        this.settings.eventIndex = 0;
+        this.sequence = getNextSequence.call(this, false);
+      } // Update the event object of the population.
+
 
       this.metadata.event.forEach(function (event) {
         event.prevCount = 0;
@@ -2757,11 +2794,12 @@
     function timeout(data, countdown) {
       var _this = this;
 
-      var timeout = window.setTimeout(function () {
+      if (this.timeout) this.timeout.stop();
+      var timeout = d3.timeout(function () {
         resetAnimation.call(_this, data);
         progress.call(_this);
-        window.clearInterval(countdown);
-        window.clearTimeout(timeout);
+        countdown.stop();
+        timeout.stop();
 
         _this.containers.countdown.classed('fdg-invisible', function (d) {
           return d === _this.settings.resetDelay / 1000 - 1;
@@ -2781,106 +2819,101 @@
 
       var countdown$1 = countdown.call(this); // Set a timeout before resetting the animation.
 
-      var timeout$1 = timeout.call(this, data, countdown$1);
+      this.timeout = timeout.call(this, data, countdown$1);
     }
 
-    function fadeOut$1(selection) {
-      return selection.transition().duration(this.settings.modalSpeed).style('opacity', 0);
+    function getNextEventInSequence() {
+      var _this = this;
+
+      this.sequence.eventIndex++;
+      var event = this.sequence.events.find(function (event, i) {
+        return i === _this.sequence.eventIndex;
+      });
+      fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+      fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+      return event;
+    }
+
+    function fadeOutAll() {
+      fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
+      fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
+      fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+      fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+    }
+
+    function runNextSequence() {
+      // Stop interval.
+      if (this.interval) this.interval.stop(); // While sequences remain run next sequence.
+
+      if (this.settings.sequenceIndex < this.settings.sequences.length - 1 || this.sequence.events && this.sequence.eventIndex < this.sequence.events.length - 1) {
+        // Get sequence.
+        if (this.sequence.eventIndex === this.sequence.events.length - 1) this.sequence = getNextSequence.call(this);else this.sequence.event = getNextEventInSequence.call(this); // Run sequence.
+
+        this.timeout = runSequence.call(this);
+      } // Otherwise clear sequence text.
+      else fadeOutAll.call(this);
     }
 
     var increment = function increment(data, _increment) {
-      var _this = this;
-
       // Increment timepoint.
       this.settings.timepoint += !!_increment; // Update animation if current timepoint is less than full duration of animation.
 
-      if (this.settings.timepoint <= this.settings.duration) update$1.call(this, data); // Otherwise restart animation.
-      else {
-          // Restart animation.
-          if (this.settings.loop === true) reset.call(this, data); // Run next sequence.
-          else if (this.sequence) {
-              if (this.settings.sequence_index < this.settings.sequences.length - 1 || this.sequence.events && this.sequence.event_index < this.sequence.events.length - 1) {
-                if (this.interval) this.interval.stop(); // get next sequence
-
-                if (this.sequence.event_index === this.sequence.events.length - 1) {
-                  this.settings.sequence_index++;
-                  fadeOut$1.call(this, this.containers.sequenceOverlay.background.sequence);
-                  fadeOut$1.call(this, this.containers.sequenceOverlay.foreground.sequence);
-                  fadeOut$1.call(this, this.containers.sequenceOverlay.background.event);
-                  fadeOut$1.call(this, this.containers.sequenceOverlay.foreground.event);
-                  this.sequence = this.settings.sequences[this.settings.sequence_index];
-                } // get next event in sequence
-                else {
-                    this.sequence.event_index++;
-                    fadeOut$1.call(this, this.containers.sequenceOverlay.background.event);
-                    fadeOut$1.call(this, this.containers.sequenceOverlay.foreground.event);
-                  }
-
-                setTimeout(function () {
-                  _this.controls.sequences.inputs.classed('current', function (d) {
-                    return d.label === _this.sequence.label;
-                  });
-
-                  runSequence.call(_this, _this.sequence);
-                }, this.settings.modalSpeed);
-              } else {
-                if (this.interval) this.interval.stop();
-                fadeOut$1.call(this, this.containers.sequenceOverlay.background.sequence);
-                fadeOut$1.call(this, this.containers.sequenceOverlay.foreground.sequence);
-                fadeOut$1.call(this, this.containers.sequenceOverlay.background.event);
-                fadeOut$1.call(this, this.containers.sequenceOverlay.foreground.event);
-              }
-            }
-        } // Resume the force simulation.
+      if (this.settings.timepoint <= this.settings.duration) update$1.call(this, data); // Otherwise if animation is sequenced, run next sequence.
+      else if (this.sequence) runNextSequence.call(this); // Otherwise restart animation.
+        else if (this.settings.loop === true) reset.call(this, data); // Reheat the force simulation.
 
       restartForceSimulation.call(this);
-    }; // TODO: 3. add sequence-level modals
-    // Default returns an interval that runs increment() every time unit.
+    }; // Default returns an interval that runs increment() every time unit.
 
     function startInterval(data) {
       var interval = d3.interval(increment.bind(this, data), this.settings.speeds[this.settings.speed]);
       return interval;
     }
 
+    // TODO: figure out how to make this function work from the UI as well as automatically with the flow of the animation
+    // TODO: modularize this function with declaritive subfunctions
     // TODO: separate mid-sequence updates from new sequence updates
 
-    function runSequence(sequence, event) {
+    function runSequence() {
       var _this = this;
 
-      var start_orbit = this.metadata.orbit.find(function (orbit) {
-        return +orbit.key === sequence.start_order;
-      });
-      sequence.events = start_orbit.values;
-      sequence.event = sequence.events.find(function (event, i) {
-        return i === sequence.event_index;
+      // Update the sequence button corresponding to the current sequence.
+      this.controls.sequences.inputs.classed('current', function (d) {
+        return d.label === _this.sequence.label;
+      }); //const start_orbit = this.metadata.orbit
+      //    .find((orbit) => +orbit.key === this.sequence.start_order);
+      //this.sequence.events = start_orbit.values;
+
+      this.sequence.event = this.sequence.events.find(function (event, i) {
+        return i === _this.sequence.eventIndex;
       }); // Update progress text.
 
       this.settings.timepoint = 0;
       this.containers.timepoint.html('0 days');
       this.containers.timer.percentComplete.html('0%'); // TODO: transition text in and out
 
-      if (this.sequence.event_index === 0) {
-        this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative); // fade in
+      if (this.sequence.eventIndex === 0) {
+        this.containers.timeRelative.html(this.sequence.timeRelative || this.settings.timeRelative); // fade in
 
-        sequence.backgroundSequence = fadeIn.call(this, this.containers.sequenceOverlay.background.sequence, this.sequence.label);
-        sequence.foregroundSequence = fadeIn.call(this, this.containers.sequenceOverlay.foreground.sequence, this.sequence.label);
+        this.sequence.backgroundSequence = fadeIn.call(this, this.containers.sequenceOverlay.background.sequence, this.sequence.label);
+        this.sequence.foregroundSequence = fadeIn.call(this, this.containers.sequenceOverlay.foreground.sequence, this.sequence.label);
       } // fade in
 
 
-      sequence.backgroundEvent = fadeIn.call(this, this.containers.sequenceOverlay.background.event, "".concat(this.settings.individualUnit.replace(/^(.)/, function (_char) {
+      this.sequence.backgroundEvent = fadeIn.call(this, this.containers.sequenceOverlay.background.event, "".concat(this.settings.individualUnit.replace(/^(.)/, function (_char) {
         return _char.toUpperCase();
       }), "s: ").concat(this.sequence.event.key));
-      sequence.foregroundEvent = fadeIn.call(this, this.containers.sequenceOverlay.foreground.event, "".concat(this.settings.individualUnit.replace(/^(.)/, function (_char2) {
+      this.sequence.foregroundEvent = fadeIn.call(this, this.containers.sequenceOverlay.foreground.event, "".concat(this.settings.individualUnit.replace(/^(.)/, function (_char2) {
         return _char2.toUpperCase();
       }), "s: ").concat(this.sequence.event.key)); // Subset data to the specified set of states.
 
-      if (this.sequence.event_index === 0) sequence.data = this.data.filter(function (d) {
-        return sequence.start_order <= d.event_order && d.event_order <= sequence.end_order;
+      if (this.sequence.eventIndex === 0) this.sequence.data = this.data.filter(function (d) {
+        return _this.sequence.start_order <= d.event_order && d.event_order <= _this.sequence.end_order;
       }).map(function (d) {
         return _objectSpread2({}, d);
       });
 
-      if (this.sequence.event_index === 0) {
+      if (this.sequence.eventIndex === 0) {
         // Re-calculate start and end timepoints from first state in sequence.
         d3.nest().key(function (d) {
           return d.id;
@@ -2897,18 +2930,20 @@
             d.start_timepoint = d === baseline ? 1 : d.start_timepoint - timeShift + 1;
             d.end_timepoint = d.start_timepoint + d.duration - 1; // Set start timepoint to sequence duration if start timepoint is greater than sequence duration.
 
-            if (!!sequence.duration && d.start_timepoint > sequence.duration) d.start_timepoint = sequence.duration; // Set end timepoint to sequence duration if end timepoint is greater than sequence duration.
+            if (!!_this.sequence.duration && d.start_timepoint > _this.sequence.duration) d.start_timepoint = _this.sequence.duration; // Set end timepoint to sequence duration if end timepoint is greater than sequence duration.
 
-            if (!!sequence.duration && d.end_timepoint > sequence.duration) d.end_timepoint = sequence.duration;
+            if (!!_this.sequence.duration && d.end_timepoint > _this.sequence.duration) d.end_timepoint = _this.sequence.duration;
           });
           return group;
-        }).entries(sequence.data);
+        }).entries(this.sequence.data);
       } // Re-define nested data with sequence subset.
+      // TODO: define a function to maintain state of nodes through animation, e.g. when changing
+      // animation track between full animation and sequences or resetting the animation
 
 
-      if (this.sequence.event_index === 0) {
-        sequence.data.nested = nestData.call(this, sequence.data);
-        sequence.data.nested.forEach(function (d) {
+      if (this.sequence.eventIndex === 0) {
+        this.sequence.data.nested = nestData.call(this, this.sequence.data);
+        this.sequence.data.nested.forEach(function (d) {
           var node = _this.nodes.find(function (node) {
             return node.key === d.key;
           });
@@ -2920,26 +2955,27 @@
       } // Lock nodes in place while another event sequence runs.
 
 
-      sequence.data.nested.forEach(function (d) {
-        d.value.locked = d.value.state.event !== sequence.event.key;
+      this.sequence.data.nested.forEach(function (d) {
+        d.value.locked = d.value.state.event !== _this.sequence.event.key;
       });
-      var duration = d3.max(sequence.data.nested.filter(function (d) {
+      var duration = d3.max(this.sequence.data.nested.filter(function (d) {
         return d.value.locked === false;
       }), function (d) {
         return d.value.state.duration;
       }) + 1;
-      this.settings.duration = sequence.duration ? Math.min(sequence.duration, duration) : duration; // Re-define force simulation.
+      this.settings.duration = this.sequence.duration ? Math.min(this.sequence.duration, duration) : duration; // Re-define force simulation.
 
       if (this.forceSimulation) this.forceSimulation.stop();
-      this.forceSimulation = addForceSimulation.call(this, sequence.data);
+      this.forceSimulation = addForceSimulation.call(this, this.sequence.data);
       this.nodes = this.forceSimulation.nodes();
       this.forceSimulation.force('center', null); // Stop the current animation
 
       if (this.interval) this.interval.stop(); // Start the sequence animation.
 
-      setTimeout(function () {
-        _this.interval = startInterval.call(_this, sequence.data);
+      var timeout = d3.timeout(function () {
+        _this.interval = startInterval.call(_this, _this.sequence.data);
       }, this.settings.modalSpeed);
+      return timeout;
     }
 
     var playPause = [{
@@ -2954,19 +2990,20 @@
     function toggle() {
       var _this = this;
 
-      // Update setting.
+      // Toggle setting.
       this.settings.playPause = playPause.find(function (value) {
         return value.action !== _this.settings.playPause;
-      }).action; // toggle playPause setting
-      // Update tooltip and display text.
+      }).action; // Update tooltip and display text.
 
       this.controls.playPause.inputs.attr('title', "".concat(playPause.find(function (value) {
         return value.action !== _this.settings.playPause;
       }).label, " animation")).html(playPause.find(function (value) {
         return value.action !== _this.settings.playPause;
-      }).html); // Pause or play animation.
+      }).html); // Stop animation.
 
-      if (this.settings.playPause === 'play') this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);else this.interval.stop();
+      if (this.interval) this.interval.stop(); // Restart animation.
+
+      if (this.settings.playPause === 'play') this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
     }
 
     function sequences(controls) {
@@ -2984,19 +3021,25 @@
           inputs.classed('current', false);
           this.classList.toggle('current');
           if (main.interval) main.interval.stop();
-          if (main.forceSimulation) main.forceSimulation.stop();
+          if (main.timeout) main.timeout.stop(); //if (main.forceSimulation) main.forceSimulation.stop();
+
           delete main.sequence;
-          main.sequence = d !== main ? d : null; //setTimeout(() => {
+          main.sequence = d !== main ? d : null;
 
           if (d !== main) {
+            main.settings.animationTrack = 'sequence';
             main.containers.sequenceOverlay.classed('fdg-hidden', false);
-            main.settings.sequence_index = main.settings.sequences.map(function (di) {
-              return di.label;
-            }).indexOf(d.label);
-            d.event_index = 0;
-            runSequence.call(main, d);
+            main.settings.sequenceIndex = main.settings.sequences.findIndex(function (sequence) {
+              return sequence === d;
+            });
+            main.sequence = getNextSequence.call(main, false);
+            main.sequence.eventIndex = 0;
+            main.timeout = d3.timeout(function () {
+              runSequence.call(main);
+            }, 1000);
           } else {
-            // Update settings.
+            main.settings.animationTrack = 'full'; // Update settings.
+
             main.settings.duration = main.settings_initial.duration;
             main.settings.loop = main.settings_initial.loop; // Update text.
 
@@ -3010,11 +3053,12 @@
 
             resetAnimation.call(main, main.data); // Restart interval.
 
-            main.interval = startInterval.call(main, main.data); // Play animation.
+            main.timeout = d3.timeout(function () {
+              main.interval = startInterval.call(main, main.data);
+            }, 1000); // Play animation.
 
             if (main.settings.playPause !== 'play') toggle.call(main);
-          } //}, main.settings.modalSpeed);
-
+          }
         });
         return {
           container: container,
@@ -3026,7 +3070,7 @@
     function speed() {
       var _this = this;
 
-      var fdg = this;
+      var main = this;
       var container = this.controls.container.append('div').classed('fdg-control fdg-control--speed', true);
       var inputs = container.selectAll('div').data(Object.keys(this.settings.speeds).map(function (key) {
         return {
@@ -3041,14 +3085,14 @@
         return d.label;
       });
       inputs.on('click', function (d) {
-        fdg.settings.speed = d.label;
+        main.settings.speed = d.label;
         inputs.classed('current', function (di) {
           return di.label === d.label;
         });
 
-        if (fdg.settings.playPause === 'play') {
-          if (!!fdg.interval) fdg.interval.stop();
-          fdg.interval = startInterval.call(fdg, fdg.data);
+        if (main.settings.playPause === 'play') {
+          if (!!main.interval) main.interval.stop();
+          main.interval = startInterval.call(main, main.sequence ? main.sequence.data : main.data);
         }
       });
       return {
@@ -3081,34 +3125,12 @@
      * 3. Allow the points to reach their destination at the new timepoint.
      */
 
-    function step() {
-      var _this = this;
-      var container = this.controls.container.append('div').classed('fdg-control fdg-control--step', true);
-      var inputs = container.append('div').classed("fdg-button fdg-input", true).attr('title', "Advance animation by one time unit.").text('Step');
-      inputs.on('click', function () {
-        // Pause simulation.
-        if (_this.settings.playPause !== 'pause') toggle.call(_this);
-        increment.call(_this, _this.data, true);
-      });
-      return {
-        container: container,
-        inputs: inputs
-      };
-    }
-
-    /**
-     * function:
-     * 1. Pause the animation.
-     * 2. Increment the timepoint by 1.
-     * 3. Allow the points to reach their destination at the new timepoint.
-     */
-
     function timepoint() {
       var _this = this;
 
       var main = this;
-      var container = this.controls.container.append('div').classed('main-control main-control--timepoint', true);
-      var inputs = container.append('div').classed("main-button main-input", true).append('input').attr('type', 'number').attr('title', "Choose a timepoint.").attr('value', +this.settings.timepoint).attr('min', 1).attr('max', this.settings.duration);
+      var container = this.controls.container.append('div').classed('fdg-control fdg-control--timepoint', true);
+      var inputs = container.append('div').classed("fdg-button fdg-input", true).append('input').attr('type', 'number').attr('title', "Choose a timepoint.").attr('value', +this.settings.timepoint).attr('min', 1).attr('max', this.settings.duration);
       inputs.on('click', function () {
         // Pause simulation.
         if (_this.settings.playPause !== 'pause') toggle.call(_this);
@@ -3127,12 +3149,33 @@
 
     function reset$1() {
       var _this = this;
-
       var container = this.controls.container.append('div').classed('fdg-control fdg-control--reset', true);
       var inputs = container.append('div').classed("fdg-button fdg-input", true).attr('title', "Reset animation.").html('&#x21ba;');
       inputs.on('click', function () {
-        resetAnimation.call(_this, _this.data);
-        if (_this.settings.playPause !== 'play') toggle.call(_this);
+        if (_this.timeout) _this.timeout.stop();
+        if (_this.interval) _this.interval.stop(); // TODO: why isn't this handled in resetAnimation?
+
+        if (_this.settings.runSequences) {
+          _this.settings.sequences.forEach(function (sequence) {
+            sequence.eventIndex = 0;
+          });
+
+          _this.settings.sequenceIndex = 0;
+          _this.sequence = getNextSequence.call(_this, false);
+        }
+
+        resetAnimation.call(_this, _this.settings.animationTrack === 'sequence' ? _this.sequence.data : _this.data);
+        if (_this.forceSimulation) _this.forceSimulation.stop(); // Restart force simulation.
+
+        _this.forceSimulation = addForceSimulation.call(_this, _this.settings.animationTrack === 'sequence' ? _this.sequence.data : _this.data); // Start the animation.
+
+        if (_this.settings.playPause === 'play') _this.timeout = d3.timeout(function () {
+          // Run first sequence.
+          if (_this.settings.animationTrack === 'sequence') runSequence.call(_this); // calls startInterval
+          // Run full animation.
+          else _this.interval = startInterval.call(_this, _this.data);
+        }, 1000 // this.settings.delay ? this.settings.modalSpeed : 0
+        );
       });
       return {
         container: container,
@@ -3146,7 +3189,7 @@
       var container, inputs;
 
       if (this.settings.colorBy.type === 'frequency' || this.settings.sizeBy.type === 'frequency') {
-        var fdg = this;
+        var main = this;
         container = this.controls.container.append('div').classed('fdg-control fdg-control--event-list', true);
         inputs = container.selectAll('div').data(this.metadata.event).enter().append('div').attr('class', function (d) {
           return "fdg-button ".concat(_this.settings.eventChangeCount.includes(d.key) ? 'current' : '');
@@ -3160,22 +3203,22 @@
 
           this.classList.toggle('current'); // Update event array.
 
-          if (fdg.settings.eventChangeCount.includes(this.textContent)) fdg.settings.eventChangeCount.splice(fdg.settings.eventChangeCount.findIndex(function (event) {
+          if (main.settings.eventChangeCount.includes(this.textContent)) main.settings.eventChangeCount.splice(main.settings.eventChangeCount.findIndex(function (event) {
             return event === _this2.textContent;
-          }), 1);else fdg.settings.eventChangeCount.push(this.textContent); // Update tooltip.
+          }), 1);else main.settings.eventChangeCount.push(this.textContent); // Update tooltip.
 
-          this.title = "".concat(fdg.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add', " ").concat(d.key, " ").concat(fdg.settings.eventChangeCount.includes(d.key) ? 'from' : 'to', " the list of events that control bubble ").concat(fdg.settings.colorBy.type === 'frequency' && fdg.settings.sizeBy.type === 'frequency' ? 'color and size' : fdg.settings.colorBy.type === 'frequency' ? 'color' : fdg.settings.sizeBy.type === 'frequency' ? 'size' : "[ something isn't right here ].", "."); // Update color-size toggle.
-          //fdg.controls.colorSizeToggle.inputs.attr(
+          this.title = "".concat(main.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add', " ").concat(d.key, " ").concat(main.settings.eventChangeCount.includes(d.key) ? 'from' : 'to', " the list of events that control bubble ").concat(main.settings.colorBy.type === 'frequency' && main.settings.sizeBy.type === 'frequency' ? 'color and size' : main.settings.colorBy.type === 'frequency' ? 'color' : main.settings.sizeBy.type === 'frequency' ? 'size' : "[ something isn't right here ].", "."); // Update color-size toggle.
+          //main.controls.colorSizeToggle.inputs.attr(
           //    'title',
           //    (di) =>
-          //        `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
+          //        `Quantify the number of ${main.util.csv(main.settings.eventChangeCount)} events by ${
           //            di !== 'both' ? di : 'color and size'
           //        }.`
           //);
           // Update legend label.
 
-          fdg.legends.container.classed('fdg-invisible', fdg.settings.eventChangeCount.length === 0).selectAll('span.fdg-measure').text(fdg.util.csv(fdg.settings.eventChangeCount));
-          increment.call(fdg, fdg.data, false);
+          main.legends.container.classed('fdg-invisible', main.settings.eventChangeCount.length === 0).selectAll('span.fdg-measure').text(main.util.csv(main.settings.eventChangeCount));
+          increment.call(main, main.data, false);
         });
       }
 
@@ -3192,7 +3235,6 @@
       this.controls.sequences = sequences.call(this);
       this.controls.speed = speed.call(this);
       this.controls.playPause = playPause$1.call(this);
-      this.controls.step = step.call(this);
       this.controls.timepoint = timepoint.call(this);
       this.controls.reset = reset$1.call(this);
       this.controls.eventList = eventList.call(this);
@@ -3884,29 +3926,26 @@
 
       this.settings_initial = _objectSpread2({}, this.settings); // Cycle through text that displays over animation.
 
-      runModal.call(this); // Add a static force layout in the background for individuals that never change state.
+      runModal.call(this); // Add a static force layout in the background for individuals that never change state (improves
+      // performance by reducing the number of nodes in the simulation).
 
       addStaticForceSimulation.call(this); // Add a dynamic force layout in the middleground.
 
       this.forceSimulation = addForceSimulation.call(this, this.data);
-      this.nodes = this.forceSimulation.nodes();
+      this.nodes = this.forceSimulation.nodes(); // Reheat the force simulation after initialization to incorporate the centering force before
+      // removing the force.
+
       increment.call(this, this.data, false);
-      this.settings.removeCenterForce = true; // Start the timer.
+      this.settings.removeCenterForce = true; // Start the animation.
 
-      if (this.settings.playPause === 'play') {
-        if (this.settings.runSequences === false) setTimeout(function () {
-          _this.interval = startInterval.call(_this, _this.data);
-        }, this.settings.delay ? this.settings.modalSpeed : 0);else setTimeout(function () {
-          _this.settings.sequence_index = 0;
-          _this.sequence = _this.settings.sequences[_this.settings.sequence_index];
-
-          _this.controls.sequences.inputs.classed('current', function (d) {
-            return d.label === _this.sequence.label;
-          });
-
-          runSequence.call(_this, _this.sequence);
-        }, this.settings.delay ? this.settings.modalSpeed : 0);
-      }
+      if (this.settings.playPause === 'play') this.timeout = d3.timeout(function () {
+        // Run first sequence.
+        if (_this.settings.runSequences === true) {
+          _this.sequence = getNextSequence.call(_this, false);
+          runSequence.call(_this); // calls startInterval
+        } // Run full animation.
+        else _this.interval = startInterval.call(_this, _this.data);
+      }, this.settings.delay ? this.settings.modalSpeed : 0);
     }
 
     function forceDirectedGraph(data) {

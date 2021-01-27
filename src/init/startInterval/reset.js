@@ -12,5 +12,5 @@ export default function reset(data) {
     const countdown = resetCountdown.call(this);
 
     // Set a timeout before resetting the animation.
-    const timeout = resetTimeout.call(this, data, countdown);
+    this.timeout = resetTimeout.call(this, data, countdown);
 }

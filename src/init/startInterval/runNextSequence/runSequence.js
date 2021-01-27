@@ -1,14 +1,23 @@
 import fadeIn from './runSequence/fadeIn';
-import nestData from '../dataManipulation/nestData';
-import addForceSimulation from './addForceSimulation';
-import startInterval from './startInterval';
+import nestData from '../../../dataManipulation/nestData';
+import addForceSimulation from '../../addForceSimulation';
+import startInterval from '../../startInterval';
 
+// TODO: figure out whether a timeout wrapper is needed around this function call
+// TODO: figure out how to make this function work from the UI as well as automatically with the flow of the animation
 // TODO: modularize this function with declaritive subfunctions
 // TODO: separate mid-sequence updates from new sequence updates
-export default function runSequence(sequence, event) {
-    const start_orbit = this.metadata.orbit.find((orbit) => +orbit.key === sequence.start_order);
-    sequence.events = start_orbit.values;
-    sequence.event = sequence.events.find((event, i) => i === sequence.event_index);
+export default function runSequence() {
+    // Update the sequence button corresponding to the current sequence.
+    this.controls.sequences.inputs.classed(
+        'current',
+        (d) => d.label === this.sequence.label
+    );
+
+    //const start_orbit = this.metadata.orbit
+    //    .find((orbit) => +orbit.key === this.sequence.start_order);
+    //this.sequence.events = start_orbit.values;
+    this.sequence.event = this.sequence.events.find((event, i) => i === this.sequence.eventIndex);
 
     // Update progress text.
     this.settings.timepoint = 0;
@@ -16,31 +25,31 @@ export default function runSequence(sequence, event) {
     this.containers.timer.percentComplete.html('0%');
 
     // TODO: transition text in and out
-    if (this.sequence.event_index === 0) {
-        this.containers.timeRelative.html(sequence.timeRelative || this.settings.timeRelative);
+    if (this.sequence.eventIndex === 0) {
+        this.containers.timeRelative.html(this.sequence.timeRelative || this.settings.timeRelative);
 
         // fade in
-        sequence.backgroundSequence = fadeIn
+        this.sequence.backgroundSequence = fadeIn
             .call(this, this.containers.sequenceOverlay.background.sequence, this.sequence.label);
-        sequence.foregroundSequence = fadeIn
+        this.sequence.foregroundSequence = fadeIn
             .call(this, this.containers.sequenceOverlay.foreground.sequence, this.sequence.label);
     }
 
     // fade in
-    sequence.backgroundEvent = fadeIn
+    this.sequence.backgroundEvent = fadeIn
         .call(this, this.containers.sequenceOverlay.background.event, `${this.settings.individualUnit.replace(/^(.)/, char => char.toUpperCase())}s: ${this.sequence.event.key}`);
-    sequence.foregroundEvent = fadeIn
+    this.sequence.foregroundEvent = fadeIn
         .call(this, this.containers.sequenceOverlay.foreground.event, `${this.settings.individualUnit.replace(/^(.)/, char => char.toUpperCase())}s: ${this.sequence.event.key}`);
 
     // Subset data to the specified set of states.
-    if (this.sequence.event_index === 0)
-        sequence.data = this.data
+    if (this.sequence.eventIndex === 0)
+        this.sequence.data = this.data
             .filter(
-                (d) => sequence.start_order <= d.event_order && d.event_order <= sequence.end_order
+                (d) => this.sequence.start_order <= d.event_order && d.event_order <= this.sequence.end_order
             )
             .map((d) => ({ ...d }));
 
-    if (this.sequence.event_index === 0) {
+    if (this.sequence.eventIndex === 0) {
         // Re-calculate start and end timepoints from first state in sequence.
         d3.nest()
             .key((d) => d.id)
@@ -62,23 +71,25 @@ export default function runSequence(sequence, event) {
                     d.end_timepoint = d.start_timepoint + d.duration - 1;
 
                     // Set start timepoint to sequence duration if start timepoint is greater than sequence duration.
-                    if (!!sequence.duration && d.start_timepoint > sequence.duration)
-                        d.start_timepoint = sequence.duration;
+                    if (!!this.sequence.duration && d.start_timepoint > this.sequence.duration)
+                        d.start_timepoint = this.sequence.duration;
 
                     // Set end timepoint to sequence duration if end timepoint is greater than sequence duration.
-                    if (!!sequence.duration && d.end_timepoint > sequence.duration)
-                        d.end_timepoint = sequence.duration;
+                    if (!!this.sequence.duration && d.end_timepoint > this.sequence.duration)
+                        d.end_timepoint = this.sequence.duration;
                 });
 
                 return group;
             })
-            .entries(sequence.data);
+            .entries(this.sequence.data);
     }
 
     // Re-define nested data with sequence subset.
-    if (this.sequence.event_index === 0) {
-        sequence.data.nested = nestData.call(this, sequence.data);
-        sequence.data.nested.forEach((d) => {
+    // TODO: define a function to maintain state of nodes through animation, e.g. when changing
+    // animation track between full animation and sequences or resetting the animation
+    if (this.sequence.eventIndex === 0) {
+        this.sequence.data.nested = nestData.call(this, this.sequence.data);
+        this.sequence.data.nested.forEach((d) => {
             const node = this.nodes.find((node) => node.key === d.key);
             for (const prop in node)
                 if (['key', 'value'].includes(prop) === false) d[prop] = node[prop];
@@ -86,20 +97,20 @@ export default function runSequence(sequence, event) {
     }
 
     // Lock nodes in place while another event sequence runs.
-    sequence.data.nested.forEach((d) => {
-        d.value.locked = d.value.state.event !== sequence.event.key;
+    this.sequence.data.nested.forEach((d) => {
+        d.value.locked = d.value.state.event !== this.sequence.event.key;
     });
 
     const duration =
         d3.max(
-            sequence.data.nested.filter((d) => d.value.locked === false),
+            this.sequence.data.nested.filter((d) => d.value.locked === false),
             (d) => d.value.state.duration
         ) + 1;
-    this.settings.duration = sequence.duration ? Math.min(sequence.duration, duration) : duration;
+    this.settings.duration = this.sequence.duration ? Math.min(this.sequence.duration, duration) : duration;
 
     // Re-define force simulation.
     if (this.forceSimulation) this.forceSimulation.stop();
-    this.forceSimulation = addForceSimulation.call(this, sequence.data);
+    this.forceSimulation = addForceSimulation.call(this, this.sequence.data);
     this.nodes = this.forceSimulation.nodes();
     this.forceSimulation.force('center', null);
 
@@ -107,7 +118,9 @@ export default function runSequence(sequence, event) {
     if (this.interval) this.interval.stop();
 
     // Start the sequence animation.
-    setTimeout(() => {
-        this.interval = startInterval.call(this, sequence.data);
+    const timeout = d3.timeout(() => {
+        this.interval = startInterval.call(this, this.sequence.data);
     }, this.settings.modalSpeed);
+
+    return timeout;
 }

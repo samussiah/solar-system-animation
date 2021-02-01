@@ -68,7 +68,7 @@ export default function update() {
 
         texts = texts.concat(
             this.settings.explanation.filter(
-                (el) => !(this.settings.hideControls && el.includes('controls'))
+                (el) => el !== null && !(this.settings.hideControls && el.includes('controls'))
             )
         );
     }

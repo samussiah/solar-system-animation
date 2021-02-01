@@ -61,19 +61,17 @@ export default function canvas(main) {
     const focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');
 
     // modal
-    const modalContainer = this.util.addElement('modal', animation);
-    // TODO: add button to clear or hide modal
-    //const modalClear = this.util.addElement('modal__clear', modalContainer)
-    //    //.classed('fdg-hidden', true)
-    //    .text('x');
-    //modalClear
-    //    .on('mouseover', function() {
-    //        if (this.classList.includes('fdg-hidden'))
-    //            this.classList.toggle('fdg-hidden')
-    //    })
-    //    .on('click', () => {
-    //        this.modal.stop();
-    //    });
+    const modalContainer = this.util.addElement('modal', animation)
+        .attr('class', d => `fdg-modal ${
+            this.settings.modalPosition
+                .split('-')
+                .map(position => `fdg-modal--${position}`)
+                .join(' ')
+        } fdg-modal--${this.settings.modalPosition}`)
+        .style('width', /^\d{1,3}%$/.test(this.settings.modalWidth)
+            ? this.settings.modalWidth
+            : '50%'
+        );
     const modal = this.util.addElement('modal__text', modalContainer);
 
     return {

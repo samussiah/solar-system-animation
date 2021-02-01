@@ -80,9 +80,6 @@ body {
                 font-size: 1.75rem;
                 color: #660000;
             }
-            .fdg-sequences {
-                font-weight: bold;
-            }
 
         /* legends */
 
@@ -303,13 +300,29 @@ body {
 
             .fdg-modal {
                 position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                text-align: center;
                 padding: 2%;
                 font-size: 2rem;
                 text-shadow: var(--text-color) 0px 0px 10px;
+            }
+            .fdg-modal--center {
+                text-align: center;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .fdg-modal--top {
+                top: 0;
+            }
+            .fdg-modal--right {
+                text-align: right;
+                right: 0;
+            }
+            .fdg-modal--bottom {
+                bottom: 0;
+            }
+            .fdg-modal--left {
+                text-align: left;
+                left: 0;
             }
 
     /**-------------------------------------------------------------------------------------------\
@@ -333,10 +346,30 @@ body {
             .fdg-controls > * {
                 display: inline-block;
             }
+            .fdg-display-controls {
+                text-align: center;
+                cursor: pointer;
+                padding-bottom: 2px;
+                border-bottom: 1px solid rgba(155,155,159,.5);
+                margin-bottom: 4px;
+            }
+            .fdg-display-controls:hover {
+                background: var(--background-lighter);
+            }
             .fdg-control {
                 font-size: 0.75rem;
                 text-transform: uppercase;
                 width: 100%;
+                max-height: 1000px;
+                transition: max-height 0.5s ease-in;
+                overflow: hidden;
+            }
+            .fdg-control:hover {
+                overflow: visible;
+            }
+            .fdg-control--collapsed {
+                max-height: 0;
+                transition: max-height 0.5s ease-out;
             }
             .fdg-control:not(:last-child) {
                 margin-bottom: 25px;
@@ -355,15 +388,22 @@ body {
                 text-overflow: ellipsis;
                 transition: width 1s;
                 float: right;
+                margin-bottom: 2px;
+                border-radius: 4px;
             }
             .fdg-button:not(:last-child) {
             }
-            .fdg-button.current {
+            .fdg-button--current {
                 color: var(--text-color);
                 background: var(--background-darker);
                 border: 1px solid var(--background-darkest);
+                font-weight: bold;
             }
-            .fdg-button.clicked {
+            .fdg-button:not(.fdg-button--current):hover {
+                background: var(--background-lighter);
+                font-weight: bold;
+            }
+            .fdg-button--clicked {
                 background: var(--background-lighter);
             }
             .fdg-button--sequence:hover {

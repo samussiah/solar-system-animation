@@ -112,6 +112,8 @@ const settings = {
     modal: true, // display modals?
     modalSpeed: 15000, // amount of time for which each modal appears
     modalIndex: 0,
+    modalPosition: 'center', // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
+    modalWidth: '50%',
     explanation: [
         'Each shape in this animation represents an individual.',
         'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.',
@@ -150,7 +152,7 @@ const settings = {
     \-------------------------------------------------------------------------------------------**/
 
     hideControls: false,
-    focusOffset: 'heuristic', // ['heuristic', 'vertical']
+    focusOffset: 'heuristic', // ['heuristic', 'none']
     displayProgressBar: false,
     stratificationPositioning: 'circular', // ['circular', 'orbital']
 };

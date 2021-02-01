@@ -17,7 +17,7 @@ export default function eventList() {
             .attr(
                 'class',
                 (d) =>
-                    `fdg-button ${this.settings.eventChangeCount.includes(d.key) ? 'current' : ''}`
+                    `fdg-button ${this.settings.eventChangeCount.includes(d.key) ? 'fdg-button--current' : ''}`
             )
             .attr(
                 'title',
@@ -40,7 +40,7 @@ export default function eventList() {
             .text((d) => d.key);
 
         inputs.on('click', function (d) {
-            this.classList.toggle('current');
+            this.classList.toggle('fdg-button--current');
 
             // Update event array.
             if (main.settings.eventChangeCount.includes(this.textContent))

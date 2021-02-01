@@ -301,7 +301,7 @@
           return text;
         });
         texts = texts.concat(this.settings.explanation.filter(function (el) {
-          return !(_this.settings.hideControls && el.includes('controls'));
+          return el !== null && !(_this.settings.hideControls && el.includes('controls'));
         }));
       }
 
@@ -455,6 +455,9 @@
       modalSpeed: 15000,
       // amount of time for which each modal appears
       modalIndex: 0,
+      modalPosition: 'center',
+      // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
+      modalWidth: '50%',
       explanation: ['Each shape in this animation represents an individual.', 'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.', 'The <span class = "fdg-emphasized">annotations</span> at each focus represent the [event-count-type].', 'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.', '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.', 'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.', 'Continue watching to learn how these individuals progress over the course of [duration] days.'],
       // array of strings
       information: null,
@@ -491,7 +494,7 @@
       \-------------------------------------------------------------------------------------------**/
       hideControls: false,
       focusOffset: 'heuristic',
-      // ['heuristic', 'vertical']
+      // ['heuristic', 'none']
       displayProgressBar: false,
       stratificationPositioning: 'circular' // ['circular', 'orbital']
 
@@ -564,6 +567,8 @@
     }
 
     function canvas(main) {
+      var _this = this;
+
       var animation = this.util.addElement('animation', main);
       this.settings.width = animation.node().clientWidth;
       this.settings.height = animation.node().clientHeight; // progress bar
@@ -586,19 +591,11 @@
       sequenceOverlay.foreground.event = this.util.addElement('sequence-overlay__foreground__event', sequenceOverlay.foreground, 'tspan').classed('fdg-focus-annotation__event-count', true).attr('x', 0).attr('y', 30).attr('alignment-baseline', 'hanging');
       var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g'); // modal
 
-      var modalContainer = this.util.addElement('modal', animation); // TODO: add button to clear or hide modal
-      //const modalClear = this.util.addElement('modal__clear', modalContainer)
-      //    //.classed('fdg-hidden', true)
-      //    .text('x');
-      //modalClear
-      //    .on('mouseover', function() {
-      //        if (this.classList.includes('fdg-hidden'))
-      //            this.classList.toggle('fdg-hidden')
-      //    })
-      //    .on('click', () => {
-      //        this.modal.stop();
-      //    });
-
+      var modalContainer = this.util.addElement('modal', animation).attr('class', function (d) {
+        return "fdg-modal ".concat(_this.settings.modalPosition.split('-').map(function (position) {
+          return "fdg-modal--".concat(position);
+        }).join(' '), " fdg-modal--").concat(_this.settings.modalPosition);
+      }).style('width', /^\d{1,3}%$/.test(this.settings.modalWidth) ? this.settings.modalWidth : '50%');
       var modal = this.util.addElement('modal__text', modalContainer);
       return {
         animation: animation,
@@ -1489,18 +1486,49 @@
       return metadata;
     }
 
+    function display() {
+      var main = this;
+      var container = this.controls.container.append('div').classed('fdg-control--display', true);
+      var inputs = container.append('div').classed('fdg-display-controls', true).datum({
+        state: true,
+        symbol: '-'
+      }).html(function (d) {
+        return "Controls <span class = 'fdg-expand'>".concat(d.symbol, "</span>");
+      }).attr('title', function (d) {
+        return d.state ? 'Hide controls.' : 'Display controls.';
+      });
+      inputs.on('click', function (d) {
+        d.state = !d.state;
+        d.symbol = d.state ? '-' : '+';
+        main.controls.display.inputs.html("Controls <span class = 'fdg-expand'>".concat(d.symbol, "</span>")).attr('title', function (d) {
+          return d.state ? 'Hide controls.' : 'Display controls.';
+        });
+        main.controls.containers.each(function () {
+          this.classList.toggle('fdg-control--collapsed');
+        });
+      });
+      return {
+        container: container,
+        inputs: inputs
+      };
+    }
+
     function fadeOut(selection) {
       return selection.transition().duration(this.settings.modalSpeed).style('opacity', 0);
     }
 
     function getNextSequence() {
+      var _this = this;
+
       var increment = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
       if (increment) this.settings.sequenceIndex++;
       var sequence = this.settings.sequences[this.settings.sequenceIndex];
       var start_orbit = this.metadata.orbit.find(function (orbit) {
         return +orbit.key === sequence.start_order;
       });
-      sequence.events = start_orbit.values;
+      sequence.events = start_orbit ? start_orbit.values : [this.metadata.event.find(function (event) {
+        return event.key === _this.settings.eventCentral;
+      })];
       fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
       fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
       fadeOut.call(this, this.containers.sequenceOverlay.background.event);
@@ -2878,7 +2906,7 @@
       var _this = this;
 
       // Update the sequence button corresponding to the current sequence.
-      this.controls.sequences.inputs.classed('current', function (d) {
+      this.controls.sequences.inputs.classed('fdg-button--current', function (d) {
         return d.label === _this.sequence.label;
       }); //const start_orbit = this.metadata.orbit
       //    .find((orbit) => +orbit.key === this.sequence.start_order);
@@ -2978,6 +3006,22 @@
       return timeout;
     }
 
+    function sequence(d) {
+      var _this = this;
+
+      console.log(d.label);
+      this.settings.animationTrack = 'sequence';
+      this.containers.sequenceOverlay.classed('fdg-hidden', false);
+      this.settings.sequenceIndex = this.settings.sequences.findIndex(function (sequence) {
+        return sequence === d;
+      });
+      this.sequence = getNextSequence.call(this, false);
+      this.sequence.eventIndex = 0;
+      this.timeout = d3.timeout(function () {
+        runSequence.call(_this);
+      }, 1000);
+    }
+
     var playPause = [{
       action: 'play',
       label: 'Play',
@@ -3006,7 +3050,33 @@
       if (this.settings.playPause === 'play') this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
     }
 
-    function sequences(controls) {
+    function fullAnimation(d) {
+      var _this = this;
+
+      console.log('full animation');
+      this.settings.animationTrack = 'full'; // Update settings.
+
+      this.settings.duration = this.settings_initial.duration;
+      this.settings.loop = this.settings_initial.loop; // Update text.
+
+      this.containers.sequenceOverlay.classed('fdg-hidden', true);
+      this.containers.timeRelative.html(this.settings_initial.timeRelative); // Stop current interval and force simulation.
+
+      if (this.interval) this.interval.stop();
+      if (this.forceSimulation) this.forceSimulation.stop(); // Restart force simulation.
+
+      this.forceSimulation = addForceSimulation.call(this, this.data); // Reset animation.
+
+      resetAnimation.call(this, this.data); // Restart interval.
+
+      this.timeout = d3.timeout(function () {
+        _this.interval = startInterval.call(_this, _this.data);
+      }, 1000); // Play animation.
+
+      if (this.settings.playPause !== 'play') toggle.call(this);
+    }
+
+    function sequences() {
       var _this = this;
 
       if (!!this.settings.sequences) {
@@ -3018,48 +3088,40 @@
           return d.label ? d.label : d === _this ? 'Full Animation' : "Sequence ".concat(i + 1);
         });
         inputs.on('click', function (d) {
-          inputs.classed('current', false);
-          this.classList.toggle('current');
+          // Toggle control.
+          inputs.classed('fdg-button--current', false);
+          this.classList.toggle('fdg-button--current'); // Stop any running interval or timeout.
+
           if (main.interval) main.interval.stop();
-          if (main.timeout) main.timeout.stop(); //if (main.forceSimulation) main.forceSimulation.stop();
+          if (main.timeout) main.timeout.stop(); // TODO: figure out if force simulation should be maintained or if it's sufficient to
+          // maintain the position of nodes on the nexted data array.
+          //if (main.forceSimulation) main.forceSimulation.stop();
+          // Update sequence property.
 
           delete main.sequence;
-          main.sequence = d !== main ? d : null;
+          main.sequence = d !== main ? d : null; // Run sequence or...
 
-          if (d !== main) {
-            main.settings.animationTrack = 'sequence';
-            main.containers.sequenceOverlay.classed('fdg-hidden', false);
-            main.settings.sequenceIndex = main.settings.sequences.findIndex(function (sequence) {
-              return sequence === d;
-            });
-            main.sequence = getNextSequence.call(main, false);
-            main.sequence.eventIndex = 0;
-            main.timeout = d3.timeout(function () {
-              runSequence.call(main);
-            }, 1000);
-          } else {
-            main.settings.animationTrack = 'full'; // Update settings.
-
-            main.settings.duration = main.settings_initial.duration;
-            main.settings.loop = main.settings_initial.loop; // Update text.
-
-            main.containers.sequenceOverlay.classed('fdg-hidden', true);
-            main.containers.timeRelative.html(main.settings_initial.timeRelative); // Stop current interval and force simulation.
-
-            if (main.interval) main.interval.stop();
-            if (main.forceSimulation) main.forceSimulation.stop(); // Restart force simulation.
-
-            main.forceSimulation = addForceSimulation.call(main, main.data); // Reset animation.
-
-            resetAnimation.call(main, main.data); // Restart interval.
-
-            main.timeout = d3.timeout(function () {
-              main.interval = startInterval.call(main, main.data);
-            }, 1000); // Play animation.
-
-            if (main.settings.playPause !== 'play') toggle.call(main);
-          }
+          if (d !== main) sequence.call(main, d); // ...full animation.
+          else fullAnimation.call(main, d);
         });
+        return {
+          container: container,
+          inputs: inputs
+        };
+      }
+    }
+
+    function stepSequences() {
+      if (!!this.settings.sequences) {
+        var container = this.util.addElement('sequences', this.containers.controls).classed('fdg-control fdg-control--step-sequences', true);
+        var inputs = container.selectAll('div').data(['<<', '>>']).join('div').classed('fdg-button fdg-button--step-sequence', true).attr('title', function (d) {
+          return d === '<<' ? 'View previous sequence.' : 'View next sequence.';
+        }).style('width', '35%').style('float', function (d, i) {
+          return i === 0 ? 'left' : 'right';
+        }).text(function (d, i) {
+          return d;
+        });
+        inputs.on('click', function (d) {});
         return {
           container: container,
           inputs: inputs
@@ -3078,7 +3140,7 @@
           value: _this.settings.speeds[key]
         };
       })).enter().append('div').attr('class', function (d) {
-        return "fdg-button ".concat(d.label, " ").concat(d.label === _this.settings.speed ? 'current' : '');
+        return "fdg-button ".concat(d.label, " ").concat(d.label === _this.settings.speed ? 'fdg-button--current' : '');
       }).attr('title', function (d) {
         return "Advance the animation every ".concat(_this.settings.speeds[d.label] / 1000, " second(s).");
       }).text(function (d) {
@@ -3086,7 +3148,7 @@
       });
       inputs.on('click', function (d) {
         main.settings.speed = d.label;
-        inputs.classed('current', function (di) {
+        inputs.classed('fdg-button--current', function (di) {
           return di.label === d.label;
         });
 
@@ -3192,7 +3254,7 @@
         var main = this;
         container = this.controls.container.append('div').classed('fdg-control fdg-control--event-list', true);
         inputs = container.selectAll('div').data(this.metadata.event).enter().append('div').attr('class', function (d) {
-          return "fdg-button ".concat(_this.settings.eventChangeCount.includes(d.key) ? 'current' : '');
+          return "fdg-button ".concat(_this.settings.eventChangeCount.includes(d.key) ? 'fdg-button--current' : '');
         }).attr('title', function (d) {
           return "".concat(_this.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add', " ").concat(d.key, " ").concat(_this.settings.eventChangeCount.includes(d.key) ? 'from' : 'to', " the list of events that control bubble ").concat(_this.settings.colorBy.type === 'frequency' && _this.settings.sizeBy.type === 'frequency' ? 'color and size' : _this.settings.colorBy.type === 'frequency' ? 'color' : _this.settings.sizeBy.type === 'frequency' ? 'size' : "[ something isn't right here ].", ".");
         }).text(function (d) {
@@ -3201,7 +3263,7 @@
         inputs.on('click', function (d) {
           var _this2 = this;
 
-          this.classList.toggle('current'); // Update event array.
+          this.classList.toggle('fdg-button--current'); // Update event array.
 
           if (main.settings.eventChangeCount.includes(this.textContent)) main.settings.eventChangeCount.splice(main.settings.eventChangeCount.findIndex(function (event) {
             return event === _this2.textContent;
@@ -3232,18 +3294,25 @@
       this.controls = {
         container: this.containers.controls
       };
+      this.controls.display = display.call(this);
       this.controls.sequences = sequences.call(this);
+      this.controls.stepSequences = stepSequences.call(this);
       this.controls.speed = speed.call(this);
       this.controls.playPause = playPause$1.call(this);
       this.controls.timepoint = timepoint.call(this);
       this.controls.reset = reset$1.call(this);
-      this.controls.eventList = eventList.call(this);
+      this.controls.eventList = eventList.call(this); // Capture all controls in a selection.
+
+      this.controls.containers = this.controls.container.selectAll('.fdg-control'); // Capture all buttons in a selection.
+
+      this.controls.buttons = this.controls.container.selectAll('.fdg-button'); // Add interactivity to buttons.
+
       this.controls.container.selectAll('.fdg-button').on('mousedown', function () {
-        this.classList.toggle('clicked');
+        this.classList.toggle('fdg-button--clicked');
       }).on('mouseup', function () {
-        this.classList.toggle('clicked');
+        this.classList.toggle('fdg-button--clicked');
       }).on('mouseout', function () {
-        if (this.classList.contains('clicked')) this.classList.toggle('clicked');
+        if (this.classList.contains('fdg-button--clicked')) this.classList.toggle('fdg-button--clicked');
       });
     }
 
@@ -3761,7 +3830,7 @@
       ['background', 'foreground'].forEach(function (pos) {
         var text = fociLabels.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true) //.style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
         .style('transform', function (d) {
-          return "translate(0,".concat(getRelative.call(_this, d), ")");
+          return _this.settings.focusOffset === 'heuristic' ? "translate(0,".concat(getRelative.call(_this, d), ")") : null;
         });
         var label = addLabel.call(_this, text);
         var eventCount = addEventCount.call(_this, text); // Position annotations differently in categorical layout.

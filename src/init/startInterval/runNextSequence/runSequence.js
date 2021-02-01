@@ -10,14 +10,15 @@ import startInterval from '../../startInterval';
 export default function runSequence() {
     // Update the sequence button corresponding to the current sequence.
     this.controls.sequences.inputs.classed(
-        'current',
+        'fdg-button--current',
         (d) => d.label === this.sequence.label
     );
 
     //const start_orbit = this.metadata.orbit
     //    .find((orbit) => +orbit.key === this.sequence.start_order);
     //this.sequence.events = start_orbit.values;
-    this.sequence.event = this.sequence.events.find((event, i) => i === this.sequence.eventIndex);
+    this.sequence.event = this.sequence.events
+        .find((event, i) => i === this.sequence.eventIndex);
 
     // Update progress text.
     this.settings.timepoint = 0;

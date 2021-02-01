@@ -6,7 +6,9 @@ export default function getNextSequence(increment = true) {
     const sequence = this.settings.sequences[this.settings.sequenceIndex];
     const start_orbit = this.metadata.orbit
         .find((orbit) => +orbit.key === sequence.start_order);
-    sequence.events = start_orbit.values;
+    sequence.events = start_orbit
+        ? start_orbit.values
+        : [this.metadata.event.find(event => event.key === this.settings.eventCentral)];
     fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
     fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
     fadeOut.call(this, this.containers.sequenceOverlay.background.event);

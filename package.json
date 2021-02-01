@@ -1,5 +1,5 @@
 {
-  "TODO": "fix controls",
+  "TODO": "",
   "name": "force-directed-graph",
   "version": "2.0.0",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",

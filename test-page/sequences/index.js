@@ -25,10 +25,6 @@ fetch('../data/adverse-event-outcome.csv')
                         start_order: 1,
                         end_order: 2,
                         //duration: 10,
-                        information: [
-                            'Event onset by severity',
-                            'Event treatment',
-                        ],
                     },
                     {
                         label: 'Treatment to Outcome',
@@ -36,10 +32,6 @@ fetch('../data/adverse-event-outcome.csv')
                         start_order: 2, 
                         end_order: 3,
                         //duration: 14,
-                        information: [
-                            'Event treatment',
-                            'Event outcome',
-                        ],
                     },
                     {
                         label: 'Outcome to Efficacy Endpoint',
@@ -47,10 +39,6 @@ fetch('../data/adverse-event-outcome.csv')
                         start_order: 3, 
                         end_order: 4,
                         //duration: 14,
-                        information: [
-                            'Event outcome',
-                            'Efficacy endpoint',
-                        ],
                     },
                 ],
                 colorBy: {
@@ -88,6 +76,8 @@ fetch('../data/adverse-event-outcome.csv')
                 explanation: null,
                 runSequences: true,
                 eventCountType: 'cumulative-id',
+                collisionPadding: 3,
+                focusOffset: 'none',
             }
         );
     });

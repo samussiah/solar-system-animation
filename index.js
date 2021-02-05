@@ -2570,30 +2570,6 @@
       return forceSimulation;
     }
 
-    function orbits() {
-      var main = this; //if (this.settings.pulseOrbits) {
-
-      this.orbits.each(function (d) {
-        d.rAdjPrev = d.rAdj;
-        var distances = d3.merge(d.values.map(function (di) {
-          return di.data;
-        })).map(function (d) {
-          return d.value.distance;
-        });
-        var rAdj = distances.length ? Math.max(d3.median(distances), d.r) : d.r;
-        var diff = rAdj - d.rAdjPrev;
-        d.rAdj = d.rAdjPrev + Math.min(diff / 10, main.settings.orbitRadius / 100); //d.change = d3.sum(d.values, (di) => di.change);
-        //if (d.change > 0) {
-
-        d3.select(this).transition().duration(main.settings.speeds[main.settings.speed]).attr('r', d.rAdj); //.duration(main.settings.speeds[main.settings.speed] / 2)
-        //.attr('stroke-width', 0.5 * d.change)
-        //.transition()
-        //.duration(main.settings.speeds[main.settings.speed] / 2)
-        //.attr('stroke-width', 0.5);
-        //}
-      }); //}
-    }
-
     function progress() {
       // Update timepoint.
       this.containers.timepoint.text("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit)); // Update timer.
@@ -2682,6 +2658,30 @@
       legends.call(this, data);
       counts.call(this);
       freqTable$1.call(this);
+    }
+
+    function orbits() {
+      var main = this; //if (this.settings.pulseOrbits) {
+
+      this.orbits.each(function (d) {
+        d.rAdjPrev = d.rAdj;
+        var distances = d3.merge(d.values.map(function (di) {
+          return di.data;
+        })).map(function (d) {
+          return d.value.distance;
+        });
+        var rAdj = distances.length ? Math.max(d3.median(distances), d.r) : d.r;
+        var diff = rAdj - d.rAdjPrev;
+        d.rAdj = d.rAdjPrev + Math.min(diff / 10, main.settings.orbitRadius / 100); //d.change = d3.sum(d.values, (di) => di.change);
+        //if (d.change > 0) {
+
+        d3.select(this).transition().duration(main.settings.speeds[main.settings.speed]).attr('r', d.rAdj); //.duration(main.settings.speeds[main.settings.speed] / 2)
+        //.attr('stroke-width', 0.5 * d.change)
+        //.transition()
+        //.duration(main.settings.speeds[main.settings.speed] / 2)
+        //.attr('stroke-width', 0.5);
+        //}
+      }); //}
     }
 
     function update$1(data$1) {
@@ -2996,7 +2996,9 @@
       if (this.forceSimulation) this.forceSimulation.stop();
       this.forceSimulation = addForceSimulation.call(this, this.sequence.data);
       this.nodes = this.forceSimulation.nodes();
-      this.forceSimulation.force('center', null); // Stop the current animation
+      this.forceSimulation.force('center', null);
+      data.call(this, this.sequence.data);
+      text.call(this, this.sequence.data); // Stop the current animation
 
       if (this.interval) this.interval.stop(); // Start the sequence animation.
 

@@ -1,6 +1,8 @@
 import fadeIn from './runSequence/fadeIn';
 import nestData from '../../../dataManipulation/nestData';
 import addForceSimulation from '../../addForceSimulation';
+import updateData from '../update/data';
+import updateText from '../update/text';
 import startInterval from '../../startInterval';
 
 // TODO: figure out whether a timeout wrapper is needed around this function call
@@ -114,6 +116,8 @@ export default function runSequence() {
     this.forceSimulation = addForceSimulation.call(this, this.sequence.data);
     this.nodes = this.forceSimulation.nodes();
     this.forceSimulation.force('center', null);
+    updateData.call(this, this.sequence.data);
+    updateText.call(this, this.sequence.data);
 
     // Stop the current animation
     if (this.interval) this.interval.stop();

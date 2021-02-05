@@ -155,6 +155,7 @@ const settings = {
     focusOffset: 'heuristic', // ['heuristic', 'none']
     displayProgressBar: false,
     stratificationPositioning: 'circular', // ['circular', 'orbital']
+    annotations: null,
 };
 
 export default settings;

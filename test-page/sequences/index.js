@@ -70,6 +70,20 @@ fetch('../data/adverse-event-outcome.csv')
                 freqTable: {
                     display: false,
                 },
+                annotations: [
+                    {
+                        label: '↑',
+                        orbit: 4,
+                        angle: -.5,
+                        dx: '-20px',
+                    },
+                    {
+                        label: '↓',
+                        orbit: 4,
+                        angle: .5,
+                        dx: '-20px',
+                    },
+                ],
                 speed: 'medium',
                 delay: false,
                 modalSpeed: 3000,

@@ -295,6 +295,11 @@ body {
                 font-size: 1rem;
                 font-weight: bold;
             }
+            .fdg-custom-annotation {
+                font-size: 3rem;
+                font-weight: bold;
+                fill: var(--text-color);
+            }
 
         /* modal */
 

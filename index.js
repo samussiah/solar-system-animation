@@ -496,8 +496,9 @@
       focusOffset: 'heuristic',
       // ['heuristic', 'none']
       displayProgressBar: false,
-      stratificationPositioning: 'circular' // ['circular', 'orbital']
-
+      stratificationPositioning: 'circular',
+      // ['circular', 'orbital']
+      annotations: null
     };
 
     function controls(main) {
@@ -589,7 +590,8 @@
       sequenceOverlay.foreground = this.util.addElement('sequence-overlay__foreground', sequenceOverlay, 'text').classed('fdg-focus-annotation__foreground fdg-focus-annotation__text', true).attr('alignment-baseline', 'hanging');
       sequenceOverlay.foreground.sequence = this.util.addElement('sequence-overlay__foreground__sequence', sequenceOverlay.foreground, 'tspan').classed('fdg-focus-annotation__label', true).attr('x', 0).attr('y', 0).attr('alignment-baseline', 'hanging');
       sequenceOverlay.foreground.event = this.util.addElement('sequence-overlay__foreground__event', sequenceOverlay.foreground, 'tspan').classed('fdg-focus-annotation__event-count', true).attr('x', 0).attr('y', 30).attr('alignment-baseline', 'hanging');
-      var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g'); // modal
+      var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');
+      var customAnnotations = this.util.addElement('custom-annotations', svgForeground, 'g'); // modal
 
       var modalContainer = this.util.addElement('modal', animation).attr('class', function (d) {
         return "fdg-modal ".concat(_this.settings.modalPosition.split('-').map(function (position) {
@@ -606,6 +608,7 @@
         svgForeground: svgForeground,
         sequenceOverlay: sequenceOverlay,
         focusAnnotations: focusAnnotations,
+        customAnnotations: customAnnotations,
         modal: modal
       };
     }
@@ -1091,7 +1094,25 @@
 
       this.focusAnnotations.attr('transform', function (d) {
         return "translate(".concat(d.x, ",").concat(d.y, ")");
-      });
+      }); // custom annotations
+
+      console.log(this.customAnnotations);
+      console.log('something');
+
+      if (this.customAnnotations) {
+        this.settings.annotations.forEach(function (annotation) {
+          annotation.radius = annotation.orbit * _this.settings.orbitRadius;
+          annotation.theta = 2 * Math.PI * annotation.angle / 360;
+          annotation.x = _this.settings.center.x + annotation.radius * // number of orbit radii from the center
+          Math.cos(annotation.theta); // position along the circle at the given orbit along which
+
+          annotation.y = annotation.order === 0 ? _this.settings.center.y : _this.settings.center.y + annotation.radius * // number of orbit radii from the center
+          Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
+        });
+        this.customAnnotations.attr('transform', function (d) {
+          return "translate(".concat(d.x, ",").concat(d.y, ")");
+        });
+      }
     }
 
     function layout() {
@@ -3862,6 +3883,43 @@
       return fociLabels;
     }
 
+    function annotateCustom() {
+      var _this = this;
+
+      var annotations;
+
+      if (this.settings.annotations && Array.isArray(this.settings.annotations)) {
+        console.log(this.settings.annotations);
+        this.settings.annotations.forEach(function (annotation) {
+          annotation.radius = annotation.orbit * _this.settings.orbitRadius;
+          annotation.theta = 2 * Math.PI * annotation.angle / 360;
+          annotation.x = _this.settings.center.x + annotation.radius * // number of orbit radii from the center
+          Math.cos(annotation.theta); // position along the circle at the given orbit along which
+
+          annotation.y = annotation.order === 0 ? _this.settings.center.y : _this.settings.center.y + annotation.radius * // number of orbit radii from the center
+          Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
+        });
+        annotations = this.containers.customAnnotations.selectAll('g.fdg-custom-annotation').data(this.settings.annotations).join('g').classed('fdg-custom-annotation', true).attr('transform', function (d) {
+          return "translate(".concat(d.x, ",").concat(d.y, ")");
+        });
+        ['background', 'foreground'].forEach(function (pos) {
+          console.log(pos);
+          var text = annotations.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true).attr('alignment-baseline', function (d) {
+            return d.angle > 0 ? 'hanging' : d.angle < 0 ? 'baseline' : 'middle';
+          }).attr('dx', function (d) {
+            return d.dx || null;
+          }).attr('dy', function (d) {
+            return d.dy || null;
+          }).text(function (d) {
+            return d.label;
+          });
+          console.log(text);
+        });
+      }
+
+      return annotations;
+    }
+
     function dataDrivenLayout() {
       // controls
       addControls.call(this); // sidebar
@@ -3871,7 +3929,9 @@
 
       this.orbits = addOrbits.call(this); // Annotate foci.
 
-      this.focusAnnotations = annotateFoci.call(this);
+      this.focusAnnotations = annotateFoci.call(this); // Add custom annotations.
+
+      this.customAnnotations = annotateCustom.call(this);
     }
 
     function hasVariables() {

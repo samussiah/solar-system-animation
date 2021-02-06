@@ -11,8 +11,6 @@ export default function annotateCustom() {
     let annotations;
 
     if (this.settings.annotations && Array.isArray(this.settings.annotations)) {
-        console.log(this.settings.annotations);
-
         this.settings.annotations.forEach(annotation => {
             annotation.radius = annotation.orbit * this.settings.orbitRadius;
             annotation.theta = (2 * Math.PI * annotation.angle) / 360;
@@ -35,7 +33,6 @@ export default function annotateCustom() {
             .attr('transform', (d) => `translate(${d.x},${d.y})`);
 
         ['background', 'foreground'].forEach((pos) => {
-            console.log(pos);
             const text = annotations
                 .append('text')
                 .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
@@ -43,7 +40,6 @@ export default function annotateCustom() {
                 .attr('dx', d => d.dx || null)
                 .attr('dy', d => d.dy || null)
                 .text(d => d.label);
-            console.log(text);
         });
     }
 

@@ -18,29 +18,29 @@ fetch('../data/adverse-event-outcome.csv')
                     'Outcome',
                     'Efficacy Endpoint' ,
                 ],
-                sequences: [
-                    {
-                        label: 'Onset to Treatment',
-                        timeRelative: 'since onset',
-                        start_order: 1,
-                        end_order: 2,
-                        //duration: 10,
-                    },
-                    {
-                        label: 'Treatment to Outcome',
-                        timeRelative: 'since beginning of treatment',
-                        start_order: 2, 
-                        end_order: 3,
-                        //duration: 14,
-                    },
-                    {
-                        label: 'Outcome to Efficacy Endpoint',
-                        timeRelative: 'since outcome',
-                        start_order: 3, 
-                        end_order: 4,
-                        //duration: 14,
-                    },
-                ],
+                //sequences: [
+                //    {
+                //        label: 'Onset to Treatment',
+                //        timeRelative: 'since onset',
+                //        start_order: 1,
+                //        end_order: 2,
+                //        //duration: 10,
+                //    },
+                //    {
+                //        label: 'Treatment to Outcome',
+                //        timeRelative: 'since beginning of treatment',
+                //        start_order: 2, 
+                //        end_order: 3,
+                //        //duration: 14,
+                //    },
+                //    {
+                //        label: 'Outcome to Efficacy Endpoint',
+                //        timeRelative: 'since outcome',
+                //        start_order: 3, 
+                //        end_order: 4,
+                //        //duration: 14,
+                //    },
+                //],
                 colorBy: {
                     type: 'categorical',
                     variable: 'color',
@@ -88,10 +88,12 @@ fetch('../data/adverse-event-outcome.csv')
                 delay: false,
                 modalSpeed: 3000,
                 explanation: null,
-                runSequences: true,
+                //runSequences: true,
                 eventCountType: 'cumulative-id',
                 collisionPadding: 3,
                 focusOffset: 'none',
+                intervalType: 'id', // ['timepoint', 'id']
+                stateChange: 'ordered',
             }
         );
     });

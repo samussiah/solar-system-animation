@@ -156,6 +156,8 @@ const settings = {
     displayProgressBar: false,
     stratificationPositioning: 'circular', // ['circular', 'orbital']
     annotations: null,
+    intervalType: 'timepoint', // ['timepoint', 'id']
+    stateChange: 'chronological', // ['chronological', 'ordered']
 };
 
 export default settings;

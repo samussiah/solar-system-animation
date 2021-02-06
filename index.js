@@ -498,7 +498,11 @@
       displayProgressBar: false,
       stratificationPositioning: 'circular',
       // ['circular', 'orbital']
-      annotations: null
+      annotations: null,
+      intervalType: 'timepoint',
+      // ['timepoint', 'id']
+      stateChange: 'chronological' // ['chronological', 'ordered']
+
     };
 
     function controls(main) {
@@ -1147,8 +1151,6 @@
       }).entries(this.data);
       nest.forEach(function (d, i) {
         Object.assign(d, d.value);
-        d.value = d.key;
-        delete d.key;
       });
       return nest;
     }
@@ -1564,6 +1566,17 @@
     function nestData(data) {
       var _this = this;
 
+      // sequenced animation (vs timed animation)
+      // one interval per state
+      // each interval is offset by the position of the ID in the full set of IDs:
+      // - ID 001 begins at timepoint 1
+      // - ID 002 begins at timepoint 2
+      // - ...
+      // the full duration of each ID is the number of times they change states
+      // - at timepoint 0 all IDs are at s0
+      // - at timepoint 1 ID 001 moves to s1
+      // - at timepoint 2 ID 001 moves to s2 and ID 002 moves to s1
+      // - ...
       var nestedData = d3.nest().key(function (d) {
         return d.id;
       }).rollup(function (group) {
@@ -1581,6 +1594,9 @@
         var colorScale = getColorScale.call(_this, aestheticValues.colorValue);
         var aesthetics = getAesthetics.call(_this, aestheticValues, colorScale);
         return _objectSpread2(_objectSpread2({
+          index: _this.metadata.id.findIndex(function (id) {
+            return id.key === state.id;
+          }),
           group: group,
           // array: data
           duration: duration,
@@ -3889,7 +3905,6 @@
       var annotations;
 
       if (this.settings.annotations && Array.isArray(this.settings.annotations)) {
-        console.log(this.settings.annotations);
         this.settings.annotations.forEach(function (annotation) {
           annotation.radius = annotation.orbit * _this.settings.orbitRadius;
           annotation.theta = 2 * Math.PI * annotation.angle / 360;
@@ -3903,7 +3918,6 @@
           return "translate(".concat(d.x, ",").concat(d.y, ")");
         });
         ['background', 'foreground'].forEach(function (pos) {
-          console.log(pos);
           var text = annotations.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true).attr('alignment-baseline', function (d) {
             return d.angle > 0 ? 'hanging' : d.angle < 0 ? 'baseline' : 'middle';
           }).attr('dx', function (d) {
@@ -3913,7 +3927,6 @@
           }).text(function (d) {
             return d.label;
           });
-          console.log(text);
         });
       }
 
@@ -3986,6 +3999,7 @@
       }).rollup(function (group) {
         group.forEach(function (d, i) {
           // Define start and end timepoints when only duration exists.
+          // This approach assumes data are already sorted chronologically.
           if (has.duration && !has.start_timepoint) {
             if (i === 0) {
               d.start_timepoint = 1;
@@ -4006,26 +4020,72 @@
             d.duration = d.start_timepoint - d.end_timepoint + 1;
           }
         }); // Define sequence
-        //if (!has.sequence) {
-        //    group
-        //        .sort((a, b) => a.start_timepoint - b.start_timepoint)
-        //        .forEach((d, i) => {
-        //            d.seq = i;
-        //        });
-        //} else {
-        //    group.sort((a, b) => a.seq - b.seq);
-        //}
+
+        group.sort(function (a, b) {
+          var start_timepoint = a.start_timepoint - b.start_timepoint;
+          var end_timepoint = a.end_timepoint - b.end_timepoint;
+          var event_order = a.event_order - b.event_order; // Realistically states should be unique and non-overlapping within
+          // start and end timepoint but if the library were to ever support
+          // concurrent states we include event order in the sort.
+
+          return start_timepoint || end_timepoint || event_order;
+        }).forEach(function (d, i) {
+          d.sequence = i;
+        });
       }).entries(this.data);
     }
 
-    function sort() {
+    // Generates an alternative state progression by orbit, state, and ID.
+    function orderByState() {
+      var _this = this;
+
+      if (this.settings.stateChange === 'ordered') {
+        var ordered = this.data.map(function (d, i) {
+          var event = _this.metadata.event.find(function (event) {
+            return event.key === d.event;
+          });
+
+          return {
+            event: d.event,
+            orbit: event.order,
+            event_order: event.position,
+            id: d.id,
+            id_order: _this.metadata.id.findIndex(function (id) {
+              return id.key === d.id;
+            })
+          };
+        }); // TODO: within each state start timepoint should be the same for all IDs - only
+        // end timepoint changes - nest by event and calculate start and endtimepoints.
+
+        ordered.sort(function (a, b) {
+          var orbit = a.orbit - b.orbit;
+          var event_order = a.event_order - b.event_order;
+          var id_order = a.id_order - b.id_order;
+          return orbit || event_order || id_order;
+        }).forEach(function (d, i) {
+          d.start_timepoint = i;
+          d.end_timepoint = i;
+          d.duration = 1;
+        });
+        this.data.forEach(function (d) {
+          var order = ordered.find(function (di) {
+            return di.id === d.id && di.event === d.event;
+          });
+          d.start_timepoint = order.start_timepoint;
+          d.end_timepoint = order.end_timepoint;
+          d.duration = 1;
+        });
+      }
+    }
+
+    function sort(has) {
       var numericId = this.data.every(function (d) {
         return /^-?\d+\.?\d*$/.test(d.id) || /^-?\d*\.?\d+$/.test(d.id);
       });
       this.data.sort(function (a, b) {
         var id_diff = numericId ? +a.id - +b.id : a.id < b.id ? -1 : b.id < a.id ? 1 : 0;
-        var seq_diff = a.seq - b.seq;
-        return id_diff || seq_diff;
+        var timepoint_diff = a.start_timepoint - b.start_timepoint;
+        return id_diff || timepoint_diff;
       });
     }
 
@@ -4033,11 +4093,16 @@
       // Check for existence of variables.
       var has = hasVariables.call(this); // Apply data mappings.
 
-      mapVariables.call(this); // Define duration, sequence, and/or start and end timepoints.
+      mapVariables.call(this); // Define:
+      // - start and end timepoints with duration if only duration exists
+      // - duration if only start and end points exist
+      // - order of states with start and end timepoints
 
-      addVariables.call(this, has); // Sort data by id and sequence.
+      addVariables.call(this, has); // Define alternative order of events by event order and ID.
 
-      sort.call(this);
+      orderByState.call(this); // Sort data by ID then chronologically.
+
+      sort.call(this, has);
     }
 
     function dataManipulation() {

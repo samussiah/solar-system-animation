@@ -5,6 +5,17 @@ import getColorScale from './nestData/getColorScale';
 import getAesthetics from './nestData/getAesthetics';
 
 export default function nestData(data) {
+    // sequenced animation (vs timed animation)
+    // one interval per state
+    // each interval is offset by the position of the ID in the full set of IDs:
+    // - ID 001 begins at timepoint 1
+    // - ID 002 begins at timepoint 2
+    // - ...
+    // the full duration of each ID is the number of times they change states
+    // - at timepoint 0 all IDs are at s0
+    // - at timepoint 1 ID 001 moves to s1
+    // - at timepoint 2 ID 001 moves to s2 and ID 002 moves to s1
+    // - ...
     const nestedData = d3
         .nest()
         .key((d) => d.id)
@@ -26,6 +37,7 @@ export default function nestData(data) {
             const aesthetics = getAesthetics.call(this, aestheticValues, colorScale);
 
             return {
+                index: this.metadata.id.findIndex(id => id.key === state.id),
                 group, // array: data
                 duration, // number: total duration of individual
                 noStateChange, // boolean: did individual ever change state?

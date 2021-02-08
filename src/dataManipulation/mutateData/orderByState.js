@@ -45,7 +45,7 @@ export default function orderByState() {
 
         // Redefine duration of animation.
         // TODO: duration of animation should be the sum of the number of IDs in each state or something
-        this.settings.duration = this.metadata.id.length * this.metadata.orbit.length;
+        this.settings.duration = this.metadata.id.length * this.metadata.orbit.length + 1;
         //d3.sum(
         //    this.metadata.event,
         //    event => event.allIds.length

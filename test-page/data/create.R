@@ -6,11 +6,11 @@ n <- 100
 state0 <- tibble(
     id = 1:n,
     event_order = 0,
-    event = 'Pre-onset',
+    event = 'Onset',
     event_position = 0,
     stdy = 0,
     endy = 1,
-    color = 'Pre-onset',
+    color = 'Onset',
     shape = 'Not Treated'
 )
 

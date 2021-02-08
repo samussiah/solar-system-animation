@@ -9,6 +9,7 @@ export default function sidebar(main) {
     const timepoint = this.util
         .addElement('timepoint', progress)
         .classed('fdg-sidebar__label', true)
+        .classed('fdg-hidden', !this.settings.displayTiming)
         .html(
             `${this.settings.timepoint} ${
                 this.settings.timepoint !== 1
@@ -19,6 +20,7 @@ export default function sidebar(main) {
     const timeRelative = this.util
         .addElement('time-relative', progress)
         .classed('fdg-sidebar__sub-label', true)
+        .classed('fdg-hidden', !this.settings.displayTiming)
         .html(this.settings.timeRelative);
     const timer = addTimer.call(this, progress);
     const countdown = addCountdown.call(this, progress);

@@ -89,4 +89,8 @@ export default function update() {
         this.settings.runSequences = false;
         this.settings.animationTrack = 'full';
     }
+
+    // timing
+    if (this.settings.stateChange === 'ordered')
+        this.settings.displayTiming = false;
 }

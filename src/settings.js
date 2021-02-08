@@ -121,7 +121,7 @@ const settings = {
         'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.',
         '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.',
         'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.',
-        'Continue watching to learn how these individuals progress over the course of [duration] days.',
+        'Continue watching to learn how these individuals progress.', // over the course of [duration] days.',
     ], // array of strings
     information: null, // array of strings
 
@@ -156,8 +156,8 @@ const settings = {
     displayProgressBar: false,
     stratificationPositioning: 'circular', // ['circular', 'orbital']
     annotations: null,
-    intervalType: 'timepoint', // ['timepoint', 'id']
     stateChange: 'chronological', // ['chronological', 'ordered']
+    displayTiming: true,
 };
 
 export default settings;

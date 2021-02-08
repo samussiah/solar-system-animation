@@ -98,8 +98,6 @@ export default function resize() {
     this.focusAnnotations.attr('transform', (d) => `translate(${d.x},${d.y})`);
 
     // custom annotations
-    console.log(this.customAnnotations);
-    console.log('something');
     if (this.customAnnotations) {
         this.settings.annotations.forEach(annotation => {
             annotation.radius = annotation.orbit * this.settings.orbitRadius;

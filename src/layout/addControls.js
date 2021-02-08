@@ -15,11 +15,11 @@ export default function addControls() {
     };
 
     this.controls.display = addDisplay.call(this);
+    this.controls.playPause = addPlayPause.call(this);
+    this.controls.timepoint = addTimepoint.call(this);
     this.controls.sequences = addSequences.call(this);
     this.controls.stepSequences = addStepSequences.call(this);
     this.controls.speed = addSpeed.call(this);
-    this.controls.playPause = addPlayPause.call(this);
-    this.controls.timepoint = addTimepoint.call(this);
     this.controls.reset = addReset.call(this);
     this.controls.eventList = addEventList.call(this);
 

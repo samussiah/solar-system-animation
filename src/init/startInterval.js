@@ -1,3 +1,4 @@
+import timeoutBetweenStates from './startInterval/timeoutBetweenStates';
 import update from './startInterval/update';
 import reset from './startInterval/reset';
 import runNextSequence from './startInterval/runNextSequence';
@@ -6,6 +7,8 @@ import restartForceSimulation from './startInterval/restartForceSimulation';
 export const increment = function (data, increment) {
     // Increment timepoint.
     this.settings.timepoint += !!increment;
+
+    timeoutBetweenStates.call(this);
 
     // Update animation if current timepoint is less than full duration of animation.
     if (this.settings.timepoint <= this.settings.duration) update.call(this, data);

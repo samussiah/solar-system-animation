@@ -1,40 +1,54 @@
 // Generates an alternative state progression by orbit, state, and ID.
 export default function orderByState() {
     if (this.settings.stateChange === 'ordered') {
-        const ordered = this.data
-            .map((d,i) => {
-                const event = this.metadata.event.find(event => event.key === d.event);
 
-                return {
-                    event: d.event,
-                    orbit: event.order,
-                    event_order: event.position,
-                    id: d.id,
-                    id_order: this.metadata.id.findIndex(id => id.key === d.id),
-                };
-            });
+        // start timepoint
+        // - first state: 1
+        // - subsequent states: position of ID in ID list of previous state
+        //
+        // end timepoint
+        // - first state: position of ID in ID list of current state
+        // - subsequent states: start timepoint of current state + position of ID in ID list of current state
 
-        // TODO: within each state start timepoint should be the same for all IDs - only
-        // end timepoint changes - nest by event and calculate start and endtimepoints.
-        ordered
-            .sort((a,b) => {
-                const orbit = a.orbit - b.orbit;
-                const event_order = a.event_order - b.event_order;
-                const id_order = a.id_order - b.id_order;
+        d3.nest()
+            .key(d => d.id)
+            .rollup(group => {
+                group
+                    .sort((a,b) => (
+                        (a.event_order - b.event_order) ||
+                        (a.event_position - b.event_position) ||
+                        (a.event < b.event ? -1 : 1)
+                    ));
 
-                return orbit || event_order || id_order;
+                group
+                    .forEach((d,i) => {
+                        const currState = this.metadata.event
+                            .find(event => event.key === d.event);
+                        const prevState = this.metadata.event
+                            .find(event => event.key === group[i-1]?.event);
+
+                        if (i === 0) {
+                            d.start_timepoint = 1;
+                            d.end_timepoint = d.start_timepoint + currState.allIds.findIndex(id => id === d.id);
+                        } else {
+                            d.start_timepoint = prevState.allIds
+                                .findIndex(id => id === d.id) +
+                                prevState.start_timepoint + 1;
+                            d.end_timepoint = currState.allIds
+                                .findIndex(id => id === d.id) +
+                                currState.start_timepoint;
+                            d.duration = d.end_timepoint - d.start_timepoint + 1;
+                        }
+                    });
             })
-            .forEach((d,i) => {
-                d.start_timepoint = i;
-                d.end_timepoint = i;
-                d.duration = 1;
-            });
+            .entries(this.data);
 
-        this.data.forEach(d => {
-            const order = ordered.find(di => di.id === d.id && di.event === d.event);
-            d.start_timepoint = order.start_timepoint;
-            d.end_timepoint = order.end_timepoint;
-            d.duration = 1;
-        });
+        // Redefine duration of animation.
+        // TODO: duration of animation should be the sum of the number of IDs in each state or something
+        this.settings.duration = this.metadata.id.length * this.metadata.orbit.length;
+        //d3.sum(
+        //    this.metadata.event,
+        //    event => event.allIds.length
+        //);
     }
 }

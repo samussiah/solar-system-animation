@@ -320,7 +320,10 @@
       } else {
         this.settings.runSequences = false;
         this.settings.animationTrack = 'full';
-      }
+      } // timing
+
+
+      if (this.settings.stateChange === 'ordered') this.settings.displayTiming = false;
     }
 
     var settings = {
@@ -458,7 +461,8 @@
       modalPosition: 'center',
       // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
       modalWidth: '50%',
-      explanation: ['Each shape in this animation represents an individual.', 'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.', 'The <span class = "fdg-emphasized">annotations</span> at each focus represent the [event-count-type].', 'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.', '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.', 'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.', 'Continue watching to learn how these individuals progress over the course of [duration] days.'],
+      explanation: ['Each shape in this animation represents an individual.', 'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.', 'The <span class = "fdg-emphasized">annotations</span> at each focus represent the [event-count-type].', 'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.', '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.', 'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.', 'Continue watching to learn how these individuals progress.' // over the course of [duration] days.',
+      ],
       // array of strings
       information: null,
       // array of strings
@@ -499,10 +503,9 @@
       stratificationPositioning: 'circular',
       // ['circular', 'orbital']
       annotations: null,
-      intervalType: 'timepoint',
-      // ['timepoint', 'id']
-      stateChange: 'chronological' // ['chronological', 'ordered']
-
+      stateChange: 'chronological',
+      // ['chronological', 'ordered']
+      displayTiming: true
     };
 
     function controls(main) {
@@ -553,8 +556,8 @@
       var events = this.util.addElement('events', sidebar).html(this.settings.individualLabel);
       var legends = this.util.addElement('legends', sidebar);
       var progress = this.util.addElement('progress', sidebar);
-      var timepoint = this.util.addElement('timepoint', progress).classed('fdg-sidebar__label', true).html("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit));
-      var timeRelative = this.util.addElement('time-relative', progress).classed('fdg-sidebar__sub-label', true).html(this.settings.timeRelative);
+      var timepoint = this.util.addElement('timepoint', progress).classed('fdg-sidebar__label', true).classed('fdg-hidden', !this.settings.displayTiming).html("".concat(this.settings.timepoint, " ").concat(this.settings.timepoint !== 1 ? this.settings.timeUnit + 's' : this.settings.timeUnit));
+      var timeRelative = this.util.addElement('time-relative', progress).classed('fdg-sidebar__sub-label', true).classed('fdg-hidden', !this.settings.displayTiming).html(this.settings.timeRelative);
       var timer = addTimer.call(this, progress);
       var countdown = addCountdown.call(this, progress);
       var freqTable = this.util.addElement('freq-table', sidebar);
@@ -786,11 +789,41 @@
       var maxTimepoint = d3.max(group, function (d) {
         return d.end_timepoint;
       });
-      var state = index !== undefined ? group[index] : this.settings.timepoint >= maxTimepoint // last state
-      ? group[group.length - 1] : this.settings.timepoint < minTimepoint // first state
-      ? group[0] : group.find(function (d, i) {
+      var state = group.find(function (d, i) {
         return d.start_timepoint <= _this.settings.timepoint && _this.settings.timepoint <= d.end_timepoint;
       }); // first (and hopefully only) state that overlaps the current timepoint
+
+      switch (true) {
+        case index !== undefined:
+          state = group[index];
+          break;
+
+        case this.settings.timepoint >= maxTimepoint:
+          state = group[group.length - 1];
+          break;
+
+        case this.settings.timepoint < minTimepoint:
+          state = group[0];
+          break;
+
+        case state === undefined:
+          state = group.slice().sort(function (a, b) {
+            return b.start_timepoint - a.start_timepoint;
+          }).find(function (d) {
+            return d.start_timepoint <= _this.settings.timepoint;
+          });
+          break;
+      } //const state =
+      //    index !== undefined
+      //        : this.settings.timepoint >= maxTimepoint // last state
+      //        ? group[group.length - 1]
+      //        : this.settings.timepoint < minTimepoint // first state
+      //        ? group[0]
+      //        : group.find((d, i) =>
+      //                d.start_timepoint <= this.settings.timepoint &&
+      //                this.settings.timepoint <= d.end_timepoint
+      //          ); // first (and hopefully only) state that overlaps the current timepoint
+
 
       return state;
     }
@@ -1100,9 +1133,6 @@
         return "translate(".concat(d.x, ",").concat(d.y, ")");
       }); // custom annotations
 
-      console.log(this.customAnnotations);
-      console.log('something');
-
       if (this.customAnnotations) {
         this.settings.annotations.forEach(function (annotation) {
           annotation.radius = annotation.orbit * _this.settings.orbitRadius;
@@ -1207,19 +1237,25 @@
           // number of individuals that have ever been in the state
           nEvents: 0,
           // number of times any individual has been in the state up to the current timepoint, i.e. the total number of events that have occurred so far
-          nEventsTotal: group.length // total number of events
-
+          nEventsTotal: group.length,
+          // total number of events
+          allIds: _toConsumableArray(new Set(group.map(function (d) {
+            return d.id;
+          })).values()).sort()
         };
-      }).entries(this.data).map(function (event) {
+      }).entries(this.data).sort(function (a, b) {
+        return a.value.order - b.value.order || a.value.position - b.value.position;
+      });
+      var event = nest.map(function (event, i) {
         Object.assign(event, event.value); // remove nesting
 
         delete event.value;
+        event.start_timepoint = i === 0 ? 1 : nest[i - 1].end_timepoint + 1;
+        event.end_timepoint = event.start_timepoint + event.allIds.length - 1;
+        event.rank = i;
         return event;
-      }).sort(function (a, b) {
-        return a.order - b.order || b.nEventsTotal - a.nEventsTotal;
-      } // ensure events plot in order
-      );
-      return nest;
+      });
+      return event;
     }
 
     function updateEventDependentSettings(metadata) {
@@ -1241,6 +1277,8 @@
         orbit.label = Array.isArray(_this.settings.orbitLabels) && _this.settings.orbitLabels.length === nest.length ? _this.settings.orbitLabels[i] : "Orbit ".concat(i + 1);
         orbit.values.sort(function (a, b) {
           return a.position - b.position;
+        }).forEach(function (event) {
+          event.orbitLabel = orbit.label;
         });
       });
       return nest;
@@ -2697,6 +2735,49 @@
       freqTable$1.call(this);
     }
 
+    function updateText() {
+      var _this = this;
+
+      if (this.prevEvent === undefined || this.currEvent.orbitLabel !== this.prevEvent.orbitLabel) {
+        this.containers.sequenceOverlay.background.sequence.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+          _this.containers.sequenceOverlay.background.sequence.html(_this.currEvent.orbitLabel || _this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+        });
+        this.containers.sequenceOverlay.foreground.sequence.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+          _this.containers.sequenceOverlay.foreground.sequence.html(_this.currEvent.orbitLabel || _this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+        });
+      }
+
+      if (this.currEvent.orbitLabel && this.currEvent.key) {
+        this.containers.sequenceOverlay.background.event.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+          _this.containers.sequenceOverlay.background.event.html(_this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+        });
+        this.containers.sequenceOverlay.foreground.event.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+          _this.containers.sequenceOverlay.foreground.event.html(_this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+        });
+      }
+    }
+
+    function timeoutBetweenStates() {
+      var _this = this;
+
+      if (this.settings.stateChange === 'ordered') {
+        var _this$currEvent;
+
+        this.prevEvent = this.currEvent;
+        this.currEvent = this.metadata.event.find(function (event) {
+          return event.start_timepoint <= _this.settings.timepoint && _this.settings.timepoint <= event.end_timepoint;
+        });
+
+        if (this.settings.timepoint === ((_this$currEvent = this.currEvent) === null || _this$currEvent === void 0 ? void 0 : _this$currEvent.start_timepoint)) {
+          this.interval.stop();
+          updateText.call(this);
+          this.timeout = d3.timeout(function () {
+            _this.interval = startInterval.call(_this, _this.data);
+          }, this.settings.modalSpeed);
+        }
+      }
+    }
+
     function orbits() {
       var main = this; //if (this.settings.pulseOrbits) {
 
@@ -2921,7 +3002,8 @@
 
     var increment = function increment(data, _increment) {
       // Increment timepoint.
-      this.settings.timepoint += !!_increment; // Update animation if current timepoint is less than full duration of animation.
+      this.settings.timepoint += !!_increment;
+      timeoutBetweenStates.call(this); // Update animation if current timepoint is less than full duration of animation.
 
       if (this.settings.timepoint <= this.settings.duration) update$1.call(this, data); // Otherwise if animation is sequenced, run next sequence.
       else if (this.sequence) runNextSequence.call(this); // Otherwise restart animation.
@@ -3334,11 +3416,11 @@
         container: this.containers.controls
       };
       this.controls.display = display.call(this);
+      this.controls.playPause = playPause$1.call(this);
+      this.controls.timepoint = timepoint.call(this);
       this.controls.sequences = sequences.call(this);
       this.controls.stepSequences = stepSequences.call(this);
       this.controls.speed = speed.call(this);
-      this.controls.playPause = playPause$1.call(this);
-      this.controls.timepoint = timepoint.call(this);
       this.controls.reset = reset$1.call(this);
       this.controls.eventList = eventList.call(this); // Capture all controls in a selection.
 
@@ -4040,41 +4122,52 @@
       var _this = this;
 
       if (this.settings.stateChange === 'ordered') {
-        var ordered = this.data.map(function (d, i) {
-          var event = _this.metadata.event.find(function (event) {
-            return event.key === d.event;
+        // start timepoint
+        // - first state: 1
+        // - subsequent states: position of ID in ID list of previous state
+        //
+        // end timepoint
+        // - first state: position of ID in ID list of current state
+        // - subsequent states: start timepoint of current state + position of ID in ID list of current state
+        d3.nest().key(function (d) {
+          return d.id;
+        }).rollup(function (group) {
+          group.sort(function (a, b) {
+            return a.event_order - b.event_order || a.event_position - b.event_position || (a.event < b.event ? -1 : 1);
           });
+          group.forEach(function (d, i) {
+            var currState = _this.metadata.event.find(function (event) {
+              return event.key === d.event;
+            });
 
-          return {
-            event: d.event,
-            orbit: event.order,
-            event_order: event.position,
-            id: d.id,
-            id_order: _this.metadata.id.findIndex(function (id) {
-              return id.key === d.id;
-            })
-          };
-        }); // TODO: within each state start timepoint should be the same for all IDs - only
-        // end timepoint changes - nest by event and calculate start and endtimepoints.
+            var prevState = _this.metadata.event.find(function (event) {
+              var _group;
 
-        ordered.sort(function (a, b) {
-          var orbit = a.orbit - b.orbit;
-          var event_order = a.event_order - b.event_order;
-          var id_order = a.id_order - b.id_order;
-          return orbit || event_order || id_order;
-        }).forEach(function (d, i) {
-          d.start_timepoint = i;
-          d.end_timepoint = i;
-          d.duration = 1;
-        });
-        this.data.forEach(function (d) {
-          var order = ordered.find(function (di) {
-            return di.id === d.id && di.event === d.event;
+              return event.key === ((_group = group[i - 1]) === null || _group === void 0 ? void 0 : _group.event);
+            });
+
+            if (i === 0) {
+              d.start_timepoint = 1;
+              d.end_timepoint = d.start_timepoint + currState.allIds.findIndex(function (id) {
+                return id === d.id;
+              });
+            } else {
+              d.start_timepoint = prevState.allIds.findIndex(function (id) {
+                return id === d.id;
+              }) + prevState.start_timepoint + 1;
+              d.end_timepoint = currState.allIds.findIndex(function (id) {
+                return id === d.id;
+              }) + currState.start_timepoint;
+              d.duration = d.end_timepoint - d.start_timepoint + 1;
+            }
           });
-          d.start_timepoint = order.start_timepoint;
-          d.end_timepoint = order.end_timepoint;
-          d.duration = 1;
-        });
+        }).entries(this.data); // Redefine duration of animation.
+        // TODO: duration of animation should be the sum of the number of IDs in each state or something
+
+        this.settings.duration = this.metadata.id.length * this.metadata.orbit.length; //d3.sum(
+        //    this.metadata.event,
+        //    event => event.allIds.length
+        //);
       }
     }
 

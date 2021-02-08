@@ -2738,21 +2738,36 @@
     function updateText() {
       var _this = this;
 
-      if (this.prevEvent === undefined || this.currEvent.orbitLabel !== this.prevEvent.orbitLabel) {
+      if (this.settings.timepoint < this.settings.duration) {
+        if (this.prevEvent === undefined || this.currEvent.orbitLabel !== this.prevEvent.orbitLabel) {
+          this.containers.sequenceOverlay.background.sequence.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+            _this.containers.sequenceOverlay.background.sequence.html(_this.currEvent.orbitLabel || _this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          });
+          this.containers.sequenceOverlay.foreground.sequence.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+            _this.containers.sequenceOverlay.foreground.sequence.html(_this.currEvent.orbitLabel || _this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          });
+        }
+
+        if (this.currEvent.orbitLabel && this.currEvent.key) {
+          this.containers.sequenceOverlay.background.event.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+            _this.containers.sequenceOverlay.background.event.html(_this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          });
+          this.containers.sequenceOverlay.foreground.event.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
+            _this.containers.sequenceOverlay.foreground.event.html(_this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          });
+        }
+      } else {
         this.containers.sequenceOverlay.background.sequence.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
-          _this.containers.sequenceOverlay.background.sequence.html(_this.currEvent.orbitLabel || _this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          return _this.containers.sequenceOverlay.background.sequence.html(null);
         });
         this.containers.sequenceOverlay.foreground.sequence.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
-          _this.containers.sequenceOverlay.foreground.sequence.html(_this.currEvent.orbitLabel || _this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          return _this.containers.sequenceOverlay.foreground.sequence.html(null);
         });
-      }
-
-      if (this.currEvent.orbitLabel && this.currEvent.key) {
         this.containers.sequenceOverlay.background.event.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
-          _this.containers.sequenceOverlay.background.event.html(_this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          return _this.containers.sequenceOverlay.background.event.html(null);
         });
         this.containers.sequenceOverlay.foreground.event.style('opacity', 1).transition().duration(this.settings.modalSpeed / 5).style('opacity', 0).on('end', function () {
-          _this.containers.sequenceOverlay.foreground.event.html(_this.currEvent.key).style('opacity', 0).transition().duration(_this.settings.modalSpeed / 5).style('opacity', 1);
+          return _this.containers.sequenceOverlay.foreground.event.html(null);
         });
       }
     }
@@ -2923,6 +2938,10 @@
         event.prevCount = 0;
         event.count = 0;
         event.cumulative = 0;
+        event.ids = new Set();
+        event.nIds = 0;
+        event.idsCumulative = new Set();
+        event.nIdsCumulative = 0;
       });
       data.nested.forEach(function (d) {
         d.value.statePrevious = null;
@@ -3312,7 +3331,7 @@
       var _this = this;
 
       var main = this;
-      var container = this.controls.container.append('div').classed('fdg-control fdg-control--timepoint', true);
+      var container = this.controls.container.append('div').classed('fdg-control fdg-control--timepoint', true).classed('fdg-hidden', this.settings.stateChange === 'ordered');
       var inputs = container.append('div').classed("fdg-button fdg-input", true).append('input').attr('type', 'number').attr('title', "Choose a timepoint.").attr('value', +this.settings.timepoint).attr('min', 1).attr('max', this.settings.duration);
       inputs.on('click', function () {
         // Pause simulation.

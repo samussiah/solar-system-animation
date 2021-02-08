@@ -14,7 +14,8 @@ export default function timepoint() {
 
     const container = this.controls.container
         .append('div')
-        .classed('fdg-control fdg-control--timepoint', true);
+        .classed('fdg-control fdg-control--timepoint', true)
+        .classed('fdg-hidden', this.settings.stateChange === 'ordered');
     const inputs = container
         .append('div')
         .classed(`fdg-button fdg-input`, true)

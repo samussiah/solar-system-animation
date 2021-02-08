@@ -23,6 +23,10 @@ export default function resetAnimation(data) {
         event.prevCount = 0;
         event.count = 0;
         event.cumulative = 0;
+        event.ids = new Set();
+        event.nIds = 0;
+        event.idsCumulative = new Set();
+        event.nIdsCumulative = 0;
     });
 
     data.nested.forEach((d) => {

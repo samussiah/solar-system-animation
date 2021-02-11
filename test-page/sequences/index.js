@@ -77,12 +77,12 @@ fetch('../data/adverse-event-outcome.csv')
                     display: false,
                 },
                 annotations,
-                speeds: {
-                    fast: 25,
-                },
+                //speeds: {
+                //    fast: 25,
+                //},
                 speed: 'fast',
                 //delay: false,
-                modalSpeed: 1000,
+                modalSpeed: 2500,
                 modalPosition: 'bottom-left',
                 eventCountType: 'cumulative-id',
                 collisionPadding: 3,

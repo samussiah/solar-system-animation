@@ -27,7 +27,9 @@ export default function annotateFoci() {
                     ? `translate(0,${getDy.call(this, d)})`
                     : null
             ));
-        const label = addLabel.call(this, text);
+        const label = addLabel.call(this, text)
+            .attr('dy', 0);
+        this.util.wrap(label, this.settings.orbitRadius);
         const eventCount = addEventCount.call(this, text);
 
         // Position annotations differently in categorical layout.

@@ -58,8 +58,8 @@ export default function canvas(main) {
         .attr('x', 0)
         .attr('y', 30)
         .attr('alignment-baseline', 'hanging');
-    const focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');
     const customAnnotations = this.util.addElement('custom-annotations', svgForeground, 'g');
+    const focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');
 
     // modal
     const modalContainer = this.util.addElement('modal', animation)

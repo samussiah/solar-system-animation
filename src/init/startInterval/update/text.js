@@ -10,4 +10,12 @@ export default function text(data) {
     updateLegends.call(this, data);
     updateCounts.call(this);
     updateFreqTable.call(this);
+
+    // Display timed annotations.
+    if (this.settings.annotations && Array.isArray(this.settings.annotations))
+        this.customAnnotations
+            .classed(
+                'fdg-hidden',
+                d => d.timepoint > this.settings.timepoint
+            );
 }

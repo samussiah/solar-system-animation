@@ -304,6 +304,9 @@ body {
             .fdg-custom-annotation .fdg-focus-annotation__foreground {
                 fill: var(--text-color--red);
             }
+            .fdg-custom-annotation__line {
+                stroke: var(--text-color--red);
+            }
 
         /* modal */
 

@@ -1,12 +1,3 @@
-import getTextAnchor from './annotateFoci/x/getPosition';
-import getDx from './annotateFoci/x/getRelative';
-import getAlignmentBaseline from './annotateFoci/y/getPosition';
-import getDy from './annotateFoci/y/getRelative';
-
-import addLabel from './annotateFoci/addLabel';
-import addEventCount from './annotateFoci/addEventCount';
-import categoricallyReposition from './annotateFoci/categoricallyReposition';
-
 export default function annotateCustom() {
     let annotations;
 
@@ -30,17 +21,33 @@ export default function annotateCustom() {
             .data(this.settings.annotations)
             .join('g')
             .classed('fdg-custom-annotation', true)
+            .classed('fdg-hidden', d => d.timepoint > this.settings.timepoint)
             .attr('transform', (d) => `translate(${d.x},${d.y})`);
 
-        ['background', 'foreground'].forEach((pos) => {
-            const text = annotations
-                .append('text')
-                .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
-                .attr('alignment-baseline', d => d.angle > 0 ? 'hanging' : d.angle < 0 ? 'baseline' : 'middle')
-                .attr('dx', d => d.dx || null)
-                .attr('dy', d => d.dy || null)
-                .text(d => d.label);
-        });
+        annotations.html(d => d.value);
+
+        //['background', 'foreground'].forEach((pos) => {
+        //    const text = annotations
+        //        .append('text')
+        //        .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
+        //        .attr('alignment-baseline', d => d.angle > 0 ? 'hanging' : d.angle < 0 ? 'baseline' : 'middle')
+        //        .html(d => d.value)
+        //        .each(function(d) {
+        //            const selection = d3.select(this);
+
+        //            // Apply attributes.
+        //            if (typeof d.attr === 'object' && d.attr !== null)
+        //                Object.keys(d.attr).forEach(attr => {
+        //                    selection.attr(attr, d.attr[attr]);
+        //                });
+
+        //            // Apply styles.
+        //            if (typeof d.style === 'object' && d.style !== null)
+        //                Object.keys(d.style).forEach(style => {
+        //                    selection.style(style, d.style[style]);
+        //                });
+        //        });
+        //});
     }
 
     return annotations;

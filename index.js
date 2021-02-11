@@ -250,11 +250,39 @@
       }, {});
     }
 
+    function wrap(text, width) {
+      text.each(function () {
+        var text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1,
+            // ems
+        y = text.attr("y"),
+            dy = parseFloat(text.attr("dy")),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+
+        while (word = words.pop()) {
+          line.push(word);
+          tspan.text(line.join(" "));
+
+          if (tspan.node().getComputedTextLength() > width) {
+            line.pop();
+            tspan.text(line.join(" "));
+            line = [word];
+            tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+          }
+        }
+      });
+    }
+
     var util = {
       addElement: addElement,
       arcTween: arcTween,
       csv: csv,
-      mergeDeep: mergeDeep
+      mergeDeep: mergeDeep,
+      wrap: wrap
     };
 
     // TODO: setting checks
@@ -597,8 +625,8 @@
       sequenceOverlay.foreground = this.util.addElement('sequence-overlay__foreground', sequenceOverlay, 'text').classed('fdg-focus-annotation__foreground fdg-focus-annotation__text', true).attr('alignment-baseline', 'hanging');
       sequenceOverlay.foreground.sequence = this.util.addElement('sequence-overlay__foreground__sequence', sequenceOverlay.foreground, 'tspan').classed('fdg-focus-annotation__label', true).attr('x', 0).attr('y', 0).attr('alignment-baseline', 'hanging');
       sequenceOverlay.foreground.event = this.util.addElement('sequence-overlay__foreground__event', sequenceOverlay.foreground, 'tspan').classed('fdg-focus-annotation__event-count', true).attr('x', 0).attr('y', 30).attr('alignment-baseline', 'hanging');
-      var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');
-      var customAnnotations = this.util.addElement('custom-annotations', svgForeground, 'g'); // modal
+      var customAnnotations = this.util.addElement('custom-annotations', svgForeground, 'g');
+      var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g'); // modal
 
       var modalContainer = this.util.addElement('modal', animation).attr('class', function (d) {
         return "fdg-modal ".concat(_this.settings.modalPosition.split('-').map(function (position) {
@@ -2728,11 +2756,17 @@
     }
 
     function text(data) {
+      var _this = this;
+
       this.settings.progress = this.settings.timepoint / this.settings.duration;
       progress.call(this);
       legends.call(this, data);
       counts.call(this);
-      freqTable$1.call(this);
+      freqTable$1.call(this); // Display timed annotations.
+
+      if (this.settings.annotations && Array.isArray(this.settings.annotations)) this.customAnnotations.classed('fdg-hidden', function (d) {
+        return d.timepoint > _this.settings.timepoint;
+      });
     }
 
     function updateText() {
@@ -3972,7 +4006,10 @@
         .style('transform', function (d) {
           return _this.settings.focusOffset === 'heuristic' ? "translate(0,".concat(getRelative.call(_this, d), ")") : null;
         });
-        var label = addLabel.call(_this, text);
+        var label = addLabel.call(_this, text).attr('dy', 0);
+
+        _this.util.wrap(label, _this.settings.orbitRadius);
+
         var eventCount = addEventCount.call(_this, text); // Position annotations differently in categorical layout.
 
         categoricallyReposition.call(_this, text, label, eventCount);
@@ -4015,20 +4052,33 @@
           annotation.y = annotation.order === 0 ? _this.settings.center.y : _this.settings.center.y + annotation.radius * // number of orbit radii from the center
           Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
         });
-        annotations = this.containers.customAnnotations.selectAll('g.fdg-custom-annotation').data(this.settings.annotations).join('g').classed('fdg-custom-annotation', true).attr('transform', function (d) {
+        annotations = this.containers.customAnnotations.selectAll('g.fdg-custom-annotation').data(this.settings.annotations).join('g').classed('fdg-custom-annotation', true).classed('fdg-hidden', function (d) {
+          return d.timepoint > _this.settings.timepoint;
+        }).attr('transform', function (d) {
           return "translate(".concat(d.x, ",").concat(d.y, ")");
         });
-        ['background', 'foreground'].forEach(function (pos) {
-          var text = annotations.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true).attr('alignment-baseline', function (d) {
-            return d.angle > 0 ? 'hanging' : d.angle < 0 ? 'baseline' : 'middle';
-          }).attr('dx', function (d) {
-            return d.dx || null;
-          }).attr('dy', function (d) {
-            return d.dy || null;
-          }).text(function (d) {
-            return d.label;
-          });
-        });
+        annotations.html(function (d) {
+          return d.value;
+        }); //['background', 'foreground'].forEach((pos) => {
+        //    const text = annotations
+        //        .append('text')
+        //        .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
+        //        .attr('alignment-baseline', d => d.angle > 0 ? 'hanging' : d.angle < 0 ? 'baseline' : 'middle')
+        //        .html(d => d.value)
+        //        .each(function(d) {
+        //            const selection = d3.select(this);
+        //            // Apply attributes.
+        //            if (typeof d.attr === 'object' && d.attr !== null)
+        //                Object.keys(d.attr).forEach(attr => {
+        //                    selection.attr(attr, d.attr[attr]);
+        //                });
+        //            // Apply styles.
+        //            if (typeof d.style === 'object' && d.style !== null)
+        //                Object.keys(d.style).forEach(style => {
+        //                    selection.style(style, d.style[style]);
+        //                });
+        //        });
+        //});
       }
 
       return annotations;

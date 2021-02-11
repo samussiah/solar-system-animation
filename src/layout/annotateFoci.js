@@ -22,8 +22,13 @@ export default function annotateFoci() {
             .append('text')
             .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
             //.style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
-            .style('transform', (d) => `translate(0,${getDy.call(this, d)})`);
-        const label = addLabel.call(this, text);
+            .style('transform', (d) =>
+                this.settings.focusOffset === 'heuristic'
+                    ? `translate(0,${getDy.call(this, d)})`
+                    : null
+            );
+        const label = addLabel.call(this, text).attr('y', 0).attr('dy', 0);
+        this.util.wrap(label, this.settings.orbitRadius);
         const eventCount = addEventCount.call(this, text);
 
         // Position annotations differently in categorical layout.

@@ -6,11 +6,11 @@ n <- 100
 state0 <- tibble(
     id = 1:n,
     event_order = 0,
-    event = 'Pre-onset',
+    event = 'Onset',
     event_position = 0,
     stdy = 0,
     endy = 1,
-    color = 'Pre-onset',
+    color = 'Onset',
     shape = 'Not Treated'
 )
 
@@ -25,7 +25,12 @@ state1 <- state0 %>%
             TRUE ~ NaN
         ),
         stdy = endy,
-        endy = stdy + sample(0:6, n, T),
+        endy = case_when(
+            event == 'Mild' ~ stdy + sample(0:6, n, T),
+            event == 'Moderate' ~ stdy + sample(0:13, n, T),
+            event == 'Severe' ~ stdy + sample(0:21, n, T),
+            TRUE ~ stdy
+        ),
         color = event
     )
 
@@ -34,8 +39,8 @@ state2 <- state1 %>%
         event_order = 2,
         event = sample(c('Not Treated', 'Standard of Care', 'Rescue Meds'), n, T),
         event_position = case_when(
-            event == 'Standard of Care' ~ -15,
-            event == 'Not Treated' ~ 0,
+            event == 'Not Treated' ~ -15,
+            event == 'Standard of Care' ~ 0,
             event == 'Rescue Meds' ~ 15,
             TRUE ~ NaN
         ),
@@ -47,10 +52,10 @@ state2 <- state1 %>%
 state3 <- state2 %>%
     mutate(
         event_order = 3,
-        event = sample(c('Resolved', 'Resolved w/ Sequelae', 'Not Resolved'), n, T),
+        event = sample(c('Resolved', 'Recovered / Resolved with Sequelae', 'Not Resolved'), n, T),
         event_position = case_when(
             event == 'Resolved' ~ -20,
-            event == 'Resolved w/ Sequelae' ~ 0,
+            event == 'Recovered / Resolved with Sequelae' ~ 0,
             event == 'Not Resolved' ~ 20,
             TRUE ~ NaN
         ),

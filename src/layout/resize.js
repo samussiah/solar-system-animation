@@ -3,6 +3,7 @@ import restartForceSimulation from '../init/startInterval/restartForceSimulation
 import addStaticForceSimulation from '../init/addStaticForceSimulation';
 import updateData from '../init/startInterval/update/data';
 
+// TODO: modularize this function with declaritive subfunctions
 export default function resize() {
     const node = this.containers.animation.node();
     this.settings.width = node.clientWidth;
@@ -87,7 +88,7 @@ export default function resize() {
     }
 
     // Update the node data.
-    updateData.call(this);
+    updateData.call(this, this.sequence ? this.sequence.data : this.data);
     restartForceSimulation.call(this);
 
     // static force simulation
@@ -95,4 +96,23 @@ export default function resize() {
 
     // focus annotations
     this.focusAnnotations.attr('transform', (d) => `translate(${d.x},${d.y})`);
+
+    // custom annotations
+    if (this.customAnnotations) {
+        this.settings.annotations.forEach((annotation) => {
+            annotation.radius = annotation.orbit * this.settings.orbitRadius;
+            annotation.theta = (2 * Math.PI * annotation.angle) / 360;
+            annotation.x =
+                this.settings.center.x +
+                annotation.radius * // number of orbit radii from the center
+                    Math.cos(annotation.theta); // position along the circle at the given orbit along which
+            annotation.y =
+                annotation.order === 0
+                    ? this.settings.center.y
+                    : this.settings.center.y +
+                      annotation.radius * // number of orbit radii from the center
+                          Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
+        });
+        this.customAnnotations.attr('transform', (d) => `translate(${d.x},${d.y})`);
+    }
 }

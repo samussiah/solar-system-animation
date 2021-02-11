@@ -11,25 +11,8 @@ fetch('./data/data_1000.csv')
             {
                 eventLabel: 'HFrEF events',
                 timeRelative: 'since baseline',
-                //colorBy: {
-                //    type: 'categorical',
-                //    variable: 'category',
-                //    label: 'Color Stratum',
-                //    colorScheme: 'Tableau10',
-                //    stratify: false,
-                //},
-                //sizeBy: {
-                //    type: null,
-                //},
-                //shapeBy: {
-                //    type: 'categorical',
-                //    variable: 'shape',
-                //    label: 'Shape Stratum',
-                //},
-                //freqTable: {
-                //},
+                //playPause: 'pause',
                 //delay: false,
-                //modalSpeed: 5000,
             }
         );
     });

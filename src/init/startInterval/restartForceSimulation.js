@@ -1,6 +1,10 @@
 export default function restartForceSimulation() {
     // Remove centering force after first interval.
-    if (this.settings.timepoint > 0 && !!this.forceSimulation)
+    if (
+        !!this.forceSimulation &&
+        !!this.forceSimulation.force('center') &&
+        this.settings.removeCenterForce === true
+    )
         this.forceSimulation.force('center', null);
 
     // Reheat the simulation (alpha(1)) and update the coordinates of the x- and y- forces.

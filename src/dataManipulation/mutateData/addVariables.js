@@ -4,6 +4,7 @@ export default function addVariables(has) {
         .rollup((group) => {
             group.forEach((d, i) => {
                 // Define start and end timepoints when only duration exists.
+                // This approach assumes data are already sorted chronologically.
                 if (has.duration && !has.start_timepoint) {
                     if (i === 0) {
                         d.start_timepoint = 1;
@@ -31,15 +32,20 @@ export default function addVariables(has) {
             });
 
             // Define sequence
-            //if (!has.sequence) {
-            //    group
-            //        .sort((a, b) => a.start_timepoint - b.start_timepoint)
-            //        .forEach((d, i) => {
-            //            d.seq = i;
-            //        });
-            //} else {
-            //    group.sort((a, b) => a.seq - b.seq);
-            //}
+            group
+                .sort((a, b) => {
+                    const start_timepoint = a.start_timepoint - b.start_timepoint;
+                    const end_timepoint = a.end_timepoint - b.end_timepoint;
+                    const event_order = a.event_order - b.event_order;
+
+                    // Realistically states should be unique and non-overlapping within
+                    // start and end timepoint but if the library were to ever support
+                    // concurrent states we include event order in the sort.
+                    return start_timepoint || end_timepoint || event_order;
+                })
+                .forEach((d, i) => {
+                    d.sequence = i;
+                });
         })
         .entries(this.data);
 }

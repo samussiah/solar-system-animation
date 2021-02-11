@@ -3,11 +3,13 @@ import updateProgress from '../update/text/progress';
 import startInterval from '../../startInterval';
 
 export default function timeout(data, countdown) {
-    const timeout = window.setTimeout(() => {
+    if (this.timeout) this.timeout.stop();
+
+    const timeout = d3.timeout(() => {
         resetAnimation.call(this, data);
         updateProgress.call(this);
-        window.clearInterval(countdown);
-        window.clearTimeout(timeout);
+        countdown.stop();
+        timeout.stop();
         this.containers.countdown
             .classed('fdg-invisible', (d) => d === this.settings.resetDelay / 1000 - 1)
             .classed('fdg-hidden', (d) => d !== this.settings.resetDelay / 1000 - 1);

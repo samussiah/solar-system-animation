@@ -68,7 +68,7 @@ export default function update() {
 
         texts = texts.concat(
             this.settings.explanation.filter(
-                (el) => !(this.settings.hideControls && el.includes('controls'))
+                (el) => el !== null && !(this.settings.hideControls && el.includes('controls'))
             )
         );
     }
@@ -81,8 +81,15 @@ export default function update() {
     if (this.settings.sequences) {
         this.settings.loop = false;
         this.settings.runSequences = true;
-        this.settings.sequences.forEach(sequence => {
-            sequence.event_index = 0;
+        this.settings.animationTrack = 'sequence';
+        this.settings.sequences.forEach((sequence) => {
+            sequence.eventIndex = 0;
         });
+    } else {
+        this.settings.runSequences = false;
+        this.settings.animationTrack = 'full';
     }
+
+    // timing
+    if (this.settings.stateChange === 'ordered') this.settings.displayTiming = false;
 }

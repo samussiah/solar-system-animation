@@ -2,7 +2,7 @@ import toggle from './playPause/toggle';
 import startInterval from '../../init/startInterval';
 
 export default function speed() {
-    const fdg = this;
+    const main = this;
 
     const container = this.controls.container
         .append('div')
@@ -18,7 +18,10 @@ export default function speed() {
         .append('div')
         .attr(
             'class',
-            (d) => `fdg-button ${d.label} ${d.label === this.settings.speed ? 'current' : ''}`
+            (d) =>
+                `fdg-button ${d.label} ${
+                    d.label === this.settings.speed ? 'fdg-button--current' : ''
+                }`
         )
         .attr(
             'title',
@@ -26,11 +29,14 @@ export default function speed() {
         )
         .text((d) => d.label);
     inputs.on('click', function (d) {
-        fdg.settings.speed = d.label;
-        inputs.classed('current', (di) => di.label === d.label);
-        if (fdg.settings.playPause === 'play') {
-            fdg.interval.stop();
-            fdg.interval = startInterval.call(fdg, fdg.data);
+        main.settings.speed = d.label;
+        inputs.classed('fdg-button--current', (di) => di.label === d.label);
+        if (main.settings.playPause === 'play') {
+            if (!!main.interval) main.interval.stop();
+            main.interval = startInterval.call(
+                main,
+                main.sequence ? main.sequence.data : main.data
+            );
         }
     });
 

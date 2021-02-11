@@ -31,7 +31,7 @@ const settings = {
         nColors: 6, // min: 3, max: 9
     },
     color: 'rgb(170,170,170)',
-    fill: null, // defined in ./defineMetadata/defineIdDependentSettings
+    fill: null, // boolean - defined in ./defineMetadata/defineIdDependentSettings
 
     // size
     sizeBy: {
@@ -50,7 +50,7 @@ const settings = {
         label: null,
         shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
     },
-    shape: 'circle',
+    shape: 'circle', // string - default shape
 
     /**-------------------------------------------------------------------------------------------\
       freq table
@@ -110,8 +110,10 @@ const settings = {
     \-------------------------------------------------------------------------------------------**/
 
     modal: true, // display modals?
-    modalSpeed: 15000, // amount of time for which each modal appears
+    modalSpeed: 10000, // amount of time for which each modal appears
     modalIndex: 0,
+    modalPosition: 'center', // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
+    modalWidth: '50%',
     explanation: [
         'Each shape in this animation represents an individual.',
         'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.',
@@ -119,7 +121,7 @@ const settings = {
         'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.',
         '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.',
         'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.',
-        'Continue watching to learn how these individuals progress over the course of [duration] days.',
+        'Continue watching to learn how these individuals progress.', // over the course of [duration] days.',
     ], // array of strings
     information: null, // array of strings
 
@@ -128,22 +130,34 @@ const settings = {
     \-------------------------------------------------------------------------------------------**/
 
     events: null, // defined in ./defineMetadata
-    eventLabel: 'Events',
+    individualUnit: 'individual',
+    individualLabel: 'Individuals',
     eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
     eventCount: true, // display [ n (%) ] beneath focus labels?
     eventCountType: 'current-id', // ['current-id', 'cumulative-id', 'cumulative-event']
     eventChangeCount: null, // defined in ./defineMetadata/updateEventDependentSettings
 
     /**-------------------------------------------------------------------------------------------\
+      sequences
+    \-------------------------------------------------------------------------------------------**/
+
+    runSequences: false,
+    sequences: null,
+    sequenceIndex: 0,
+    eventIndex: 0,
+    animationTrack: 'full', // ['full', 'sequence']
+
+    /**-------------------------------------------------------------------------------------------\
       miscellaneous
     \-------------------------------------------------------------------------------------------**/
 
     hideControls: false,
-    focusOffset: 'heuristic', // ['heuristic', 'vertical']
+    focusOffset: 'heuristic', // ['heuristic', 'none']
     displayProgressBar: false,
     stratificationPositioning: 'circular', // ['circular', 'orbital']
-    sequences: null,
-    runSequences: false,
+    annotations: null,
+    stateChange: 'chronological', // ['chronological', 'ordered']
+    displayTiming: true,
 };
 
 export default settings;

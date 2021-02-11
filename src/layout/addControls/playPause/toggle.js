@@ -20,15 +20,9 @@ export default function toggle() {
         .html(playPause.find((value) => value.action !== this.settings.playPause).html);
 
     // Stop animation.
-    if (this.interval)
-        this.interval.stop();
+    if (this.interval) this.interval.stop();
 
     // Restart animation.
     if (this.settings.playPause === 'play')
-        this.interval = startInterval.call(
-            this,
-            this.sequence
-                ? this.sequence.data
-                : this.data
-        );
+        this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
 }

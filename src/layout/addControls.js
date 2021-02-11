@@ -39,6 +39,7 @@ export default function addControls() {
             this.classList.toggle('fdg-button--clicked');
         })
         .on('mouseout', function () {
-            if (this.classList.contains('fdg-button--clicked')) this.classList.toggle('fdg-button--clicked');
+            if (this.classList.contains('fdg-button--clicked'))
+                this.classList.toggle('fdg-button--clicked');
         });
 }

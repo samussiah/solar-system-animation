@@ -99,20 +99,20 @@ export default function resize() {
 
     // custom annotations
     if (this.customAnnotations) {
-        this.settings.annotations.forEach(annotation => {
+        this.settings.annotations.forEach((annotation) => {
             annotation.radius = annotation.orbit * this.settings.orbitRadius;
             annotation.theta = (2 * Math.PI * annotation.angle) / 360;
-            annotation.x = this.settings.center.x +
-                    annotation.radius * // number of orbit radii from the center
-                        Math.cos(annotation.theta); // position along the circle at the given orbit along which
+            annotation.x =
+                this.settings.center.x +
+                annotation.radius * // number of orbit radii from the center
+                    Math.cos(annotation.theta); // position along the circle at the given orbit along which
             annotation.y =
                 annotation.order === 0
                     ? this.settings.center.y
                     : this.settings.center.y +
-                    annotation.radius * // number of orbit radii from the center
-                        Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
+                      annotation.radius * // number of orbit radii from the center
+                          Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
         });
-        this.customAnnotations
-            .attr('transform', (d) => `translate(${d.x},${d.y})`);
+        this.customAnnotations.attr('transform', (d) => `translate(${d.x},${d.y})`);
     }
 }

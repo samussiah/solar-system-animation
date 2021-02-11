@@ -18,13 +18,12 @@ export default function stepSequences() {
             .data(['<<', '>>'])
             .join('div')
             .classed('fdg-button fdg-button--step-sequence', true)
-            .attr('title', (d) => d === '<<' ? 'View previous sequence.' : 'View next sequence.')
+            .attr('title', (d) => (d === '<<' ? 'View previous sequence.' : 'View next sequence.'))
             .style('width', '35%')
-            .style('float', (d,i) => i === 0 ? 'left' : 'right')
+            .style('float', (d, i) => (i === 0 ? 'left' : 'right'))
             .text((d, i) => d);
 
-        inputs.on('click', function (d) {
-        });
+        inputs.on('click', function (d) {});
 
         return {
             container,

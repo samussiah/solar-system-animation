@@ -13,11 +13,9 @@ export const increment = function (data, increment) {
     // Update animation if current timepoint is less than full duration of animation.
     if (this.settings.timepoint <= this.settings.duration) update.call(this, data);
     // Otherwise if animation is sequenced, run next sequence.
-    else if (this.sequence)
-        runNextSequence.call(this);
+    else if (this.sequence) runNextSequence.call(this);
     // Otherwise restart animation.
-    else if (this.settings.loop === true)
-        reset.call(this, data);
+    else if (this.settings.loop === true) reset.call(this, data);
 
     // Reheat the force simulation.
     restartForceSimulation.call(this);

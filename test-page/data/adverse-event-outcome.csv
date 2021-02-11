@@ -2,7 +2,7 @@
 1,0,"Onset",0,0,1,"Onset","Not Treated",2
 1,1,"Severe",45,1,4,"Severe","Not Treated",4
 1,2,"Rescue Meds",15,4,26,"Severe","Rescue Meds",23
-1,3,"Resolved w/ Sequelae",0,26,38,"Severe","Rescue Meds",13
+1,3,"Recovered / Resolved with Sequelae",0,26,38,"Severe","Rescue Meds",13
 1,4,"Minor Loss",5,38,38,"Severe","Rescue Meds",1
 2,0,"Onset",0,0,1,"Onset","Not Treated",2
 2,1,"Moderate",0,1,13,"Moderate","Not Treated",13
@@ -27,12 +27,12 @@
 6,0,"Onset",0,0,1,"Onset","Not Treated",2
 6,1,"Mild",-45,1,5,"Mild","Not Treated",5
 6,2,"Standard of Care",0,5,6,"Mild","Standard of Care",2
-6,3,"Resolved w/ Sequelae",0,6,8,"Mild","Standard of Care",3
+6,3,"Recovered / Resolved with Sequelae",0,6,8,"Mild","Standard of Care",3
 6,4,"Major Gain",-15,8,8,"Mild","Standard of Care",1
 7,0,"Onset",0,0,1,"Onset","Not Treated",2
 7,1,"Moderate",0,1,9,"Moderate","Not Treated",9
 7,2,"Standard of Care",0,9,25,"Moderate","Standard of Care",17
-7,3,"Resolved w/ Sequelae",0,25,31,"Moderate","Standard of Care",7
+7,3,"Recovered / Resolved with Sequelae",0,25,31,"Moderate","Standard of Care",7
 7,4,"Minor Loss",5,31,31,"Moderate","Standard of Care",1
 8,0,"Onset",0,0,1,"Onset","Not Treated",2
 8,1,"Severe",45,1,4,"Severe","Not Treated",4
@@ -62,12 +62,12 @@
 13,0,"Onset",0,0,1,"Onset","Not Treated",2
 13,1,"Severe",45,1,3,"Severe","Not Treated",3
 13,2,"Rescue Meds",15,3,20,"Severe","Rescue Meds",18
-13,3,"Resolved w/ Sequelae",0,20,20,"Severe","Rescue Meds",1
+13,3,"Recovered / Resolved with Sequelae",0,20,20,"Severe","Rescue Meds",1
 13,4,"Major Loss",15,20,20,"Severe","Rescue Meds",1
 14,0,"Onset",0,0,1,"Onset","Not Treated",2
 14,1,"Mild",-45,1,6,"Mild","Not Treated",6
 14,2,"Not Treated",-15,6,20,"Mild","Not Treated",15
-14,3,"Resolved w/ Sequelae",0,20,31,"Mild","Not Treated",12
+14,3,"Recovered / Resolved with Sequelae",0,20,31,"Mild","Not Treated",12
 14,4,"Minor Gain",-5,31,31,"Mild","Not Treated",1
 15,0,"Onset",0,0,1,"Onset","Not Treated",2
 15,1,"Mild",-45,1,7,"Mild","Not Treated",7
@@ -102,7 +102,7 @@
 21,0,"Onset",0,0,1,"Onset","Not Treated",2
 21,1,"Moderate",0,1,6,"Moderate","Not Treated",6
 21,2,"Rescue Meds",15,6,16,"Moderate","Rescue Meds",11
-21,3,"Resolved w/ Sequelae",0,16,28,"Moderate","Rescue Meds",13
+21,3,"Recovered / Resolved with Sequelae",0,16,28,"Moderate","Rescue Meds",13
 21,4,"Major Gain",-15,28,28,"Moderate","Rescue Meds",1
 22,0,"Onset",0,0,1,"Onset","Not Treated",2
 22,1,"Severe",45,1,17,"Severe","Not Treated",17
@@ -127,7 +127,7 @@
 26,0,"Onset",0,0,1,"Onset","Not Treated",2
 26,1,"Severe",45,1,15,"Severe","Not Treated",15
 26,2,"Rescue Meds",15,15,31,"Severe","Rescue Meds",17
-26,3,"Resolved w/ Sequelae",0,31,40,"Severe","Rescue Meds",10
+26,3,"Recovered / Resolved with Sequelae",0,31,40,"Severe","Rescue Meds",10
 26,4,"Major Gain",-15,40,40,"Severe","Rescue Meds",1
 27,0,"Onset",0,0,1,"Onset","Not Treated",2
 27,1,"Severe",45,1,11,"Severe","Not Treated",11
@@ -137,7 +137,7 @@
 28,0,"Onset",0,0,1,"Onset","Not Treated",2
 28,1,"Moderate",0,1,13,"Moderate","Not Treated",13
 28,2,"Standard of Care",0,13,40,"Moderate","Standard of Care",28
-28,3,"Resolved w/ Sequelae",0,40,42,"Moderate","Standard of Care",3
+28,3,"Recovered / Resolved with Sequelae",0,40,42,"Moderate","Standard of Care",3
 28,4,"Minor Loss",5,42,42,"Moderate","Standard of Care",1
 29,0,"Onset",0,0,1,"Onset","Not Treated",2
 29,1,"Moderate",0,1,7,"Moderate","Not Treated",7
@@ -147,17 +147,17 @@
 30,0,"Onset",0,0,1,"Onset","Not Treated",2
 30,1,"Moderate",0,1,7,"Moderate","Not Treated",7
 30,2,"Not Treated",-15,7,16,"Moderate","Not Treated",10
-30,3,"Resolved w/ Sequelae",0,16,21,"Moderate","Not Treated",6
+30,3,"Recovered / Resolved with Sequelae",0,16,21,"Moderate","Not Treated",6
 30,4,"Minor Gain",-5,21,21,"Moderate","Not Treated",1
 31,0,"Onset",0,0,1,"Onset","Not Treated",2
 31,1,"Mild",-45,1,5,"Mild","Not Treated",5
 31,2,"Standard of Care",0,5,10,"Mild","Standard of Care",6
-31,3,"Resolved w/ Sequelae",0,10,12,"Mild","Standard of Care",3
+31,3,"Recovered / Resolved with Sequelae",0,10,12,"Mild","Standard of Care",3
 31,4,"Major Gain",-15,12,12,"Mild","Standard of Care",1
 32,0,"Onset",0,0,1,"Onset","Not Treated",2
 32,1,"Moderate",0,1,12,"Moderate","Not Treated",12
 32,2,"Rescue Meds",15,12,13,"Moderate","Rescue Meds",2
-32,3,"Resolved w/ Sequelae",0,13,24,"Moderate","Rescue Meds",12
+32,3,"Recovered / Resolved with Sequelae",0,13,24,"Moderate","Rescue Meds",12
 32,4,"Minor Gain",-5,24,24,"Moderate","Rescue Meds",1
 33,0,"Onset",0,0,1,"Onset","Not Treated",2
 33,1,"Severe",45,1,2,"Severe","Not Treated",2
@@ -187,7 +187,7 @@
 38,0,"Onset",0,0,1,"Onset","Not Treated",2
 38,1,"Mild",-45,1,2,"Mild","Not Treated",2
 38,2,"Rescue Meds",15,2,29,"Mild","Rescue Meds",28
-38,3,"Resolved w/ Sequelae",0,29,35,"Mild","Rescue Meds",7
+38,3,"Recovered / Resolved with Sequelae",0,29,35,"Mild","Rescue Meds",7
 38,4,"Minor Loss",5,35,35,"Mild","Rescue Meds",1
 39,0,"Onset",0,0,1,"Onset","Not Treated",2
 39,1,"Moderate",0,1,5,"Moderate","Not Treated",5
@@ -202,17 +202,17 @@
 41,0,"Onset",0,0,1,"Onset","Not Treated",2
 41,1,"Moderate",0,1,3,"Moderate","Not Treated",3
 41,2,"Standard of Care",0,3,12,"Moderate","Standard of Care",10
-41,3,"Resolved w/ Sequelae",0,12,23,"Moderate","Standard of Care",12
+41,3,"Recovered / Resolved with Sequelae",0,12,23,"Moderate","Standard of Care",12
 41,4,"Minor Gain",-5,23,23,"Moderate","Standard of Care",1
 42,0,"Onset",0,0,1,"Onset","Not Treated",2
 42,1,"Moderate",0,1,6,"Moderate","Not Treated",6
 42,2,"Not Treated",-15,6,22,"Moderate","Not Treated",17
-42,3,"Resolved w/ Sequelae",0,22,25,"Moderate","Not Treated",4
+42,3,"Recovered / Resolved with Sequelae",0,22,25,"Moderate","Not Treated",4
 42,4,"Major Loss",15,25,25,"Moderate","Not Treated",1
 43,0,"Onset",0,0,1,"Onset","Not Treated",2
 43,1,"Moderate",0,1,8,"Moderate","Not Treated",8
 43,2,"Not Treated",-15,8,18,"Moderate","Not Treated",11
-43,3,"Resolved w/ Sequelae",0,18,27,"Moderate","Not Treated",10
+43,3,"Recovered / Resolved with Sequelae",0,18,27,"Moderate","Not Treated",10
 43,4,"Major Loss",15,27,27,"Moderate","Not Treated",1
 44,0,"Onset",0,0,1,"Onset","Not Treated",2
 44,1,"Severe",45,1,20,"Severe","Not Treated",20
@@ -222,7 +222,7 @@
 45,0,"Onset",0,0,1,"Onset","Not Treated",2
 45,1,"Severe",45,1,10,"Severe","Not Treated",10
 45,2,"Not Treated",-15,10,21,"Severe","Not Treated",12
-45,3,"Resolved w/ Sequelae",0,21,24,"Severe","Not Treated",4
+45,3,"Recovered / Resolved with Sequelae",0,21,24,"Severe","Not Treated",4
 45,4,"Minor Gain",-5,24,24,"Severe","Not Treated",1
 46,0,"Onset",0,0,1,"Onset","Not Treated",2
 46,1,"Moderate",0,1,13,"Moderate","Not Treated",13
@@ -242,12 +242,12 @@
 49,0,"Onset",0,0,1,"Onset","Not Treated",2
 49,1,"Mild",-45,1,2,"Mild","Not Treated",2
 49,2,"Rescue Meds",15,2,7,"Mild","Rescue Meds",6
-49,3,"Resolved w/ Sequelae",0,7,20,"Mild","Rescue Meds",14
+49,3,"Recovered / Resolved with Sequelae",0,7,20,"Mild","Rescue Meds",14
 49,4,"Minor Loss",5,20,20,"Mild","Rescue Meds",1
 50,0,"Onset",0,0,1,"Onset","Not Treated",2
 50,1,"Moderate",0,1,12,"Moderate","Not Treated",12
 50,2,"Rescue Meds",15,12,36,"Moderate","Rescue Meds",25
-50,3,"Resolved w/ Sequelae",0,36,38,"Moderate","Rescue Meds",3
+50,3,"Recovered / Resolved with Sequelae",0,36,38,"Moderate","Rescue Meds",3
 50,4,"Major Gain",-15,38,38,"Moderate","Rescue Meds",1
 51,0,"Onset",0,0,1,"Onset","Not Treated",2
 51,1,"Severe",45,1,21,"Severe","Not Treated",21
@@ -272,7 +272,7 @@
 55,0,"Onset",0,0,1,"Onset","Not Treated",2
 55,1,"Severe",45,1,22,"Severe","Not Treated",22
 55,2,"Rescue Meds",15,22,38,"Severe","Rescue Meds",17
-55,3,"Resolved w/ Sequelae",0,38,39,"Severe","Rescue Meds",2
+55,3,"Recovered / Resolved with Sequelae",0,38,39,"Severe","Rescue Meds",2
 55,4,"Major Gain",-15,39,39,"Severe","Rescue Meds",1
 56,0,"Onset",0,0,1,"Onset","Not Treated",2
 56,1,"Mild",-45,1,4,"Mild","Not Treated",4
@@ -282,7 +282,7 @@
 57,0,"Onset",0,0,1,"Onset","Not Treated",2
 57,1,"Moderate",0,1,12,"Moderate","Not Treated",12
 57,2,"Standard of Care",0,12,33,"Moderate","Standard of Care",22
-57,3,"Resolved w/ Sequelae",0,33,42,"Moderate","Standard of Care",10
+57,3,"Recovered / Resolved with Sequelae",0,33,42,"Moderate","Standard of Care",10
 57,4,"Minor Loss",5,42,42,"Moderate","Standard of Care",1
 58,0,"Onset",0,0,1,"Onset","Not Treated",2
 58,1,"Severe",45,1,9,"Severe","Not Treated",9
@@ -302,7 +302,7 @@
 61,0,"Onset",0,0,1,"Onset","Not Treated",2
 61,1,"Mild",-45,1,2,"Mild","Not Treated",2
 61,2,"Standard of Care",0,2,18,"Mild","Standard of Care",17
-61,3,"Resolved w/ Sequelae",0,18,23,"Mild","Standard of Care",6
+61,3,"Recovered / Resolved with Sequelae",0,18,23,"Mild","Standard of Care",6
 61,4,"Major Loss",15,23,23,"Mild","Standard of Care",1
 62,0,"Onset",0,0,1,"Onset","Not Treated",2
 62,1,"Severe",45,1,5,"Severe","Not Treated",5
@@ -322,12 +322,12 @@
 65,0,"Onset",0,0,1,"Onset","Not Treated",2
 65,1,"Severe",45,1,21,"Severe","Not Treated",21
 65,2,"Not Treated",-15,21,26,"Severe","Not Treated",6
-65,3,"Resolved w/ Sequelae",0,26,32,"Severe","Not Treated",7
+65,3,"Recovered / Resolved with Sequelae",0,26,32,"Severe","Not Treated",7
 65,4,"Minor Gain",-5,32,32,"Severe","Not Treated",1
 66,0,"Onset",0,0,1,"Onset","Not Treated",2
 66,1,"Mild",-45,1,5,"Mild","Not Treated",5
 66,2,"Rescue Meds",15,5,21,"Mild","Rescue Meds",17
-66,3,"Resolved w/ Sequelae",0,21,30,"Mild","Rescue Meds",10
+66,3,"Recovered / Resolved with Sequelae",0,21,30,"Mild","Rescue Meds",10
 66,4,"Major Loss",15,30,30,"Mild","Rescue Meds",1
 67,0,"Onset",0,0,1,"Onset","Not Treated",2
 67,1,"Mild",-45,1,1,"Mild","Not Treated",1
@@ -362,7 +362,7 @@
 73,0,"Onset",0,0,1,"Onset","Not Treated",2
 73,1,"Moderate",0,1,3,"Moderate","Not Treated",3
 73,2,"Rescue Meds",15,3,26,"Moderate","Rescue Meds",24
-73,3,"Resolved w/ Sequelae",0,26,33,"Moderate","Rescue Meds",8
+73,3,"Recovered / Resolved with Sequelae",0,26,33,"Moderate","Rescue Meds",8
 73,4,"Minor Gain",-5,33,33,"Moderate","Rescue Meds",1
 74,0,"Onset",0,0,1,"Onset","Not Treated",2
 74,1,"Mild",-45,1,3,"Mild","Not Treated",3
@@ -372,7 +372,7 @@
 75,0,"Onset",0,0,1,"Onset","Not Treated",2
 75,1,"Moderate",0,1,9,"Moderate","Not Treated",9
 75,2,"Standard of Care",0,9,26,"Moderate","Standard of Care",18
-75,3,"Resolved w/ Sequelae",0,26,27,"Moderate","Standard of Care",2
+75,3,"Recovered / Resolved with Sequelae",0,26,27,"Moderate","Standard of Care",2
 75,4,"Minor Gain",-5,27,27,"Moderate","Standard of Care",1
 76,0,"Onset",0,0,1,"Onset","Not Treated",2
 76,1,"Mild",-45,1,4,"Mild","Not Treated",4
@@ -382,7 +382,7 @@
 77,0,"Onset",0,0,1,"Onset","Not Treated",2
 77,1,"Severe",45,1,7,"Severe","Not Treated",7
 77,2,"Rescue Meds",15,7,34,"Severe","Rescue Meds",28
-77,3,"Resolved w/ Sequelae",0,34,34,"Severe","Rescue Meds",1
+77,3,"Recovered / Resolved with Sequelae",0,34,34,"Severe","Rescue Meds",1
 77,4,"Major Gain",-15,34,34,"Severe","Rescue Meds",1
 78,0,"Onset",0,0,1,"Onset","Not Treated",2
 78,1,"Mild",-45,1,2,"Mild","Not Treated",2
@@ -427,7 +427,7 @@
 86,0,"Onset",0,0,1,"Onset","Not Treated",2
 86,1,"Moderate",0,1,3,"Moderate","Not Treated",3
 86,2,"Rescue Meds",15,3,22,"Moderate","Rescue Meds",20
-86,3,"Resolved w/ Sequelae",0,22,28,"Moderate","Rescue Meds",7
+86,3,"Recovered / Resolved with Sequelae",0,22,28,"Moderate","Rescue Meds",7
 86,4,"Major Loss",15,28,28,"Moderate","Rescue Meds",1
 87,0,"Onset",0,0,1,"Onset","Not Treated",2
 87,1,"Severe",45,1,21,"Severe","Not Treated",21
@@ -437,12 +437,12 @@
 88,0,"Onset",0,0,1,"Onset","Not Treated",2
 88,1,"Severe",45,1,3,"Severe","Not Treated",3
 88,2,"Rescue Meds",15,3,9,"Severe","Rescue Meds",7
-88,3,"Resolved w/ Sequelae",0,9,14,"Severe","Rescue Meds",6
+88,3,"Recovered / Resolved with Sequelae",0,9,14,"Severe","Rescue Meds",6
 88,4,"Major Gain",-15,14,14,"Severe","Rescue Meds",1
 89,0,"Onset",0,0,1,"Onset","Not Treated",2
 89,1,"Moderate",0,1,7,"Moderate","Not Treated",7
 89,2,"Rescue Meds",15,7,21,"Moderate","Rescue Meds",15
-89,3,"Resolved w/ Sequelae",0,21,23,"Moderate","Rescue Meds",3
+89,3,"Recovered / Resolved with Sequelae",0,21,23,"Moderate","Rescue Meds",3
 89,4,"Major Loss",15,23,23,"Moderate","Rescue Meds",1
 90,0,"Onset",0,0,1,"Onset","Not Treated",2
 90,1,"Severe",45,1,19,"Severe","Not Treated",19
@@ -467,12 +467,12 @@
 94,0,"Onset",0,0,1,"Onset","Not Treated",2
 94,1,"Mild",-45,1,7,"Mild","Not Treated",7
 94,2,"Rescue Meds",15,7,28,"Mild","Rescue Meds",22
-94,3,"Resolved w/ Sequelae",0,28,28,"Mild","Rescue Meds",1
+94,3,"Recovered / Resolved with Sequelae",0,28,28,"Mild","Rescue Meds",1
 94,4,"Major Loss",15,28,28,"Mild","Rescue Meds",1
 95,0,"Onset",0,0,1,"Onset","Not Treated",2
 95,1,"Severe",45,1,13,"Severe","Not Treated",13
 95,2,"Rescue Meds",15,13,21,"Severe","Rescue Meds",9
-95,3,"Resolved w/ Sequelae",0,21,26,"Severe","Rescue Meds",6
+95,3,"Recovered / Resolved with Sequelae",0,21,26,"Severe","Rescue Meds",6
 95,4,"Minor Loss",5,26,26,"Severe","Rescue Meds",1
 96,0,"Onset",0,0,1,"Onset","Not Treated",2
 96,1,"Mild",-45,1,2,"Mild","Not Treated",2
@@ -487,7 +487,7 @@
 98,0,"Onset",0,0,1,"Onset","Not Treated",2
 98,1,"Severe",45,1,21,"Severe","Not Treated",21
 98,2,"Standard of Care",0,21,39,"Severe","Standard of Care",19
-98,3,"Resolved w/ Sequelae",0,39,52,"Severe","Standard of Care",14
+98,3,"Recovered / Resolved with Sequelae",0,39,52,"Severe","Standard of Care",14
 98,4,"Major Gain",-15,52,52,"Severe","Standard of Care",1
 99,0,"Onset",0,0,1,"Onset","Not Treated",2
 99,1,"Mild",-45,1,6,"Mild","Not Treated",6
@@ -497,5 +497,5 @@
 100,0,"Onset",0,0,1,"Onset","Not Treated",2
 100,1,"Mild",-45,1,3,"Mild","Not Treated",3
 100,2,"Not Treated",-15,3,7,"Mild","Not Treated",5
-100,3,"Resolved w/ Sequelae",0,7,8,"Mild","Not Treated",2
+100,3,"Recovered / Resolved with Sequelae",0,7,8,"Mild","Not Treated",2
 100,4,"Minor Loss",5,8,8,"Mild","Not Treated",1

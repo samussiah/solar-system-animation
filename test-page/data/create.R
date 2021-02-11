@@ -52,10 +52,10 @@ state2 <- state1 %>%
 state3 <- state2 %>%
     mutate(
         event_order = 3,
-        event = sample(c('Resolved', 'Resolved w/ Sequelae', 'Not Resolved'), n, T),
+        event = sample(c('Resolved', 'Recovered / Resolved with Sequelae', 'Not Resolved'), n, T),
         event_position = case_when(
             event == 'Resolved' ~ -20,
-            event == 'Resolved w/ Sequelae' ~ 0,
+            event == 'Recovered / Resolved with Sequelae' ~ 0,
             event == 'Not Resolved' ~ 20,
             TRUE ~ NaN
         ),

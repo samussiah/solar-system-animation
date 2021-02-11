@@ -19,8 +19,7 @@ export default function runSequence() {
     //const start_orbit = this.metadata.orbit
     //    .find((orbit) => +orbit.key === this.sequence.start_order);
     //this.sequence.events = start_orbit.values;
-    this.sequence.event = this.sequence.events
-        .find((event, i) => i === this.sequence.eventIndex);
+    this.sequence.event = this.sequence.events.find((event, i) => i === this.sequence.eventIndex);
 
     // Update progress text.
     this.settings.timepoint = 0;
@@ -32,23 +31,41 @@ export default function runSequence() {
         this.containers.timeRelative.html(this.sequence.timeRelative || this.settings.timeRelative);
 
         // fade in
-        this.sequence.backgroundSequence = fadeIn
-            .call(this, this.containers.sequenceOverlay.background.sequence, this.sequence.label);
-        this.sequence.foregroundSequence = fadeIn
-            .call(this, this.containers.sequenceOverlay.foreground.sequence, this.sequence.label);
+        this.sequence.backgroundSequence = fadeIn.call(
+            this,
+            this.containers.sequenceOverlay.background.sequence,
+            this.sequence.label
+        );
+        this.sequence.foregroundSequence = fadeIn.call(
+            this,
+            this.containers.sequenceOverlay.foreground.sequence,
+            this.sequence.label
+        );
     }
 
     // fade in
-    this.sequence.backgroundEvent = fadeIn
-        .call(this, this.containers.sequenceOverlay.background.event, `${this.settings.individualUnit.replace(/^(.)/, char => char.toUpperCase())}s: ${this.sequence.event.key}`);
-    this.sequence.foregroundEvent = fadeIn
-        .call(this, this.containers.sequenceOverlay.foreground.event, `${this.settings.individualUnit.replace(/^(.)/, char => char.toUpperCase())}s: ${this.sequence.event.key}`);
+    this.sequence.backgroundEvent = fadeIn.call(
+        this,
+        this.containers.sequenceOverlay.background.event,
+        `${this.settings.individualUnit.replace(/^(.)/, (char) => char.toUpperCase())}s: ${
+            this.sequence.event.key
+        }`
+    );
+    this.sequence.foregroundEvent = fadeIn.call(
+        this,
+        this.containers.sequenceOverlay.foreground.event,
+        `${this.settings.individualUnit.replace(/^(.)/, (char) => char.toUpperCase())}s: ${
+            this.sequence.event.key
+        }`
+    );
 
     // Subset data to the specified set of states.
     if (this.sequence.eventIndex === 0)
         this.sequence.data = this.data
             .filter(
-                (d) => this.sequence.start_order <= d.event_order && d.event_order <= this.sequence.end_order
+                (d) =>
+                    this.sequence.start_order <= d.event_order &&
+                    d.event_order <= this.sequence.end_order
             )
             .map((d) => ({ ...d }));
 
@@ -68,9 +85,7 @@ export default function runSequence() {
                     d.duration_cumulative = duration_cumulative;
 
                     // Adjust start and end timepoint.
-                    d.start_timepoint = d === baseline
-                        ? 1
-                        : d.start_timepoint - timeShift + 1;
+                    d.start_timepoint = d === baseline ? 1 : d.start_timepoint - timeShift + 1;
                     d.end_timepoint = d.start_timepoint + d.duration - 1;
 
                     // Set start timepoint to sequence duration if start timepoint is greater than sequence duration.
@@ -109,7 +124,9 @@ export default function runSequence() {
             this.sequence.data.nested.filter((d) => d.value.locked === false),
             (d) => d.value.state.duration
         ) + 1;
-    this.settings.duration = this.sequence.duration ? Math.min(this.sequence.duration, duration) : duration;
+    this.settings.duration = this.sequence.duration
+        ? Math.min(this.sequence.duration, duration)
+        : duration;
 
     // Re-define force simulation.
     if (this.forceSimulation) this.forceSimulation.stop();

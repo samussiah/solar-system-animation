@@ -37,7 +37,7 @@ export default function nestData(data) {
             const aesthetics = getAesthetics.call(this, aestheticValues, colorScale);
 
             return {
-                index: this.metadata.id.findIndex(id => id.key === state.id),
+                index: this.metadata.id.findIndex((id) => id.key === state.id),
                 group, // array: data
                 duration, // number: total duration of individual
                 noStateChange, // boolean: did individual ever change state?

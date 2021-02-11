@@ -43,4 +43,10 @@ export default function resetAnimation(data) {
 
     if (this.modal) this.modal.stop();
     runModal.call(this);
+
+    // Display timed annotations.
+    if (this.settings.annotations && Array.isArray(this.settings.annotations))
+        this.customAnnotations.attr('opacity', (d) =>
+            d.timepoint > this.settings.timepoint ? 0 : 1
+        );
 }

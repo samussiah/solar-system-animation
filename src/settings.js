@@ -110,7 +110,7 @@ const settings = {
     \-------------------------------------------------------------------------------------------**/
 
     modal: true, // display modals?
-    modalSpeed: 15000, // amount of time for which each modal appears
+    modalSpeed: 10000, // amount of time for which each modal appears
     modalIndex: 0,
     modalPosition: 'center', // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
     modalWidth: '50%',

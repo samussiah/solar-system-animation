@@ -17,7 +17,9 @@ export default function eventList() {
             .attr(
                 'class',
                 (d) =>
-                    `fdg-button ${this.settings.eventChangeCount.includes(d.key) ? 'fdg-button--current' : ''}`
+                    `fdg-button ${
+                        this.settings.eventChangeCount.includes(d.key) ? 'fdg-button--current' : ''
+                    }`
             )
             .attr(
                 'title',

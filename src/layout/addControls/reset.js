@@ -17,38 +17,41 @@ export default function reset() {
         .html('&#x21ba;');
 
     inputs.on('click', () => {
-        if (this.timeout)
-            this.timeout.stop();
+        if (this.timeout) this.timeout.stop();
 
-        if (this.interval)
-            this.interval.stop();
+        if (this.interval) this.interval.stop();
 
         // TODO: why isn't this handled in resetAnimation?
         if (this.settings.runSequences) {
-            this.settings.sequences.forEach(sequence => {
+            this.settings.sequences.forEach((sequence) => {
                 sequence.eventIndex = 0;
             });
             this.settings.sequenceIndex = 0;
             this.sequence = getNextSequence.call(this, false);
         }
 
-        resetAnimation.call(this, this.settings.animationTrack === 'sequence' ? this.sequence.data : this.data);
+        resetAnimation.call(
+            this,
+            this.settings.animationTrack === 'sequence' ? this.sequence.data : this.data
+        );
 
         if (this.forceSimulation) this.forceSimulation.stop();
 
         // Restart force simulation.
-        this.forceSimulation = addForceSimulation.call(this, this.settings.animationTrack === 'sequence' ? this.sequence.data : this.data);
+        this.forceSimulation = addForceSimulation.call(
+            this,
+            this.settings.animationTrack === 'sequence' ? this.sequence.data : this.data
+        );
 
         // Start the animation.
         if (this.settings.playPause === 'play')
             this.timeout = d3.timeout(
                 () => {
                     // Run first sequence.
-                    if (this.settings.animationTrack === 'sequence')
-                        runSequence.call(this); // calls startInterval
+                    if (this.settings.animationTrack === 'sequence') runSequence.call(this);
+                    // calls startInterval
                     // Run full animation.
-                    else
-                        this.interval = startInterval.call(this, this.data);
+                    else this.interval = startInterval.call(this, this.data);
                 },
                 1000 // this.settings.delay ? this.settings.modalSpeed : 0
             );

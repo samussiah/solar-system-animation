@@ -91,6 +91,5 @@ export default function update() {
     }
 
     // timing
-    if (this.settings.stateChange === 'ordered')
-        this.settings.displayTiming = false;
+    if (this.settings.stateChange === 'ordered') this.settings.displayTiming = false;
 }

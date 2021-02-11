@@ -29,31 +29,38 @@ export default function canvas(main) {
         .addElement('svg--foreground', animation, 'svg')
         .attr('width', this.settings.width)
         .attr('height', this.settings.height);
-    const sequenceOverlay = this.util.addElement('sequence-overlay', svgForeground, 'g')
+    const sequenceOverlay = this.util
+        .addElement('sequence-overlay', svgForeground, 'g')
         .classed('fdg-focus-annotation', true)
         .attr('transform', 'translate(20,20)');
-    sequenceOverlay.background = this.util.addElement('sequence-overlay__background', sequenceOverlay, 'text')
+    sequenceOverlay.background = this.util
+        .addElement('sequence-overlay__background', sequenceOverlay, 'text')
         .classed('fdg-focus-annotation__background fdg-focus-annotation__text', true)
         .attr('alignment-baseline', 'hanging');
-    sequenceOverlay.background.sequence = this.util.addElement('sequence-overlay__background__sequence', sequenceOverlay.background, 'tspan')
+    sequenceOverlay.background.sequence = this.util
+        .addElement('sequence-overlay__background__sequence', sequenceOverlay.background, 'tspan')
         .classed('fdg-focus-annotation__label', true)
         .attr('x', 0)
         .attr('y', 0)
         .attr('alignment-baseline', 'hanging');
-    sequenceOverlay.background.event = this.util.addElement('sequence-overlay__background__event', sequenceOverlay.background, 'tspan')
+    sequenceOverlay.background.event = this.util
+        .addElement('sequence-overlay__background__event', sequenceOverlay.background, 'tspan')
         .classed('fdg-focus-annotation__event-count', true)
         .attr('x', 0)
         .attr('y', 30)
         .attr('alignment-baseline', 'hanging');
-    sequenceOverlay.foreground = this.util.addElement('sequence-overlay__foreground', sequenceOverlay, 'text')
+    sequenceOverlay.foreground = this.util
+        .addElement('sequence-overlay__foreground', sequenceOverlay, 'text')
         .classed('fdg-focus-annotation__foreground fdg-focus-annotation__text', true)
         .attr('alignment-baseline', 'hanging');
-    sequenceOverlay.foreground.sequence = this.util.addElement('sequence-overlay__foreground__sequence', sequenceOverlay.foreground, 'tspan')
+    sequenceOverlay.foreground.sequence = this.util
+        .addElement('sequence-overlay__foreground__sequence', sequenceOverlay.foreground, 'tspan')
         .classed('fdg-focus-annotation__label', true)
         .attr('x', 0)
         .attr('y', 0)
         .attr('alignment-baseline', 'hanging');
-    sequenceOverlay.foreground.event = this.util.addElement('sequence-overlay__foreground__event', sequenceOverlay.foreground, 'tspan')
+    sequenceOverlay.foreground.event = this.util
+        .addElement('sequence-overlay__foreground__event', sequenceOverlay.foreground, 'tspan')
         .classed('fdg-focus-annotation__event-count', true)
         .attr('x', 0)
         .attr('y', 30)
@@ -62,16 +69,19 @@ export default function canvas(main) {
     const focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g');
 
     // modal
-    const modalContainer = this.util.addElement('modal', animation)
-        .attr('class', d => `fdg-modal ${
-            this.settings.modalPosition
-                .split('-')
-                .map(position => `fdg-modal--${position}`)
-                .join(' ')
-        } fdg-modal--${this.settings.modalPosition}`)
-        .style('width', /^\d{1,3}%$/.test(this.settings.modalWidth)
-            ? this.settings.modalWidth
-            : '50%'
+    const modalContainer = this.util
+        .addElement('modal', animation)
+        .attr(
+            'class',
+            (d) =>
+                `fdg-modal ${this.settings.modalPosition
+                    .split('-')
+                    .map((position) => `fdg-modal--${position}`)
+                    .join(' ')} fdg-modal--${this.settings.modalPosition}`
+        )
+        .style(
+            'width',
+            /^\d{1,3}%$/.test(this.settings.modalWidth) ? this.settings.modalWidth : '50%'
         );
     const modal = this.util.addElement('modal__text', modalContainer);
 

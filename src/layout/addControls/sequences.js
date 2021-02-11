@@ -34,16 +34,12 @@ export default function sequences() {
 
             // Update sequence property.
             delete main.sequence;
-            main.sequence = d !== main
-                ? d
-                : null;
+            main.sequence = d !== main ? d : null;
 
             // Run sequence or...
-            if (d !== main)
-                sequence.call(main, d);
+            if (d !== main) sequence.call(main, d);
             // ...full animation.
-            else
-                fullAnimation.call(main, d);
+            else fullAnimation.call(main, d);
         });
 
         return {

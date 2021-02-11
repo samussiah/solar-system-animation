@@ -22,7 +22,7 @@ export default function init() {
 
     // Reheat the force simulation after initialization to incorporate the centering force before
     // removing the force.
-    increment.call(this, this.data, false);
+    //increment.call(this, this.data, false);
     this.settings.removeCenterForce = true;
 
     // Start the animation.
@@ -35,8 +35,7 @@ export default function init() {
                     runSequence.call(this); // calls startInterval
                 }
                 // Run full animation.
-                else
-                    this.interval = startInterval.call(this, this.data);
+                else this.interval = startInterval.call(this, this.data);
             },
             this.settings.delay ? this.settings.modalSpeed : 0
         );

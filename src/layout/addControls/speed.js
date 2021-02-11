@@ -18,7 +18,10 @@ export default function speed() {
         .append('div')
         .attr(
             'class',
-            (d) => `fdg-button ${d.label} ${d.label === this.settings.speed ? 'fdg-button--current' : ''}`
+            (d) =>
+                `fdg-button ${d.label} ${
+                    d.label === this.settings.speed ? 'fdg-button--current' : ''
+                }`
         )
         .attr(
             'title',
@@ -30,7 +33,10 @@ export default function speed() {
         inputs.classed('fdg-button--current', (di) => di.label === d.label);
         if (main.settings.playPause === 'play') {
             if (!!main.interval) main.interval.stop();
-            main.interval = startInterval.call(main, main.sequence ? main.sequence.data : main.data);
+            main.interval = startInterval.call(
+                main,
+                main.sequence ? main.sequence.data : main.data
+            );
         }
     });
 

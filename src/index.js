@@ -1,3 +1,4 @@
+import './util/polyfills';
 import util from './util/index';
 import defaults from './settings';
 import layout from './layout';

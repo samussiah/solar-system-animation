@@ -6,7 +6,18 @@ export default function strata(metadata) {
             .nest()
             .key((d) => d[this.settings.colorBy.variable])
             .entries(this.data)
-            .sort((a, b) => (a.key < b.key ? -1 : 1));
+            .sort((a, b) => {
+                const aOrder = Array.isArray(this.settings.colorBy.order)
+                    ? this.settings.colorBy.order.indexOf(a.key)
+                    : null;
+                const bOrder = Array.isArray(this.settings.colorBy.order)
+                    ? this.settings.colorBy.order.indexOf(b.key)
+                    : null;
+                const orderSort = aOrder - bOrder;
+                const alphaSort = a.key < b.key ? -1 : 1;
+
+                return orderSort ? orderSort : alphaSort;
+            });
 
         this.settings.colorBy.nStrata = nest.length;
         this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;

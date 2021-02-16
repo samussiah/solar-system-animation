@@ -8,6 +8,189 @@
 })(this, function () {
     'use strict';
 
+    if (typeof Object.assign != 'function') {
+        Object.defineProperty(Object, 'assign', {
+            value: function assign(target, varArgs) {
+                if (target == null) {
+                    // TypeError if undefined or null
+                    throw new TypeError('Cannot convert undefined or null to object');
+                }
+
+                var to = Object(target);
+
+                for (var index = 1; index < arguments.length; index++) {
+                    var nextSource = arguments[index];
+
+                    if (nextSource != null) {
+                        // Skip over if undefined or null
+                        for (var nextKey in nextSource) {
+                            // Avoid bugs when hasOwnProperty is shadowed
+                            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                                to[nextKey] = nextSource[nextKey];
+                            }
+                        }
+                    }
+                }
+
+                return to;
+            },
+            writable: true,
+            configurable: true,
+        });
+    }
+
+    if (!Array.prototype.includes) {
+        Object.defineProperty(Array.prototype, 'includes', {
+            value: function value(valueToFind, fromIndex) {
+                if (this == null) {
+                    throw new TypeError('"this" is null or not defined');
+                } // 1. Let O be ? ToObject(this value).
+
+                var o = Object(this); // 2. Let len be ? ToLength(? Get(O, "length")).
+
+                var len = o.length >>> 0; // 3. If len is 0, return false.
+
+                if (len === 0) {
+                    return false;
+                } // 4. Let n be ? ToInteger(fromIndex).
+                //        (If fromIndex is undefined, this step produces the value 0.)
+
+                var n = fromIndex | 0; // 5. If n = 0, then
+                //    a. Let k be n.
+                // 6. Else n < 0,
+                //    a. Let k be len + n.
+                //    b. If k < 0, let k be 0.
+
+                var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+                function sameValueZero(x, y) {
+                    return (
+                        x === y ||
+                        (typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y))
+                    );
+                } // 7. Repeat, while k < len
+
+                while (k < len) {
+                    // a. Let elementK be the result of ? Get(O, ! ToString(k)).
+                    // b. If SameValueZero(valueToFind, elementK) is true, return true.
+                    if (sameValueZero(o[k], valueToFind)) {
+                        return true;
+                    } // c. Increase k by 1.
+
+                    k++;
+                } // 8. Return false
+
+                return false;
+            },
+        });
+    }
+
+    if (!Array.prototype.find) {
+        Object.defineProperty(Array.prototype, 'find', {
+            value: function value(predicate) {
+                // 1. Let O be ? ToObject(this value).
+                if (this == null) {
+                    throw new TypeError('"this" is null or not defined');
+                }
+
+                var o = Object(this); // 2. Let len be ? ToLength(? Get(O, 'length')).
+
+                var len = o.length >>> 0; // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+
+                if (typeof predicate !== 'function') {
+                    throw new TypeError('predicate must be a function');
+                } // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+
+                var thisArg = arguments[1]; // 5. Let k be 0.
+
+                var k = 0; // 6. Repeat, while k < len
+
+                while (k < len) {
+                    // a. Let Pk be ! ToString(k).
+                    // b. Let kValue be ? Get(O, Pk).
+                    // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+                    // d. If testResult is true, return kValue.
+                    var kValue = o[k];
+
+                    if (predicate.call(thisArg, kValue, k, o)) {
+                        return kValue;
+                    } // e. Increase k by 1.
+
+                    k++;
+                } // 7. Return undefined.
+
+                return undefined;
+            },
+        });
+    }
+
+    if (!Array.prototype.findIndex) {
+        Object.defineProperty(Array.prototype, 'findIndex', {
+            value: function value(predicate) {
+                // 1. Let O be ? ToObject(this value).
+                if (this == null) {
+                    throw new TypeError('"this" is null or not defined');
+                }
+
+                var o = Object(this); // 2. Let len be ? ToLength(? Get(O, "length")).
+
+                var len = o.length >>> 0; // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+
+                if (typeof predicate !== 'function') {
+                    throw new TypeError('predicate must be a function');
+                } // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+
+                var thisArg = arguments[1]; // 5. Let k be 0.
+
+                var k = 0; // 6. Repeat, while k < len
+
+                while (k < len) {
+                    // a. Let Pk be ! ToString(k).
+                    // b. Let kValue be ? Get(O, Pk).
+                    // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+                    // d. If testResult is true, return k.
+                    var kValue = o[k];
+
+                    if (predicate.call(thisArg, kValue, k, o)) {
+                        return k;
+                    } // e. Increase k by 1.
+
+                    k++;
+                } // 7. Return -1.
+
+                return -1;
+            },
+        });
+    }
+
+    if (!Object.values) {
+        Object.values = function (obj) {
+            var ownProps = Object.keys(obj),
+                i = ownProps.length,
+                resArray = new Array(i); // preallocate the Array
+
+            while (i--) {
+                resArray[i] = obj[ownProps[i]];
+            }
+
+            return resArray;
+        };
+    }
+
+    if (!Object.entries) {
+        Object.entries = function (obj) {
+            var ownProps = Object.keys(obj),
+                i = ownProps.length,
+                resArray = new Array(i); // preallocate the Array
+
+            while (i--) {
+                resArray[i] = [ownProps[i], obj[ownProps[i]]];
+            }
+
+            return resArray;
+        };
+    }
+
     function addElement(name, parent) {
         var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
         var element = parent
@@ -288,11 +471,51 @@
         }, {});
     }
 
+    function wrap(text, width) {
+        text.each(function () {
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                fontStyle = text.style('font-size'),
+                fontSize = parseFloat(fontStyle),
+                fontUnit = fontStyle.replace(fontSize, ''),
+                x = text.attr('x'),
+                y = text.attr('y'),
+                dy = parseFloat(text.attr('dy')),
+                tspan = text
+                    .text(null)
+                    .append('tspan')
+                    .attr('x', x)
+                    .attr('y', y)
+                    .attr('dy', dy + 'rem');
+
+            while ((word = words.pop())) {
+                line.push(word);
+                tspan.text(line.join(' '));
+
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(' '));
+                    line = [word];
+                    tspan = text
+                        .append('tspan')
+                        .attr('x', x)
+                        .attr('y', y)
+                        .attr('dy', ++lineNumber * fontSize + dy + fontUnit)
+                        .text(word);
+                }
+            }
+        });
+    }
+
     var util = {
         addElement: addElement,
         arcTween: arcTween,
         csv: csv,
         mergeDeep: mergeDeep,
+        wrap: wrap,
     };
 
     // TODO: setting checks
@@ -360,21 +583,24 @@
                         : 'total number of events'
                 ); // frequency aesthetic
 
-                if (
-                    _this.settings.colorBy.type === 'frequency' &&
-                    _this.settings.sizeBy.type === 'frequency'
-                )
-                    text = text.replace('[frequency-aesthetic]', 'color and size');
-                else if (_this.settings.colorBy.type === 'frequency')
-                    text = text.replace('[frequency-aesthetic]', 'color');
-                else if (_this.settings.sizeBy.type === 'frequency')
-                    text = text.replace('[frequency-aesthetic]', 'size');
-                else text = null;
+                if (/\[frequency-aesthetic]/.test(text)) {
+                    if (
+                        _this.settings.colorBy.type === 'frequency' &&
+                        _this.settings.sizeBy.type === 'frequency'
+                    )
+                        text = text.replace('[frequency-aesthetic]', 'color and size');
+                    else if (_this.settings.colorBy.type === 'frequency')
+                        text = text.replace('[frequency-aesthetic]', 'color');
+                    else if (_this.settings.sizeBy.type === 'frequency')
+                        text = text.replace('[frequency-aesthetic]', 'size');
+                    else text = null;
+                }
+
                 return text;
             });
             texts = texts.concat(
                 this.settings.explanation.filter(function (el) {
-                    return !(_this.settings.hideControls && el.includes('controls'));
+                    return el !== null && !(_this.settings.hideControls && el.includes('controls'));
                 })
             );
         }
@@ -383,26 +609,42 @@
             texts = texts.concat(this.settings.information);
         this.settings.text = texts.filter(function (text) {
             return typeof text === 'string';
-        });
+        }); // sequences
+
+        if (this.settings.sequences) {
+            this.settings.loop = false;
+            this.settings.runSequences = true;
+            this.settings.animationTrack = 'sequence';
+            this.settings.sequences.forEach(function (sequence) {
+                sequence.eventIndex = 0;
+            });
+        } else {
+            this.settings.runSequences = false;
+            this.settings.animationTrack = 'full';
+        } // timing
+
+        if (this.settings.stateChange === 'ordered') this.settings.displayTiming = false;
     }
 
     var settings = {
         update: update,
 
         /**-------------------------------------------------------------------------------------------\
-        data mapping
-      \-------------------------------------------------------------------------------------------**/
+      data mapping
+    \-------------------------------------------------------------------------------------------**/
         id_var: 'id',
         event_var: 'event',
         event_order_var: 'event_order',
+        // zero-indexed orbit
+        event_position_var: 'event_position',
+        // angle of event focus on orbit
         start_timepoint_var: 'stdy',
         end_timepoint_var: 'endy',
         duration_var: 'duration',
-        sequence_var: 'seq',
 
         /**-------------------------------------------------------------------------------------------\
-        aesthetics
-      \-------------------------------------------------------------------------------------------**/
+      aesthetics
+    \-------------------------------------------------------------------------------------------**/
         // color
         colorBy: {
             type: 'frequency',
@@ -420,7 +662,7 @@
         },
         color: 'rgb(170,170,170)',
         fill: null,
-        // defined in ./defineMetadata/defineIdDependentSettings
+        // boolean - defined in ./defineMetadata/defineIdDependentSettings
         // size
         sizeBy: {
             type: 'frequency',
@@ -443,10 +685,11 @@
             shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
         },
         shape: 'circle',
+        // string - default shape
 
         /**-------------------------------------------------------------------------------------------\
-        freq table
-      \-------------------------------------------------------------------------------------------**/
+      freq table
+    \-------------------------------------------------------------------------------------------**/
         freqTable: {
             display: true,
             bars: true,
@@ -457,8 +700,8 @@
         },
 
         /**-------------------------------------------------------------------------------------------\
-        animation
-      \-------------------------------------------------------------------------------------------**/
+      animation
+    \-------------------------------------------------------------------------------------------**/
         // animation settings
         speed: 'medium',
         speeds: {
@@ -481,8 +724,8 @@
         resetDelay: 15000,
 
         /**-------------------------------------------------------------------------------------------\
-        dimensions
-      \-------------------------------------------------------------------------------------------**/
+      dimensions
+    \-------------------------------------------------------------------------------------------**/
         width: null,
         // defined in ./defineMetadata/coordinates
         height: null,
@@ -491,8 +734,8 @@
         // defined in ./defineMetadata/coordinates
 
         /**-------------------------------------------------------------------------------------------\
-        force simulation
-      \-------------------------------------------------------------------------------------------**/
+      force simulation
+    \-------------------------------------------------------------------------------------------**/
         manyBody: 'forceManyBodyReuse',
         // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
         chargeStrength: null,
@@ -506,13 +749,16 @@
         // ['circular', 'radial']
 
         /**-------------------------------------------------------------------------------------------\
-        modal
-      \-------------------------------------------------------------------------------------------**/
+      modal
+    \-------------------------------------------------------------------------------------------**/
         modal: true,
         // display modals?
-        modalSpeed: 15000,
+        modalSpeed: 10000,
         // amount of time for which each modal appears
         modalIndex: 0,
+        modalPosition: 'center',
+        // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
+        modalWidth: '50%',
         explanation: [
             'Each shape in this animation represents an individual.',
             'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.',
@@ -520,18 +766,19 @@
             'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.',
             '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.',
             'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.',
-            'Continue watching to learn how these individuals progress over the course of [duration] days.',
+            'Continue watching to learn how these individuals progress.', // over the course of [duration] days.',
         ],
         // array of strings
         information: null,
         // array of strings
 
         /**-------------------------------------------------------------------------------------------\
-        event/state
-      \-------------------------------------------------------------------------------------------**/
+      event/state
+    \-------------------------------------------------------------------------------------------**/
         events: null,
         // defined in ./defineMetadata
-        eventLabel: 'Events',
+        individualUnit: 'individual',
+        individualLabel: 'Individuals',
         eventCentral: null,
         // defined in ./defineMetadata/updateEventDependentSettings
         eventCount: true,
@@ -542,14 +789,44 @@
         // defined in ./defineMetadata/updateEventDependentSettings
 
         /**-------------------------------------------------------------------------------------------\
-        miscellaneous
-      \-------------------------------------------------------------------------------------------**/
+      sequences
+    \-------------------------------------------------------------------------------------------**/
+        runSequences: false,
+        sequences: null,
+        sequenceIndex: 0,
+        eventIndex: 0,
+        animationTrack: 'full',
+        // ['full', 'sequence']
+
+        /**-------------------------------------------------------------------------------------------\
+      miscellaneous
+    \-------------------------------------------------------------------------------------------**/
         hideControls: false,
         focusOffset: 'heuristic',
-        // ['heuristic', 'vertical']
+        // ['heuristic', 'none']
         displayProgressBar: false,
-        stratificationPositioning: 'circular', // ['circular', 'orbital']
+        stratificationPositioning: 'circular',
+        // ['circular', 'orbital']
+        annotations: null,
+        stateChange: 'chronological',
+        // ['chronological', 'ordered']
+        displayTiming: true,
+        root: {
+            'left-margin': '25%',
+        },
+        footnotes: [],
     };
+
+    function controls(main) {
+        var controls = this.util
+            .addElement('controls', main)
+            .classed('fdg-hidden', this.settings.hideControls);
+        var hide = this.util.addElement('hide', controls, 'span');
+        return {
+            controls: controls,
+            hide: hide,
+        };
+    }
 
     function addElement$1(name, parent) {
         var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
@@ -559,14 +836,6 @@
             .classed('fdg-'.concat(name), true)
             .classed('fdg-'.concat(tagName, '--').concat(name), true);
         return element;
-    }
-
-    function controls(main) {
-        var controls = addElement$1('controls', main).classed('fdg-hidden', true);
-        var hide = addElement$1('hide', controls, 'span');
-        return {
-            controls: controls,
-        };
     }
 
     function addTimer(progress) {
@@ -620,12 +889,14 @@
     }
 
     function sidebar(main) {
-        var sidebar = addElement$1('sidebar', main);
-        var events = addElement$1('events', sidebar).html(this.settings.eventLabel);
-        var legends = addElement$1('legends', sidebar);
-        var progress = addElement$1('progress', sidebar);
-        var timepoint = addElement$1('timepoint', progress)
+        var sidebar = this.util.addElement('sidebar', main);
+        var events = this.util.addElement('events', sidebar).html(this.settings.individualLabel);
+        var legends = this.util.addElement('legends', sidebar);
+        var progress = this.util.addElement('progress', sidebar);
+        var timepoint = this.util
+            .addElement('timepoint', progress)
             .classed('fdg-sidebar__label', true)
+            .classed('fdg-hidden', !this.settings.displayTiming)
             .html(
                 ''
                     .concat(this.settings.timepoint, ' ')
@@ -635,12 +906,14 @@
                             : this.settings.timeUnit
                     )
             );
-        var timeRelative = addElement$1('time-relative', progress)
+        var timeRelative = this.util
+            .addElement('time-relative', progress)
             .classed('fdg-sidebar__sub-label', true)
+            .classed('fdg-hidden', !this.settings.displayTiming)
             .html(this.settings.timeRelative);
         var timer = addTimer.call(this, progress);
         var countdown = addCountdown.call(this, progress);
-        var freqTable = addElement$1('freq-table', sidebar);
+        var freqTable = this.util.addElement('freq-table', sidebar);
         return {
             sidebar: sidebar,
             events: events,
@@ -655,47 +928,115 @@
     }
 
     function canvas(main) {
-        var animation = addElement$1('animation', main);
+        var _this = this;
+
+        this.settings.fullWidth = main.node().clientWidth;
+        var animation = this.util.addElement('animation', main).style('position', 'relative');
         this.settings.width = animation.node().clientWidth;
-        this.settings.height = animation.node().clientHeight; // progress bar at top
+        this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
+        this.settings.height = animation.node().clientHeight; // progress bar
 
-        var progressBar = addElement$1('progress-bar', animation).classed(
-            'fdg-hidden',
-            !this.settings.displayProgressBar
-        );
-        var progressTimepoint = addElement$1('progress-timepoint', animation).classed(
-            'fdg-hidden',
-            !this.settings.displayProgressBar
-        ); // background SVG
+        var progressBar = this.util
+            .addElement('progress-bar', animation)
+            .classed('fdg-hidden', !this.settings.displayProgressBar);
+        var progressTimepoint = this.util
+            .addElement('progress-timepoint', animation)
+            .classed('fdg-hidden', !this.settings.displayProgressBar); // background SVG - orbits
 
-        var svgBackground = addElement$1('svg--background', animation, 'svg')
-            .attr('width', this.settings.width)
-            .attr('height', this.settings.height); // canvas
+        var svgBackground = this.util
+            .addElement('svg--background', animation, 'svg')
+            .attr('width', main.node().clientWidth)
+            .attr('height', this.settings.height)
+            .style('position', 'absolute')
+            .style('left', -this.settings.widthDiff)
+            .style('top', 0); // canvas - bubbles
 
-        var canvas = addElement$1('canvas', animation, 'canvas')
+        var canvas = this.util
+            .addElement('canvas', animation, 'canvas')
             .attr('width', this.settings.width)
             .attr('height', this.settings.height);
-        canvas.context = canvas.node().getContext('2d'); // SVG
+        canvas.context = canvas.node().getContext('2d'); // foreground SVG - annotations
 
-        var svgForeground = addElement$1('svg--foreground', animation, 'svg')
+        var svgForeground = this.util
+            .addElement('svg--foreground', animation, 'svg')
             .attr('width', this.settings.width)
             .attr('height', this.settings.height);
-        var focusAnnotations = addElement$1('focus-annotations', svgForeground, 'g'); // modal
+        var sequenceOverlay = this.util
+            .addElement('sequence-overlay', svgForeground, 'g')
+            .classed('fdg-focus-annotation', true)
+            .attr('transform', 'translate(20,20)');
+        sequenceOverlay.background = this.util
+            .addElement('sequence-overlay__background', sequenceOverlay, 'text')
+            .classed('fdg-focus-annotation__background fdg-focus-annotation__text', true)
+            .attr('alignment-baseline', 'hanging');
+        sequenceOverlay.background.sequence = this.util
+            .addElement(
+                'sequence-overlay__background__sequence',
+                sequenceOverlay.background,
+                'tspan'
+            )
+            .classed('fdg-focus-annotation__label', true)
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('alignment-baseline', 'hanging');
+        sequenceOverlay.background.event = this.util
+            .addElement('sequence-overlay__background__event', sequenceOverlay.background, 'tspan')
+            .classed('fdg-focus-annotation__event-count', true)
+            .attr('x', 0)
+            .attr('y', 30)
+            .attr('alignment-baseline', 'hanging');
+        sequenceOverlay.foreground = this.util
+            .addElement('sequence-overlay__foreground', sequenceOverlay, 'text')
+            .classed('fdg-focus-annotation__foreground fdg-focus-annotation__text', true)
+            .attr('alignment-baseline', 'hanging');
+        sequenceOverlay.foreground.sequence = this.util
+            .addElement(
+                'sequence-overlay__foreground__sequence',
+                sequenceOverlay.foreground,
+                'tspan'
+            )
+            .classed('fdg-focus-annotation__label', true)
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('alignment-baseline', 'hanging');
+        sequenceOverlay.foreground.event = this.util
+            .addElement('sequence-overlay__foreground__event', sequenceOverlay.foreground, 'tspan')
+            .classed('fdg-focus-annotation__event-count', true)
+            .attr('x', 0)
+            .attr('y', 30)
+            .attr('alignment-baseline', 'hanging');
+        var customAnnotations = this.util.addElement('custom-annotations', svgForeground, 'g');
+        var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g'); // modal
 
-        var modalContainer = addElement$1('modal', animation); // TODO: add button to clear or hide modal
-        //const modalClear = addElement('modal__clear', modalContainer)
-        //    //.classed('fdg-hidden', true)
-        //    .text('x');
-        //modalClear
-        //    .on('mouseover', function() {
-        //        if (this.classList.includes('fdg-hidden'))
-        //            this.classList.toggle('fdg-hidden')
-        //    })
-        //    .on('click', () => {
-        //        this.modal.stop();
-        //    });
-
-        var modal = addElement$1('modal__text', modalContainer);
+        var modalContainer = this.util
+            .addElement('modal', animation)
+            .attr('class', function (d) {
+                return 'fdg-modal '
+                    .concat(
+                        _this.settings.modalPosition
+                            .split('-')
+                            .map(function (position) {
+                                return 'fdg-modal--'.concat(position);
+                            })
+                            .join(' '),
+                        ' fdg-modal--'
+                    )
+                    .concat(_this.settings.modalPosition);
+            })
+            .style(
+                'width',
+                /^\d{1,3}%$/.test(this.settings.modalWidth) ? this.settings.modalWidth : '50%'
+            );
+        var modal = this.util.addElement('modal__text', modalContainer);
+        var footnotes = this.util.addElement('footnotes', animation);
+        footnotes
+            .selectAll('div.fdg-footnote')
+            .data(this.settings.footnotes)
+            .join('div')
+            .classed('fdg-footnote', true)
+            .html(function (d) {
+                return d;
+            });
         return {
             animation: animation,
             progressBar: progressBar,
@@ -703,8 +1044,11 @@
             svgBackground: svgBackground,
             canvas: canvas,
             svgForeground: svgForeground,
+            sequenceOverlay: sequenceOverlay,
             focusAnnotations: focusAnnotations,
+            customAnnotations: customAnnotations,
             modal: modal,
+            footnotes: footnotes,
         };
     }
 
@@ -752,7 +1096,11 @@
         var _this = this;
 
         // Remove centering force after first interval.
-        if (this.settings.timepoint > 0 && !!this.forceSimulation)
+        if (
+            !!this.forceSimulation &&
+            !!this.forceSimulation.force('center') &&
+            this.settings.removeCenterForce === true
+        )
             this.forceSimulation.force('center', null); // Reheat the simulation (alpha(1)) and update the coordinates of the x- and y- forces.
 
         this.forceSimulation
@@ -936,16 +1284,53 @@
     function getState(group, index) {
         var _this = this;
 
-        var state =
-            index !== undefined
-                ? group[index]
-                : group.find(function (d, i) {
-                      return (
-                          (d.start_timepoint <= _this.settings.timepoint &&
-                              _this.settings.timepoint <= d.end_timepoint) ||
-                          i === group.length - 1
-                      );
-                  });
+        var minTimepoint = d3.min(group, function (d) {
+            return d.start_timepoint;
+        });
+        var maxTimepoint = d3.max(group, function (d) {
+            return d.end_timepoint;
+        });
+        var state = group.find(function (d, i) {
+            return (
+                d.start_timepoint <= _this.settings.timepoint &&
+                _this.settings.timepoint <= d.end_timepoint
+            );
+        }); // first (and hopefully only) state that overlaps the current timepoint
+
+        switch (true) {
+            case index !== undefined:
+                state = group[index];
+                break;
+
+            case this.settings.timepoint >= maxTimepoint:
+                state = group[group.length - 1];
+                break;
+
+            case this.settings.timepoint < minTimepoint:
+                state = group[0];
+                break;
+
+            case state === undefined:
+                state = group
+                    .slice()
+                    .sort(function (a, b) {
+                        return b.start_timepoint - a.start_timepoint;
+                    })
+                    .find(function (d) {
+                        return d.start_timepoint <= _this.settings.timepoint;
+                    });
+                break;
+        } //const state =
+        //    index !== undefined
+        //        : this.settings.timepoint >= maxTimepoint // last state
+        //        ? group[group.length - 1]
+        //        : this.settings.timepoint < minTimepoint // first state
+        //        ? group[0]
+        //        : group.find((d, i) =>
+        //                d.start_timepoint <= this.settings.timepoint &&
+        //                this.settings.timepoint <= d.end_timepoint
+        //          ); // first (and hopefully only) state that overlaps the current timepoint
+
         return state;
     }
 
@@ -1061,14 +1446,14 @@
         );
     }
 
-    function nestedData() {
+    function nestedData(data) {
         var _this = this;
 
-        this.data.nested.forEach(function (d) {
+        data.nested.forEach(function (d, i) {
             // Update individual to next event.
             var currentState = getState.call(_this, d.value.group);
 
-            if (d.value.state !== currentState) {
+            if (d.value.state !== currentState && !d.value.locked) {
                 d.value.statePrevious = d.value.state;
                 d.value.state = currentState;
             }
@@ -1203,12 +1588,12 @@
         return cells;
     }
 
-    function eventMetadata() {
+    function eventMetadata(data) {
         var _this = this;
 
         this.metadata.event.forEach(function (event) {
             // Subset data on individuals in the given state.
-            event.data = filterData(_this.data.nested, ['value', 'state', 'event'], event.key); // Update current set of individuals.
+            event.data = filterData(data.nested, ['value', 'state', 'event'], event.key); // Update current set of individuals.
 
             event.ids = updateIdSet(event.data, event.ids);
             event.nIds = event.ids.size; // Update cumulative set of individuals.
@@ -1216,7 +1601,7 @@
             updateIdSet(event.data, event.idsCumulative, true);
             event.nIdsCumulative = event.idsCumulative.size; // Update cumulative number of events.
 
-            event.nEvents = countCumulative(_this.data, _this.settings.timepoint, event.key); // Calculate numerators, denominators, and proportions.
+            event.nEvents = countCumulative(data, _this.settings.timepoint, event.key); // Calculate numerators, denominators, and proportions.
 
             event.freqs = getFreqs.call(_this, event, event, _this.metadata);
             event.fmt = formatValues.call(_this, event); // Calculate the change in IDs in the given state from the previous timepoint.
@@ -1233,15 +1618,10 @@
                     updateIdSet(focus.data, focus.idsCumulative, true);
                     focus.nIdsCumulative = focus.idsCumulative.size; // Update cumulative number of events.
 
-                    focus.nEvents = countCumulative(
-                        _this.data,
-                        _this.settings.timepoint,
-                        event.key,
-                        {
-                            key: _this.settings.colorBy.variable,
-                            value: focus.key,
-                        }
-                    ); // Calculate numerators, denominators, and proportions.
+                    focus.nEvents = countCumulative(data, _this.settings.timepoint, event.key, {
+                        key: _this.settings.colorBy.variable,
+                        value: focus.key,
+                    }); // Calculate numerators, denominators, and proportions.
 
                     focus.freqs = getFreqs.call(_this, focus, event, _this.metadata);
                     focus.fmt = formatValues.call(_this, focus);
@@ -1253,7 +1633,7 @@
         });
     }
 
-    function data() {
+    function data(data) {
         // Count the number of individuals at each focus at previous timepoint.
         this.metadata.event.forEach(function (event) {
             event.prevCount = event.count;
@@ -1262,15 +1642,17 @@
                     focus.prevCount = focus.count;
                 });
         });
-        nestedData.call(this);
-        eventMetadata.call(this);
+        nestedData.call(this, data);
+        eventMetadata.call(this, data);
     }
 
     function resize() {
         var _this = this;
 
+        this.settings.fullWidth = this.containers.main.node().clientWidth;
         var node = this.containers.animation.node();
         this.settings.width = node.clientWidth;
+        this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
         this.settings.height = this.containers.animation.node().clientHeight; // timer
 
         this.containers.timer.width = this.containers.timer.node().clientWidth;
@@ -1290,8 +1672,9 @@
         this.containers.timer.foreground.attr('d', this.containers.timer.arc); // background SVG
 
         this.containers.svgBackground
-            .attr('width', this.settings.width)
-            .attr('height', this.settings.height); // canvas
+            .attr('width', this.settings.fullWidth)
+            .attr('height', this.settings.height)
+            .style('left', -this.settings.widthDiff); // canvas
 
         this.containers.canvas
             .attr('width', this.settings.width)
@@ -1311,7 +1694,10 @@
             })
             .attr('r', function (d) {
                 return d.r;
-            }); // focus coordinates
+            });
+        this.containers.svgBackground
+            .select('g.fdg-g--orbits')
+            .attr('transform', 'translate('.concat(this.settings.widthDiff, ',0)')); // focus coordinates
 
         if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
             this.metadata.event.forEach(function (event, i) {
@@ -1358,18 +1744,46 @@
             });
         } // Update the node data.
 
-        data.call(this);
+        data.call(this, this.sequence ? this.sequence.data : this.data);
         restartForceSimulation.call(this); // static force simulation
 
         addStaticForceSimulation.call(this); // focus annotations
 
         this.focusAnnotations.attr('transform', function (d) {
             return 'translate('.concat(d.x, ',').concat(d.y, ')');
-        });
+        }); // custom annotations
+
+        if (this.customAnnotations) {
+            this.settings.annotations.forEach(function (annotation) {
+                annotation.radius = annotation.orbit * _this.settings.orbitRadius;
+                annotation.theta = (2 * Math.PI * annotation.angle) / 360;
+                annotation.x =
+                    _this.settings.center.x +
+                    annotation.radius * // number of orbit radii from the center
+                        Math.cos(annotation.theta); // position along the circle at the given orbit along which
+
+                annotation.y =
+                    annotation.order === 0
+                        ? _this.settings.center.y
+                        : _this.settings.center.y +
+                          annotation.radius * // number of orbit radii from the center
+                              Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
+            });
+            this.customAnnotations.attr('transform', function (d) {
+                return 'translate('.concat(d.x, ',').concat(d.y, ')');
+            });
+        }
     }
 
     function layout() {
-        var main = addElement$1('main', d3.select(this.element)).datum(this); // controls positioned absolutely
+        var main = this.util.addElement('main', d3.select(this.element)).datum(this);
+
+        for (var prop in this.settings.root) {
+            console.log(prop);
+            document
+                .querySelector(':root')
+                .style.setProperty('--'.concat(prop), this.settings.root[prop]);
+        } // controls positioned absolutely
 
         var controls$1 = controls.call(this, main); // sidebar to the left
 
@@ -1419,8 +1833,6 @@
             .entries(this.data);
         nest.forEach(function (d, i) {
             Object.assign(d, d.value);
-            d.value = d.key;
-            delete d.key;
         });
         return nest;
     }
@@ -1504,22 +1916,31 @@
                     // number of individuals that have ever been in the state
                     nEvents: 0,
                     // number of times any individual has been in the state up to the current timepoint, i.e. the total number of events that have occurred so far
-                    nEventsTotal: group.length, // total number of events
+                    nEventsTotal: group.length,
+                    // total number of events
+                    allIds: _toConsumableArray(
+                        new Set(
+                            group.map(function (d) {
+                                return d.id;
+                            })
+                        ).values()
+                    ).sort(),
                 };
             })
             .entries(this.data)
-            .map(function (event) {
-                Object.assign(event, event.value); // remove nesting
-
-                delete event.value;
-                return event;
-            })
             .sort(function (a, b) {
-                return (
-                    a.order - b.order || b.nEventsTotal - a.nEventsTotal // ensure events plot in order
-                );
+                return a.value.order - b.value.order || a.value.position - b.value.position;
             });
-        return nest;
+        var event = nest.map(function (event, i) {
+            Object.assign(event, event.value); // remove nesting
+
+            delete event.value;
+            event.start_timepoint = i === 0 ? 1 : nest[i - 1].end_timepoint + 1;
+            event.end_timepoint = event.start_timepoint + event.allIds.length - 1;
+            event.rank = i;
+            return event;
+        });
+        return event;
     }
 
     function updateEventDependentSettings(metadata) {
@@ -1544,6 +1965,20 @@
                     return event.key !== _this.settings.eventCentral;
                 })
             );
+        nest.forEach(function (orbit, i) {
+            orbit.label =
+                Array.isArray(_this.settings.orbitLabels) &&
+                _this.settings.orbitLabels.length === nest.length
+                    ? _this.settings.orbitLabels[i]
+                    : 'Orbit '.concat(i + 1);
+            orbit.values
+                .sort(function (a, b) {
+                    return a.position - b.position;
+                })
+                .forEach(function (event) {
+                    event.orbitLabel = orbit.label;
+                });
+        });
         return nest;
     }
 
@@ -1560,7 +1995,15 @@
                 })
                 .entries(this.data)
                 .sort(function (a, b) {
-                    return a.key < b.key ? -1 : 1;
+                    var aOrder = Array.isArray(_this.settings.colorBy.order)
+                        ? _this.settings.colorBy.order.indexOf(a.key)
+                        : null;
+                    var bOrder = Array.isArray(_this.settings.colorBy.order)
+                        ? _this.settings.colorBy.order.indexOf(b.key)
+                        : null;
+                    var orderSort = aOrder - bOrder;
+                    var alphaSort = a.key < b.key ? -1 : 1;
+                    return orderSort ? orderSort : alphaSort;
                 });
             this.settings.colorBy.nStrata = nest.length;
             this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
@@ -1620,7 +2063,15 @@
                 })
                 .entries(this.data)
                 .sort(function (a, b) {
-                    return a.key < b.key ? -1 : 1;
+                    var aOrder = Array.isArray(_this.settings.shapeBy.order)
+                        ? _this.settings.shapeBy.order.indexOf(a.key)
+                        : null;
+                    var bOrder = Array.isArray(_this.settings.shapeBy.order)
+                        ? _this.settings.shapeBy.order.indexOf(b.key)
+                        : null;
+                    var orderSort = aOrder - bOrder;
+                    var alphaSort = a.key < b.key ? -1 : 1;
+                    return orderSort ? orderSort : alphaSort;
                 });
         }
 
@@ -1880,1825 +2331,90 @@
         return metadata;
     }
 
-    function orbits() {
-        var main = this; //if (this.settings.pulseOrbits) {
-
-        this.orbits.each(function (d) {
-            d.rAdjPrev = d.rAdj;
-            var distances = d3
-                .merge(
-                    d.values.map(function (di) {
-                        return di.data;
-                    })
-                )
-                .map(function (d) {
-                    return d.value.distance;
-                });
-            var rAdj = distances.length ? Math.max(d3.median(distances), d.r) : d.r;
-            var diff = rAdj - d.rAdjPrev;
-            d.rAdj = d.rAdjPrev + Math.min(diff / 10, main.settings.orbitRadius / 100); //d.change = d3.sum(d.values, (di) => di.change);
-            //if (d.change > 0) {
-
-            d3.select(this)
-                .transition()
-                .duration(main.settings.speeds[main.settings.speed])
-                .attr('r', d.rAdj); //.duration(main.settings.speeds[main.settings.speed] / 2)
-            //.attr('stroke-width', 0.5 * d.change)
-            //.transition()
-            //.duration(main.settings.speeds[main.settings.speed] / 2)
-            //.attr('stroke-width', 0.5);
-            //}
-        }); //}
-    }
-
-    function progress() {
-        // Update timepoint.
-        this.containers.timepoint.text(
-            ''
-                .concat(this.settings.timepoint, ' ')
-                .concat(
-                    this.settings.timepoint !== 1
-                        ? this.settings.timeUnit + 's'
-                        : this.settings.timeUnit
-                )
-        ); // Update timer.
-
-        this.containers.progress.attr(
-            'title',
-            'The animation is '
-                .concat(d3.format('.1%')(this.settings.progress), ' complete with ')
-                .concat(this.settings.duration - this.settings.timepoint, ' ')
-                .concat(this.settings.timeUnit.split(' ')[0], ' to go.')
-        );
-        this.containers.timer.foreground
-            .transition()
-            .duration(this.settings.speed)
-            .attrTween(
-                'd',
-                this.util.arcTween(this.settings.progress * Math.PI * 2, this.containers.timer.arc)
-            );
-        this.containers.timer.percentComplete.text(
-            this.settings.progress < 0.0095
-                ? d3.format('.1%')(this.settings.progress)
-                : d3.format('.0%')(this.settings.progress)
-        ); // Update timepoint control.
-
-        this.controls.timepoint.inputs.property('value', this.settings.timepoint); // Update progress bar.
-
-        this.containers.progressBar.style('width', ''.concat(this.settings.progress * 100, '%'));
-        this.containers.progressTimepoint
-            .style('right', ''.concat(100 - this.settings.progress * 100, '%'))
-            .text(
-                ''
-                    .concat(
-                        this.settings.timeUnit.replace(/^(.)/, function (letter) {
-                            return letter.toUpperCase();
-                        }),
-                        ' '
-                    )
-                    .concat(this.settings.timepoint)
-            );
-    }
-
-    // TODO: make color legend reactive
-    function legends() {
-        var shapeCounts = d3
-            .nest()
-            .key(function (d) {
-                return d.value.shapeValue;
-            })
-            .rollup(function (group) {
-                return group.length;
-            })
-            .entries(this.data.nested);
-        this.containers.legends
-            .selectAll('.fdg-legend--shape')
-            .selectAll('text')
-            .text(function (d) {
-                var shapeCount = shapeCounts.find(function (di) {
-                    return di.key === d;
-                });
-                var value = shapeCount ? shapeCount.value : 0;
-                return ''.concat(d, ' (n=').concat(d3.format(',d')(value), ')');
-            });
-    }
-
-    // Update focus percentages.
-    function counts() {
-        var _this = this;
-
-        if (this.settings.eventCount)
-            this.focusAnnotations
-                .selectAll('tspan.fdg-focus-annotation__event-count')
-                .text(function (d) {
-                    return _this.settings.eventCountType === 'cumulative-event'
-                        ? d.fmt.eventNumerator
-                        : d.fmt.idNumeratorPercent;
-                });
-        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
-            this.metadata.event.forEach(function (event) {
-                event.fociLabels.selectAll('text').text(function (d) {
-                    return _this.settings.eventCountType === 'cumulative-event'
-                        ? d.fmt.eventNumeratorPercent
-                        : d.fmt.idNumeratorPercent;
-                });
-            });
-    }
-
-    // Update frequency table.
-    function freqTable$1() {
+    function display() {
         var main = this;
-        var maxProportion = d3.max(this.containers.freqTable.tr.data(), function (d) {
-            return d.freqs.idProportion;
-        });
-        this.containers.freqTable.tr.each(function (d) {
-            var relativeProportion = d.freqs.idProportion / maxProportion;
-            var relativeProportionFmt = d3.format('.1%')(relativeProportion);
-            var tr = d3.select(this);
-            tr.selectAll('td')
-                .data(d.cells)
-                .join('td')
-                .style('background', function (di, i) {
-                    return i === 1 && main.settings.freqTable.bars
-                        ? 'linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) '
-                              .concat(relativeProportionFmt, ', transparent ')
-                              .concat(relativeProportionFmt, ')')
-                        : null;
-                })
-                .text(function (d) {
-                    return d;
-                });
-        });
-    }
-
-    function text() {
-        this.settings.progress = this.settings.timepoint / this.settings.duration;
-        progress.call(this);
-        legends.call(this);
-        counts.call(this);
-        freqTable$1.call(this);
-    }
-
-    function update$1() {
-        // Update the node data.
-        data.call(this); // Gradually transition the radius of the orbits to match the median position of the nodes
-        // along each orbit.  As the nodes at each focus influence the position of nodes at other foci,
-        // nodes gradually congregate off their orbit.
-
-        orbits.call(this); // Update timer, focus labels, and annotations.
-
-        text.call(this);
-    }
-
-    function countdown() {
-        var _this = this;
-
-        var counter = this.settings.resetDelay / 1000 - 1;
-        this.containers.countdown
-            .classed('fdg-invisible', false)
-            .classed('fdg-hidden', function (d) {
-                return d !== counter;
-            });
-        var interval = window.setInterval(function () {
-            counter--;
-
-            _this.containers.countdown.classed('fdg-hidden', function (d) {
-                return d !== counter;
-            });
-        }, 1000);
-        return interval;
-    }
-
-    function fadeOut(modalSpeed) {
-        // Transition text from full opacity to zero opacity to create fade-out effect.
-        d3.select(this)
-            .transition()
-            .duration(modalSpeed / 15)
-            .delay(modalSpeed - (modalSpeed / 15) * 2)
-            .style('opacity', 0);
-    }
-
-    function fadeIn(selection, modalSpeed) {
-        // Transition text from zero opacity to full opacity to create fade-in effect.
-        selection
-            .style('opacity', 0)
-            .transition()
-            .duration(modalSpeed / 15)
-            .style('opacity', 1)
-            .on('end', function () {
-                fadeOut.call(this, modalSpeed);
-            });
-    }
-
-    function emphasizeComponent(component) {
-        var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'outline';
-        var value1 =
-            arguments.length > 2 && arguments[2] !== undefined
-                ? arguments[2]
-                : 'thick groove rgba(215,25,28,0)';
-        var value2 =
-            arguments.length > 3 && arguments[3] !== undefined
-                ? arguments[3]
-                : 'thick groove rgba(215,25,28,.5)';
-        var duration = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-        if (duration)
-            component
-                .style(style, value1)
-                .transition()
-                .duration(this.settings.modalSpeed / 15)
-                .style(style, value2)
-                .transition()
-                .duration(this.settings.modalSpeed / 15)
-                .delay(this.settings.modalSpeed - (this.settings.modalSpeed / 15) * 2)
-                .style(style, value1)
-                .on('end', function () {
-                    return component.style(style, null);
-                });
-        else {
-            component.style(style, value2);
-            d3.timeout(function () {
-                component.style(style, null);
-            }, this.settings.modalSpeed);
-        }
-    }
-
-    function update$2() {
-        this.modalText = this.settings.text[this.settings.modalIndex];
-        if (this.settings.modalIndex === this.settings.text.length - 1 && this.modal)
-            this.modal.stop(); // Update modal text.
-
-        this.containers.modal.html(this.modalText).call(fadeIn, this.settings.modalSpeed); // Highlight referenced component.
-
-        switch (true) {
-            case /time/i.test(this.modalText):
-                emphasizeComponent.call(this, this.containers.progress); //emphasizeComponent.call(this, this.focusAnnotations);
-
-                break;
-
-            case /annotations/i.test(this.modalText):
-                emphasizeComponent.call(
-                    this,
-                    this.containers.focusAnnotations.selectAll('.fdg-focus-annotation__event-count')
-                );
-                break;
-
-            case /number of events.*color/i.test(this.modalText):
-                emphasizeComponent.call(this, this.legends.color);
-                break;
-
-            case /number of events.*size/i.test(this.modalText):
-                emphasizeComponent.call(this, this.legends.size);
-                break;
-
-            case /static/i.test(this.modalText):
-                // Style static bubbles differently than components.
-                emphasizeComponent.call(
-                    this,
-                    this.containers.svgBackground.selectAll('.fdg-static__mark'),
-                    'stroke',
-                    'rgba(215,25,28,0)',
-                    'rgba(215,25,28,.5)',
-                    false
-                );
-                break;
-
-            case /controls/i.test(this.modalText):
-                emphasizeComponent.call(
-                    this,
-                    this.containers.controls.classed('fdg-hidden', this.settings.hideControls)
-                );
-                break;
-        }
-    }
-
-    function runModal() {
-        var _this = this;
-
-        // Set initial modal text.
-        update$2.call(this);
-        this.modal = d3.interval(function () {
-            _this.settings.modalIndex++; // Update modal text.
-
-            update$2.call(_this);
-        }, this.settings.modalSpeed);
-    }
-
-    function resetAnimation() {
-        var _this = this;
-
-        this.settings.timepoint = 0;
-        this.settings.progress = 0;
-        this.settings.modalIndex = 0;
-        this.controls.timepoint.inputs.attr('value', 0); // Update the event object of the population.
-
-        this.metadata.event.forEach(function (event) {
-            event.prevCount = 0;
-            event.count = 0;
-            event.cumulative = 0;
-        });
-        this.data.nested.forEach(function (d) {
-            d.value.statePrevious = null;
-            d.value.state = getState.call(_this, d.value.group);
-            var aestheticValues = getAestheticValues.call(_this, d.value.group, d.value.state);
-            d.value.coordinates = getCoordinates.call(
-                _this,
-                d.value.state,
-                aestheticValues.colorValue
-            );
-            d.value.colorScale = getColorScale.call(_this, aestheticValues.colorValue);
-            var aesthetics = getAesthetics.call(_this, aestheticValues, d.value.colorScale);
-            Object.assign(d.value, aestheticValues, aesthetics);
-        });
-        if (this.modal) this.modal.stop();
-        runModal.call(this);
-    }
-
-    function timeout(countdown) {
-        var _this = this;
-
-        var timeout = window.setTimeout(function () {
-            resetAnimation.call(_this);
-            progress.call(_this);
-            window.clearInterval(countdown);
-            window.clearTimeout(timeout);
-
-            _this.containers.countdown
-                .classed('fdg-invisible', function (d) {
-                    return d === _this.settings.resetDelay / 1000 - 1;
-                })
-                .classed('fdg-hidden', function (d) {
-                    return d !== _this.settings.resetDelay / 1000 - 1;
-                });
-
-            _this.interval = startInterval.call(_this);
-        }, this.settings.resetDelay);
-        return timeout;
-    }
-
-    function reset() {
-        this.interval.stop(); // Reheat the animation one last time so marks reach to their final destination.
-
-        restartForceSimulation.call(this); // Display a visual countdown to reset.
-
-        var countdown$1 = countdown.call(this); // Set a timeout before resetting the animation.
-
-        var timeout$1 = timeout.call(this, countdown$1);
-    }
-
-    var increment = function increment(arg) {
-        // Increment the timepoint.
-        this.settings.timepoint += !!arg; // Update animation if the current timepoint is less than duration of animation.
-
-        if (this.settings.timepoint <= this.settings.duration) update$1.call(this);
-        // Otherwise reset animation.
-        else if (this.settings.loop === true) reset.call(this); // Resume the force simulation.
-
-        restartForceSimulation.call(this);
-    }; // Default returns an interval that runs increment() every time unit.
-
-    function startInterval() {
-        var interval = d3.interval(increment.bind(this), this.settings.speeds[this.settings.speed]);
-        return interval;
-    }
-
-    var playPause = [
-        {
-            action: 'play',
-            label: 'Play',
-            html: '&#9658;',
-        },
-        {
-            action: 'pause',
-            label: 'Pause',
-            html: '&#10074;&#10074;',
-        },
-    ];
-    function toggle() {
-        var _this = this;
-
-        // Update setting.
-        this.settings.playPause = playPause.find(function (value) {
-            return value.action !== _this.settings.playPause;
-        }).action; // toggle playPause setting
-        // Update tooltip and display text.
-
-        this.controls.playPause.inputs
-            .attr(
-                'title',
-                ''.concat(
-                    playPause.find(function (value) {
-                        return value.action !== _this.settings.playPause;
-                    }).label,
-                    ' animation'
-                )
-            )
-            .html(
-                playPause.find(function (value) {
-                    return value.action !== _this.settings.playPause;
-                }).html
-            ); // Pause or play animation.
-
-        if (this.settings.playPause === 'play') this.interval = startInterval.call(this);
-        else this.interval.stop();
-    }
-
-    function speed() {
-        var _this = this;
-
-        var fdg = this;
-        var container = this.controls.container
-            .append('div')
-            .classed('fdg-control fdg-control--speed', true);
+        var container = this.controls.container.append('div').classed('fdg-control--display', true);
         var inputs = container
-            .selectAll('div')
-            .data(
-                Object.keys(this.settings.speeds).map(function (key) {
-                    return {
-                        label: key,
-                        value: _this.settings.speeds[key],
-                    };
-                })
-            )
-            .enter()
             .append('div')
-            .attr('class', function (d) {
-                return 'fdg-button '
-                    .concat(d.label, ' ')
-                    .concat(d.label === _this.settings.speed ? 'current' : '');
+            .classed('fdg-display-controls', true)
+            .datum({
+                state: true,
+                symbol: '-',
+            })
+            .html(function (d) {
+                return "Controls <span class = 'fdg-expand'>".concat(d.symbol, '</span>');
             })
             .attr('title', function (d) {
-                return 'Advance the animation every '.concat(
-                    _this.settings.speeds[d.label] / 1000,
-                    ' second(s).'
-                );
-            })
-            .text(function (d) {
-                return d.label;
+                return d.state ? 'Hide controls.' : 'Display controls.';
             });
         inputs.on('click', function (d) {
-            fdg.settings.speed = d.label;
-            inputs.classed('current', function (di) {
-                return di.label === d.label;
-            });
-
-            if (fdg.settings.playPause === 'play') {
-                fdg.interval.stop();
-                fdg.interval = startInterval.call(fdg);
-            }
-        });
-        return {
-            container: container,
-            inputs: inputs,
-        };
-    }
-
-    function playPause$1() {
-        var _this = this;
-        var container = this.controls.container
-            .append('div')
-            .classed('fdg-control fdg-control--play-pause', true);
-        var inputs = container
-            .append('div')
-            .classed('fdg-button fdg-input', true)
-            .attr(
-                'title',
-                ''.concat(
-                    playPause.find(function (value) {
-                        return value.action !== _this.settings.playPause;
-                    }).label,
-                    ' animation.'
-                )
-            )
-            .html(
-                playPause.find(function (value) {
-                    return value.action !== _this.settings.playPause;
-                }).html
-            );
-        inputs.on('click', function () {
-            toggle.call(_this);
-        });
-        return {
-            container: container,
-            inputs: inputs,
-        };
-    }
-
-    /**
-     * function:
-     * 1. Pause the animation.
-     * 2. Increment the timepoint by 1.
-     * 3. Allow the points to reach their destination at the new timepoint.
-     */
-
-    function step() {
-        var _this = this;
-        var container = this.controls.container
-            .append('div')
-            .classed('fdg-control fdg-control--step', true);
-        var inputs = container
-            .append('div')
-            .classed('fdg-button fdg-input', true)
-            .attr('title', 'Advance animation by one time unit.')
-            .text('Step');
-        inputs.on('click', function () {
-            // Pause simulation.
-            if (_this.settings.playPause !== 'pause') toggle.call(_this);
-            increment.call(_this, true);
-        });
-        return {
-            container: container,
-            inputs: inputs,
-        };
-    }
-
-    /**
-     * function:
-     * 1. Pause the animation.
-     * 2. Increment the timepoint by 1.
-     * 3. Allow the points to reach their destination at the new timepoint.
-     */
-
-    function timepoint() {
-        var _this = this;
-
-        var fdg = this;
-        var container = this.controls.container
-            .append('div')
-            .classed('fdg-control fdg-control--timepoint', true);
-        var inputs = container
-            .append('div')
-            .classed('fdg-button fdg-input', true)
-            .append('input')
-            .attr('type', 'number')
-            .attr('title', 'Choose a timepoint.')
-            .attr('value', +this.settings.timepoint)
-            .attr('min', 1)
-            .attr('max', this.settings.duration);
-        inputs.on('click', function () {
-            // Pause simulation.
-            if (_this.settings.playPause !== 'pause') toggle.call(_this);
-        });
-        inputs.on('change', function () {
-            // Pause simulation.
-            if (fdg.settings.playPause !== 'pause') toggle.call(fdg);
-            fdg.settings.timepoint = +this.value - 1;
-            increment.call(fdg, true);
-        });
-        return {
-            container: container,
-            inputs: inputs,
-        };
-    }
-
-    function reset$1() {
-        var _this = this;
-
-        var container = this.controls.container
-            .append('div')
-            .classed('fdg-control fdg-control--reset', true);
-        var inputs = container
-            .append('div')
-            .classed('fdg-button fdg-input', true)
-            .attr('title', 'Reset animation.')
-            .html('&#x21ba;');
-        inputs.on('click', function () {
-            resetAnimation.call(_this);
-            if (_this.settings.playPause !== 'play') toggle.call(_this);
-        });
-        return {
-            container: container,
-            inputs: inputs,
-        };
-    }
-
-    function eventList() {
-        var _this = this;
-
-        var container, inputs;
-
-        if (
-            this.settings.colorBy.type === 'frequency' ||
-            this.settings.sizeBy.type === 'frequency'
-        ) {
-            var fdg = this;
-            container = this.controls.container
-                .append('div')
-                .classed('fdg-control fdg-control--event-list', true);
-            inputs = container
-                .selectAll('div')
-                .data(this.metadata.event)
-                .enter()
-                .append('div')
-                .attr('class', function (d) {
-                    return 'fdg-button '.concat(
-                        _this.settings.eventChangeCount.includes(d.key) ? 'current' : ''
-                    );
-                })
+            d.state = !d.state;
+            d.symbol = d.state ? '-' : '+';
+            main.controls.display.inputs
+                .html("Controls <span class = 'fdg-expand'>".concat(d.symbol, '</span>'))
                 .attr('title', function (d) {
-                    return ''
-                        .concat(
-                            _this.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add',
-                            ' '
-                        )
-                        .concat(d.key, ' ')
-                        .concat(
-                            _this.settings.eventChangeCount.includes(d.key) ? 'from' : 'to',
-                            ' the list of events that control bubble '
-                        )
-                        .concat(
-                            _this.settings.colorBy.type === 'frequency' &&
-                                _this.settings.sizeBy.type === 'frequency'
-                                ? 'color and size'
-                                : _this.settings.colorBy.type === 'frequency'
-                                ? 'color'
-                                : _this.settings.sizeBy.type === 'frequency'
-                                ? 'size'
-                                : "[ something isn't right here ].",
-                            '.'
-                        );
-                })
-                .text(function (d) {
-                    return d.key;
+                    return d.state ? 'Hide controls.' : 'Display controls.';
                 });
-            inputs.on('click', function (d) {
-                var _this2 = this;
-
-                this.classList.toggle('current'); // Update event array.
-
-                if (fdg.settings.eventChangeCount.includes(this.textContent))
-                    fdg.settings.eventChangeCount.splice(
-                        fdg.settings.eventChangeCount.findIndex(function (event) {
-                            return event === _this2.textContent;
-                        }),
-                        1
-                    );
-                else fdg.settings.eventChangeCount.push(this.textContent); // Update tooltip.
-
-                this.title = ''
-                    .concat(fdg.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add', ' ')
-                    .concat(d.key, ' ')
-                    .concat(
-                        fdg.settings.eventChangeCount.includes(d.key) ? 'from' : 'to',
-                        ' the list of events that control bubble '
-                    )
-                    .concat(
-                        fdg.settings.colorBy.type === 'frequency' &&
-                            fdg.settings.sizeBy.type === 'frequency'
-                            ? 'color and size'
-                            : fdg.settings.colorBy.type === 'frequency'
-                            ? 'color'
-                            : fdg.settings.sizeBy.type === 'frequency'
-                            ? 'size'
-                            : "[ something isn't right here ].",
-                        '.'
-                    ); // Update color-size toggle.
-                //fdg.controls.colorSizeToggle.inputs.attr(
-                //    'title',
-                //    (di) =>
-                //        `Quantify the number of ${fdg.util.csv(fdg.settings.eventChangeCount)} events by ${
-                //            di !== 'both' ? di : 'color and size'
-                //        }.`
-                //);
-                // Update legend label.
-
-                fdg.legends.container
-                    .classed('fdg-invisible', fdg.settings.eventChangeCount.length === 0)
-                    .selectAll('span.fdg-measure')
-                    .text(fdg.util.csv(fdg.settings.eventChangeCount));
-                increment.call(fdg, false);
+            main.controls.containers.each(function () {
+                this.classList.toggle('fdg-control--collapsed');
             });
-        }
-
+        });
         return {
             container: container,
             inputs: inputs,
         };
     }
 
-    function addControls() {
-        this.controls = {
-            container: this.containers.controls,
-        };
-        this.controls.speed = speed.call(this);
-        this.controls.playPause = playPause$1.call(this);
-        this.controls.step = step.call(this);
-        this.controls.timepoint = timepoint.call(this);
-        this.controls.reset = reset$1.call(this);
-        this.controls.eventList = eventList.call(this);
-        this.controls.container
-            .selectAll('.fdg-button')
-            .on('mousedown', function () {
-                this.classList.toggle('clicked');
-            })
-            .on('mouseup', function () {
-                this.classList.toggle('clicked');
-            })
-            .on('mouseout', function () {
-                if (this.classList.contains('clicked')) this.classList.toggle('clicked');
-            });
+    function fadeOut(selection) {
+        return selection.transition().duration(this.settings.modalSpeed).style('opacity', 0);
     }
 
-    function color$1(svg, legendDimensions) {
+    function getNextSequence() {
         var _this = this;
 
-        var marks = svg
-            .selectAll('rect.legend-mark')
-            .data(this.scales.color.range())
-            .enter()
-            .append('rect')
-            .classed('legend-mark', true)
-            .attr('x', function (d, i) {
-                return i * (legendDimensions[0] / _this.settings.colorBy.nColors);
-            })
-            .attr('y', 0)
-            .attr('width', legendDimensions[0] / this.settings.colorBy.nColors)
-            .attr('height', legendDimensions[1] / 3)
-            .attr('fill', function (d) {
-                return d;
-            })
-            .attr('fill-opacity', 0.5)
-            .attr('stroke', function (d) {
-                return d;
-            })
-            .attr('stroke-opacity', 1);
-        return marks;
-    }
-
-    function size$1(svg, legendDimensions) {
-        var _this = this;
-
-        var marks = svg
-            .selectAll('circle.legend-mark')
-            .data(d3.range(this.settings.colorBy.nColors))
-            .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
-            .classed('legend-mark', true)
-            .attr('fill', function (d) {
-                return '#aaa';
-            })
-            .attr('fill-opacity', 0.5)
-            .attr('stroke', function (d) {
-                return '#aaa';
-            })
-            .attr('stroke-opacity', 1);
-        if (this.settings.shape === 'circle')
-            marks
-                .attr('cx', function (d, i) {
-                    return (
-                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
-                        legendDimensions[0] / _this.settings.colorBy.nColors / 2
-                    );
-                })
-                .attr('cy', legendDimensions[1] / 4)
-                .attr('r', function (d, i) {
-                    return i + _this.settings.minRadius;
-                });
-        else if (this.settings.shape === 'square')
-            marks
-                .attr('x', function (d, i) {
-                    return (
-                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
-                        legendDimensions[0] / _this.settings.colorBy.nColors / 2 -
-                        (i + _this.settings.minRadius)
-                    );
-                })
-                .attr('y', function (d, i) {
-                    return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
-                })
-                .attr('width', function (d, i) {
-                    return (i + _this.settings.minRadius) * 2;
-                })
-                .attr('height', function (d, i) {
-                    return (i + _this.settings.minRadius) * 2;
-                });
-        return marks;
-    }
-
-    function both(svg, legendDimensions) {
-        var _this = this;
-
-        var marks = svg
-            .selectAll('circle.legend-mark')
-            .data(this.scales.color.range())
-            .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
-            .classed('legend-mark', true)
-            .attr('fill', function (d) {
-                return d;
-            })
-            .attr('fill-opacity', 0.5)
-            .attr('stroke', function (d) {
-                return d;
-            })
-            .attr('stroke-opacity', 1);
-        if (this.settings.shape === 'circle')
-            marks
-                .attr('cx', function (d, i) {
-                    return (
-                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
-                        legendDimensions[0] / _this.settings.colorBy.nColors / 2
-                    );
-                })
-                .attr('cy', legendDimensions[1] / 4)
-                .attr('r', function (d, i) {
-                    return i + _this.settings.minRadius;
-                });
-        else if (this.settings.shape === 'square')
-            marks
-                .attr('x', function (d, i) {
-                    return (
-                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
-                        legendDimensions[0] / _this.settings.colorBy.nColors / 2 -
-                        (i + _this.settings.minRadius)
-                    );
-                })
-                .attr('y', function (d, i) {
-                    return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
-                })
-                .attr('width', function (d, i) {
-                    return (i + _this.settings.minRadius) * 2;
-                })
-                .attr('height', function (d, i) {
-                    return (i + _this.settings.minRadius) * 2;
-                });
-        return marks;
-    }
-
-    var makeLegendMarks = {
-        color: color$1,
-        size: size$1,
-        both: both,
-    };
-
-    function makeLegend(type) {
-        var legendDimensions = [200, 50]; // container
-
-        var container = this.legends.container
-            .append('div')
-            .classed('fdg-legend fdg-legend--'.concat(type), true); // label
-
-        var label = container
-            .append('div')
-            .classed('fdg-sidebar__label fdg-legend__label', true)
-            .html(
-                'Number of <span class = "fdg-measure">'.concat(
-                    this.util.csv(this.settings.eventChangeCount),
-                    '</span> events'
-                )
-            ); // svg
-
-        var svg = container
-            .append('svg')
-            .attr('width', legendDimensions[0])
-            .attr('height', legendDimensions[1])
-            .append('g')
-            .attr('transform', 'translate(23,0)'); // marks
-
-        var marks = makeLegendMarks[type].call(this, svg, legendDimensions); // lower end of scale
-
-        var lower = svg
-            .append('text')
-            .attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2)
-            .attr('y', legendDimensions[1] / 2 + 16)
-            .attr('text-anchor', 'middle')
-            .html('0'); // upper end of scale
-
-        var upper = svg
-            .append('text')
-            .attr(
-                'x',
-                legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2
-            )
-            .attr('y', legendDimensions[1] / 2 + 16)
-            .attr('text-anchor', 'middle')
-            .html(''.concat(this.settings.colorBy.nColors - 1, '+'));
-        return container;
-    }
-
-    function frequency() {
-        var container;
-        if (this.settings.colorBy.type === 'frequency' && this.settings.sizeBy.type === 'frequency')
-            container = makeLegend.call(this, 'both');
-        else if (this.settings.colorBy.type === 'frequency')
-            container = makeLegend.call(this, 'color');
-        else if (this.settings.sizeBy.type === 'frequency')
-            container = makeLegend.call(this, 'size');
-        return container;
-    }
-
-    function categorical() {
-        var _this = this;
-
-        var container = this.legends.container
-            .append('div')
-            .classed('fdg-legend fdg-legend--categorical', true);
-        container
-            .append('div')
-            .classed('fdg-sidebar__label fdg-legend__label', true)
-            .html(this.settings.colorBy.label);
-        var legendItems = container
-            .append('svg')
-            .attr('width', 200)
-            .attr('height', 20 * this.scales.color.domain().length)
-            .selectAll('g')
-            .data(this.scales.color.domain())
-            .join('g')
-            .attr('transform', 'translate(20,0)');
-        legendItems
-            .append('circle')
-            .classed('fdg-legend__symbol', true)
-            .attr('cx', 20)
-            .attr('cy', function (d, i) {
-                return i * 20 + 10;
-            })
-            .attr('r', 7)
-            .attr('fill', function (d) {
-                return _this.scales.color(d);
-            });
-        legendItems
-            .append('text')
-            .classed('fdg-legend__label', true)
-            .attr('font-size', '1rem')
-            .attr('x', 35)
-            .attr('y', function (d, i) {
-                return i * 20 + 12;
-            })
-            .attr('alignment-baseline', 'middle')
-            .html(function (d) {
-                return ''.concat(d, ' (n=').concat(
-                    d3.format(',d')(
-                        _this.metadata.id.filter(function (di) {
-                            return di.colorStratum === d;
-                        }).length
-                    ),
-                    ')'
-                );
-            });
-        return container;
-    }
-
-    function ramp(color) {
-        var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 256;
-        //DOM.canvas(n, 1);
-        var canvas = document.createElement('canvas');
-        canvas.width = n;
-        canvas.height = 1;
-        var context = canvas.getContext('2d');
-
-        for (var i = 0; i < n; ++i) {
-            context.fillStyle = color(i / (n - 1));
-            context.fillRect(i, 0, 1, 1);
-        }
-
-        return canvas;
-    }
-
-    function continuous() {
-        var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-            color = _ref.color,
-            title = _ref.title,
-            _ref$tickSize = _ref.tickSize,
-            tickSize = _ref$tickSize === void 0 ? 6 : _ref$tickSize,
-            _ref$width = _ref.width,
-            width = _ref$width === void 0 ? 320 : _ref$width,
-            _ref$height = _ref.height,
-            height = _ref$height === void 0 ? 44 + tickSize : _ref$height,
-            _ref$marginTop = _ref.marginTop,
-            marginTop = _ref$marginTop === void 0 ? 18 : _ref$marginTop,
-            _ref$marginRight = _ref.marginRight,
-            marginRight = _ref$marginRight === void 0 ? 0 : _ref$marginRight,
-            _ref$marginBottom = _ref.marginBottom,
-            marginBottom = _ref$marginBottom === void 0 ? 16 + tickSize : _ref$marginBottom,
-            _ref$marginLeft = _ref.marginLeft,
-            marginLeft = _ref$marginLeft === void 0 ? 0 : _ref$marginLeft,
-            _ref$ticks = _ref.ticks,
-            ticks = _ref$ticks === void 0 ? width / 64 : _ref$ticks,
-            tickFormat = _ref.tickFormat,
-            tickValues = _ref.tickValues;
-
-        var svg = d3
-            .create('svg')
-            .attr('width', width)
-            .attr('height', height)
-            .attr('viewBox', [0, 0, width, height])
-            .style('overflow', 'visible'); //.style('display', 'block');
-
-        var tickAdjust = function tickAdjust(g) {
-            return g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height);
-        };
-
-        var x; // Continuous
-
-        if (color.interpolate) {
-            var n = Math.min(color.domain().length, color.range().length);
-            x = color
-                .copy()
-                .rangeRound(d3.quantize(d3.interpolate(marginLeft, width - marginRight), n));
-            svg.append('image')
-                .attr('x', marginLeft)
-                .attr('y', marginTop)
-                .attr('width', width - marginLeft - marginRight)
-                .attr('height', height - marginTop - marginBottom)
-                .attr('preserveAspectRatio', 'none')
-                .attr(
-                    'xlink:href',
-                    ramp
-                        .call(this, color.copy().domain(d3.quantize(d3.interpolate(0, 1), n)))
-                        .toDataURL()
-                );
-        } // Sequential
-        else if (color.interpolator) {
-            x = Object.assign(
-                color.copy().interpolator(d3.interpolateRound(marginLeft, width - marginRight)),
-                {
-                    range: function range() {
-                        return [marginLeft, width - marginRight];
-                    },
-                }
-            );
-            svg.append('image')
-                .attr('x', marginLeft)
-                .attr('y', marginTop)
-                .attr('width', width - marginLeft - marginRight)
-                .attr('height', height - marginTop - marginBottom)
-                .attr('preserveAspectRatio', 'none')
-                .attr('xlink:href', ramp.call(this, color.interpolator()).toDataURL()); // scaleSequentialQuantile doesn’t implement ticks or tickFormat.
-
-            if (!x.ticks) {
-                if (tickValues === undefined) {
-                    var _n = Math.round(ticks + 1);
-
-                    tickValues = d3.range(_n).map(function (i) {
-                        return d3.quantile(color.domain(), i / (_n - 1));
-                    });
-                }
-
-                if (typeof tickFormat !== 'function') {
-                    tickFormat = d3.format(tickFormat === undefined ? ',f' : tickFormat);
-                }
-            }
-        } // Threshold
-        else if (color.invertExtent) {
-            var thresholds = color.thresholds
-                ? color.thresholds() // scaleQuantize
-                : color.quantiles
-                ? color.quantiles() // scaleQuantile
-                : color.domain(); // scaleThreshold
-
-            var thresholdFormat =
-                tickFormat === undefined
-                    ? function (d) {
-                          return d;
-                      }
-                    : typeof tickFormat === 'string'
-                    ? d3.format(tickFormat)
-                    : tickFormat;
-            x = d3
-                .scaleLinear()
-                .domain([-1, color.range().length - 1])
-                .rangeRound([marginLeft, width - marginRight]);
-            svg.append('g')
-                .selectAll('rect')
-                .data(color.range())
-                .join('rect')
-                .attr('x', function (d, i) {
-                    return x(i - 1);
-                })
-                .attr('y', marginTop)
-                .attr('width', function (d, i) {
-                    return x(i) - x(i - 1);
-                })
-                .attr('height', height - marginTop - marginBottom)
-                .attr('fill', function (d) {
-                    return d;
-                });
-            tickValues = d3.range(thresholds.length);
-
-            tickFormat = function tickFormat(i) {
-                return thresholdFormat(thresholds[i], i);
-            };
-        } // Ordinal
-        else {
-            x = d3
-                .scaleBand()
-                .domain(color.domain())
-                .rangeRound([marginLeft, width - marginRight]);
-            svg.append('g')
-                .selectAll('rect')
-                .data(color.domain())
-                .join('rect')
-                .attr('x', x)
-                .attr('y', marginTop)
-                .attr('width', Math.max(0, x.bandwidth() - 1))
-                .attr('height', height - marginTop - marginBottom)
-                .attr('fill', color);
-
-            tickAdjust = function tickAdjust() {};
-        }
-
-        svg.append('g')
-            .attr('transform', 'translate(0,'.concat(height - marginBottom, ')'))
-            .call(
-                d3
-                    .axisBottom(x)
-                    .ticks(ticks, typeof tickFormat === 'string' ? tickFormat : undefined)
-                    .tickFormat(typeof tickFormat === 'function' ? tickFormat : undefined)
-                    .tickSize(tickSize)
-                    .tickValues(tickValues)
-            )
-            .call(tickAdjust)
-            .call(function (g) {
-                return g.select('.domain').remove();
-            })
-            .call(function (g) {
-                return g
-                    .append('text')
-                    .classed('fdg-sidebar__label fdg-legend__label', true)
-                    .attr('x', marginLeft)
-                    .attr('y', marginTop + marginBottom - height - 6)
-                    .attr('fill', 'currentColor')
-                    .attr('text-anchor', 'middle')
-                    .attr('transform', 'translate('.concat(width / 2, ',0)'))
-                    .attr('font-weight', 'bold')
-                    .attr('font-size', '1.25rem')
-                    .html(title);
-            });
-        return svg.node();
-    }
-
-    function continuous$1() {
-        var container = this.legends.container
-            .append('div')
-            .classed('fdg-legend fdg-legend--continuous', true);
-        container.node().appendChild(
-            continuous({
-                color: this.scales.color,
-                title: this.settings.colorBy.label,
-                width: 200,
-                height: 50,
-                tickValues: [
-                    this.scales.color.domain()[0],
-                    (this.scales.color.domain()[1] - this.scales.color.domain()[0]) / 2,
-                    this.scales.color.domain()[1],
-                ],
-            })
-        );
-        return container;
-    }
-
-    function color$2() {
-        var container;
-
-        if (this.settings.colorify) {
-            switch (this.settings.colorBy.type) {
-                case 'frequency':
-                    container = frequency.call(this);
-                    break;
-
-                case 'categorical':
-                    container = categorical.call(this);
-                    break;
-
-                case 'continuous':
-                    container = continuous$1.call(this);
-                    break;
-
-                default:
-                    return;
-            }
-        }
-
-        return container;
-    }
-
-    function size$2() {
-        var container;
-
-        if (this.settings.sizify && this.settings.colorBy.type !== 'frequency') {
-            container = makeLegend.call(this, 'size');
-        }
-
-        return container;
-    }
-
-    function circle(legendItem, i, spacing, radius) {
-        return legendItem
-            .append('circle')
-            .attr('cx', spacing)
-            .attr('cy', i * spacing + 10)
-            .attr('r', radius - 1)
-            .attr('fill', 'none')
-            .attr('stroke', '#444');
-    }
-
-    function square(legendItem, i, spacing, radius) {
-        return legendItem
-            .append('rect')
-            .attr('x', spacing - radius + 1.5)
-            .attr('y', i * spacing + radius / 2 + 1)
-            .attr('width', radius * 1.5)
-            .attr('height', radius * 1.5)
-            .attr('fill', 'none')
-            .attr('stroke', '#444');
-    }
-
-    function triangle(legendItem, i, spacing, radius) {
-        var side = radius * 1.5;
-        var dist = side / Math.sqrt(3);
-        var x = spacing;
-        var y = i * spacing + dist + 3;
-        var top = [x, y - dist];
-        var left = [x - dist, y + dist];
-        var right = [x + dist, y + dist];
-        return legendItem
-            .append('polygon')
-            .attr('points', [top, left, right])
-            .attr('fill', 'none')
-            .attr('stroke', '#444');
-    }
-
-    function diamond(legendItem, i, spacing, radius) {
-        var x = spacing;
-        var y = i * spacing;
-        return legendItem
-            .append('rect')
-            .attr('transform', 'rotate(45 '.concat(x, ' ').concat(y, ')'))
-            .attr('x', x)
-            .attr('y', y)
-            .attr('width', radius * 1.5)
-            .attr('height', radius * 1.5)
-            .attr('fill', 'none')
-            .attr('stroke', '#444');
-    }
-
-    //<svg height="210" width="500">
-    //  <polygon points="100,10 40,198 190,78 10,78 160,198"
-    //  style="fill:lime;stroke:purple;stroke-width:5;fill-rule:nonzero;" />
-    //</svg>
-    function star(legendItem, i, spacing, radius) {
-        var spikes = 5;
-        var step = Math.PI / spikes;
-        var innerRadius = radius * 0.6;
-        var outerRadius = radius * 1.2;
-        var dist = (radius * 2) / Math.sqrt(3);
-        var rot = (Math.PI / 2) * 3;
-        var x = spacing;
-        var y = i * spacing + dist;
-        var centroid = [x, y];
-        var coordinates = [];
-
-        for (var _i = 0; _i < spikes; _i++) {
-            x = centroid[0] + Math.cos(rot) * outerRadius;
-            y = centroid[1] + Math.sin(rot) * outerRadius;
-            coordinates.push([x, y]);
-            rot += step;
-            x = centroid[0] + Math.cos(rot) * innerRadius;
-            y = centroid[1] + Math.sin(rot) * innerRadius;
-            coordinates.push([x, y]);
-            rot += step;
-        }
-
-        return legendItem
-            .append('polygon')
-            .attr('points', coordinates)
-            .attr('fill', 'none')
-            .attr('stroke', '#444');
-    }
-
-    function triangleDown(legendItem, i, spacing, radius) {
-        var side = radius * 1.5;
-        var dist = side / Math.sqrt(3);
-        var x = spacing;
-        var y = i * spacing + dist + 3;
-        var top = [x, y + dist];
-        var left = [x - dist, y - dist];
-        var right = [x + dist, y - dist];
-        return legendItem
-            .append('polygon')
-            .attr('points', [top, left, right])
-            .attr('fill', 'none')
-            .attr('stroke', '#444');
-    }
-
-    function shape$2() {
-        var _this = this;
-
-        var container;
-
-        if (this.settings.shapify) {
-            var main = this;
-            var shapes = {
-                circle: circle,
-                square: square,
-                triangle: triangle,
-                diamond: diamond,
-                star: star,
-                triangleDown: triangleDown,
-            };
-            container = this.legends.container
-                .append('div')
-                .classed('fdg-legend fdg-legend--shape', true);
-            container
-                .append('div')
-                .classed('fdg-sidebar__label fdg-legend__label', true)
-                .html(this.settings.shapeBy.label);
-            var legendItems = container
-                .append('svg')
-                .attr('width', 200)
-                .attr('height', 20 * this.scales.shape.domain().length)
-                .selectAll('g')
-                .data(this.scales.shape.domain())
-                .join('g')
-                .attr('transform', 'translate(20,0)');
-            var radius = 7;
-            var spacing = 20;
-            legendItems.each(function (value, i) {
-                var shape = shapes[main.scales.shape(value)]
-                    .call(main, d3.select(this), i, spacing, radius)
-                    .classed('fdg-legend__shape', true)
-                    .classed('fdg-legend__symbol', true);
-            });
-            legendItems
-                .append('text')
-                .classed('fdg-legend__label', true)
-                .attr('font-size', '1rem')
-                .attr('x', 35)
-                .attr('y', function (d, i) {
-                    return i * 20 + 12;
-                })
-                .attr('alignment-baseline', 'middle')
-                .html(function (d) {
-                    return ''.concat(d, ' (n=').concat(
-                        _this.metadata.id.filter(function (di) {
-                            return di.shapeStratum === d;
-                        }).length,
-                        ')'
-                    );
-                });
-        }
-
-        return container;
-    }
-
-    function addLegends() {
-        this.legends = {
-            container: this.containers.legends,
-        };
-        this.legends.color = color$2.call(this);
-        this.legends.size = size$2.call(this);
-        this.legends.shape = shape$2.call(this);
-    }
-
-    function addFreqTable() {
-        var _this = this;
-
-        var main = this;
-        var freqTable = {
-            container: this.containers.freqTable
-                .classed('fdg-hidden', this.settings.freqTable.display === false)
-                .classed(
-                    'fdg-freq-table--vertical',
-                    this.settings.freqTable.structure === 'vertical'
-                )
-                .classed(
-                    'fdg-freq-table--horizontal',
-                    this.settings.freqTable.structure === 'horizontal'
-                ),
-        };
-        freqTable.label = this.util
-            .addElement('freq-table__label', freqTable.container)
-            .classed('fdg-sidebar__label', true)
-            .text(
-                this.settings.freqTable.structure === 'vertical'
-                    ? ''
-                    : this.settings.freqTable.countType === 'id'
-                    ? 'Number of Individuals'
-                    : 'Number of Events'
-            );
-        freqTable.table = freqTable.container
-            .append('table')
-            .classed('fdg-freq-table__table', true);
-        freqTable.thead = freqTable.table.append('thead').classed('fdg-freq-table__thead', true); // Add column headers.
-
-        freqTable.th = freqTable.thead
-            .selectAll('th')
-            .data(
-                this.settings.freqTable.structure === 'vertical'
-                    ? ['', 'Individuals', 'Events']
-                    : ['', 'Total'].concat(
-                          _toConsumableArray(
-                              this.metadata.strata.map(function (stratum) {
-                                  return stratum.key;
-                              })
-                          )
-                      )
-            )
-            .join('th')
-            .attr('class', function (d, i) {
-                return 'fdg-freq-table__th--'.concat(
-                    i === 0 ? 'label' : i === 1 ? 'individual' : i === 2 ? 'event' : i
-                );
-            })
-            .classed('fdg-freq-table__th', true)
-            .text(function (d) {
-                return d;
-            }); // Add info icon explaining bars.
-
-        if (this.settings.freqTable.bars)
-            freqTable.th
-                .filter(function (d) {
-                    return d === 'Individuals';
-                })
-                .html(function (d) {
-                    return ''
-                        .concat(d, ' <span ', "class = 'fdg-info-icon'", ' ')
-                        .concat(
-                            _this.settings.colorBy.type === 'categorical'
-                                ? "title = 'Gray background represents the percentage of individuals in the given group at the given state'"
-                                : "title = 'Gray background represents the percentage of individuals at the given state'",
-                            '>&#9432;</span>'
-                        );
-                });
-        freqTable.tbody = freqTable.table.append('tbody').classed('fdg-freq-table__tbody', true); // Add table rows.
-
-        freqTable.tr = freqTable.tbody
-            .selectAll('tr')
-            .data(
-                this.data.freqTable.filter(
-                    function (d) {
-                        return (
-                            !(
-                                _this.settings.freqTable.includeEventCentral === false &&
-                                d.state === _this.settings.eventCentral
-                            ) && !(_this.settings.freqTable.structure === 'horizontal' && !d.foci)
-                        );
-                    } // exclude central event row(s) // exclude strata rows
-                )
-            )
-            .join('tr')
-            .attr('class', function (d) {
-                return d.state !== d.label ? 'fdg-freq-table__tr--subgroup' : null;
-            })
-            .classed('fdg-freq-table__tr', true)
-            .style('font-size', function (d) {
-                return d.group !== d.value ? '1rem' : '1.25rem';
-            }); // Add table cells.
-
-        freqTable.tr.each(function (d, i) {
-            var tr = d3.select(this);
-            var td = tr
-                .selectAll('td')
-                .data(function (di) {
-                    return d.cells;
-                })
-                .join('td')
-                .attr('class', function (d, i) {
-                    return main.settings.freqTable.structure === 'vertical'
-                        ? 'fdg-freq-table__td--'.concat(
-                              i === 0 ? 'label' : i === 1 ? 'individual' : i === 2 ? 'event' : i
-                          )
-                        : 'fdg-freq-table__td--'.concat(i === 0 ? 'label' : 'freq');
-                })
-                .classed('fdg-freq-table__td', true)
-                .style('background', function (di, i) {
-                    return i === 1 && main.settings.freqTable.bars
-                        ? 'linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) '
-                              .concat(d.proportionFmt, ', transparent ')
-                              .concat(d.proportionFmt, ')')
-                        : null;
-                }) // add background to individual cell proportional to the percentage of individuals at state or focus
-                .text(function (di) {
-                    return typeof di === 'number' ? d3.format(',d')(di) : di;
-                });
+        var increment = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+        if (increment) this.settings.sequenceIndex++;
+        var sequence = this.settings.sequences[this.settings.sequenceIndex];
+        var start_orbit = this.metadata.orbit.find(function (orbit) {
+            return +orbit.key === sequence.start_order;
         });
-        freqTable.td = freqTable.tr.selectAll('td');
-        return freqTable;
+        sequence.events = start_orbit
+            ? start_orbit.values
+            : [
+                  this.metadata.event.find(function (event) {
+                      return event.key === _this.settings.eventCentral;
+                  }),
+              ];
+        fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
+        fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
+        fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+        fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+        return sequence;
     }
 
-    function addOrbits() {
-        var g = this.containers.svgBackground.append('g').classed('fdg-g fdg-g--orbits', true);
-        var shadows = g
-            .append('defs')
-            .selectAll('filter')
-            .data(this.metadata.orbit)
-            .join('filter')
-            .attr('id', function (d, i) {
-                return 'orbit--'.concat(i);
-            });
-        shadows
-            .append('feDropShadow')
-            .attr('dx', 0)
-            .attr('dy', 0)
-            .attr('stdDeviation', 5)
-            .attr('flood-color', 'black');
-        var orbits = g
-            .selectAll('circle.orbit')
-            .data(this.metadata.orbit)
-            .enter()
-            .append('circle')
-            .classed('orbit', true)
-            .attr('cx', function (d) {
-                return d.cx;
-            })
-            .attr('cy', function (d) {
-                return d.cy;
-            })
-            .attr('r', function (d) {
-                return d.r;
-            })
-            .attr('fill', 'none')
-            .attr('stroke', '#aaa')
-            .attr('stroke-width', '.5')
-            .style('filter', function (d, i) {
-                return 'url(#orbit--'.concat(i, ')');
-            });
-        return orbits;
+    function fadeIn(selection, html) {
+        return selection
+            .html(html)
+            .style('opacity', 0)
+            .transition()
+            .duration(this.settings.modalSpeed / 5)
+            .style('opacity', 1);
     }
 
-    function isCenter(d) {
-        return Math.round(d.y) === Math.round(this.settings.height / 2);
-    }
-
-    function isLessThanCenter(d) {
-        return Math.round(d.y) < Math.round(this.settings.height / 2);
-    }
-
-    function getPosition(d) {
-        var reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        var position = isCenter.call(this, d)
-            ? 'middle'
-            : isLessThanCenter.call(this, d)
-            ? 'hanging'
-            : 'baseline';
-        if (reverse)
-            position =
-                position === 'hanging'
-                    ? 'baseline'
-                    : position === 'baseline'
-                    ? 'hanging'
-                    : position;
-        return position;
-    }
-
-    function getRelative(d) {
-        return d.key === this.settings.eventCentral
-            ? 0
-            : isLessThanCenter.call(this, d)
-            ? '-2.5em'
-            : '2.5em';
-    }
-
-    function addLabel(text) {
+    function nestData(data) {
         var _this = this;
 
-        var label = text
-            .append('tspan')
-            .classed('fdg-focus-annotation__label', true)
-            .attr('x', 0) //.attr('text-anchor', (d) => getTextAnchor.call(this, d))
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .text(function (d) {
-                return d.key;
-            });
-        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
-            label.attr('alignment-baseline', function (d) {
-                return getPosition.call(_this, d, true);
-            });
-        return label;
-    }
-
-    function addEventCount(text) {
-        var eventCount = text
-            .append('tspan')
-            .classed('fdg-focus-annotation__event-count', true)
-            .classed('fdg-hidden', this.settings.eventCount === false)
-            .attr('x', 0)
-            .attr('dy', '1.3em') //.attr('text-anchor', (d) => getTextAnchor.call(this, d));
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle');
-        return eventCount;
-    }
-
-    function categoricallyReposition(text, label, eventCount) {
-        var _this = this;
-
-        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
-            text.style('transform', function (d) {
-                return 'translate('.concat(isCenter.call(_this, d) ? '-5em,0' : '0,-5em', ')');
-            });
-            label.attr('text-anchor', function (d) {
-                return d.key === _this.settings.eventCentral ? 'start' : 'middle';
-            });
-            eventCount.attr('text-anchor', 'middle').classed('fdg-hidden', true);
-        }
-    }
-
-    function annotateFoci() {
-        var _this = this;
-
-        var fociLabels = this.containers.focusAnnotations
-            .selectAll('g.fdg-focus-annotation')
-            .data(this.metadata.event)
-            .join('g')
-            .classed('fdg-focus-annotation', true)
-            .attr('transform', function (d) {
-                return 'translate('.concat(d.x, ',').concat(d.y, ')');
-            }); // background - white annotation highlight
-        // foreground - black annotation text
-
-        ['background', 'foreground'].forEach(function (pos) {
-            var text = fociLabels
-                .append('text')
-                .classed('fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos), true) //.style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
-                .style('transform', function (d) {
-                    return 'translate(0,'.concat(getRelative.call(_this, d), ')');
-                });
-            var label = addLabel.call(_this, text);
-            var eventCount = addEventCount.call(_this, text); // Position annotations differently in categorical layout.
-
-            categoricallyReposition.call(_this, text, label, eventCount);
-        }); // Annotate strata at each focus.
-
-        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
-            this.metadata.event.forEach(function (event) {
-                event.fociLabels = _this.containers.focusAnnotations
-                    .append('g')
-                    .classed('fdg-focus-annotation fdg-focus-annotation--categorical', true);
-                ['background', 'foreground'].forEach(function (pos) {
-                    var text = event.fociLabels
-                        .selectAll('text.fdg-focus-annotation__'.concat(pos))
-                        .data(event.foci)
-                        .join('text')
-                        .classed(
-                            'fdg-focus-annotation__event-count fdg-focus-annotation__text fdg-focus-annotation__'.concat(
-                                pos
-                            ),
-                            true
-                        )
-                        .attr('x', function (d) {
-                            return d.dx;
-                        })
-                        .attr('dx', function (d) {
-                            return event.key === _this.settings.eventCentral ? null : '-1em';
-                        })
-                        .attr('y', function (d) {
-                            return d.dy;
-                        })
-                        .attr('text-anchor', function (d) {
-                            return event.key === _this.settings.eventCentral ? 'middle' : 'end';
-                        })
-                        .attr('alignment-baseline', function (d) {
-                            return getPosition.call(_this, d, true);
-                        });
-                });
-            });
-        }
-
-        return fociLabels;
-    }
-
-    function dataDrivenLayout() {
-        // controls
-        addControls.call(this); // sidebar
-
-        addLegends.call(this);
-        this.containers.freqTable = addFreqTable.call(this); // Draw concentric circles.
-
-        this.orbits = addOrbits.call(this); // Annotate foci.
-
-        this.focusAnnotations = annotateFoci.call(this);
-    }
-
-    function hasVariables() {
-        var has = {};
-
-        var _iterator = _createForOfIteratorHelper(
-                Object.keys(this.settings).filter(function (key) {
-                    return /_var$/.test(key);
-                })
-            ),
-            _step;
-
-        try {
-            for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-                var setting = _step.value;
-                var variable = setting.replace(/_var$/, '');
-                has[variable] = this.data[0].hasOwnProperty(this.settings[setting]);
-            }
-        } catch (err) {
-            _iterator.e(err);
-        } finally {
-            _iterator.f();
-        }
-
-        return has;
-    }
-
-    function mapVariables() {
-        var _this = this;
-
-        this.data.forEach(function (d) {
-            var _iterator = _createForOfIteratorHelper(
-                    Object.keys(_this.settings).filter(function (key) {
-                        return /_var$/.test(key);
-                    })
-                ),
-                _step;
-
-            try {
-                for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-                    var setting = _step.value;
-                    var variable = setting.replace(/_var$/, '');
-                    d[variable] = [
-                        'event_order',
-                        'start_timepoint',
-                        'end_timepoint',
-                        'duration',
-                        'sequence',
-                    ].includes(variable)
-                        ? +d[_this.settings[setting]]
-                        : d[_this.settings[setting]];
-                }
-            } catch (err) {
-                _iterator.e(err);
-            } finally {
-                _iterator.f();
-            }
-        });
-    }
-
-    function addVariables(has) {
-        d3.nest()
-            .key(function (d) {
-                return d.id;
-            })
-            .rollup(function (group) {
-                group.forEach(function (d, i) {
-                    // Define start and end timepoints when only duration exists.
-                    if (has.duration && !has.start_timepoint) {
-                        if (i === 0) {
-                            d.start_timepoint = 1;
-                            d.end_timepoint = d.duration;
-                        } else {
-                            d.start_timepoint = group[i - 1].end_timepoint + 1;
-                            d.end_timepoint = d.start_timepoint + d.duration - 1;
-                        }
-                    } // Define end timepoint when only start timepoint exists.
-
-                    if (has.start_timepoint && !has.end_timepoint) {
-                        d.end_timepoint =
-                            i < group.length - 1
-                                ? group[i + 1].start_timepoint - 1
-                                : d.duration
-                                ? d.start_timepoint + d.duration - 1
-                                : d.start_timepoint;
-                    } // Define duration when only timepoints exist.
-
-                    if (!has.duration && has.start_timepoint && has.end_timepoint) {
-                        d.duration = d.start_timepoint - d.end_timepoint + 1;
-                    }
-                }); // Define sequence
-
-                if (!has.sequence) {
-                    group
-                        .sort(function (a, b) {
-                            return a.start_timepoint - b.start_timepoint;
-                        })
-                        .forEach(function (d, i) {
-                            d.seq = i;
-                        });
-                } else {
-                    group.sort(function (a, b) {
-                        return a.seq - b.seq;
-                    });
-                }
-            })
-            .entries(this.data);
-    }
-
-    function sort() {
-        var numericId = this.data.every(function (d) {
-            return /^-?\d+\.?\d*$/.test(d.id) || /^-?\d*\.?\d+$/.test(d.id);
-        });
-        this.data.sort(function (a, b) {
-            var id_diff = numericId ? +a.id - +b.id : a.id < b.id ? -1 : b.id < a.id ? 1 : 0;
-            var seq_diff = a.seq - b.seq;
-            return id_diff || seq_diff;
-        });
-    }
-
-    function mutateData() {
-        // Check for existence of variables.
-        var has = hasVariables.call(this); // Apply data mappings.
-
-        mapVariables.call(this); // Define duration, sequence, and/or start and end timepoints.
-
-        addVariables.call(this, has); // Sort data by id and sequence.
-
-        sort.call(this);
-    }
-
-    function nestData() {
-        var _this = this;
-
+        // sequenced animation (vs timed animation)
+        // one interval per state
+        // each interval is offset by the position of the ID in the full set of IDs:
+        // - ID 001 begins at timepoint 1
+        // - ID 002 begins at timepoint 2
+        // - ...
+        // the full duration of each ID is the number of times they change states
+        // - at timepoint 0 all IDs are at s0
+        // - at timepoint 1 ID 001 moves to s1
+        // - at timepoint 2 ID 001 moves to s2 and ID 002 moves to s1
+        // - ...
         var nestedData = d3
             .nest()
             .key(function (d) {
@@ -3709,7 +2425,8 @@
                 var duration = d3.sum(group, function (d) {
                     return d.duration;
                 });
-                var noStateChange = group.length === 1; // state-level values - calculated once per timepoint
+                var noStateChange = group.length === 1;
+                // state-level values - calculated once per timepoint
 
                 var state = getState.call(_this, group, 0);
                 var aestheticValues = getAestheticValues.call(_this, group, state);
@@ -3723,6 +2440,9 @@
                 return _objectSpread2(
                     _objectSpread2(
                         {
+                            index: _this.metadata.id.findIndex(function (id) {
+                                return id.key === state.id;
+                            }),
                             group: group,
                             // array: data
                             duration: duration,
@@ -3746,20 +2466,8 @@
                     aesthetics
                 );
             })
-            .entries(this.data);
+            .entries(data);
         return nestedData;
-    }
-
-    function dataManipulation() {
-        var _this = this;
-
-        mutateData.call(this);
-        this.data.nested = nestData.call(this);
-        this.metadata.event.forEach(function (event) {
-            event.data = _this.data.nested.filter(function (d) {
-                return d.value.state.event === event.key;
-            });
-        });
     }
 
     function constant(x) {
@@ -4659,7 +3367,7 @@
         return force;
     }
 
-    function circle$1(d) {
+    function circle(d) {
         this.containers.canvas.context.moveTo(d.x + d.size, d.y);
         this.containers.canvas.context.arc(d.x, d.y, d.value.size, 0, 2 * Math.PI);
 
@@ -4672,7 +3380,7 @@
         this.containers.canvas.context.stroke();
     }
 
-    function square$1(d) {
+    function square(d) {
         this.containers.canvas.context.rect(
             d.x - d.value.size,
             d.y - d.value.size,
@@ -4690,7 +3398,7 @@
     }
 
     // TODO: use some kind of cos/sin shit to make a perfect equilateral triangle
-    function triangle$1(d) {
+    function triangle(d) {
         var ctx = this.containers.canvas.context;
         var side = d.value.size * 2; // * Math.sqrt(3)/6;
 
@@ -4713,7 +3421,7 @@
         this.containers.canvas.context.stroke();
     }
 
-    function diamond$1(d) {
+    function diamond(d) {
         var ctx = this.containers.canvas.context;
         var halfWidth = d.value.size * Math.sqrt(2);
         ctx.moveTo(d.x, d.y - halfWidth);
@@ -4731,7 +3439,7 @@
         this.containers.canvas.context.stroke();
     }
 
-    function star$1(d) {
+    function star(d) {
         var ctx = this.containers.canvas.context;
         var spikes = 5;
         var step = Math.PI / spikes;
@@ -4764,7 +3472,7 @@
     }
 
     // TODO: use some kind of cos/sin shit to make a perfect equilateral triangle
-    function triangle$2(d) {
+    function triangle$1(d) {
         var ctx = this.containers.canvas.context;
         var side = d.value.size * 2; // * Math.sqrt(3)/6;
 
@@ -4787,12 +3495,12 @@
         this.containers.canvas.context.stroke();
     }
 
-    function tick() {
+    function tick(data) {
         var _this = this;
 
         this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
         this.containers.canvas.context.save();
-        this.data.nested
+        data.nested
             .sort(function (a, b) {
                 return a.value.stateChanges - b.value.stateChanges;
             }) // draw bubbles with more state changes last
@@ -4801,43 +3509,49 @@
 
                 switch (d.value.shape) {
                     case 'circle':
-                        circle$1.call(_this, d);
+                        circle.call(_this, d);
                         break;
 
                     case 'square':
-                        square$1.call(_this, d);
+                        square.call(_this, d);
                         break;
 
                     case 'triangle':
-                        triangle$1.call(_this, d);
+                        triangle.call(_this, d);
                         break;
 
                     case 'diamond':
-                        diamond$1.call(_this, d);
+                        diamond.call(_this, d);
                         break;
 
                     case 'star':
-                        star$1.call(_this, d);
+                        star.call(_this, d);
                         break;
 
                     case 'triangleDown':
-                        triangle$2.call(_this, d);
+                        triangle$1.call(_this, d);
                         break;
 
                     default:
-                        circle$1.call(_this, d);
+                        circle.call(_this, d);
                 }
             });
         this.containers.canvas.context.restore();
     }
 
-    function addForceSimulation() {
+    // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
+    // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
+    // the viewport.
+    //
+    // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
+
+    function addForceSimulation(data) {
         var _this = this;
 
-        this.forceSimulation = d3
+        var forceSimulation = d3
             .forceSimulation()
             .nodes(
-                this.data.nested.filter(function (d) {
+                data.nested.filter(function (d) {
                     return !(_this.settings.drawStaticSeparately && d.value.noStateChange);
                 })
             )
@@ -4881,28 +3595,2545 @@
                     return d.value.size + _this.settings.collisionPadding;
                 })
             )
-            .on('tick', tick.bind(this)); // When using D3’s force layout with a disjoint graph, you typically want the positioning
-        // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
-        // positioning forces, unlike the centering force, prevent detached subgraphs from escaping
-        // the viewport.
-        //
-        // https://observablehq.com/@d3/disjoint-force-directed-graph?collection=@d3/d3-force
+            .on('tick', tick.bind(this, data));
+        return forceSimulation;
+    }
+
+    function progress() {
+        // Update timepoint.
+        this.containers.timepoint.text(
+            ''
+                .concat(this.settings.timepoint, ' ')
+                .concat(
+                    this.settings.timepoint !== 1
+                        ? this.settings.timeUnit + 's'
+                        : this.settings.timeUnit
+                )
+        ); // Update timer.
+
+        this.containers.progress.attr(
+            'title',
+            'The animation is '
+                .concat(d3.format('.1%')(this.settings.progress), ' complete with ')
+                .concat(this.settings.duration - this.settings.timepoint, ' ')
+                .concat(this.settings.timeUnit.split(' ')[0], ' to go.')
+        );
+        this.containers.timer.foreground
+            .transition()
+            .duration(this.settings.speed)
+            .attrTween(
+                'd',
+                this.util.arcTween(this.settings.progress * Math.PI * 2, this.containers.timer.arc)
+            );
+        this.containers.timer.percentComplete.text(
+            this.settings.progress < 0.0095
+                ? d3.format('.1%')(this.settings.progress)
+                : d3.format('.0%')(this.settings.progress)
+        ); // Update timepoint control.
+
+        this.controls.timepoint.inputs.property('value', this.settings.timepoint); // Update progress bar.
+
+        this.containers.progressBar.style('width', ''.concat(this.settings.progress * 100, '%'));
+        this.containers.progressTimepoint
+            .style('right', ''.concat(100 - this.settings.progress * 100, '%'))
+            .text(
+                ''
+                    .concat(
+                        this.settings.timeUnit.replace(/^(.)/, function (letter) {
+                            return letter.toUpperCase();
+                        }),
+                        ' '
+                    )
+                    .concat(this.settings.timepoint)
+            );
+    }
+
+    function legends(data) {
+        // color legend
+        if (this.settings.colorBy.type === 'categorical') {
+            var colorCounts = d3
+                .nest()
+                .key(function (d) {
+                    return d.value.colorValue;
+                })
+                .rollup(function (group) {
+                    return group.length;
+                })
+                .entries(data.nested);
+            this.containers.legends
+                .selectAll('.fdg-legend--color')
+                .selectAll('text')
+                .text(function (d) {
+                    var colorCount = colorCounts.find(function (di) {
+                        return di.key === d;
+                    });
+                    var value = colorCount ? colorCount.value : 0;
+                    return ''.concat(d, ' (n=').concat(d3.format(',d')(value), ')');
+                });
+        } // shape legend
+
+        if (this.settings.shapeBy.type === 'categorical') {
+            var shapeCounts = d3
+                .nest()
+                .key(function (d) {
+                    return d.value.shapeValue;
+                })
+                .rollup(function (group) {
+                    return group.length;
+                })
+                .entries(data.nested);
+            this.containers.legends
+                .selectAll('.fdg-legend--shape')
+                .selectAll('text')
+                .text(function (d) {
+                    var shapeCount = shapeCounts.find(function (di) {
+                        return di.key === d;
+                    });
+                    var value = shapeCount ? shapeCount.value : 0;
+                    return ''.concat(d, ' (n=').concat(d3.format(',d')(value), ')');
+                });
+        }
+    }
+
+    // Update focus percentages.
+    function counts() {
+        var _this = this;
+
+        if (this.settings.eventCount)
+            this.focusAnnotations
+                .selectAll('tspan.fdg-focus-annotation__event-count')
+                .text(function (d) {
+                    return _this.settings.eventCountType === 'cumulative-event'
+                        ? d.fmt.eventNumerator
+                        : d.fmt.idNumeratorPercent;
+                });
+        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
+            this.metadata.event.forEach(function (event) {
+                event.fociLabels.selectAll('text').text(function (d) {
+                    return _this.settings.eventCountType === 'cumulative-event'
+                        ? d.fmt.eventNumeratorPercent
+                        : d.fmt.idNumeratorPercent;
+                });
+            });
+    }
+
+    // Update frequency table.
+    function freqTable$1() {
+        var main = this;
+        var maxProportion = d3.max(this.containers.freqTable.tr.data(), function (d) {
+            return d.freqs.idProportion;
+        });
+        this.containers.freqTable.tr.each(function (d) {
+            var relativeProportion = d.freqs.idProportion / maxProportion;
+            var relativeProportionFmt = d3.format('.1%')(relativeProportion);
+            var tr = d3.select(this);
+            tr.selectAll('td')
+                .data(d.cells)
+                .join('td')
+                .style('background', function (di, i) {
+                    return i === 1 && main.settings.freqTable.bars
+                        ? 'linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) '
+                              .concat(relativeProportionFmt, ', transparent ')
+                              .concat(relativeProportionFmt, ')')
+                        : null;
+                })
+                .text(function (d) {
+                    return d;
+                });
+        });
+    }
+
+    function text(data) {
+        var main = this;
+        this.settings.progress =
+            this.settings.stateChange === 'ordered'
+                ? (this.settings.timepoint - 1) / (this.settings.duration - 1) // progress > 0 for first timepoint of first sequence - annoying
+                : this.settings.timepoint / this.settings.duration;
+        progress.call(this);
+        legends.call(this, data);
+        counts.call(this);
+        freqTable$1.call(this); // Display timed annotations.
+
+        if (this.settings.annotations && Array.isArray(this.settings.annotations))
+            this.customAnnotations
+                .filter(function (d) {
+                    return (
+                        d.timepoint <= main.settings.timepoint &&
+                        +d3.select(this).attr('opacity') === 0
+                    );
+                })
+                .transition()
+                .duration(this.settings.modalSpeed / 2)
+                .attr('opacity', 1);
+    }
+
+    function updateText() {
+        var _this = this;
+
+        if (this.settings.timepoint < this.settings.duration) {
+            if (
+                this.prevEvent === undefined ||
+                this.currEvent.orbitLabel !== this.prevEvent.orbitLabel
+            ) {
+                this.containers.sequenceOverlay.background.sequence
+                    .style('opacity', 1)
+                    .transition()
+                    .duration(this.settings.modalSpeed / 5)
+                    .style('opacity', 0)
+                    .on('end', function () {
+                        _this.containers.sequenceOverlay.background.sequence
+                            .html(_this.currEvent.orbitLabel || _this.currEvent.key)
+                            .style('opacity', 0)
+                            .transition()
+                            .duration(_this.settings.modalSpeed / 5)
+                            .style('opacity', 1);
+                    });
+                this.containers.sequenceOverlay.foreground.sequence
+                    .style('opacity', 1)
+                    .transition()
+                    .duration(this.settings.modalSpeed / 5)
+                    .style('opacity', 0)
+                    .on('end', function () {
+                        _this.containers.sequenceOverlay.foreground.sequence
+                            .html(_this.currEvent.orbitLabel || _this.currEvent.key)
+                            .style('opacity', 0)
+                            .transition()
+                            .duration(_this.settings.modalSpeed / 5)
+                            .style('opacity', 1);
+                    });
+            }
+
+            if (this.currEvent.orbitLabel && this.currEvent.key) {
+                this.containers.sequenceOverlay.background.event
+                    .style('opacity', 1)
+                    .transition()
+                    .duration(this.settings.modalSpeed / 5)
+                    .style('opacity', 0)
+                    .on('end', function () {
+                        _this.containers.sequenceOverlay.background.event
+                            .html(_this.currEvent.key)
+                            .style('opacity', 0)
+                            .transition()
+                            .duration(_this.settings.modalSpeed / 5)
+                            .style('opacity', 1);
+                    });
+                this.containers.sequenceOverlay.foreground.event
+                    .style('opacity', 1)
+                    .transition()
+                    .duration(this.settings.modalSpeed / 5)
+                    .style('opacity', 0)
+                    .on('end', function () {
+                        _this.containers.sequenceOverlay.foreground.event
+                            .html(_this.currEvent.key)
+                            .style('opacity', 0)
+                            .transition()
+                            .duration(_this.settings.modalSpeed / 5)
+                            .style('opacity', 1);
+                    });
+            }
+        } else {
+            this.containers.sequenceOverlay.background.sequence
+                .style('opacity', 1)
+                .transition()
+                .duration(this.settings.modalSpeed / 5)
+                .style('opacity', 0)
+                .on('end', function () {
+                    return _this.containers.sequenceOverlay.background.sequence.html(null);
+                });
+            this.containers.sequenceOverlay.foreground.sequence
+                .style('opacity', 1)
+                .transition()
+                .duration(this.settings.modalSpeed / 5)
+                .style('opacity', 0)
+                .on('end', function () {
+                    return _this.containers.sequenceOverlay.foreground.sequence.html(null);
+                });
+            this.containers.sequenceOverlay.background.event
+                .style('opacity', 1)
+                .transition()
+                .duration(this.settings.modalSpeed / 5)
+                .style('opacity', 0)
+                .on('end', function () {
+                    return _this.containers.sequenceOverlay.background.event.html(null);
+                });
+            this.containers.sequenceOverlay.foreground.event
+                .style('opacity', 1)
+                .transition()
+                .duration(this.settings.modalSpeed / 5)
+                .style('opacity', 0)
+                .on('end', function () {
+                    return _this.containers.sequenceOverlay.foreground.event.html(null);
+                });
+        }
+    }
+
+    function timeoutBetweenStates() {
+        var _this = this;
+
+        if (this.settings.stateChange === 'ordered') {
+            var _this$currEvent;
+
+            this.prevEvent = this.currEvent;
+            this.currEvent = this.metadata.event.find(function (event) {
+                return (
+                    event.start_timepoint <= _this.settings.timepoint &&
+                    _this.settings.timepoint <= event.end_timepoint
+                );
+            });
+
+            if (
+                this.settings.timepoint ===
+                ((_this$currEvent = this.currEvent) === null || _this$currEvent === void 0
+                    ? void 0
+                    : _this$currEvent.start_timepoint)
+            ) {
+                this.interval.stop();
+                updateText.call(this);
+                this.timeout = d3.timeout(function () {
+                    _this.interval = startInterval.call(_this, _this.data);
+                }, this.settings.modalSpeed);
+            }
+        }
+    }
+
+    function orbits() {
+        var main = this; //if (this.settings.pulseOrbits) {
+
+        this.orbits.each(function (d) {
+            d.rAdjPrev = d.rAdj;
+            var distances = d3
+                .merge(
+                    d.values.map(function (di) {
+                        return di.data;
+                    })
+                )
+                .map(function (d) {
+                    return d.value.distance;
+                });
+            var rAdj = distances.length ? Math.max(d3.median(distances), d.r) : d.r;
+            var diff = rAdj - d.rAdjPrev;
+            d.rAdj = d.rAdjPrev + Math.min(diff / 10, main.settings.orbitRadius / 100); //d.change = d3.sum(d.values, (di) => di.change);
+            //if (d.change > 0) {
+
+            d3.select(this)
+                .transition()
+                .duration(main.settings.speeds[main.settings.speed])
+                .attr('r', d.rAdj); //.duration(main.settings.speeds[main.settings.speed] / 2)
+            //.attr('stroke-width', 0.5 * d.change)
+            //.transition()
+            //.duration(main.settings.speeds[main.settings.speed] / 2)
+            //.attr('stroke-width', 0.5);
+            //}
+        }); //}
+    }
+
+    function update$1(data$1) {
+        // Update the node data.
+        data.call(this, data$1); // Gradually transition the radius of the orbits to match the median position of the nodes
+        // along each orbit.  As the nodes at each focus influence the position of nodes at other foci,
+        // nodes gradually congregate off their orbit.
+
+        orbits.call(this); // Update timer, focus labels, and annotations.
+
+        text.call(this, data$1);
+    }
+
+    function countdown() {
+        var _this = this;
+
+        var counter = this.settings.resetDelay / 1000 - 1;
+        this.containers.countdown
+            .classed('fdg-invisible', false)
+            .classed('fdg-hidden', function (d) {
+                return d !== counter;
+            });
+        var interval = d3.interval(function () {
+            counter--;
+
+            _this.containers.countdown.classed('fdg-hidden', function (d) {
+                return d !== counter;
+            });
+        }, 1000);
+        return interval;
+    }
+
+    function fadeOut$1(modalSpeed) {
+        // Transition text from full opacity to zero opacity to create fade-out effect.
+        d3.select(this)
+            .transition()
+            .duration(modalSpeed / 15)
+            .delay(modalSpeed - (modalSpeed / 15) * 2)
+            .style('opacity', 0);
+    }
+
+    function fadeIn$1(selection, modalSpeed) {
+        // Transition text from zero opacity to full opacity to create fade-in effect.
+        selection
+            .style('opacity', 0)
+            .transition()
+            .duration(modalSpeed / 15)
+            .style('opacity', 1)
+            .on('end', function () {
+                fadeOut$1.call(this, modalSpeed);
+            });
+    }
+
+    function emphasizeComponent(component) {
+        var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'outline';
+        var value1 =
+            arguments.length > 2 && arguments[2] !== undefined
+                ? arguments[2]
+                : 'thick groove rgba(215,25,28,0)';
+        var value2 =
+            arguments.length > 3 && arguments[3] !== undefined
+                ? arguments[3]
+                : 'thick groove rgba(215,25,28,.5)';
+        var duration = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+        if (duration)
+            component
+                .style(style, value1)
+                .transition()
+                .duration(this.settings.modalSpeed / 15)
+                .style(style, value2)
+                .transition()
+                .duration(this.settings.modalSpeed / 15)
+                .delay(this.settings.modalSpeed - (this.settings.modalSpeed / 15) * 2)
+                .style(style, value1)
+                .on('end', function () {
+                    return component.style(style, null);
+                });
+        else {
+            component.style(style, value2);
+            d3.timeout(function () {
+                component.style(style, null);
+            }, this.settings.modalSpeed);
+        }
+    }
+
+    function update$2() {
+        this.modalText = this.settings.text[this.settings.modalIndex];
+        if (this.settings.modalIndex === this.settings.text.length - 1 && this.modal)
+            this.modal.stop(); // Update modal text.
+
+        this.containers.modal.html(this.modalText).call(fadeIn$1, this.settings.modalSpeed); // Highlight referenced component.
+
+        switch (true) {
+            case /time/i.test(this.modalText):
+                emphasizeComponent.call(this, this.containers.progress); //emphasizeComponent.call(this, this.focusAnnotations);
+
+                break;
+
+            case /annotations/i.test(this.modalText):
+                emphasizeComponent.call(
+                    this,
+                    this.containers.focusAnnotations.selectAll('.fdg-focus-annotation__event-count')
+                );
+                break;
+
+            case /number of events.*color/i.test(this.modalText):
+                emphasizeComponent.call(this, this.legends.color);
+                break;
+
+            case /number of events.*size/i.test(this.modalText):
+                emphasizeComponent.call(this, this.legends.size);
+                break;
+
+            case /static/i.test(this.modalText):
+                // Style static bubbles differently than components.
+                emphasizeComponent.call(
+                    this,
+                    this.containers.svgBackground.selectAll('.fdg-static__mark'),
+                    'stroke',
+                    'rgba(215,25,28,0)',
+                    'rgba(215,25,28,.5)',
+                    false
+                );
+                break;
+
+            case /controls/i.test(this.modalText):
+                if (this.settings.hideControls === false)
+                    emphasizeComponent.call(
+                        this,
+                        this.containers.controls.classed('fdg-hidden', this.settings.hideControls)
+                    );
+                break;
+        }
+    }
+
+    function runModal() {
+        var _this = this;
+
+        // Set initial modal text.
+        update$2.call(this);
+        this.modal = d3.interval(function () {
+            _this.settings.modalIndex++; // Update modal text.
+
+            update$2.call(_this);
+        }, this.settings.modalSpeed);
+    }
+
+    function resetAnimation(data) {
+        var _this = this;
+
+        this.settings.timepoint = 0;
+        this.settings.progress = 0;
+        this.settings.modalIndex = 0;
+        this.controls.timepoint.inputs.attr('value', 0);
+
+        if (this.settings.runSequences) {
+            this.settings.sequenceIndex = 0;
+            this.settings.eventIndex = 0;
+            this.sequence = getNextSequence.call(this, false);
+        } // Update the event object of the population.
+
+        this.metadata.event.forEach(function (event) {
+            event.prevCount = 0;
+            event.count = 0;
+            event.cumulative = 0;
+            event.ids = new Set();
+            event.nIds = 0;
+            event.idsCumulative = new Set();
+            event.nIdsCumulative = 0;
+        });
+        data.nested.forEach(function (d) {
+            d.value.statePrevious = null;
+            d.value.state = getState.call(_this, d.value.group);
+            var aestheticValues = getAestheticValues.call(_this, d.value.group, d.value.state);
+            d.value.coordinates = getCoordinates.call(
+                _this,
+                d.value.state,
+                aestheticValues.colorValue
+            );
+            d.value.colorScale = getColorScale.call(_this, aestheticValues.colorValue);
+            var aesthetics = getAesthetics.call(_this, aestheticValues, d.value.colorScale);
+            Object.assign(d.value, aestheticValues, aesthetics);
+        });
+        if (this.modal) this.modal.stop();
+        runModal.call(this); // Display timed annotations.
+
+        if (this.settings.annotations && Array.isArray(this.settings.annotations))
+            this.customAnnotations.attr('opacity', function (d) {
+                return d.timepoint > _this.settings.timepoint ? 0 : 1;
+            });
+    }
+
+    function timeout(data, countdown) {
+        var _this = this;
+
+        if (this.timeout) this.timeout.stop();
+        var timeout = d3.timeout(function () {
+            resetAnimation.call(_this, data);
+            progress.call(_this);
+            countdown.stop();
+            timeout.stop();
+
+            _this.containers.countdown
+                .classed('fdg-invisible', function (d) {
+                    return d === _this.settings.resetDelay / 1000 - 1;
+                })
+                .classed('fdg-hidden', function (d) {
+                    return d !== _this.settings.resetDelay / 1000 - 1;
+                });
+
+            _this.interval = startInterval.call(_this, data);
+        }, this.settings.resetDelay);
+        return timeout;
+    }
+
+    function reset(data) {
+        this.interval.stop(); // Reheat the animation one last time so marks reach to their final destination.
+
+        restartForceSimulation.call(this); // Display a visual countdown to reset.
+
+        var countdown$1 = countdown.call(this); // Set a timeout before resetting the animation.
+
+        this.timeout = timeout.call(this, data, countdown$1);
+    }
+
+    function getNextEventInSequence() {
+        var _this = this;
+
+        this.sequence.eventIndex++;
+        var event = this.sequence.events.find(function (event, i) {
+            return i === _this.sequence.eventIndex;
+        });
+        fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+        fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+        return event;
+    }
+
+    function fadeOutAll() {
+        fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
+        fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
+        fadeOut.call(this, this.containers.sequenceOverlay.background.event);
+        fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+    }
+
+    function runNextSequence() {
+        // Stop interval.
+        if (this.interval) this.interval.stop(); // While sequences remain run next sequence.
+
+        if (
+            this.settings.sequenceIndex < this.settings.sequences.length - 1 ||
+            (this.sequence.events && this.sequence.eventIndex < this.sequence.events.length - 1)
+        ) {
+            // Get sequence.
+            if (this.sequence.eventIndex === this.sequence.events.length - 1)
+                this.sequence = getNextSequence.call(this);
+            else this.sequence.event = getNextEventInSequence.call(this); // Run sequence.
+
+            this.timeout = runSequence.call(this);
+        } // Otherwise clear sequence text.
+        else fadeOutAll.call(this);
+    }
+
+    var increment = function increment(data, _increment) {
+        // Increment timepoint.
+        this.settings.timepoint += !!_increment;
+        timeoutBetweenStates.call(this); // Update animation if current timepoint is less than full duration of animation.
+
+        if (this.settings.timepoint <= this.settings.duration) update$1.call(this, data);
+        // Otherwise if animation is sequenced, run next sequence.
+        else if (this.sequence) runNextSequence.call(this);
+        // Otherwise restart animation.
+        else if (this.settings.loop === true) reset.call(this, data); // Reheat the force simulation.
+
+        restartForceSimulation.call(this);
+    }; // Default returns an interval that runs increment() every time unit.
+
+    function startInterval(data) {
+        var interval = d3.interval(
+            increment.bind(this, data),
+            this.settings.speeds[this.settings.speed]
+        );
+        return interval;
+    }
+
+    // TODO: figure out how to make this function work from the UI as well as automatically with the flow of the animation
+    // TODO: modularize this function with declaritive subfunctions
+    // TODO: separate mid-sequence updates from new sequence updates
+
+    function runSequence() {
+        var _this = this;
+
+        // Update the sequence button corresponding to the current sequence.
+        this.controls.sequences.inputs.classed('fdg-button--current', function (d) {
+            return d.label === _this.sequence.label;
+        }); //const start_orbit = this.metadata.orbit
+        //    .find((orbit) => +orbit.key === this.sequence.start_order);
+        //this.sequence.events = start_orbit.values;
+
+        this.sequence.event = this.sequence.events.find(function (event, i) {
+            return i === _this.sequence.eventIndex;
+        }); // Update progress text.
+
+        this.settings.timepoint = 0;
+        this.containers.timepoint.html('0 days');
+        this.containers.timer.percentComplete.html('0%'); // TODO: transition text in and out
+
+        if (this.sequence.eventIndex === 0) {
+            this.containers.timeRelative.html(
+                this.sequence.timeRelative || this.settings.timeRelative
+            ); // fade in
+
+            this.sequence.backgroundSequence = fadeIn.call(
+                this,
+                this.containers.sequenceOverlay.background.sequence,
+                this.sequence.label
+            );
+            this.sequence.foregroundSequence = fadeIn.call(
+                this,
+                this.containers.sequenceOverlay.foreground.sequence,
+                this.sequence.label
+            );
+        } // fade in
+
+        this.sequence.backgroundEvent = fadeIn.call(
+            this,
+            this.containers.sequenceOverlay.background.event,
+            ''
+                .concat(
+                    this.settings.individualUnit.replace(/^(.)/, function (_char) {
+                        return _char.toUpperCase();
+                    }),
+                    's: '
+                )
+                .concat(this.sequence.event.key)
+        );
+        this.sequence.foregroundEvent = fadeIn.call(
+            this,
+            this.containers.sequenceOverlay.foreground.event,
+            ''
+                .concat(
+                    this.settings.individualUnit.replace(/^(.)/, function (_char2) {
+                        return _char2.toUpperCase();
+                    }),
+                    's: '
+                )
+                .concat(this.sequence.event.key)
+        ); // Subset data to the specified set of states.
+
+        if (this.sequence.eventIndex === 0)
+            this.sequence.data = this.data
+                .filter(function (d) {
+                    return (
+                        _this.sequence.start_order <= d.event_order &&
+                        d.event_order <= _this.sequence.end_order
+                    );
+                })
+                .map(function (d) {
+                    return _objectSpread2({}, d);
+                });
+
+        if (this.sequence.eventIndex === 0) {
+            // Re-calculate start and end timepoints from first state in sequence.
+            d3.nest()
+                .key(function (d) {
+                    return d.id;
+                })
+                .rollup(function (group) {
+                    var baseline = group[0]; // first state in sequence
+
+                    var timeShift = baseline.start_timepoint; // Track cumulative duration to send individuals to the final state in the sequence prematurely.
+
+                    var duration_cumulative = 0;
+                    group.forEach(function (d, i) {
+                        duration_cumulative += d.duration;
+                        d.duration_cumulative = duration_cumulative; // Adjust start and end timepoint.
+
+                        d.start_timepoint = d === baseline ? 1 : d.start_timepoint - timeShift + 1;
+                        d.end_timepoint = d.start_timepoint + d.duration - 1; // Set start timepoint to sequence duration if start timepoint is greater than sequence duration.
+
+                        if (
+                            !!_this.sequence.duration &&
+                            d.start_timepoint > _this.sequence.duration
+                        )
+                            d.start_timepoint = _this.sequence.duration; // Set end timepoint to sequence duration if end timepoint is greater than sequence duration.
+
+                        if (!!_this.sequence.duration && d.end_timepoint > _this.sequence.duration)
+                            d.end_timepoint = _this.sequence.duration;
+                    });
+                    return group;
+                })
+                .entries(this.sequence.data);
+        } // Re-define nested data with sequence subset.
+        // TODO: define a function to maintain state of nodes through animation, e.g. when changing
+        // animation track between full animation and sequences or resetting the animation
+
+        if (this.sequence.eventIndex === 0) {
+            this.sequence.data.nested = nestData.call(this, this.sequence.data);
+            this.sequence.data.nested.forEach(function (d) {
+                var node = _this.nodes.find(function (node) {
+                    return node.key === d.key;
+                });
+
+                for (var prop in node) {
+                    if (['key', 'value'].includes(prop) === false) d[prop] = node[prop];
+                }
+            });
+        } // Lock nodes in place while another event sequence runs.
+
+        this.sequence.data.nested.forEach(function (d) {
+            d.value.locked = d.value.state.event !== _this.sequence.event.key;
+        });
+        var duration =
+            d3.max(
+                this.sequence.data.nested.filter(function (d) {
+                    return d.value.locked === false;
+                }),
+                function (d) {
+                    return d.value.state.duration;
+                }
+            ) + 1;
+        this.settings.duration = this.sequence.duration
+            ? Math.min(this.sequence.duration, duration)
+            : duration; // Re-define force simulation.
+
+        if (this.forceSimulation) this.forceSimulation.stop();
+        this.forceSimulation = addForceSimulation.call(this, this.sequence.data);
+        this.nodes = this.forceSimulation.nodes();
+        this.forceSimulation.force('center', null);
+        data.call(this, this.sequence.data);
+        text.call(this, this.sequence.data); // Stop the current animation
+
+        if (this.interval) this.interval.stop(); // Start the sequence animation.
+
+        var timeout = d3.timeout(function () {
+            _this.interval = startInterval.call(_this, _this.sequence.data);
+        }, this.settings.modalSpeed);
+        return timeout;
+    }
+
+    function sequence(d) {
+        var _this = this;
+
+        console.log(d.label);
+        this.settings.animationTrack = 'sequence';
+        this.containers.sequenceOverlay.classed('fdg-hidden', false);
+        this.settings.sequenceIndex = this.settings.sequences.findIndex(function (sequence) {
+            return sequence === d;
+        });
+        this.sequence = getNextSequence.call(this, false);
+        this.sequence.eventIndex = 0;
+        this.timeout = d3.timeout(function () {
+            runSequence.call(_this);
+        }, 1000);
+    }
+
+    var playPause = [
+        {
+            action: 'play',
+            label: 'Play',
+            html: '&#9658;',
+        },
+        {
+            action: 'pause',
+            label: 'Pause',
+            html: '&#10074;&#10074;',
+        },
+    ];
+    function toggle() {
+        var _this = this;
+
+        // Toggle setting.
+        this.settings.playPause = playPause.find(function (value) {
+            return value.action !== _this.settings.playPause;
+        }).action; // Update tooltip and display text.
+
+        this.controls.playPause.inputs
+            .attr(
+                'title',
+                ''.concat(
+                    playPause.find(function (value) {
+                        return value.action !== _this.settings.playPause;
+                    }).label,
+                    ' animation'
+                )
+            )
+            .html(
+                playPause.find(function (value) {
+                    return value.action !== _this.settings.playPause;
+                }).html
+            ); // Stop animation.
+
+        if (this.interval) this.interval.stop(); // Restart animation.
+
+        if (this.settings.playPause === 'play')
+            this.interval = startInterval.call(
+                this,
+                this.sequence ? this.sequence.data : this.data
+            );
+    }
+
+    function fullAnimation(d) {
+        var _this = this;
+
+        console.log('full animation');
+        this.settings.animationTrack = 'full'; // Update settings.
+
+        this.settings.duration = this.settings_initial.duration;
+        this.settings.loop = this.settings_initial.loop; // Update text.
+
+        this.containers.sequenceOverlay.classed('fdg-hidden', true);
+        this.containers.timeRelative.html(this.settings_initial.timeRelative); // Stop current interval and force simulation.
+
+        if (this.interval) this.interval.stop();
+        if (this.forceSimulation) this.forceSimulation.stop(); // Restart force simulation.
+
+        this.forceSimulation = addForceSimulation.call(this, this.data); // Reset animation.
+
+        resetAnimation.call(this, this.data); // Restart interval.
+
+        this.timeout = d3.timeout(function () {
+            _this.interval = startInterval.call(_this, _this.data);
+        }, 1000); // Play animation.
+
+        if (this.settings.playPause !== 'play') toggle.call(this);
+    }
+
+    function sequences() {
+        var _this = this;
+
+        if (!!this.settings.sequences) {
+            var main = this;
+            var container = this.util
+                .addElement('sequences', this.containers.controls)
+                .classed('fdg-control fdg-control--sequences', true);
+            var inputs = container
+                .selectAll('div')
+                .data([this].concat(_toConsumableArray(this.settings.sequences)))
+                .join('div')
+                .classed('fdg-button fdg-button--sequence', true)
+                .attr('title', function (d) {
+                    return 'View '.concat(
+                        d !== _this ? 'sequence '.concat(d.label) : 'full animation',
+                        '.'
+                    );
+                })
+                .text(function (d, i) {
+                    return d.label
+                        ? d.label
+                        : d === _this
+                        ? 'Full Animation'
+                        : 'Sequence '.concat(i + 1);
+                });
+            inputs.on('click', function (d) {
+                // Toggle control.
+                inputs.classed('fdg-button--current', false);
+                this.classList.toggle('fdg-button--current'); // Stop any running interval or timeout.
+
+                if (main.interval) main.interval.stop();
+                if (main.timeout) main.timeout.stop(); // TODO: figure out if force simulation should be maintained or if it's sufficient to
+                // maintain the position of nodes on the nexted data array.
+                //if (main.forceSimulation) main.forceSimulation.stop();
+                // Update sequence property.
+
+                delete main.sequence;
+                main.sequence = d !== main ? d : null; // Run sequence or...
+
+                if (d !== main) sequence.call(main, d);
+                // ...full animation.
+                else fullAnimation.call(main, d);
+            });
+            return {
+                container: container,
+                inputs: inputs,
+            };
+        }
+    }
+
+    function stepSequences() {
+        if (!!this.settings.sequences) {
+            var container = this.util
+                .addElement('sequences', this.containers.controls)
+                .classed('fdg-control fdg-control--step-sequences', true);
+            var inputs = container
+                .selectAll('div')
+                .data(['<<', '>>'])
+                .join('div')
+                .classed('fdg-button fdg-button--step-sequence', true)
+                .attr('title', function (d) {
+                    return d === '<<' ? 'View previous sequence.' : 'View next sequence.';
+                })
+                .style('width', '35%')
+                .style('float', function (d, i) {
+                    return i === 0 ? 'left' : 'right';
+                })
+                .text(function (d, i) {
+                    return d;
+                });
+            inputs.on('click', function (d) {});
+            return {
+                container: container,
+                inputs: inputs,
+            };
+        }
+    }
+
+    function speed() {
+        var _this = this;
+
+        var main = this;
+        var container = this.controls.container
+            .append('div')
+            .classed('fdg-control fdg-control--speed', true);
+        var inputs = container
+            .selectAll('div')
+            .data(
+                Object.keys(this.settings.speeds).map(function (key) {
+                    return {
+                        label: key,
+                        value: _this.settings.speeds[key],
+                    };
+                })
+            )
+            .enter()
+            .append('div')
+            .attr('class', function (d) {
+                return 'fdg-button '
+                    .concat(d.label, ' ')
+                    .concat(d.label === _this.settings.speed ? 'fdg-button--current' : '');
+            })
+            .attr('title', function (d) {
+                return 'Advance the animation every '.concat(
+                    _this.settings.speeds[d.label] / 1000,
+                    ' second(s).'
+                );
+            })
+            .text(function (d) {
+                return d.label;
+            });
+        inputs.on('click', function (d) {
+            main.settings.speed = d.label;
+            inputs.classed('fdg-button--current', function (di) {
+                return di.label === d.label;
+            });
+
+            if (main.settings.playPause === 'play') {
+                if (!!main.interval) main.interval.stop();
+                main.interval = startInterval.call(
+                    main,
+                    main.sequence ? main.sequence.data : main.data
+                );
+            }
+        });
+        return {
+            container: container,
+            inputs: inputs,
+        };
+    }
+
+    function playPause$1() {
+        var _this = this;
+        var container = this.controls.container
+            .append('div')
+            .classed('fdg-control fdg-control--play-pause', true);
+        var inputs = container
+            .append('div')
+            .classed('fdg-button fdg-input', true)
+            .attr(
+                'title',
+                ''.concat(
+                    playPause.find(function (value) {
+                        return value.action !== _this.settings.playPause;
+                    }).label,
+                    ' animation.'
+                )
+            )
+            .html(
+                playPause.find(function (value) {
+                    return value.action !== _this.settings.playPause;
+                }).html
+            );
+        inputs.on('click', function () {
+            toggle.call(_this);
+        });
+        return {
+            container: container,
+            inputs: inputs,
+        };
+    }
+
+    /**
+     * function:
+     * 1. Pause the animation.
+     * 2. Increment the timepoint by 1.
+     * 3. Allow the points to reach their destination at the new timepoint.
+     */
+
+    function timepoint() {
+        var _this = this;
+
+        var main = this;
+        var container = this.controls.container
+            .append('div')
+            .classed('fdg-control fdg-control--timepoint', true)
+            .classed('fdg-hidden', this.settings.stateChange === 'ordered');
+        var inputs = container
+            .append('div')
+            .classed('fdg-button fdg-input', true)
+            .append('input')
+            .attr('type', 'number')
+            .attr('title', 'Choose a timepoint.')
+            .attr('value', +this.settings.timepoint)
+            .attr('min', 1)
+            .attr('max', this.settings.duration);
+        inputs.on('click', function () {
+            // Pause simulation.
+            if (_this.settings.playPause !== 'pause') toggle.call(_this);
+        });
+        inputs.on('change', function () {
+            // Pause simulation.
+            if (main.settings.playPause !== 'pause') toggle.call(main);
+            main.settings.timepoint = +this.value - 1;
+            increment.call(main, main.sequence ? main.sequence.data : main.data, true);
+        });
+        return {
+            container: container,
+            inputs: inputs,
+        };
+    }
+
+    function reset$1() {
+        var _this = this;
+        var container = this.controls.container
+            .append('div')
+            .classed('fdg-control fdg-control--reset', true);
+        var inputs = container
+            .append('div')
+            .classed('fdg-button fdg-input', true)
+            .attr('title', 'Reset animation.')
+            .html('&#x21ba;');
+        inputs.on('click', function () {
+            if (_this.timeout) _this.timeout.stop();
+            if (_this.interval) _this.interval.stop(); // TODO: why isn't this handled in resetAnimation?
+
+            if (_this.settings.runSequences) {
+                _this.settings.sequences.forEach(function (sequence) {
+                    sequence.eventIndex = 0;
+                });
+
+                _this.settings.sequenceIndex = 0;
+                _this.sequence = getNextSequence.call(_this, false);
+            }
+
+            resetAnimation.call(
+                _this,
+                _this.settings.animationTrack === 'sequence' ? _this.sequence.data : _this.data
+            );
+            if (_this.forceSimulation) _this.forceSimulation.stop(); // Restart force simulation.
+
+            _this.forceSimulation = addForceSimulation.call(
+                _this,
+                _this.settings.animationTrack === 'sequence' ? _this.sequence.data : _this.data
+            ); // Start the animation.
+
+            if (_this.settings.playPause === 'play')
+                _this.timeout = d3.timeout(
+                    function () {
+                        // Run first sequence.
+                        if (_this.settings.animationTrack === 'sequence') runSequence.call(_this);
+                        // calls startInterval
+                        // Run full animation.
+                        else _this.interval = startInterval.call(_this, _this.data);
+                    },
+                    1000 // this.settings.delay ? this.settings.modalSpeed : 0
+                );
+        });
+        return {
+            container: container,
+            inputs: inputs,
+        };
+    }
+
+    function eventList() {
+        var _this = this;
+
+        var container, inputs;
+
+        if (
+            this.settings.colorBy.type === 'frequency' ||
+            this.settings.sizeBy.type === 'frequency'
+        ) {
+            var main = this;
+            container = this.controls.container
+                .append('div')
+                .classed('fdg-control fdg-control--event-list', true);
+            inputs = container
+                .selectAll('div')
+                .data(this.metadata.event)
+                .enter()
+                .append('div')
+                .attr('class', function (d) {
+                    return 'fdg-button '.concat(
+                        _this.settings.eventChangeCount.includes(d.key) ? 'fdg-button--current' : ''
+                    );
+                })
+                .attr('title', function (d) {
+                    return ''
+                        .concat(
+                            _this.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add',
+                            ' '
+                        )
+                        .concat(d.key, ' ')
+                        .concat(
+                            _this.settings.eventChangeCount.includes(d.key) ? 'from' : 'to',
+                            ' the list of events that control bubble '
+                        )
+                        .concat(
+                            _this.settings.colorBy.type === 'frequency' &&
+                                _this.settings.sizeBy.type === 'frequency'
+                                ? 'color and size'
+                                : _this.settings.colorBy.type === 'frequency'
+                                ? 'color'
+                                : _this.settings.sizeBy.type === 'frequency'
+                                ? 'size'
+                                : "[ something isn't right here ].",
+                            '.'
+                        );
+                })
+                .text(function (d) {
+                    return d.key;
+                });
+            inputs.on('click', function (d) {
+                var _this2 = this;
+
+                this.classList.toggle('fdg-button--current'); // Update event array.
+
+                if (main.settings.eventChangeCount.includes(this.textContent))
+                    main.settings.eventChangeCount.splice(
+                        main.settings.eventChangeCount.findIndex(function (event) {
+                            return event === _this2.textContent;
+                        }),
+                        1
+                    );
+                else main.settings.eventChangeCount.push(this.textContent); // Update tooltip.
+
+                this.title = ''
+                    .concat(main.settings.eventChangeCount.includes(d.key) ? 'Remove' : 'Add', ' ')
+                    .concat(d.key, ' ')
+                    .concat(
+                        main.settings.eventChangeCount.includes(d.key) ? 'from' : 'to',
+                        ' the list of events that control bubble '
+                    )
+                    .concat(
+                        main.settings.colorBy.type === 'frequency' &&
+                            main.settings.sizeBy.type === 'frequency'
+                            ? 'color and size'
+                            : main.settings.colorBy.type === 'frequency'
+                            ? 'color'
+                            : main.settings.sizeBy.type === 'frequency'
+                            ? 'size'
+                            : "[ something isn't right here ].",
+                        '.'
+                    ); // Update color-size toggle.
+                //main.controls.colorSizeToggle.inputs.attr(
+                //    'title',
+                //    (di) =>
+                //        `Quantify the number of ${main.util.csv(main.settings.eventChangeCount)} events by ${
+                //            di !== 'both' ? di : 'color and size'
+                //        }.`
+                //);
+                // Update legend label.
+
+                main.legends.container
+                    .classed('fdg-invisible', main.settings.eventChangeCount.length === 0)
+                    .selectAll('span.fdg-measure')
+                    .text(main.util.csv(main.settings.eventChangeCount));
+                increment.call(main, main.data, false);
+            });
+        }
+
+        return {
+            container: container,
+            inputs: inputs,
+        };
+    }
+
+    function addControls() {
+        this.controls = {
+            container: this.containers.controls,
+        };
+        this.controls.display = display.call(this);
+        this.controls.playPause = playPause$1.call(this);
+        this.controls.timepoint = timepoint.call(this);
+        this.controls.sequences = sequences.call(this);
+        this.controls.stepSequences = stepSequences.call(this);
+        this.controls.speed = speed.call(this);
+        this.controls.reset = reset$1.call(this);
+        this.controls.eventList = eventList.call(this); // Capture all controls in a selection.
+
+        this.controls.containers = this.controls.container.selectAll('.fdg-control'); // Capture all buttons in a selection.
+
+        this.controls.buttons = this.controls.container.selectAll('.fdg-button'); // Add interactivity to buttons.
+
+        this.controls.container
+            .selectAll('.fdg-button')
+            .on('mousedown', function () {
+                this.classList.toggle('fdg-button--clicked');
+            })
+            .on('mouseup', function () {
+                this.classList.toggle('fdg-button--clicked');
+            })
+            .on('mouseout', function () {
+                if (this.classList.contains('fdg-button--clicked'))
+                    this.classList.toggle('fdg-button--clicked');
+            });
+    }
+
+    function color$1(svg, legendDimensions) {
+        var _this = this;
+
+        var marks = svg
+            .selectAll('rect.legend-mark')
+            .data(this.scales.color.range())
+            .enter()
+            .append('rect')
+            .classed('legend-mark', true)
+            .attr('x', function (d, i) {
+                return i * (legendDimensions[0] / _this.settings.colorBy.nColors);
+            })
+            .attr('y', 0)
+            .attr('width', legendDimensions[0] / this.settings.colorBy.nColors)
+            .attr('height', legendDimensions[1] / 3)
+            .attr('fill', function (d) {
+                return d;
+            })
+            .attr('fill-opacity', 0.5)
+            .attr('stroke', function (d) {
+                return d;
+            })
+            .attr('stroke-opacity', 1);
+        return marks;
+    }
+
+    function size$1(svg, legendDimensions) {
+        var _this = this;
+
+        var marks = svg
+            .selectAll('circle.legend-mark')
+            .data(d3.range(this.settings.colorBy.nColors))
+            .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
+            .classed('legend-mark', true)
+            .attr('fill', function (d) {
+                return '#aaa';
+            })
+            .attr('fill-opacity', 0.5)
+            .attr('stroke', function (d) {
+                return '#aaa';
+            })
+            .attr('stroke-opacity', 1);
+        if (this.settings.shape === 'circle')
+            marks
+                .attr('cx', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2
+                    );
+                })
+                .attr('cy', legendDimensions[1] / 4)
+                .attr('r', function (d, i) {
+                    return i + _this.settings.minRadius;
+                });
+        else if (this.settings.shape === 'square')
+            marks
+                .attr('x', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2 -
+                        (i + _this.settings.minRadius)
+                    );
+                })
+                .attr('y', function (d, i) {
+                    return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
+                })
+                .attr('width', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                })
+                .attr('height', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                });
+        return marks;
+    }
+
+    function both(svg, legendDimensions) {
+        var _this = this;
+
+        var marks = svg
+            .selectAll('circle.legend-mark')
+            .data(this.scales.color.range())
+            .join(this.settings.shape === 'circle' ? 'circle' : 'rect')
+            .classed('legend-mark', true)
+            .attr('fill', function (d) {
+                return d;
+            })
+            .attr('fill-opacity', 0.5)
+            .attr('stroke', function (d) {
+                return d;
+            })
+            .attr('stroke-opacity', 1);
+        if (this.settings.shape === 'circle')
+            marks
+                .attr('cx', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2
+                    );
+                })
+                .attr('cy', legendDimensions[1] / 4)
+                .attr('r', function (d, i) {
+                    return i + _this.settings.minRadius;
+                });
+        else if (this.settings.shape === 'square')
+            marks
+                .attr('x', function (d, i) {
+                    return (
+                        i * (legendDimensions[0] / _this.settings.colorBy.nColors) +
+                        legendDimensions[0] / _this.settings.colorBy.nColors / 2 -
+                        (i + _this.settings.minRadius)
+                    );
+                })
+                .attr('y', function (d, i) {
+                    return legendDimensions[1] / 4 - (i + _this.settings.minRadius);
+                })
+                .attr('width', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                })
+                .attr('height', function (d, i) {
+                    return (i + _this.settings.minRadius) * 2;
+                });
+        return marks;
+    }
+
+    var makeLegendMarks = {
+        color: color$1,
+        size: size$1,
+        both: both,
+    };
+
+    function makeLegend(type) {
+        var legendDimensions = [200, 50]; // container
+
+        var container = this.legends.container.append('div'); // label
+
+        var label = container
+            .append('div')
+            .classed('fdg-sidebar__label fdg-legend__label', true)
+            .html(
+                'Number of <span class = "fdg-measure">'.concat(
+                    this.util.csv(this.settings.eventChangeCount),
+                    '</span> events'
+                )
+            ); // svg
+
+        var svg = container
+            .append('svg')
+            .attr('width', legendDimensions[0])
+            .attr('height', legendDimensions[1])
+            .append('g')
+            .attr('transform', 'translate(23,0)'); // marks
+
+        var marks = makeLegendMarks[type].call(this, svg, legendDimensions); // lower end of scale
+
+        var lower = svg
+            .append('text')
+            .attr('x', legendDimensions[0] / this.settings.colorBy.nColors / 2)
+            .attr('y', legendDimensions[1] / 2 + 16)
+            .attr('text-anchor', 'middle')
+            .html('0'); // upper end of scale
+
+        var upper = svg
+            .append('text')
+            .attr(
+                'x',
+                legendDimensions[0] - legendDimensions[0] / this.settings.colorBy.nColors / 2
+            )
+            .attr('y', legendDimensions[1] / 2 + 16)
+            .attr('text-anchor', 'middle')
+            .html(''.concat(this.settings.colorBy.nColors - 1, '+'));
+        return container;
+    }
+
+    function frequency() {
+        var container;
+        if (this.settings.colorBy.type === 'frequency' && this.settings.sizeBy.type === 'frequency')
+            container = makeLegend.call(this, 'both');
+        else if (this.settings.colorBy.type === 'frequency')
+            container = makeLegend.call(this, 'color');
+        else if (this.settings.sizeBy.type === 'frequency')
+            container = makeLegend.call(this, 'size');
+        return container;
+    }
+
+    function categorical() {
+        var _this = this;
+
+        var container = this.legends.container.append('div');
+        container
+            .append('div')
+            .classed('fdg-sidebar__label fdg-legend__label', true)
+            .html(this.settings.colorBy.label);
+        var legendItems = container
+            .append('svg')
+            .attr('width', 200)
+            .attr('height', 20 * this.scales.color.domain().length)
+            .selectAll('g')
+            .data(this.scales.color.domain())
+            .join('g')
+            .attr('transform', 'translate(20,0)');
+        legendItems
+            .append('circle')
+            .classed('fdg-legend__symbol', true)
+            .attr('cx', 20)
+            .attr('cy', function (d, i) {
+                return i * 20 + 10;
+            })
+            .attr('r', 7)
+            .attr('fill', function (d) {
+                return _this.scales.color(d);
+            });
+        legendItems
+            .append('text')
+            .classed('fdg-legend__label', true)
+            .attr('font-size', '1rem')
+            .attr('x', 35)
+            .attr('y', function (d, i) {
+                return i * 20 + 12;
+            })
+            .attr('alignment-baseline', 'middle')
+            .html(function (d) {
+                return ''.concat(d, ' (n=').concat(
+                    d3.format(',d')(
+                        _this.metadata.id.filter(function (di) {
+                            return di.colorStratum === d;
+                        }).length
+                    ),
+                    ')'
+                );
+            });
+        return container;
+    }
+
+    function ramp(color) {
+        var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 256;
+        //DOM.canvas(n, 1);
+        var canvas = document.createElement('canvas');
+        canvas.width = n;
+        canvas.height = 1;
+        var context = canvas.getContext('2d');
+
+        for (var i = 0; i < n; ++i) {
+            context.fillStyle = color(i / (n - 1));
+            context.fillRect(i, 0, 1, 1);
+        }
+
+        return canvas;
+    }
+
+    function continuous() {
+        var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+            color = _ref.color,
+            title = _ref.title,
+            _ref$tickSize = _ref.tickSize,
+            tickSize = _ref$tickSize === void 0 ? 6 : _ref$tickSize,
+            _ref$width = _ref.width,
+            width = _ref$width === void 0 ? 320 : _ref$width,
+            _ref$height = _ref.height,
+            height = _ref$height === void 0 ? 44 + tickSize : _ref$height,
+            _ref$marginTop = _ref.marginTop,
+            marginTop = _ref$marginTop === void 0 ? 18 : _ref$marginTop,
+            _ref$marginRight = _ref.marginRight,
+            marginRight = _ref$marginRight === void 0 ? 0 : _ref$marginRight,
+            _ref$marginBottom = _ref.marginBottom,
+            marginBottom = _ref$marginBottom === void 0 ? 16 + tickSize : _ref$marginBottom,
+            _ref$marginLeft = _ref.marginLeft,
+            marginLeft = _ref$marginLeft === void 0 ? 0 : _ref$marginLeft,
+            _ref$ticks = _ref.ticks,
+            ticks = _ref$ticks === void 0 ? width / 64 : _ref$ticks,
+            tickFormat = _ref.tickFormat,
+            tickValues = _ref.tickValues;
+
+        var svg = d3
+            .create('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .attr('viewBox', [0, 0, width, height])
+            .style('overflow', 'visible'); //.style('display', 'block');
+
+        var tickAdjust = function tickAdjust(g) {
+            return g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height);
+        };
+
+        var x; // Continuous
+
+        if (color.interpolate) {
+            var n = Math.min(color.domain().length, color.range().length);
+            x = color
+                .copy()
+                .rangeRound(d3.quantize(d3.interpolate(marginLeft, width - marginRight), n));
+            svg.append('image')
+                .attr('x', marginLeft)
+                .attr('y', marginTop)
+                .attr('width', width - marginLeft - marginRight)
+                .attr('height', height - marginTop - marginBottom)
+                .attr('preserveAspectRatio', 'none')
+                .attr(
+                    'xlink:href',
+                    ramp
+                        .call(this, color.copy().domain(d3.quantize(d3.interpolate(0, 1), n)))
+                        .toDataURL()
+                );
+        } // Sequential
+        else if (color.interpolator) {
+            x = Object.assign(
+                color.copy().interpolator(d3.interpolateRound(marginLeft, width - marginRight)),
+                {
+                    range: function range() {
+                        return [marginLeft, width - marginRight];
+                    },
+                }
+            );
+            svg.append('image')
+                .attr('x', marginLeft)
+                .attr('y', marginTop)
+                .attr('width', width - marginLeft - marginRight)
+                .attr('height', height - marginTop - marginBottom)
+                .attr('preserveAspectRatio', 'none')
+                .attr('xlink:href', ramp.call(this, color.interpolator()).toDataURL()); // scaleSequentialQuantile doesn’t implement ticks or tickFormat.
+
+            if (!x.ticks) {
+                if (tickValues === undefined) {
+                    var _n = Math.round(ticks + 1);
+
+                    tickValues = d3.range(_n).map(function (i) {
+                        return d3.quantile(color.domain(), i / (_n - 1));
+                    });
+                }
+
+                if (typeof tickFormat !== 'function') {
+                    tickFormat = d3.format(tickFormat === undefined ? ',f' : tickFormat);
+                }
+            }
+        } // Threshold
+        else if (color.invertExtent) {
+            var thresholds = color.thresholds
+                ? color.thresholds() // scaleQuantize
+                : color.quantiles
+                ? color.quantiles() // scaleQuantile
+                : color.domain(); // scaleThreshold
+
+            var thresholdFormat =
+                tickFormat === undefined
+                    ? function (d) {
+                          return d;
+                      }
+                    : typeof tickFormat === 'string'
+                    ? d3.format(tickFormat)
+                    : tickFormat;
+            x = d3
+                .scaleLinear()
+                .domain([-1, color.range().length - 1])
+                .rangeRound([marginLeft, width - marginRight]);
+            svg.append('g')
+                .selectAll('rect')
+                .data(color.range())
+                .join('rect')
+                .attr('x', function (d, i) {
+                    return x(i - 1);
+                })
+                .attr('y', marginTop)
+                .attr('width', function (d, i) {
+                    return x(i) - x(i - 1);
+                })
+                .attr('height', height - marginTop - marginBottom)
+                .attr('fill', function (d) {
+                    return d;
+                });
+            tickValues = d3.range(thresholds.length);
+
+            tickFormat = function tickFormat(i) {
+                return thresholdFormat(thresholds[i], i);
+            };
+        } // Ordinal
+        else {
+            x = d3
+                .scaleBand()
+                .domain(color.domain())
+                .rangeRound([marginLeft, width - marginRight]);
+            svg.append('g')
+                .selectAll('rect')
+                .data(color.domain())
+                .join('rect')
+                .attr('x', x)
+                .attr('y', marginTop)
+                .attr('width', Math.max(0, x.bandwidth() - 1))
+                .attr('height', height - marginTop - marginBottom)
+                .attr('fill', color);
+
+            tickAdjust = function tickAdjust() {};
+        }
+
+        svg.append('g')
+            .attr('transform', 'translate(0,'.concat(height - marginBottom, ')'))
+            .call(
+                d3
+                    .axisBottom(x)
+                    .ticks(ticks, typeof tickFormat === 'string' ? tickFormat : undefined)
+                    .tickFormat(typeof tickFormat === 'function' ? tickFormat : undefined)
+                    .tickSize(tickSize)
+                    .tickValues(tickValues)
+            )
+            .call(tickAdjust)
+            .call(function (g) {
+                return g.select('.domain').remove();
+            })
+            .call(function (g) {
+                return g
+                    .append('text')
+                    .classed('fdg-sidebar__label fdg-legend__label', true)
+                    .attr('x', marginLeft)
+                    .attr('y', marginTop + marginBottom - height - 6)
+                    .attr('fill', 'currentColor')
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'translate('.concat(width / 2, ',0)'))
+                    .attr('font-weight', 'bold')
+                    .attr('font-size', '1.25rem')
+                    .html(title);
+            });
+        return svg.node();
+    }
+
+    function continuous$1() {
+        var container = this.legends.container.append('div');
+        container.node().appendChild(
+            continuous({
+                color: this.scales.color,
+                title: this.settings.colorBy.label,
+                width: 200,
+                height: 50,
+                tickValues: [
+                    this.scales.color.domain()[0],
+                    (this.scales.color.domain()[1] - this.scales.color.domain()[0]) / 2,
+                    this.scales.color.domain()[1],
+                ],
+            })
+        );
+        return container;
+    }
+
+    function color$2() {
+        var container;
+
+        if (this.settings.colorify) {
+            switch (this.settings.colorBy.type) {
+                case 'frequency':
+                    container = frequency.call(this);
+                    break;
+
+                case 'categorical':
+                    container = categorical.call(this);
+                    break;
+
+                case 'continuous':
+                    container = continuous$1.call(this);
+                    break;
+
+                default:
+                    return;
+            }
+
+            container.classed(
+                'fdg-legend fdg-legend--color fdg-legend--'.concat(this.settings.colorBy.type),
+                true
+            );
+        }
+
+        return container;
+    }
+
+    function size$2() {
+        var container;
+
+        if (this.settings.sizify && this.settings.colorBy.type !== 'frequency') {
+            container = makeLegend
+                .call(this, 'size')
+                .classed(
+                    'fdg-legend fdg-legend--size fdg-legend--'.concat(this.settings.sizeBy.type),
+                    true
+                );
+        }
+
+        return container;
+    }
+
+    function circle$1(legendItem, i, spacing, radius) {
+        return legendItem
+            .append('circle')
+            .attr('cx', spacing)
+            .attr('cy', i * spacing + 10)
+            .attr('r', radius - 1)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function square$1(legendItem, i, spacing, radius) {
+        return legendItem
+            .append('rect')
+            .attr('x', spacing - radius + 1.5)
+            .attr('y', i * spacing + radius / 2 + 1)
+            .attr('width', radius * 1.5)
+            .attr('height', radius * 1.5)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function triangle$2(legendItem, i, spacing, radius) {
+        var side = radius * 1.5;
+        var dist = side / Math.sqrt(3);
+        var x = spacing;
+        var y = i * spacing + dist + 3;
+        var top = [x, y - dist];
+        var left = [x - dist, y + dist];
+        var right = [x + dist, y + dist];
+        return legendItem
+            .append('polygon')
+            .attr('points', [top, left, right])
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function diamond$1(legendItem, i, spacing, radius) {
+        var x = spacing;
+        var y = i * spacing;
+        return legendItem
+            .append('rect')
+            .attr('transform', 'rotate(45 '.concat(x, ' ').concat(y, ')'))
+            .attr('x', x)
+            .attr('y', y)
+            .attr('width', radius * 1.5)
+            .attr('height', radius * 1.5)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    //<svg height="210" width="500">
+    //  <polygon points="100,10 40,198 190,78 10,78 160,198"
+    //  style="fill:lime;stroke:purple;stroke-width:5;fill-rule:nonzero;" />
+    //</svg>
+    function star$1(legendItem, i, spacing, radius) {
+        var spikes = 5;
+        var step = Math.PI / spikes;
+        var innerRadius = radius * 0.6;
+        var outerRadius = radius * 1.2;
+        var dist = (radius * 2) / Math.sqrt(3);
+        var rot = (Math.PI / 2) * 3;
+        var x = spacing;
+        var y = i * spacing + dist;
+        var centroid = [x, y];
+        var coordinates = [];
+
+        for (var _i = 0; _i < spikes; _i++) {
+            x = centroid[0] + Math.cos(rot) * outerRadius;
+            y = centroid[1] + Math.sin(rot) * outerRadius;
+            coordinates.push([x, y]);
+            rot += step;
+            x = centroid[0] + Math.cos(rot) * innerRadius;
+            y = centroid[1] + Math.sin(rot) * innerRadius;
+            coordinates.push([x, y]);
+            rot += step;
+        }
+
+        return legendItem
+            .append('polygon')
+            .attr('points', coordinates)
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function triangleDown(legendItem, i, spacing, radius) {
+        var side = radius * 1.5;
+        var dist = side / Math.sqrt(3);
+        var x = spacing;
+        var y = i * spacing + dist + 3;
+        var top = [x, y + dist];
+        var left = [x - dist, y - dist];
+        var right = [x + dist, y - dist];
+        return legendItem
+            .append('polygon')
+            .attr('points', [top, left, right])
+            .attr('fill', 'none')
+            .attr('stroke', '#444');
+    }
+
+    function shape$2() {
+        var _this = this;
+
+        var container;
+
+        if (this.settings.shapify) {
+            var main = this;
+            var shapes = {
+                circle: circle$1,
+                square: square$1,
+                triangle: triangle$2,
+                diamond: diamond$1,
+                star: star$1,
+                triangleDown: triangleDown,
+            };
+            container = this.legends.container
+                .append('div')
+                .classed(
+                    'fdg-legend fdg-legend--shape fdg-legend--'.concat(this.settings.shapeBy.type),
+                    true
+                );
+            container
+                .append('div')
+                .classed('fdg-sidebar__label fdg-legend__label', true)
+                .html(this.settings.shapeBy.label);
+            var legendItems = container
+                .append('svg')
+                .attr('width', 200)
+                .attr('height', 20 * this.scales.shape.domain().length)
+                .selectAll('g')
+                .data(this.scales.shape.domain())
+                .join('g')
+                .attr('transform', 'translate(20,0)');
+            var radius = 7;
+            var spacing = 20;
+            legendItems.each(function (value, i) {
+                var shape = shapes[main.scales.shape(value)]
+                    .call(main, d3.select(this), i, spacing, radius)
+                    .classed('fdg-legend__shape', true)
+                    .classed('fdg-legend__symbol', true);
+            });
+            legendItems
+                .append('text')
+                .classed('fdg-legend__label', true)
+                .attr('font-size', '1rem')
+                .attr('x', 35)
+                .attr('y', function (d, i) {
+                    return i * 20 + 12;
+                })
+                .attr('dy', 0)
+                .attr('alignment-baseline', 'middle')
+                .html(function (d) {
+                    return ''.concat(d, ' (n=').concat(
+                        _this.metadata.id.filter(function (di) {
+                            return di.shapeStratum === d;
+                        }).length,
+                        ')'
+                    );
+                }); //.each(function(d) {
+            //    const text = d3.select(this);
+            //    main.util.wrap(text, 100);
+            //});
+        }
+
+        return container;
+    }
+
+    function addLegends() {
+        this.legends = {
+            container: this.containers.legends,
+        };
+        this.legends.color = color$2.call(this);
+        this.legends.size = size$2.call(this);
+        this.legends.shape = shape$2.call(this);
+    }
+
+    function addFreqTable() {
+        var _this = this;
+
+        var main = this;
+        var freqTable = {
+            container: this.containers.freqTable
+                .classed('fdg-hidden', this.settings.freqTable.display === false)
+                .classed(
+                    'fdg-freq-table--vertical',
+                    this.settings.freqTable.structure === 'vertical'
+                )
+                .classed(
+                    'fdg-freq-table--horizontal',
+                    this.settings.freqTable.structure === 'horizontal'
+                ),
+        };
+        freqTable.label = this.util
+            .addElement('freq-table__label', freqTable.container)
+            .classed('fdg-sidebar__label', true)
+            .text(
+                this.settings.freqTable.structure === 'vertical'
+                    ? ''
+                    : this.settings.freqTable.countType === 'id'
+                    ? 'Number of Individuals'
+                    : 'Number of Events'
+            );
+        freqTable.table = freqTable.container
+            .append('table')
+            .classed('fdg-freq-table__table', true);
+        freqTable.thead = freqTable.table.append('thead').classed('fdg-freq-table__thead', true); // Add column headers.
+
+        freqTable.th = freqTable.thead
+            .selectAll('th')
+            .data(
+                this.settings.freqTable.structure === 'vertical'
+                    ? ['', 'Individuals', 'Events']
+                    : ['', 'Total'].concat(
+                          _toConsumableArray(
+                              this.metadata.strata.map(function (stratum) {
+                                  return stratum.key;
+                              })
+                          )
+                      )
+            )
+            .join('th')
+            .attr('class', function (d, i) {
+                return 'fdg-freq-table__th--'.concat(
+                    i === 0 ? 'label' : i === 1 ? 'individual' : i === 2 ? 'event' : i
+                );
+            })
+            .classed('fdg-freq-table__th', true)
+            .text(function (d) {
+                return d;
+            }); // Add info icon explaining bars.
+
+        if (this.settings.freqTable.bars)
+            freqTable.th
+                .filter(function (d) {
+                    return d === 'Individuals';
+                })
+                .html(function (d) {
+                    return ''
+                        .concat(d, ' <span ', "class = 'fdg-info-icon'", ' ')
+                        .concat(
+                            _this.settings.colorBy.type === 'categorical'
+                                ? "title = 'Gray background represents the percentage of individuals in the given group at the given state'"
+                                : "title = 'Gray background represents the percentage of individuals at the given state'",
+                            '>&#9432;</span>'
+                        );
+                });
+        freqTable.tbody = freqTable.table.append('tbody').classed('fdg-freq-table__tbody', true); // Add table rows.
+
+        freqTable.tr = freqTable.tbody
+            .selectAll('tr')
+            .data(
+                this.data.freqTable.filter(
+                    function (d) {
+                        return (
+                            !(
+                                _this.settings.freqTable.includeEventCentral === false &&
+                                d.state === _this.settings.eventCentral
+                            ) && !(_this.settings.freqTable.structure === 'horizontal' && !d.foci)
+                        );
+                    } // exclude central event row(s) // exclude strata rows
+                )
+            )
+            .join('tr')
+            .attr('class', function (d) {
+                return d.state !== d.label ? 'fdg-freq-table__tr--subgroup' : null;
+            })
+            .classed('fdg-freq-table__tr', true)
+            .style('font-size', function (d) {
+                return d.group !== d.value ? '1rem' : '1.25rem';
+            }); // Add table cells.
+
+        freqTable.tr.each(function (d, i) {
+            var tr = d3.select(this);
+            var td = tr
+                .selectAll('td')
+                .data(function (di) {
+                    return d.cells;
+                })
+                .join('td')
+                .attr('class', function (d, i) {
+                    return main.settings.freqTable.structure === 'vertical'
+                        ? 'fdg-freq-table__td--'.concat(
+                              i === 0 ? 'label' : i === 1 ? 'individual' : i === 2 ? 'event' : i
+                          )
+                        : 'fdg-freq-table__td--'.concat(i === 0 ? 'label' : 'freq');
+                })
+                .classed('fdg-freq-table__td', true)
+                .style('background', function (di, i) {
+                    return i === 1 && main.settings.freqTable.bars
+                        ? 'linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) '
+                              .concat(d.proportionFmt, ', transparent ')
+                              .concat(d.proportionFmt, ')')
+                        : null;
+                }) // add background to individual cell proportional to the percentage of individuals at state or focus
+                .text(function (di) {
+                    return typeof di === 'number' ? d3.format(',d')(di) : di;
+                });
+        });
+        freqTable.td = freqTable.tr.selectAll('td');
+        return freqTable;
+    }
+
+    function addOrbits() {
+        var g = this.containers.svgBackground
+            .append('g')
+            .classed('fdg-g fdg-g--orbits', true)
+            .attr('transform', 'translate('.concat(this.settings.widthDiff, ',0)'));
+        var shadows = g
+            .append('defs')
+            .selectAll('filter')
+            .data(this.metadata.orbit)
+            .join('filter')
+            .attr('id', function (d, i) {
+                return 'orbit--'.concat(i);
+            });
+        shadows
+            .append('feDropShadow')
+            .attr('dx', 0)
+            .attr('dy', 0)
+            .attr('stdDeviation', 5)
+            .attr('flood-color', 'black');
+        var orbits = g
+            .selectAll('circle.orbit')
+            .data(this.metadata.orbit)
+            .enter()
+            .append('circle')
+            .classed('orbit', true)
+            .attr('cx', function (d) {
+                return d.cx;
+            })
+            .attr('cy', function (d) {
+                return d.cy;
+            })
+            .attr('r', function (d) {
+                return d.r;
+            })
+            .attr('fill', 'none')
+            .attr('stroke', '#aaa')
+            .attr('stroke-width', '.5')
+            .style('filter', function (d, i) {
+                return 'url(#orbit--'.concat(i, ')');
+            });
+        return orbits;
+    }
+
+    function isCenter(d) {
+        return Math.round(d.y) === Math.round(this.settings.height / 2);
+    }
+
+    function isLessThanCenter(d) {
+        return Math.round(d.y) < Math.round(this.settings.height / 2);
+    }
+
+    function getPosition(d) {
+        var reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var position = isCenter.call(this, d)
+            ? 'middle'
+            : isLessThanCenter.call(this, d)
+            ? 'hanging'
+            : 'baseline';
+        if (reverse)
+            position =
+                position === 'hanging'
+                    ? 'baseline'
+                    : position === 'baseline'
+                    ? 'hanging'
+                    : position;
+        return position;
+    }
+
+    function getRelative(d) {
+        return d.key === this.settings.eventCentral
+            ? 0
+            : isLessThanCenter.call(this, d)
+            ? '-2.5em'
+            : '2.5em';
+    }
+
+    function addLabel(text) {
+        var _this = this;
+
+        var label = text
+            .append('tspan')
+            .classed('fdg-focus-annotation__label', true)
+            .attr('x', 0) //.attr('text-anchor', (d) => getTextAnchor.call(this, d))
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle')
+            .text(function (d) {
+                return d.key;
+            });
+        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify)
+            label.attr('alignment-baseline', function (d) {
+                return getPosition.call(_this, d, true);
+            });
+        return label;
+    }
+
+    function addEventCount(text) {
+        var eventCount = text
+            .append('tspan')
+            .classed('fdg-focus-annotation__event-count', true)
+            .classed('fdg-hidden', this.settings.eventCount === false)
+            .attr('x', 0)
+            .attr('dy', '1.3em') //.attr('text-anchor', (d) => getTextAnchor.call(this, d));
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle');
+        return eventCount;
+    }
+
+    function categoricallyReposition(text, label, eventCount) {
+        var _this = this;
+
+        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
+            text.style('transform', function (d) {
+                return 'translate('.concat(isCenter.call(_this, d) ? '-5em,0' : '0,-5em', ')');
+            });
+            label.attr('text-anchor', function (d) {
+                return d.key === _this.settings.eventCentral ? 'start' : 'middle';
+            });
+            eventCount.attr('text-anchor', 'middle').classed('fdg-hidden', true);
+        }
+    }
+
+    function annotateFoci() {
+        var _this = this;
+
+        var fociLabels = this.containers.focusAnnotations
+            .selectAll('g.fdg-focus-annotation')
+            .data(this.metadata.event)
+            .join('g')
+            .classed('fdg-focus-annotation', true)
+            .attr('transform', function (d) {
+                return 'translate('.concat(d.x, ',').concat(d.y, ')');
+            }); // background - white annotation highlight
+        // foreground - black annotation text
+
+        ['background', 'foreground'].forEach(function (pos) {
+            var text = fociLabels
+                .append('text')
+                .classed('fdg-focus-annotation__text fdg-focus-annotation__'.concat(pos), true) //.style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
+                .style('transform', function (d) {
+                    return _this.settings.focusOffset === 'heuristic'
+                        ? 'translate(0,'.concat(getRelative.call(_this, d), ')')
+                        : null;
+                });
+            var label = addLabel.call(_this, text).attr('y', 0).attr('dy', 0);
+
+            _this.util.wrap(label, _this.settings.orbitRadius);
+
+            var eventCount = addEventCount.call(_this, text); // Position annotations differently in categorical layout.
+
+            categoricallyReposition.call(_this, text, label, eventCount);
+        }); // Annotate strata at each focus.
+
+        if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
+            this.metadata.event.forEach(function (event) {
+                event.fociLabels = _this.containers.focusAnnotations
+                    .append('g')
+                    .classed('fdg-focus-annotation fdg-focus-annotation--categorical', true);
+                ['background', 'foreground'].forEach(function (pos) {
+                    var text = event.fociLabels
+                        .selectAll('text.fdg-focus-annotation__'.concat(pos))
+                        .data(event.foci)
+                        .join('text')
+                        .classed(
+                            'fdg-focus-annotation__event-count fdg-focus-annotation__text fdg-focus-annotation__'.concat(
+                                pos
+                            ),
+                            true
+                        )
+                        .attr('x', function (d) {
+                            return d.dx;
+                        })
+                        .attr('dx', function (d) {
+                            return event.key === _this.settings.eventCentral ? null : '-1em';
+                        })
+                        .attr('y', function (d) {
+                            return d.dy;
+                        })
+                        .attr('text-anchor', function (d) {
+                            return event.key === _this.settings.eventCentral ? 'middle' : 'end';
+                        })
+                        .attr('alignment-baseline', function (d) {
+                            return getPosition.call(_this, d, true);
+                        });
+                });
+            });
+        }
+
+        return fociLabels;
+    }
+
+    function annotateCustom() {
+        var _this = this;
+
+        var annotations;
+
+        if (this.settings.annotations && Array.isArray(this.settings.annotations)) {
+            this.settings.annotations.forEach(function (annotation) {
+                annotation.radius = annotation.orbit * _this.settings.orbitRadius;
+                annotation.theta = (2 * Math.PI * annotation.angle) / 360;
+                annotation.x =
+                    _this.settings.center.x +
+                    annotation.radius * // number of orbit radii from the center
+                        Math.cos(annotation.theta); // position along the circle at the given orbit along which
+
+                annotation.y =
+                    annotation.order === 0
+                        ? _this.settings.center.y
+                        : _this.settings.center.y +
+                          annotation.radius * // number of orbit radii from the center
+                              Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
+            });
+            annotations = this.containers.customAnnotations
+                .selectAll('g.fdg-custom-annotation')
+                .data(this.settings.annotations)
+                .join('g')
+                .classed('fdg-custom-annotation', true)
+                .attr('transform', function (d) {
+                    return 'translate('.concat(d.x, ',').concat(d.y, ')');
+                })
+                .attr('opacity', function (d) {
+                    return d.timepoint > _this.settings.timepoint ? 0 : 1;
+                });
+            annotations.html(function (d) {
+                return d.value;
+            }); //['background', 'foreground'].forEach((pos) => {
+            //    const text = annotations
+            //        .append('text')
+            //        .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true)
+            //        .attr('alignment-baseline', d => d.angle > 0 ? 'hanging' : d.angle < 0 ? 'baseline' : 'middle')
+            //        .html(d => d.value)
+            //        .each(function(d) {
+            //            const selection = d3.select(this);
+            //            // Apply attributes.
+            //            if (typeof d.attr === 'object' && d.attr !== null)
+            //                Object.keys(d.attr).forEach(attr => {
+            //                    selection.attr(attr, d.attr[attr]);
+            //                });
+            //            // Apply styles.
+            //            if (typeof d.style === 'object' && d.style !== null)
+            //                Object.keys(d.style).forEach(style => {
+            //                    selection.style(style, d.style[style]);
+            //                });
+            //        });
+            //});
+        }
+
+        return annotations;
+    }
+
+    function dataDrivenLayout() {
+        // controls
+        addControls.call(this); // sidebar
+
+        addLegends.call(this);
+        this.containers.freqTable = addFreqTable.call(this); // Draw concentric circles.
+
+        this.orbits = addOrbits.call(this); // Annotate foci.
+
+        this.focusAnnotations = annotateFoci.call(this); // Add custom annotations.
+
+        this.customAnnotations = annotateCustom.call(this);
+    }
+
+    function hasVariables() {
+        var has = {};
+
+        var _iterator = _createForOfIteratorHelper(
+                Object.keys(this.settings).filter(function (key) {
+                    return /_var$/.test(key);
+                })
+            ),
+            _step;
+
+        try {
+            for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+                var setting = _step.value;
+                var variable = setting.replace(/_var$/, '');
+                has[variable] = this.data[0].hasOwnProperty(this.settings[setting]);
+            }
+        } catch (err) {
+            _iterator.e(err);
+        } finally {
+            _iterator.f();
+        }
+
+        return has;
+    }
+
+    function mapVariables() {
+        var _this = this;
+
+        this.data.forEach(function (d) {
+            var _iterator = _createForOfIteratorHelper(
+                    Object.keys(_this.settings).filter(function (key) {
+                        return /_var$/.test(key);
+                    })
+                ),
+                _step;
+
+            try {
+                for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+                    var setting = _step.value;
+                    var variable = setting.replace(/_var$/, '');
+                    d[variable] = [
+                        'event_order',
+                        'start_timepoint',
+                        'end_timepoint',
+                        'duration',
+                    ].includes(variable)
+                        ? +d[_this.settings[setting]]
+                        : d[_this.settings[setting]];
+                }
+            } catch (err) {
+                _iterator.e(err);
+            } finally {
+                _iterator.f();
+            }
+        });
+    }
+
+    function addVariables(has) {
+        d3.nest()
+            .key(function (d) {
+                return d.id;
+            })
+            .rollup(function (group) {
+                group.forEach(function (d, i) {
+                    // Define start and end timepoints when only duration exists.
+                    // This approach assumes data are already sorted chronologically.
+                    if (has.duration && !has.start_timepoint) {
+                        if (i === 0) {
+                            d.start_timepoint = 1;
+                            d.end_timepoint = d.duration;
+                        } else {
+                            d.start_timepoint = group[i - 1].end_timepoint + 1;
+                            d.end_timepoint = d.start_timepoint + d.duration - 1;
+                        }
+                    } // Define end timepoint when only start timepoint exists.
+
+                    if (has.start_timepoint && !has.end_timepoint) {
+                        d.end_timepoint =
+                            i < group.length - 1
+                                ? group[i + 1].start_timepoint - 1
+                                : d.duration
+                                ? d.start_timepoint + d.duration - 1
+                                : d.start_timepoint;
+                    } // Define duration when only timepoints exist.
+
+                    if (!has.duration && has.start_timepoint && has.end_timepoint) {
+                        d.duration = d.start_timepoint - d.end_timepoint + 1;
+                    }
+                }); // Define sequence
+
+                group
+                    .sort(function (a, b) {
+                        var start_timepoint = a.start_timepoint - b.start_timepoint;
+                        var end_timepoint = a.end_timepoint - b.end_timepoint;
+                        var event_order = a.event_order - b.event_order; // Realistically states should be unique and non-overlapping within
+                        // start and end timepoint but if the library were to ever support
+                        // concurrent states we include event order in the sort.
+
+                        return start_timepoint || end_timepoint || event_order;
+                    })
+                    .forEach(function (d, i) {
+                        d.sequence = i;
+                    });
+            })
+            .entries(this.data);
+    }
+
+    // Generates an alternative state progression by orbit, state, and ID.
+    function orderByState() {
+        var _this = this;
+
+        if (this.settings.stateChange === 'ordered') {
+            // start timepoint
+            // - first state: 1
+            // - subsequent states: position of ID in ID list of previous state
+            //
+            // end timepoint
+            // - first state: position of ID in ID list of current state
+            // - subsequent states: start timepoint of current state + position of ID in ID list of current state
+            d3.nest()
+                .key(function (d) {
+                    return d.id;
+                })
+                .rollup(function (group) {
+                    group.sort(function (a, b) {
+                        return (
+                            a.event_order - b.event_order ||
+                            a.event_position - b.event_position ||
+                            (a.event < b.event ? -1 : 1)
+                        );
+                    });
+                    group.forEach(function (d, i) {
+                        var currState = _this.metadata.event.find(function (event) {
+                            return event.key === d.event;
+                        });
+
+                        var prevState = _this.metadata.event.find(function (event) {
+                            var _group;
+
+                            return (
+                                event.key ===
+                                ((_group = group[i - 1]) === null || _group === void 0
+                                    ? void 0
+                                    : _group.event)
+                            );
+                        });
+
+                        if (i === 0) {
+                            d.start_timepoint = 1;
+                            d.end_timepoint =
+                                d.start_timepoint +
+                                currState.allIds.findIndex(function (id) {
+                                    return id === d.id;
+                                });
+                        } else {
+                            d.start_timepoint =
+                                prevState.allIds.findIndex(function (id) {
+                                    return id === d.id;
+                                }) +
+                                prevState.start_timepoint +
+                                1;
+                            d.end_timepoint =
+                                currState.allIds.findIndex(function (id) {
+                                    return id === d.id;
+                                }) + currState.start_timepoint;
+                            d.duration = d.end_timepoint - d.start_timepoint + 1;
+                        }
+                    });
+                })
+                .entries(this.data); // Redefine duration of animation.
+            // TODO: duration of animation should be the sum of the number of IDs in each state or something
+
+            this.settings.duration = this.metadata.id.length * this.metadata.orbit.length + 1; //d3.sum(
+            //    this.metadata.event,
+            //    event => event.allIds.length
+            //);
+        }
+    }
+
+    function sort(has) {
+        var numericId = this.data.every(function (d) {
+            return /^-?\d+\.?\d*$/.test(d.id) || /^-?\d*\.?\d+$/.test(d.id);
+        });
+        this.data.sort(function (a, b) {
+            var id_diff = numericId ? +a.id - +b.id : a.id < b.id ? -1 : b.id < a.id ? 1 : 0;
+            var timepoint_diff = a.start_timepoint - b.start_timepoint;
+            return id_diff || timepoint_diff;
+        });
+    }
+
+    function mutateData() {
+        // Check for existence of variables.
+        var has = hasVariables.call(this); // Apply data mappings.
+
+        mapVariables.call(this); // Define:
+        // - start and end timepoints with duration if only duration exists
+        // - duration if only start and end points exist
+        // - order of states with start and end timepoints
+
+        addVariables.call(this, has); // Define alternative order of events by event order and ID.
+
+        orderByState.call(this); // Sort data by ID then chronologically.
+
+        sort.call(this, has);
+    }
+
+    function dataManipulation() {
+        var _this = this;
+
+        mutateData.call(this);
+        this.data.nested = nestData.call(this, this.data);
+        this.metadata.event.forEach(function (event) {
+            event.data = _this.data.nested.filter(function (d) {
+                return d.value.state.event === event.key;
+            });
+        });
     }
 
     function init() {
         var _this = this;
 
-        // Cycle through text that displays over animation.
-        runModal.call(this); // Add a static force layout in the background for individuals that never change state.
+        this.settings_initial = _objectSpread2({}, this.settings); // Cycle through text that displays over animation.
+
+        runModal.call(this); // Add a static force layout in the background for individuals that never change state (improves
+        // performance by reducing the number of nodes in the simulation).
 
         addStaticForceSimulation.call(this); // Add a dynamic force layout in the middleground.
 
-        addForceSimulation.call(this); // Start the timer.
+        this.forceSimulation = addForceSimulation.call(this, this.data);
+        this.nodes = this.forceSimulation.nodes(); // Reheat the force simulation after initialization to incorporate the centering force before
+        // removing the force.
+        //increment.call(this, this.data, false);
+
+        this.settings.removeCenterForce = true; // Start the animation.
 
         if (this.settings.playPause === 'play')
-            setTimeout(
+            this.timeout = d3.timeout(
                 function () {
-                    _this.interval = startInterval.call(_this);
+                    // Run first sequence.
+                    if (_this.settings.runSequences === true) {
+                        _this.sequence = getNextSequence.call(_this, false);
+                        runSequence.call(_this); // calls startInterval
+                    } // Run full animation.
+                    else _this.interval = startInterval.call(_this, _this.data);
                 },
                 this.settings.delay ? this.settings.modalSpeed : 0
             );

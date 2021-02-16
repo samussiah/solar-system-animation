@@ -3,9 +3,12 @@ import restartForceSimulation from '../init/startInterval/restartForceSimulation
 import addStaticForceSimulation from '../init/addStaticForceSimulation';
 import updateData from '../init/startInterval/update/data';
 
+// TODO: modularize this function with declaritive subfunctions
 export default function resize() {
+    this.settings.fullWidth = this.containers.main.node().clientWidth;
     const node = this.containers.animation.node();
     this.settings.width = node.clientWidth;
+    this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
     this.settings.height = this.containers.animation.node().clientHeight;
 
     // timer
@@ -25,8 +28,9 @@ export default function resize() {
 
     // background SVG
     this.containers.svgBackground
-        .attr('width', this.settings.width)
-        .attr('height', this.settings.height);
+        .attr('width', this.settings.fullWidth)
+        .attr('height', this.settings.height)
+        .style('left', -this.settings.widthDiff);
 
     // canvas
     this.containers.canvas.attr('width', this.settings.width).attr('height', this.settings.height);
@@ -43,6 +47,9 @@ export default function resize() {
         .attr('cx', (d) => d.cx)
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r);
+    this.containers.svgBackground
+        .select('g.fdg-g--orbits')
+        .attr('transform', `translate(${this.settings.widthDiff},0)`);
 
     // focus coordinates
     if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
@@ -87,7 +94,7 @@ export default function resize() {
     }
 
     // Update the node data.
-    updateData.call(this);
+    updateData.call(this, this.sequence ? this.sequence.data : this.data);
     restartForceSimulation.call(this);
 
     // static force simulation
@@ -95,4 +102,23 @@ export default function resize() {
 
     // focus annotations
     this.focusAnnotations.attr('transform', (d) => `translate(${d.x},${d.y})`);
+
+    // custom annotations
+    if (this.customAnnotations) {
+        this.settings.annotations.forEach((annotation) => {
+            annotation.radius = annotation.orbit * this.settings.orbitRadius;
+            annotation.theta = (2 * Math.PI * annotation.angle) / 360;
+            annotation.x =
+                this.settings.center.x +
+                annotation.radius * // number of orbit radii from the center
+                    Math.cos(annotation.theta); // position along the circle at the given orbit along which
+            annotation.y =
+                annotation.order === 0
+                    ? this.settings.center.y
+                    : this.settings.center.y +
+                      annotation.radius * // number of orbit radii from the center
+                          Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
+        });
+        this.customAnnotations.attr('transform', (d) => `translate(${d.x},${d.y})`);
+    }
 }

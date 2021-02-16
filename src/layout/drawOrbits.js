@@ -1,5 +1,8 @@
 export default function addOrbits() {
-    const g = this.containers.svgBackground.append('g').classed('fdg-g fdg-g--orbits', true);
+    const g = this.containers.svgBackground
+        .append('g')
+        .classed('fdg-g fdg-g--orbits', true)
+        .attr('transform', `translate(${this.settings.widthDiff},0)`);
 
     const shadows = g
         .append('defs')

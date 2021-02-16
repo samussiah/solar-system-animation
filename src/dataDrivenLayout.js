@@ -3,6 +3,7 @@ import addLegends from './layout/addLegends';
 import addFreqTable from './layout/addFreqTable';
 import drawOrbits from './layout/drawOrbits';
 import annotateFoci from './layout/annotateFoci';
+import annotateCustom from './layout/annotateCustom';
 
 export default function dataDrivenLayout() {
     // controls
@@ -17,4 +18,7 @@ export default function dataDrivenLayout() {
 
     // Annotate foci.
     this.focusAnnotations = annotateFoci.call(this);
+
+    // Add custom annotations.
+    this.customAnnotations = annotateCustom.call(this);
 }

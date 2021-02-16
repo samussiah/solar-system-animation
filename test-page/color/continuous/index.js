@@ -12,6 +12,9 @@ fetch('../../data/data_1000.csv')
                     label: 'Outcome',
                     //mirror: false,
                 },
+                sizeBy: {
+                    type: null,
+                },
             }
         );
     });

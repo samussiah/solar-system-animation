@@ -13,6 +13,9 @@ fetch('../../data/data_1000.csv')
                     colorScheme: 'Tableau10',
                     //stratify: false,
                 },
+                sizeBy: {
+                    type: null,
+                },
             }
         );
     });

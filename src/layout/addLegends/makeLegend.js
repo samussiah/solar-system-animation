@@ -4,9 +4,7 @@ export default function makeLegend(type) {
     const legendDimensions = [200, 50];
 
     // container
-    const container = this.legends.container
-        .append('div')
-        .classed(`fdg-legend fdg-legend--${type}`, true);
+    const container = this.legends.container.append('div');
 
     // label
     const label = container

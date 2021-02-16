@@ -3,7 +3,7 @@ export default function countdown() {
     this.containers.countdown
         .classed('fdg-invisible', false)
         .classed('fdg-hidden', (d) => d !== counter);
-    const interval = window.setInterval(() => {
+    const interval = d3.interval(() => {
         counter--;
         this.containers.countdown.classed('fdg-hidden', (d) => d !== counter);
     }, 1000);

@@ -1,9 +1,7 @@
 import makeContinuous from '../makeLegend/continuous';
 
 export default function continuous() {
-    const container = this.legends.container
-        .append('div')
-        .classed('fdg-legend fdg-legend--continuous', true);
+    const container = this.legends.container.append('div');
 
     container.node().appendChild(
         makeContinuous({

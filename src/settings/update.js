@@ -50,23 +50,25 @@ export default function update() {
             );
 
             // frequency aesthetic
-            if (
-                this.settings.colorBy.type === 'frequency' &&
-                this.settings.sizeBy.type === 'frequency'
-            )
-                text = text.replace('[frequency-aesthetic]', 'color and size');
-            else if (this.settings.colorBy.type === 'frequency')
-                text = text.replace('[frequency-aesthetic]', 'color');
-            else if (this.settings.sizeBy.type === 'frequency')
-                text = text.replace('[frequency-aesthetic]', 'size');
-            else text = null;
+            if (/\[frequency-aesthetic]/.test(text)) {
+                if (
+                    this.settings.colorBy.type === 'frequency' &&
+                    this.settings.sizeBy.type === 'frequency'
+                )
+                    text = text.replace('[frequency-aesthetic]', 'color and size');
+                else if (this.settings.colorBy.type === 'frequency')
+                    text = text.replace('[frequency-aesthetic]', 'color');
+                else if (this.settings.sizeBy.type === 'frequency')
+                    text = text.replace('[frequency-aesthetic]', 'size');
+                else text = null;
+            }
 
             return text;
         });
 
         texts = texts.concat(
             this.settings.explanation.filter(
-                (el) => !(this.settings.hideControls && el.includes('controls'))
+                (el) => el !== null && !(this.settings.hideControls && el.includes('controls'))
             )
         );
     }
@@ -74,4 +76,20 @@ export default function update() {
     if (Array.isArray(this.settings.information)) texts = texts.concat(this.settings.information);
 
     this.settings.text = texts.filter((text) => typeof text === 'string');
+
+    // sequences
+    if (this.settings.sequences) {
+        this.settings.loop = false;
+        this.settings.runSequences = true;
+        this.settings.animationTrack = 'sequence';
+        this.settings.sequences.forEach((sequence) => {
+            sequence.eventIndex = 0;
+        });
+    } else {
+        this.settings.runSequences = false;
+        this.settings.animationTrack = 'full';
+    }
+
+    // timing
+    if (this.settings.stateChange === 'ordered') this.settings.displayTiming = false;
 }

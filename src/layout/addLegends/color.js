@@ -19,6 +19,11 @@ export default function color() {
             default:
                 return;
         }
+
+        container.classed(
+            `fdg-legend fdg-legend--color fdg-legend--${this.settings.colorBy.type}`,
+            true
+        );
     }
 
     return container;

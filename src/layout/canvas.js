@@ -1,6 +1,9 @@
 export default function canvas(main) {
-    const animation = this.util.addElement('animation', main);
+    this.settings.fullWidth = main.node().clientWidth;
+    const animation = this.util.addElement('animation', main)
+        .style('position', 'relative');
     this.settings.width = animation.node().clientWidth;
+    this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
     this.settings.height = animation.node().clientHeight;
 
     // progress bar
@@ -14,8 +17,11 @@ export default function canvas(main) {
     // background SVG - orbits
     const svgBackground = this.util
         .addElement('svg--background', animation, 'svg')
-        .attr('width', this.settings.width)
-        .attr('height', this.settings.height);
+        .attr('width', main.node().clientWidth)
+        .attr('height', this.settings.height)
+        .style('position', 'absolute')
+        .style('left', -this.settings.widthDiff)
+        .style('top', 0);
 
     // canvas - bubbles
     const canvas = this.util
@@ -85,6 +91,14 @@ export default function canvas(main) {
         );
     const modal = this.util.addElement('modal__text', modalContainer);
 
+    const footnotes = this.util.addElement('footnotes', animation);
+    footnotes
+        .selectAll('div.fdg-footnote')
+        .data(this.settings.footnotes)
+        .join('div')
+        .classed('fdg-footnote', true)
+        .html(d => d);
+
     return {
         animation,
         progressBar,
@@ -96,5 +110,6 @@ export default function canvas(main) {
         focusAnnotations,
         customAnnotations,
         modal,
+        footnotes,
     };
 }

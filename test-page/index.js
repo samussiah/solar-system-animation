@@ -1,10 +1,8 @@
 fetch('./data/data_1000.csv')
-    .then(response => response.text())
-    .then(text => d3.csvParse(text))
-    .then(data => {
-        data.forEach(d => {
-        });
-
+    .then(function(response) { console.log(response); return response.text(); })
+    .then(function(text) { console.log(text); return d3.csvParse(text); })
+    .then(function(data) {
+        console.log(data);
         const fdg = forceDirectedGraph(
             data,
             '#container',
@@ -15,4 +13,5 @@ fetch('./data/data_1000.csv')
                 //delay: false,
             }
         );
+        console.log(fdg);
     });

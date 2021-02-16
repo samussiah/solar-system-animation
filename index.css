@@ -4,12 +4,19 @@ body {
 :root {
     --left-margin: 25%;
     --background-lightest: rgba(248,248,255,.5);
+    --background-lightest-opaque: rgba(248,248,255,1);
     --background-lighter: rgba(232,232,239,.5);
+    --background-lighter-opaque: rgba(232,232,239,1);
     --background-light: rgba(217,217,223,.5);
+    --background-light-opaque: rgba(217,217,223,1);
     --background-neutral: rgba(201,201,207,.5);
+    --background-neutral-opaque: rgba(201,201,207,1);
     --background-dark: rgba(186,186,191,.5);
+    --background-dark-opaque: rgba(186,186,191,1);
     --background-darker: rgba(170,170,175,.5);
+    --background-darker-opaque: rgba(170,170,175,1);
     --background-darkest: rgba(155,155,159,.5);
+    --background-darkest-opaque: rgba(155,155,159,1);
     --text-color--blue: #003366;
     --text-color--red: #660000;
     --border: 1px solid var(--background-darkest);
@@ -273,6 +280,10 @@ body {
 
         /* background */
 
+            .fdg-svg--background {
+                z-index: -1;
+            }
+
         /* midground */
 
         /* foreground */
@@ -280,12 +291,13 @@ body {
             .fdg-focus-annotation {
                 font-weight: bold;
                 font-size: 1.5rem;
+                text-rendering: optimizeLegibility;
             }
             .fdg-focus-annotation__foreground {
                 fill: var(--text-color--blue);
             }
             .fdg-focus-annotation__background {
-                stroke: rgb(248,248,255);
+                stroke: var(--background-lightest-opaque);
             }
             .fdg-focus-annotation__label {
                 stroke-width: 4px;
@@ -335,6 +347,14 @@ body {
             .fdg-modal--left {
                 text-align: left;
                 left: 0;
+            }
+
+        /* footnotes */
+
+            .fdg-footnotes {
+                position: absolute;
+                bottom: 1rem;
+                left: 1rem;
             }
 
     /**-------------------------------------------------------------------------------------------\

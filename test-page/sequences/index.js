@@ -81,13 +81,22 @@ fetch('../data/adverse-event-outcome.csv')
                 //    fast: 25,
                 //},
                 speed: 'fast',
-                //delay: false,
+                delay: false,
+                //playPause: 'pause',
                 modalSpeed: 2500,
                 modalPosition: 'bottom-left',
                 eventCountType: 'cumulative-id',
                 collisionPadding: 3,
                 focusOffset: 'none',
                 stateChange: 'ordered',
+                footnotes: [
+                    '<sup>1</sup> Footnote 1',
+                    '<sup>2</sup> Footnote 2',
+                    '<sup>3</sup> Footnote 3',
+                ],
+                root: {
+                    'left-margin': '15%',
+                }
             }
         );
     });

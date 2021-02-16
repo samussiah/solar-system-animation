@@ -5,6 +5,7 @@ import diamond from './shape/diamond';
 import star from './shape/star';
 import triangleDown from './shape/triangleDown';
 
+// TODO: figure out how to line wrap long labels
 export default function shape() {
     let container;
 
@@ -50,10 +51,15 @@ export default function shape() {
             .attr('font-size', '1rem')
             .attr('x', 35)
             .attr('y', (d, i) => i * 20 + 12)
+            .attr('dy', 0)
             .attr('alignment-baseline', 'middle')
             .html(
                 (d) => `${d} (n=${this.metadata.id.filter((di) => di.shapeStratum === d).length})`
-            );
+            )
+            //.each(function(d) {
+            //    const text = d3.select(this);
+            //    main.util.wrap(text, 100);
+            //});
     }
 
     return container;

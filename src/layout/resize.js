@@ -5,8 +5,10 @@ import updateData from '../init/startInterval/update/data';
 
 // TODO: modularize this function with declaritive subfunctions
 export default function resize() {
+    this.settings.fullWidth = this.containers.main.node().clientWidth;
     const node = this.containers.animation.node();
     this.settings.width = node.clientWidth;
+    this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
     this.settings.height = this.containers.animation.node().clientHeight;
 
     // timer
@@ -26,8 +28,9 @@ export default function resize() {
 
     // background SVG
     this.containers.svgBackground
-        .attr('width', this.settings.width)
-        .attr('height', this.settings.height);
+        .attr('width', this.settings.fullWidth)
+        .attr('height', this.settings.height)
+        .style('left', -this.settings.widthDiff);
 
     // canvas
     this.containers.canvas.attr('width', this.settings.width).attr('height', this.settings.height);
@@ -44,6 +47,9 @@ export default function resize() {
         .attr('cx', (d) => d.cx)
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r);
+    this.containers.svgBackground
+        .select('g.fdg-g--orbits')
+        .attr('transform', `translate(${this.settings.widthDiff},0)`);
 
     // focus coordinates
     if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {

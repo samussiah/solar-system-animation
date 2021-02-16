@@ -5,13 +5,16 @@ export default function wrap(text, width) {
             word,
             line = [],
             lineNumber = 0,
-            lineHeight = 1.8, // rems
+            fontStyle = text.style('font-size'),
+            fontSize = parseFloat(fontStyle),
+            fontUnit = fontStyle.replace(fontSize, ''),
+            x = text.attr('x'),
             y = text.attr('y'),
             dy = parseFloat(text.attr('dy')),
             tspan = text
                 .text(null)
                 .append('tspan')
-                .attr('x', 0)
+                .attr('x', x)
                 .attr('y', y)
                 .attr('dy', dy + 'rem');
         while ((word = words.pop())) {
@@ -23,9 +26,9 @@ export default function wrap(text, width) {
                 line = [word];
                 tspan = text
                     .append('tspan')
-                    .attr('x', 0)
+                    .attr('x', x)
                     .attr('y', y)
-                    .attr('dy', ++lineNumber * lineHeight + dy + 'rem')
+                    .attr('dy', ++lineNumber * fontSize + dy + fontUnit)
                     .text(word);
             }
         }

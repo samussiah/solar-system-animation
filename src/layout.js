@@ -6,6 +6,11 @@ import resize from './layout/resize';
 export default function layout() {
     const main = this.util.addElement('main', d3.select(this.element)).datum(this);
 
+    for (const prop in this.settings.root) {
+        console.log(prop);
+        document.querySelector(':root').style.setProperty(`--${prop}`, this.settings.root[prop]);
+    }
+
     // controls positioned absolutely
     const controls = layoutControls.call(this, main);
 

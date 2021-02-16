@@ -158,6 +158,10 @@ const settings = {
     annotations: null,
     stateChange: 'chronological', // ['chronological', 'ordered']
     displayTiming: true,
+    root: {
+        'left-margin': '25%',
+    },
+    footnotes: [],
 };
 
 export default settings;

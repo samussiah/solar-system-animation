@@ -1,5 +1,7 @@
 # Force-directed Graph
-The Force-directed Graph library animates the movements of individuals between states over time.  View a live example [here](https://samussiah.github.io/force-directed-graph/test-page/).
+The Force-directed Graph library animates the movements of individuals between states over time.  Inspired by Nathan Yau's [A Day in the Life of Americans](https://flowingdata.com/2015/12/15/a-day-in-the-life-of-americans/), the library was created to visualize any dataset with one record per individual per state.  View a live example [here](https://samussiah.github.io/force-directed-graph/test-page/).
+
+![example-gif](https://imgur.com/F66V5qA.gif)
 
 The library supports multiple aesthetics as demonstrated in these examples:
 

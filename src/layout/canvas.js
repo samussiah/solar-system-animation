@@ -1,7 +1,6 @@
 export default function canvas(main) {
     this.settings.fullWidth = main.node().clientWidth;
-    const animation = this.util.addElement('animation', main)
-        .style('position', 'relative');
+    const animation = this.util.addElement('animation', main).style('position', 'relative');
     this.settings.width = animation.node().clientWidth;
     this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
     this.settings.height = animation.node().clientHeight;
@@ -97,7 +96,7 @@ export default function canvas(main) {
         .data(this.settings.footnotes)
         .join('div')
         .classed('fdg-footnote', true)
-        .html(d => d);
+        .html((d) => d);
 
     return {
         animation,

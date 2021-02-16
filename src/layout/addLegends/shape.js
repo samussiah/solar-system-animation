@@ -55,11 +55,11 @@ export default function shape() {
             .attr('alignment-baseline', 'middle')
             .html(
                 (d) => `${d} (n=${this.metadata.id.filter((di) => di.shapeStratum === d).length})`
-            )
-            //.each(function(d) {
-            //    const text = d3.select(this);
-            //    main.util.wrap(text, 100);
-            //});
+            );
+        //.each(function(d) {
+        //    const text = d3.select(this);
+        //    main.util.wrap(text, 100);
+        //});
     }
 
     return container;

@@ -1,17 +1,16 @@
-fetch('./data/data_1000.csv')
-    .then(function(response) { console.log(response); return response.text(); })
-    .then(function(text) { console.log(text); return d3.csvParse(text); })
-    .then(function(data) {
-        console.log(data);
+fetch('./data/data_2000_fixed.csv')
+    .then(response => response.text())
+    .then(text => d3.csvParse(text))
+    .then(data => {
         const fdg = forceDirectedGraph(
             data,
             '#container',
             {
                 eventLabel: 'HFrEF events',
                 timeRelative: 'since baseline',
+                drawStaticSeparately: true,
                 //playPause: 'pause',
                 //delay: false,
             }
         );
-        console.log(fdg);
     });

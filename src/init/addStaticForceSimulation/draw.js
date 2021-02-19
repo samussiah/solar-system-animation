@@ -6,13 +6,16 @@ export default function draw(worker, color) {
         main.containers.svgBackground.selectAll(`.${className}`).remove();
         const g = main.containers.svgBackground
             .insert('g', ':first-child')
-            .classed(`fdg-static ${className}`, true);
+            .classed(`fdg-static ${className}`, true)
+            .attr('transform', `translate(${main.settings.widthDiff},0)`);
 
         // translate to the central focus
         if (main.settings.staticLayout == 'radial')
             g.attr(
                 'transform',
-                `translate(${main.settings.orbitRadius / 2},${main.settings.height / 2})`
+                `translate(${main.settings.widthDiff + main.settings.orbitRadius / 2},${
+                    main.settings.height / 2
+                })`
             );
 
         const marks = g

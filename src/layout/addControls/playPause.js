@@ -18,6 +18,7 @@ export default function playPause() {
         .html(playPauseData.find((value) => value.action !== this.settings.playPause).html);
 
     inputs.on('click', () => {
+        if (this.timeout) this.timeout.stop();
         toggle.call(this);
     });
 

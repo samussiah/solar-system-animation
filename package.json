@@ -1,7 +1,7 @@
 {
   "TODO": "",
   "name": "force-directed-graph",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",
   "module": "./src/index.js",
   "main": "./index.js",
@@ -29,9 +29,7 @@
   "dependencies": {
     "d3": "^5.16.0",
     "d3-force-reuse": "^1.0.1",
-    "d3-force-sampled": "^1.0.0",
-    "d3.js": "0.0.2-security",
-    "progressbar.js": "^1.1.0"
+    "d3-force-sampled": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -45,7 +43,6 @@
     "prettier": "^2.0.5",
     "rollup": "^2.32.0",
     "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-web-worker-loader": "^1.4.0",
-    "webpack": "^4.44.1"
+    "rollup-plugin-web-worker-loader": "^1.4.0"
   }
 }

@@ -630,8 +630,8 @@
         update: update,
 
         /**-------------------------------------------------------------------------------------------\
-      data mapping
-    \-------------------------------------------------------------------------------------------**/
+        data mapping
+      \-------------------------------------------------------------------------------------------**/
         id_var: 'id',
         event_var: 'event',
         event_order_var: 'event_order',
@@ -643,8 +643,8 @@
         duration_var: 'duration',
 
         /**-------------------------------------------------------------------------------------------\
-      aesthetics
-    \-------------------------------------------------------------------------------------------**/
+        aesthetics
+      \-------------------------------------------------------------------------------------------**/
         // color
         colorBy: {
             type: 'frequency',
@@ -688,8 +688,8 @@
         // string - default shape
 
         /**-------------------------------------------------------------------------------------------\
-      freq table
-    \-------------------------------------------------------------------------------------------**/
+        freq table
+      \-------------------------------------------------------------------------------------------**/
         freqTable: {
             display: true,
             bars: true,
@@ -700,8 +700,8 @@
         },
 
         /**-------------------------------------------------------------------------------------------\
-      animation
-    \-------------------------------------------------------------------------------------------**/
+        animation
+      \-------------------------------------------------------------------------------------------**/
         // animation settings
         speed: 'medium',
         speeds: {
@@ -724,8 +724,8 @@
         resetDelay: 15000,
 
         /**-------------------------------------------------------------------------------------------\
-      dimensions
-    \-------------------------------------------------------------------------------------------**/
+        dimensions
+      \-------------------------------------------------------------------------------------------**/
         width: null,
         // defined in ./defineMetadata/coordinates
         height: null,
@@ -734,8 +734,8 @@
         // defined in ./defineMetadata/coordinates
 
         /**-------------------------------------------------------------------------------------------\
-      force simulation
-    \-------------------------------------------------------------------------------------------**/
+        force simulation
+      \-------------------------------------------------------------------------------------------**/
         manyBody: 'forceManyBodyReuse',
         // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
         chargeStrength: null,
@@ -749,8 +749,8 @@
         // ['circular', 'radial']
 
         /**-------------------------------------------------------------------------------------------\
-      modal
-    \-------------------------------------------------------------------------------------------**/
+        modal
+      \-------------------------------------------------------------------------------------------**/
         modal: true,
         // display modals?
         modalSpeed: 10000,
@@ -773,8 +773,8 @@
         // array of strings
 
         /**-------------------------------------------------------------------------------------------\
-      event/state
-    \-------------------------------------------------------------------------------------------**/
+        event/state
+      \-------------------------------------------------------------------------------------------**/
         events: null,
         // defined in ./defineMetadata
         individualUnit: 'individual',
@@ -789,8 +789,8 @@
         // defined in ./defineMetadata/updateEventDependentSettings
 
         /**-------------------------------------------------------------------------------------------\
-      sequences
-    \-------------------------------------------------------------------------------------------**/
+        sequences
+      \-------------------------------------------------------------------------------------------**/
         runSequences: false,
         sequences: null,
         sequenceIndex: 0,
@@ -799,8 +799,8 @@
         // ['full', 'sequence']
 
         /**-------------------------------------------------------------------------------------------\
-      miscellaneous
-    \-------------------------------------------------------------------------------------------**/
+        miscellaneous
+      \-------------------------------------------------------------------------------------------**/
         hideControls: false,
         focusOffset: 'heuristic',
         // ['heuristic', 'none']
@@ -1197,13 +1197,14 @@
             main.containers.svgBackground.selectAll('.'.concat(className)).remove();
             var g = main.containers.svgBackground
                 .insert('g', ':first-child')
-                .classed('fdg-static '.concat(className), true); // translate to the central focus
+                .classed('fdg-static '.concat(className), true)
+                .attr('transform', 'translate('.concat(main.settings.widthDiff, ',0)')); // translate to the central focus
 
             if (main.settings.staticLayout == 'radial')
                 g.attr(
                     'transform',
                     'translate('
-                        .concat(main.settings.orbitRadius / 2, ',')
+                        .concat(main.settings.widthDiff + main.settings.orbitRadius / 2, ',')
                         .concat(main.settings.height / 2, ')')
                 );
             var marks = g
@@ -1779,7 +1780,6 @@
         var main = this.util.addElement('main', d3.select(this.element)).datum(this);
 
         for (var prop in this.settings.root) {
-            console.log(prop);
             document
                 .querySelector(':root')
                 .style.setProperty('--'.concat(prop), this.settings.root[prop]);
@@ -4606,6 +4606,7 @@
                 }).html
             );
         inputs.on('click', function () {
+            if (_this.timeout) _this.timeout.stop();
             toggle.call(_this);
         });
         return {

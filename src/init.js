@@ -37,6 +37,6 @@ export default function init() {
                 // Run full animation.
                 else this.interval = startInterval.call(this, this.data);
             },
-            this.settings.delay ? this.settings.modalSpeed : 0
+            this.settings.delay
         );
 }

@@ -77,8 +77,8 @@ body {
         .fdg-events,
         .fdg-sidebar__label {
             padding-bottom: 8px;
-            font-size: 1.5rem;
-            font-weight: 500;
+            font-size: 1.75rem;
+            font-weight: 600;
             text-align: left;
         }
 
@@ -111,6 +111,18 @@ body {
                 fill: var(--background-light);
                 stroke: var(--text-color--blue);
                 stroke-width: 2px;
+            }
+            .fdg-legend table {
+                width: 100%;
+            }
+            .fdg-legend td:first-child {
+                width: 20px;
+            }
+            .fdg-legend td:first-child svg {
+                width: 20px;
+            }
+            .fdg-legend td:last-child {
+                text-align: right;
             }
 
         /* progress */
@@ -352,6 +364,7 @@ body {
         /* footnotes */
 
             .fdg-footnotes {
+                font-size: .8rem;
                 position: absolute;
                 bottom: 1rem;
                 left: 1rem;

@@ -518,6 +518,199 @@
         wrap: wrap,
     };
 
+    function dataMapping() {
+        return {
+            id_var: 'id',
+            event_var: 'event',
+            event_order_var: 'event_order',
+            // zero-indexed orbit
+            event_position_var: 'event_position',
+            // angle of event focus on orbit
+            start_timepoint_var: 'stdy',
+            end_timepoint_var: 'endy',
+            duration_var: 'duration',
+        };
+    }
+
+    function color() {
+        return {
+            colorBy: {
+                type: 'frequency',
+                // ['frequency', 'continuous', 'categorical']
+                variable: null,
+                label: null,
+                mirror: true,
+                // reverse color scheme?
+                stratify: true,
+                // present categories separately at each focus?
+                colorScheme: 'RdYlGn',
+                colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'],
+                // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
+                nColors: 6, // min: 3, max: 9
+            },
+            color: 'rgb(170,170,170)',
+            fill: null, // boolean - defined in ./defineMetadata/defineIdDependentSettings
+        };
+    }
+
+    function size() {
+        return {
+            sizeBy: {
+                type: 'frequency',
+                // ['frequency', 'continuous']
+                variable: null,
+                label: null,
+            },
+            minRadius: null,
+            // defined in ./defineMetadata/updateIdDependentSettings
+            maxRadius: 10,
+            // defined in ./defineMetadata/updateIdDependentSettings
+            staticRadius: null, // defined in ./defineMetadata/updateIdDependentSettings
+        };
+    }
+
+    function shape() {
+        return {
+            shapeBy: {
+                type: 'categorical',
+                // ['categorical']
+                variable: null,
+                label: null,
+                shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
+            },
+            shape: 'circle', // string - default shape
+        };
+    }
+
+    function aesthetics() {
+        return _objectSpread2(_objectSpread2(_objectSpread2({}, color()), size()), shape());
+    }
+
+    function freqTable() {
+        return {
+            freqTable: {
+                display: true,
+                bars: true,
+                structure: 'vertical',
+                // ['vertical', 'horizontal']
+                includeEventCentral: false,
+                countType: 'id', // ['id', 'event'] - applies only when structure = 'horizontal'
+            },
+        };
+    }
+
+    function timing() {
+        return {
+            playPause: 'play',
+            delay: 5000,
+            speed: 'medium',
+            speeds: {
+                slow: 1000,
+                medium: 500,
+                fast: 100,
+            },
+            timepoint: 0,
+            // initial timepoint
+            timeUnit: 'day',
+            // time unit that appears in labels
+            timeRelative: null,
+            // e.g. "from baseline"
+            duration: null,
+            // defined in ./defineMetadata/updateIdDependentSettings
+            loop: true,
+            resetDelay: 15000,
+        };
+    }
+
+    function dimensions() {
+        return {
+            width: {
+                main: null,
+                sidebar: null,
+                canvas: null,
+            },
+            // defined in ../layout
+            height: {
+                main: null,
+            },
+            // defined in ../layout
+            orbitRadius: null, // defined in ../defineMetadata/coordinates
+        };
+    }
+
+    function forceSimulation() {
+        return {
+            manyBody: 'forceManyBodyReuse',
+            // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
+            chargeStrength: null,
+            // defined in ./defineMetadata/updateIdDependentSettings
+            collisionPadding: 1,
+            staticChargeStrength: null,
+            // defined in ./defineMetadata/updateIdDependentSettings
+            drawStaticSeparately: false,
+            // draw static shapes in a static force simulation to improve performance
+            staticLayout: 'circular', // ['circular', 'radial']
+        };
+    }
+
+    function modal() {
+        return {
+            modal: true,
+            // display modals?
+            modalSpeed: 10000,
+            // amount of time for which each modal appears
+            modalIndex: 0,
+            modalPosition: 'center',
+            // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
+            modalWidth: '50%',
+            explanation: [
+                'Each shape in this animation represents an individual.',
+                'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.',
+                'The <span class = "fdg-emphasized">annotations</span> at each focus represent the [event-count-type].',
+                'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.',
+                '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.',
+                'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.',
+                'Continue watching to learn how these individuals progress.', // over the course of [duration] days.',
+            ],
+            // array of strings
+            information: null, // array of strings
+        };
+    }
+
+    function states() {
+        return {
+            events: null,
+            // defined in ./defineMetadata
+            individualUnit: 'individual',
+            individualLabel: 'Individuals',
+            eventCentral: null,
+            // defined in ./defineMetadata/updateEventDependentSettings
+            eventCount: true,
+            // display [ n (%) ] beneath focus labels?
+            eventCountType: 'current-id',
+            // ['current-id', 'cumulative-id', 'cumulative-event']
+            eventChangeCount: null, // defined in ./defineMetadata/updateEventDependentSettings
+        };
+    }
+
+    function miscellaneous() {
+        return {
+            hideControls: false,
+            focusOffset: 'heuristic',
+            // ['heuristic', 'none']
+            stratificationPositioning: 'circular',
+            // ['circular', 'orbital']
+            annotations: null,
+            stateChange: 'chronological',
+            // ['chronological', 'ordered']
+            displayProgress: true,
+            footnotes: [],
+            root: {
+                'left-margin': '25%',
+            },
+        };
+    }
+
     // TODO: setting checks
     function update() {
         var _this = this;
@@ -621,228 +814,57 @@
         } else {
             this.settings.runSequences = false;
             this.settings.animationTrack = 'full';
-        } // timing
+        } // progress
 
-        if (this.settings.stateChange === 'ordered') this.settings.displayTiming = false;
+        if (this.settings.stateChange === 'ordered') this.settings.displayProgress = false;
     }
 
-    var settings = {
-        update: update,
-
-        /**-------------------------------------------------------------------------------------------\
-        data mapping
-      \-------------------------------------------------------------------------------------------**/
-        id_var: 'id',
-        event_var: 'event',
-        event_order_var: 'event_order',
-        // zero-indexed orbit
-        event_position_var: 'event_position',
-        // angle of event focus on orbit
-        start_timepoint_var: 'stdy',
-        end_timepoint_var: 'endy',
-        duration_var: 'duration',
-
-        /**-------------------------------------------------------------------------------------------\
-        aesthetics
-      \-------------------------------------------------------------------------------------------**/
-        // color
-        colorBy: {
-            type: 'frequency',
-            // ['frequency', 'continuous', 'categorical']
-            variable: null,
-            label: null,
-            mirror: true,
-            // reverse color scheme?
-            stratify: true,
-            // present categories separately at each focus?
-            colorScheme: 'RdYlGn',
-            colorSchemes: ['blue', 'orange', 'red', 'purple', 'green', 'grey'],
-            // must be one of D3's sequential, single-hue color schemes: https://github.com/d3/d3-scale-chromatic#sequential-single-hue
-            nColors: 6, // min: 3, max: 9
-        },
-        color: 'rgb(170,170,170)',
-        fill: null,
-        // boolean - defined in ./defineMetadata/defineIdDependentSettings
-        // size
-        sizeBy: {
-            type: 'frequency',
-            // ['frequency', 'continuous']
-            variable: null,
-            label: null,
-        },
-        minRadius: null,
-        // defined in ./defineMetadata/updateIdDependentSettings
-        maxRadius: 10,
-        // defined in ./defineMetadata/updateIdDependentSettings
-        staticRadius: null,
-        // defined in ./defineMetadata/updateIdDependentSettings
-        // shape
-        shapeBy: {
-            type: 'categorical',
-            // ['categorical']
-            variable: null,
-            label: null,
-            shapes: ['circle', 'square', 'triangle', 'diamond', 'star', 'triangleDown'],
-        },
-        shape: 'circle',
-        // string - default shape
-
-        /**-------------------------------------------------------------------------------------------\
-        freq table
-      \-------------------------------------------------------------------------------------------**/
-        freqTable: {
-            display: true,
-            bars: true,
-            structure: 'vertical',
-            // ['vertical', 'horizontal']
-            includeEventCentral: false,
-            countType: 'id', // ['id', 'event'] - applies only when structure = 'horizontal'
-        },
-
-        /**-------------------------------------------------------------------------------------------\
-        animation
-      \-------------------------------------------------------------------------------------------**/
-        // animation settings
-        speed: 'medium',
-        speeds: {
-            slow: 1000,
-            medium: 500,
-            fast: 100,
-        },
-        playPause: 'play',
-        loop: true,
-        delay: 5000,
-        // time settings
-        timepoint: 0,
-        // initial timepoint
-        timeUnit: 'day',
-        // time unit that appears in labels
-        timeRelative: null,
-        // e.g. "from baseline"
-        duration: null,
-        // defined in ./defineMetadata/updateIdDependentSettings
-        resetDelay: 15000,
-
-        /**-------------------------------------------------------------------------------------------\
-        dimensions
-      \-------------------------------------------------------------------------------------------**/
-        width: null,
-        // defined in ./defineMetadata/coordinates
-        height: null,
-        // defined in ./defineMetadata/coordinates
-        orbitRadius: null,
-        // defined in ./defineMetadata/coordinates
-
-        /**-------------------------------------------------------------------------------------------\
-        force simulation
-      \-------------------------------------------------------------------------------------------**/
-        manyBody: 'forceManyBodyReuse',
-        // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
-        chargeStrength: null,
-        // defined in ./defineMetadata/updateIdDependentSettings
-        collisionPadding: 1,
-        staticChargeStrength: null,
-        // defined in ./defineMetadata/updateIdDependentSettings
-        drawStaticSeparately: false,
-        // draw static shapes in a static force simulation to improve performance
-        staticLayout: 'circular',
-        // ['circular', 'radial']
-
-        /**-------------------------------------------------------------------------------------------\
-        modal
-      \-------------------------------------------------------------------------------------------**/
-        modal: true,
-        // display modals?
-        modalSpeed: 10000,
-        // amount of time for which each modal appears
-        modalIndex: 0,
-        modalPosition: 'center',
-        // ['center', 'top-left', 'top-right', 'bottom-right', 'bottom-left']
-        modalWidth: '50%',
-        explanation: [
-            'Each shape in this animation represents an individual.',
-            'As <span class = "fdg-emphasized">time progresses</span> and individuals experience events, their shape gravitates toward the focus or "planet" representing that event.',
-            'The <span class = "fdg-emphasized">annotations</span> at each focus represent the [event-count-type].',
-            'The <span class = "fdg-emphasized">number of events</span> an individual has experienced determines the [frequency-aesthetic] of their shape.',
-            '<span class = "fdg-emphasized">Static shapes</span> represent individuals who never experience an event.',
-            'Use the <span class = "fdg-emphasized">controls</span> on the right to interact with and alter the animation.',
-            'Continue watching to learn how these individuals progress.', // over the course of [duration] days.',
-        ],
-        // array of strings
-        information: null,
-        // array of strings
-
-        /**-------------------------------------------------------------------------------------------\
-        event/state
-      \-------------------------------------------------------------------------------------------**/
-        events: null,
-        // defined in ./defineMetadata
-        individualUnit: 'individual',
-        individualLabel: 'Individuals',
-        eventCentral: null,
-        // defined in ./defineMetadata/updateEventDependentSettings
-        eventCount: true,
-        // display [ n (%) ] beneath focus labels?
-        eventCountType: 'current-id',
-        // ['current-id', 'cumulative-id', 'cumulative-event']
-        eventChangeCount: null,
-        // defined in ./defineMetadata/updateEventDependentSettings
-
-        /**-------------------------------------------------------------------------------------------\
-        sequences
-      \-------------------------------------------------------------------------------------------**/
-        runSequences: false,
-        sequences: null,
-        sequenceIndex: 0,
-        eventIndex: 0,
-        animationTrack: 'full',
-        // ['full', 'sequence']
-
-        /**-------------------------------------------------------------------------------------------\
-        miscellaneous
-      \-------------------------------------------------------------------------------------------**/
-        hideControls: false,
-        focusOffset: 'heuristic',
-        // ['heuristic', 'none']
-        displayProgressBar: false,
-        stratificationPositioning: 'circular',
-        // ['circular', 'orbital']
-        annotations: null,
-        stateChange: 'chronological',
-        // ['chronological', 'ordered']
-        displayTiming: true,
-        root: {
-            'left-margin': '25%',
-        },
-        footnotes: [],
-    };
+    var settings = _objectSpread2(
+        _objectSpread2(
+            _objectSpread2(
+                _objectSpread2(
+                    _objectSpread2(
+                        _objectSpread2(
+                            _objectSpread2(
+                                _objectSpread2(
+                                    _objectSpread2(_objectSpread2({}, dataMapping()), aesthetics()),
+                                    freqTable()
+                                ),
+                                timing()
+                            ),
+                            dimensions()
+                        ),
+                        forceSimulation()
+                    ),
+                    modal()
+                ),
+                states()
+            ),
+            miscellaneous()
+        ),
+        {},
+        {
+            update: update,
+        }
+    );
 
     function controls(main) {
-        var controls = this.util
+        var container = this.util
             .addElement('controls', main)
             .classed('fdg-hidden', this.settings.hideControls);
-        var hide = this.util.addElement('hide', controls, 'span');
+        var hide = this.util.addElement('hide', container, 'span');
         return {
-            controls: controls,
+            controlsContainer: container,
             hide: hide,
         };
     }
 
-    function addElement$1(name, parent) {
-        var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
-        var element = parent
-            .append(tagName)
-            .classed('fdg-'.concat(tagName), true)
-            .classed('fdg-'.concat(name), true)
-            .classed('fdg-'.concat(tagName, '--').concat(name), true);
-        return element;
-    }
-
     function addTimer(progress) {
-        var timer = addElement$1('timer', progress);
+        var timer = this.util.addElement('timer', progress);
         timer.width = timer.node().clientWidth;
         timer.innerRadius = timer.width / 8;
-        timer.svg = addElement$1('timer__svg', timer, 'svg')
+        timer.svg = this.util
+            .addElement('timer__svg', timer, 'svg')
             .attr('width', timer.width)
             .attr('height', timer.width);
         timer.arc = d3
@@ -850,29 +872,36 @@
             .innerRadius(timer.width / 2.25)
             .outerRadius(timer.width / 2 - 1)
             .startAngle(0);
-        timer.g = addElement$1('timer__path', timer.svg, 'g').attr(
-            'transform',
-            'translate('.concat(timer.width / 2, ',').concat(timer.width / 2, ')')
-        );
-        timer.background = addElement$1('timer__path', timer.g, 'path')
+        timer.g = this.util
+            .addElement('timer__path', timer.svg, 'g')
+            .attr(
+                'transform',
+                'translate('.concat(timer.width / 2, ',').concat(timer.width / 2, ')')
+            );
+        timer.background = this.util
+            .addElement('timer__path', timer.g, 'path')
             .classed('fdg-timer__path--background', true)
             .datum({
                 endAngle: 2 * Math.PI,
             })
             .attr('d', timer.arc);
-        timer.foreground = addElement$1('timer__path', timer.g, 'path')
+        timer.foreground = this.util
+            .addElement('timer__path', timer.g, 'path')
             .classed('fdg-timer__path--foreground', true)
             .datum({
                 endAngle: 0,
             })
             .attr('d', timer.arc);
-        timer.percentComplete = addElement$1('timer__percent-complete', timer.g, 'text').text('0%');
+        timer.percentComplete = this.util
+            .addElement('timer__percent-complete', timer.g, 'text')
+            .text('0%');
         return timer;
     }
 
     function addCountdown(progress) {
         var resetDelay = this.settings.resetDelay / 1000;
-        return addElement$1('countdown', progress)
+        return this.util
+            .addElement('countdown', progress)
             .classed('fdg-sidebar__label', true)
             .selectAll('div')
             .data(d3.range(-1, resetDelay))
@@ -889,14 +918,16 @@
     }
 
     function sidebar(main) {
-        var sidebar = this.util.addElement('sidebar', main);
-        var events = this.util.addElement('events', sidebar).html(this.settings.individualLabel);
-        var legends = this.util.addElement('legends', sidebar);
-        var progress = this.util.addElement('progress', sidebar);
+        var container = this.util.addElement('sidebar', main);
+        this.settings.width.sidebar = container.node().clientWidth;
+        var events = this.util.addElement('events', container).html(this.settings.individualLabel);
+        var legends = this.util.addElement('legends', container);
+        var progress = this.util
+            .addElement('progress', container)
+            .classed('fdg-hidden', !this.settings.displayProgress);
         var timepoint = this.util
             .addElement('timepoint', progress)
             .classed('fdg-sidebar__label', true)
-            .classed('fdg-hidden', !this.settings.displayTiming)
             .html(
                 ''
                     .concat(this.settings.timepoint, ' ')
@@ -909,13 +940,12 @@
         var timeRelative = this.util
             .addElement('time-relative', progress)
             .classed('fdg-sidebar__sub-label', true)
-            .classed('fdg-hidden', !this.settings.displayTiming)
             .html(this.settings.timeRelative);
         var timer = addTimer.call(this, progress);
         var countdown = addCountdown.call(this, progress);
-        var freqTable = this.util.addElement('freq-table', sidebar);
+        var freqTable = this.util.addElement('freq-table', container);
         return {
-            sidebar: sidebar,
+            sidebarContainer: container,
             events: events,
             legends: legends,
             progress: progress,
@@ -930,37 +960,27 @@
     function canvas(main) {
         var _this = this;
 
-        this.settings.fullWidth = main.node().clientWidth;
-        var animation = this.util.addElement('animation', main).style('position', 'relative');
-        this.settings.width = animation.node().clientWidth;
-        this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
-        this.settings.height = animation.node().clientHeight; // progress bar
-
-        var progressBar = this.util
-            .addElement('progress-bar', animation)
-            .classed('fdg-hidden', !this.settings.displayProgressBar);
-        var progressTimepoint = this.util
-            .addElement('progress-timepoint', animation)
-            .classed('fdg-hidden', !this.settings.displayProgressBar); // background SVG - orbits
+        var container = this.util.addElement('animation', main);
+        this.settings.width.canvas = container.node().clientWidth; // background SVG - orbits
 
         var svgBackground = this.util
-            .addElement('svg--background', animation, 'svg')
-            .attr('width', main.node().clientWidth)
-            .attr('height', this.settings.height)
+            .addElement('svg--background', container, 'svg')
+            .attr('width', this.settings.width.main)
+            .attr('height', this.settings.height.main)
             .style('position', 'absolute')
-            .style('left', -this.settings.widthDiff)
+            .style('left', -this.settings.width.sidebar)
             .style('top', 0); // canvas - bubbles
 
         var canvas = this.util
-            .addElement('canvas', animation, 'canvas')
-            .attr('width', this.settings.width)
-            .attr('height', this.settings.height);
+            .addElement('canvas', container, 'canvas')
+            .attr('width', this.settings.width.canvas)
+            .attr('height', this.settings.height.main);
         canvas.context = canvas.node().getContext('2d'); // foreground SVG - annotations
 
         var svgForeground = this.util
-            .addElement('svg--foreground', animation, 'svg')
-            .attr('width', this.settings.width)
-            .attr('height', this.settings.height);
+            .addElement('svg--foreground', container, 'svg')
+            .attr('width', this.settings.width.canvas)
+            .attr('height', this.settings.height.main);
         var sequenceOverlay = this.util
             .addElement('sequence-overlay', svgForeground, 'g')
             .classed('fdg-focus-annotation', true)
@@ -1009,7 +1029,7 @@
         var focusAnnotations = this.util.addElement('focus-annotations', svgForeground, 'g'); // modal
 
         var modalContainer = this.util
-            .addElement('modal', animation)
+            .addElement('modal', container)
             .attr('class', function (d) {
                 return 'fdg-modal '
                     .concat(
@@ -1023,12 +1043,14 @@
                     )
                     .concat(_this.settings.modalPosition);
             })
+            .classed('fdg-hidden', this.settings.text.length === 0)
             .style(
                 'width',
                 /^\d{1,3}%$/.test(this.settings.modalWidth) ? this.settings.modalWidth : '50%'
             );
-        var modal = this.util.addElement('modal__text', modalContainer);
-        var footnotes = this.util.addElement('footnotes', animation);
+        var modal = this.util.addElement('modal__text', modalContainer); // footnotes
+
+        var footnotes = this.util.addElement('footnotes', container);
         footnotes
             .selectAll('div.fdg-footnote')
             .data(this.settings.footnotes)
@@ -1038,9 +1060,7 @@
                 return d;
             });
         return {
-            animation: animation,
-            progressBar: progressBar,
-            progressTimepoint: progressTimepoint,
+            canvasContainer: container,
             svgBackground: svgBackground,
             canvas: canvas,
             svgForeground: svgForeground,
@@ -1056,11 +1076,11 @@
         var _this = this;
 
         // Dimensions of canvas.
-        this.settings.orbitRadius = this.settings.width / (metadata.orbit.length + 1); // Calculate coordinates of event focus.
+        this.settings.orbitRadius = this.settings.width.canvas / (metadata.orbit.length + 1); // Calculate coordinates of event focus.
 
         this.settings.center = {
             x: this.settings.orbitRadius / 2,
-            y: this.settings.height / 2,
+            y: this.settings.height.main / 2,
         };
         metadata.event.forEach(function (event, i) {
             // Define radius of the orbit on which the event focus will appear.
@@ -1194,8 +1214,8 @@
 
         worker.onmessage = function (event) {
             var className = 'fdg-static--'.concat(event.data.id.replace(/[^0-9_a-z]/gi, '-'));
-            main.containers.svgBackground.selectAll('.'.concat(className)).remove();
-            var g = main.containers.svgBackground
+            main.layout.svgBackground.selectAll('.'.concat(className)).remove();
+            var g = main.layout.svgBackground
                 .insert('g', ':first-child')
                 .classed('fdg-static '.concat(className), true)
                 .attr('transform', 'translate('.concat(main.settings.widthDiff, ',0)')); // translate to the central focus
@@ -1242,7 +1262,7 @@
         var _this = this;
 
         if (this.settings.drawStaticSeparately) {
-            this.containers.svgBackground.selectAll('.fdg-static').remove(); // Capture individuals without state change.
+            this.layout.svgBackground.selectAll('.fdg-static').remove(); // Capture individuals without state change.
 
             var noStateChange = this.data.nested
                 .filter(function (d) {
@@ -1650,40 +1670,39 @@
     function resize() {
         var _this = this;
 
-        this.settings.fullWidth = this.containers.main.node().clientWidth;
-        var node = this.containers.animation.node();
-        this.settings.width = node.clientWidth;
-        this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
-        this.settings.height = this.containers.animation.node().clientHeight; // timer
+        this.settings.width.main = this.layout.main.node().clientWidth;
+        this.settings.height.main = this.layout.main.node().clientHeight;
+        this.settings.width.sidebar = this.layout.sidebarContainer.node().clientWidth;
+        this.settings.width.canvas = this.layout.canvasContainer.node().clientWidth; // timer
 
-        this.containers.timer.width = this.containers.timer.node().clientWidth;
-        this.containers.timer.svg
-            .attr('width', this.containers.timer.width)
-            .attr('height', this.containers.timer.width);
-        this.containers.timer.arc
-            .innerRadius(this.containers.timer.width / 2.25)
-            .outerRadius(this.containers.timer.width / 2);
-        this.containers.timer.g.attr(
+        this.layout.timer.width = this.layout.timer.node().clientWidth;
+        this.layout.timer.svg
+            .attr('width', this.layout.timer.width)
+            .attr('height', this.layout.timer.width);
+        this.layout.timer.arc
+            .innerRadius(this.layout.timer.width / 2.25)
+            .outerRadius(this.layout.timer.width / 2);
+        this.layout.timer.g.attr(
             'transform',
             'translate('
-                .concat(this.containers.timer.width / 2, ',')
-                .concat(this.containers.timer.width / 2, ')')
+                .concat(this.layout.timer.width / 2, ',')
+                .concat(this.layout.timer.width / 2, ')')
         );
-        this.containers.timer.background.attr('d', this.containers.timer.arc);
-        this.containers.timer.foreground.attr('d', this.containers.timer.arc); // background SVG
+        this.layout.timer.background.attr('d', this.layout.timer.arc);
+        this.layout.timer.foreground.attr('d', this.layout.timer.arc); // background SVG
 
-        this.containers.svgBackground
-            .attr('width', this.settings.fullWidth)
-            .attr('height', this.settings.height)
-            .style('left', -this.settings.widthDiff); // canvas
+        this.layout.svgBackground
+            .attr('width', this.settings.width.main)
+            .attr('height', this.settings.height.main)
+            .style('left', -this.settings.width.sidebar); // canvas
 
-        this.containers.canvas
-            .attr('width', this.settings.width)
-            .attr('height', this.settings.height); // SVG
+        this.layout.canvas
+            .attr('width', this.settings.width.canvas)
+            .attr('height', this.settings.height.main); // SVG
 
-        this.containers.svgForeground
-            .attr('width', this.settings.width)
-            .attr('height', this.settings.height);
+        this.layout.svgForeground
+            .attr('width', this.settings.width.canvas)
+            .attr('height', this.settings.height.main);
         coordinates.call(this, this.metadata); // orbits
 
         this.orbits
@@ -1696,9 +1715,9 @@
             .attr('r', function (d) {
                 return d.r;
             });
-        this.containers.svgBackground
+        this.layout.svgBackground
             .select('g.fdg-g--orbits')
-            .attr('transform', 'translate('.concat(this.settings.widthDiff, ',0)')); // focus coordinates
+            .attr('transform', 'translate('.concat(this.settings.width.sidebar, ',0)')); // focus coordinates
 
         if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
             this.metadata.event.forEach(function (event, i) {
@@ -1776,561 +1795,6 @@
         }
     }
 
-    function layout() {
-        var main = this.util.addElement('main', d3.select(this.element)).datum(this);
-
-        for (var prop in this.settings.root) {
-            document
-                .querySelector(':root')
-                .style.setProperty('--'.concat(prop), this.settings.root[prop]);
-        } // controls positioned absolutely
-
-        var controls$1 = controls.call(this, main); // sidebar to the left
-
-        var sidebar$1 = sidebar.call(this, main); // animation to the right
-
-        var canvas$1 = canvas.call(this, main); // add resize event
-
-        window.addEventListener('resize', resize.bind(this));
-        return _objectSpread2(
-            _objectSpread2(
-                _objectSpread2(
-                    {
-                        main: main,
-                    },
-                    controls$1
-                ),
-                sidebar$1
-            ),
-            canvas$1
-        );
-    }
-
-    function id() {
-        var _this = this;
-
-        var nest = d3
-            .nest()
-            .key(function (d) {
-                return d.id;
-            })
-            .rollup(function (group) {
-                return {
-                    duration: d3.sum(group, function (d) {
-                        return +d.duration;
-                    }),
-                    static: group.length === 1,
-                    colorStratum:
-                        _this.settings.colorBy.type === 'categorical'
-                            ? group[0][_this.settings.colorBy.variable]
-                            : null,
-                    shapeStratum:
-                        _this.settings.shapeBy.type === 'categorical'
-                            ? group[0][_this.settings.shapeBy.variable]
-                            : null,
-                };
-            })
-            .entries(this.data);
-        nest.forEach(function (d, i) {
-            Object.assign(d, d.value);
-        });
-        return nest;
-    }
-
-    function updateIdDependentSettings(metadata) {
-        var _this = this;
-
-        this.settings.duration =
-            this.settings.duration ||
-            d3.max(metadata.id, function (id) {
-                return id.duration;
-            });
-        this.settings.text = this.settings.text
-            .filter(function (text) {
-                return (
-                    // Remove if:
-                    //   - text contains static
-                    //   - there are no static IDs
-                    //   - static IDs are drawn separately
-                    !(
-                        /static/i.test(text) &&
-                        (metadata.id.every(function (id) {
-                            return id['static'] === false;
-                        }) ||
-                            _this.settings.drawStaticSeparately === false)
-                    )
-                );
-            })
-            .map(function (text) {
-                return text.replace('[duration]', d3.format(',d')(_this.settings.duration));
-            });
-        this.settings.minRadius =
-            this.settings.minRadius ||
-            Math.max(
-                Math.min(
-                    3000 /
-                        metadata.id.filter(function (d) {
-                            return !(_this.settings.drawStaticSeparately && d['static']);
-                        }).length,
-                    this.settings.maxRadius
-                ),
-                1
-            );
-        this.settings.staticRadius =
-            this.settings.staticRadius || Math.max(3000 / metadata.id.length, 1);
-        this.settings.maxRadius = this.settings.minRadius + this.settings.colorBy.nColors;
-        this.settings.chargeStrength = -(
-            2000 /
-            metadata.id.filter(function (d) {
-                return !(_this.settings.drawStaticSeparately && d['static']);
-            }).length
-        );
-        this.settings.staticChargeStrength = -(2000 / metadata.id.length);
-        this.settings.fill = this.settings.fill || metadata.id.length <= 2500;
-    }
-
-    function event() {
-        // Group data by event.
-        var nest = d3
-            .nest()
-            .key(function (d) {
-                return d.event;
-            })
-            .rollup(function (group) {
-                var datum = group[0];
-                var order = parseInt(datum.event_order);
-                var position = datum.hasOwnProperty('event_position')
-                    ? parseInt(datum.event_position)
-                    : null;
-                return {
-                    order: order,
-                    position: position,
-                    ids: new Set(),
-                    // individuals in the state currently
-                    nIds: 0,
-                    // number of individuals in the state currently
-                    nIdsPrevious: 0,
-                    idsCumulative: new Set(),
-                    // individuals that have ever been in the state
-                    nIdsCumulative: 0,
-                    // number of individuals that have ever been in the state
-                    nEvents: 0,
-                    // number of times any individual has been in the state up to the current timepoint, i.e. the total number of events that have occurred so far
-                    nEventsTotal: group.length,
-                    // total number of events
-                    allIds: _toConsumableArray(
-                        new Set(
-                            group.map(function (d) {
-                                return d.id;
-                            })
-                        ).values()
-                    ).sort(),
-                };
-            })
-            .entries(this.data)
-            .sort(function (a, b) {
-                return a.value.order - b.value.order || a.value.position - b.value.position;
-            });
-        var event = nest.map(function (event, i) {
-            Object.assign(event, event.value); // remove nesting
-
-            delete event.value;
-            event.start_timepoint = i === 0 ? 1 : nest[i - 1].end_timepoint + 1;
-            event.end_timepoint = event.start_timepoint + event.allIds.length - 1;
-            event.rank = i;
-            return event;
-        });
-        return event;
-    }
-
-    function updateEventDependentSettings(metadata) {
-        this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].key;
-        this.settings.eventChangeCount =
-            this.settings.eventChangeCount ||
-            metadata.event.slice(1).map(function (event) {
-                return event.key;
-            });
-    }
-
-    function orbit(metadata) {
-        var _this = this;
-
-        var nest = d3
-            .nest()
-            .key(function (d) {
-                return d.order;
-            })
-            .entries(
-                metadata.event.filter(function (event) {
-                    return event.key !== _this.settings.eventCentral;
-                })
-            );
-        nest.forEach(function (orbit, i) {
-            orbit.label =
-                Array.isArray(_this.settings.orbitLabels) &&
-                _this.settings.orbitLabels.length === nest.length
-                    ? _this.settings.orbitLabels[i]
-                    : 'Orbit '.concat(i + 1);
-            orbit.values
-                .sort(function (a, b) {
-                    return a.position - b.position;
-                })
-                .forEach(function (event) {
-                    event.orbitLabel = orbit.label;
-                });
-        });
-        return nest;
-    }
-
-    function strata(metadata) {
-        var _this = this;
-
-        var nest;
-
-        if (this.settings.stratify) {
-            nest = d3
-                .nest()
-                .key(function (d) {
-                    return d[_this.settings.colorBy.variable];
-                })
-                .entries(this.data)
-                .sort(function (a, b) {
-                    var aOrder = Array.isArray(_this.settings.colorBy.order)
-                        ? _this.settings.colorBy.order.indexOf(a.key)
-                        : null;
-                    var bOrder = Array.isArray(_this.settings.colorBy.order)
-                        ? _this.settings.colorBy.order.indexOf(b.key)
-                        : null;
-                    var orderSort = aOrder - bOrder;
-                    var alphaSort = a.key < b.key ? -1 : 1;
-                    return orderSort ? orderSort : alphaSort;
-                });
-            this.settings.colorBy.nStrata = nest.length;
-            this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
-            nest.forEach(function (stratum, i) {
-                //ids: new Set(), // individuals in the state currently
-                //nIds: 0, // number of individuals in the state currently
-                //idsCumulative: new Set(), // individuals that have ever been in the state
-                //nIdsCumulative: 0, // number of individuals that have ever been in the state
-                //nEvents: 0, // number of times any individual has been in the state up to the current timepoint, i.e. the total number of events that have occurred so far
-                //nEventsTotal: group.length, // total number of events
-                var colorScheme = _this.settings.colorBy.colorSchemes[i];
-                stratum.colorScheme =
-                    d3[
-                        'scheme'
-                            .concat(colorScheme.substring(0, 1).toUpperCase())
-                            .concat(colorScheme.substring(1), 's')
-                    ]; // domain: number of recurrent events
-                //  range: sequential, single-hue color scheme of the same length
-
-                stratum.colorScale = d3
-                    .scaleLinear()
-                    .domain(d3.range(_this.settings.nColors))
-                    .range(
-                        stratum.colorScheme[9].reverse().slice(0, _this.settings.nColors).reverse()
-                    )
-                    .clamp(true);
-                stratum.individuals = metadata.id.filter(function (d) {
-                    return d.colorStratum === stratum.key;
-                });
-                stratum.duration = d3.max(stratum.individuals, function (d) {
-                    return d.duration;
-                });
-                stratum.nIndividuals = stratum.individuals.length;
-                stratum.nEvents = stratum.values.length; // TODO: figure out how to shift the foci to match the order in the legend
-
-                stratum.angle =
-                    _this.settings.colorBy.nStrata % 2
-                        ? (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta
-                        : (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta +
-                          Math.PI / _this.settings.colorBy.nStrata;
-            });
-        }
-
-        return nest;
-    }
-
-    function shape(metadata) {
-        var _this = this;
-
-        var nest;
-
-        if (this.settings.shapify) {
-            nest = d3
-                .nest()
-                .key(function (d) {
-                    return d[_this.settings.shapeBy.variable];
-                })
-                .entries(this.data)
-                .sort(function (a, b) {
-                    var aOrder = Array.isArray(_this.settings.shapeBy.order)
-                        ? _this.settings.shapeBy.order.indexOf(a.key)
-                        : null;
-                    var bOrder = Array.isArray(_this.settings.shapeBy.order)
-                        ? _this.settings.shapeBy.order.indexOf(b.key)
-                        : null;
-                    var orderSort = aOrder - bOrder;
-                    var alphaSort = a.key < b.key ? -1 : 1;
-                    return orderSort ? orderSort : alphaSort;
-                });
-        }
-
-        return nest;
-    }
-
-    function color(metadata) {
-        var scale;
-
-        if (this.settings.colorify) {
-            var colorBy = this.settings.colorBy; // scale domain
-
-            var domain =
-                colorBy.type === 'frequency'
-                    ? d3.range(colorBy.nColors)
-                    : colorBy.type === 'continuous'
-                    ? d3.extent(this.data, function (d) {
-                          return d[colorBy.variable];
-                      })
-                    : colorBy.type === 'categorical'
-                    ? metadata.strata.map(function (d) {
-                          return d.key;
-                      })
-                    : null; // scale
-
-            var range;
-
-            switch (colorBy.type) {
-                case 'frequency':
-                    range = colorBy.mirror
-                        ? d3['scheme'.concat(colorBy.colorScheme)][colorBy.nColors].reverse()
-                        : d3['scheme'.concat(colorBy.colorScheme)][colorBy.nColors];
-                    scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
-                    break;
-
-                case 'continuous':
-                    scale = d3
-                        .scaleSequential(d3['interpolate'.concat(colorBy.colorScheme)])
-                        .domain(domain); // Invert color scale.
-
-                    if (colorBy.mirror) {
-                        var interpolator = scale.interpolator(); // read the color scale's interpolator
-
-                        var mirror = function mirror(t) {
-                            return interpolator(1 - t);
-                        }; // returns the mirror image of the interpolator
-
-                        scale.interpolator(mirror); // updates the scale's interpolator
-                    }
-
-                    break;
-
-                case 'categorical':
-                    var scheme = d3['scheme'.concat(colorBy.colorScheme)];
-                    range = scheme.every(function (el) {
-                        return typeof el === 'string';
-                    })
-                        ? scheme
-                        : scheme[Math.min(Math.max(3, domain.length), 9)];
-                    scale = d3
-                        .scaleOrdinal()
-                        .domain(domain)
-                        .range(
-                            range.map(function (color) {
-                                return d3.rgb(color) + '';
-                            })
-                        );
-                    break;
-
-                default:
-                    scale = null;
-            }
-        }
-
-        return scale;
-    }
-
-    function size(metadata) {
-        var scale;
-
-        if (this.settings.sizify) {
-            var sizeBy = this.settings.sizeBy; // scale domain
-
-            var domain =
-                sizeBy.type === 'frequency'
-                    ? [0, this.settings.colorBy.nColors]
-                    : sizeBy.type === 'continuous'
-                    ? d3.extent(this.data, function (d) {
-                          return d[sizeBy.variable];
-                      })
-                    : null; // scale range
-
-            var range = [this.settings.minRadius, this.settings.maxRadius]; // scale
-
-            scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
-        }
-
-        return scale;
-    }
-
-    function shape$1(metadata) {
-        var scale;
-
-        if (this.settings.shapify) {
-            var shapeBy = this.settings.shapeBy; // scale domain
-
-            var domain =
-                shapeBy.type === 'categorical'
-                    ? metadata.shape.map(function (d) {
-                          return d.key;
-                      })
-                    : null; // scale range
-
-            var range = shapeBy.shapes; // scale
-
-            scale = d3.scaleOrdinal().domain(domain).range(range);
-        }
-
-        return scale;
-    }
-
-    function scales(metadata) {
-        var color$1 = color.call(this, metadata);
-        var size$1 = size.call(this, metadata);
-        var shape = shape$1.call(this, metadata);
-        return {
-            color: color$1,
-            size: size$1,
-            shape: shape,
-        };
-    }
-
-    function focus(metadata) {
-        var _this = this;
-
-        // Stratify only when the color aesthetic is categorical.
-        if (this.settings.colorBy.type === 'categorical') {
-            // Define a consistent arc length when positioning strata along orbit.
-            if (this.settings.stratificationPositioning === 'orbital') {
-                this.settings.arcLength = this.settings.orbitRadius / 200;
-                this.settings.offsets =
-                    this.settings.stratificationPositioning === 'orbital'
-                        ? metadata.strata.length % 2
-                            ? d3.range(
-                                  -Math.floor(metadata.strata.length / 2),
-                                  Math.floor(metadata.strata.length / 2) + 1
-                              )
-                            : d3.range(
-                                  -metadata.strata.length / 2 + 0.5,
-                                  metadata.strata.length / 2 + 0.5
-                              )
-                        : null;
-            } // Define coordinates of stratified foci as a function of event coordinates.
-
-            metadata.event.forEach(function (event, i) {
-                event.foci = metadata.strata.map(function (stratum, j) {
-                    var focus = _objectSpread2(
-                        _objectSpread2({}, stratum),
-                        {},
-                        {
-                            x: event.x + 50 * Math.cos(stratum.angle),
-                            dx: event.x + (i === 0 ? 75 : 50) * Math.cos(stratum.angle),
-                            y: event.y + 50 * Math.sin(stratum.angle),
-                            dy: event.y + (i === 0 ? 75 : 50) * Math.sin(stratum.angle),
-                            ids: new Set(),
-                            nIds: 0,
-                            nIdsPrevious: 0,
-                            idsCumulative: new Set(),
-                            nIdsCumulative: 0,
-                            nEvents: 0,
-                        }
-                    ); // Position stratum foci along orbits rather than on a circle at event focus.
-
-                    if (_this.settings.stratificationPositioning === 'orbital') {
-                        focus.theta =
-                            event.theta +
-                            ((_this.settings.arcLength * _this.settings.offsets[j]) /
-                                (2 * Math.PI * event.radius)) *
-                                360; // Define position along orbit on which the stratum focus will appear.
-
-                        focus.x =
-                            event.order === 0
-                                ? focus.x
-                                : _this.settings.center.x +
-                                  event.radius * // number of orbit radii from the center
-                                      Math.cos(focus.theta); // position along the circle at the given orbit along which
-
-                        focus.dx = focus.x;
-                        focus.y =
-                            event.order === 0
-                                ? focus.y
-                                : _this.settings.center.y +
-                                  event.radius * // number of orbit radii from the center
-                                      Math.sin(focus.theta); // y-position of the along the given orbit at which the focus circle at the
-
-                        focus.dy = focus.y;
-                    }
-
-                    return focus;
-                });
-            });
-        }
-    }
-
-    function freqTable(metadata) {
-        var _this = this;
-
-        var freqTable = d3.merge(
-            metadata.event.map(function (event) {
-                // One row per event per focus plus an overall event record.
-                var rowGroup =
-                    _this.settings.colorBy.type === 'categorical'
-                        ? [event].concat(_toConsumableArray(event.foci))
-                        : [event]; // For each row calculate numerators, denominators, and proportions.
-
-                rowGroup.forEach(function (d) {
-                    d.state = event.key; // state
-
-                    d.label = d.key; // state or stratum
-
-                    d.freqs = getFreqs.call(_this, d, event, metadata);
-                    d.fmt = formatValues.call(_this, d);
-                });
-                return rowGroup;
-            })
-        ); // Define an array of values to populate the frequency table.
-
-        freqTable.forEach(function (d) {
-            d.cells = defineCellValues.call(_this, d);
-        });
-        return freqTable;
-    }
-
-    function defineMetadata() {
-        var metadata = {}; // Define ID set and update settings that depend on the ID set.
-
-        metadata.id = id.call(this);
-        updateIdDependentSettings.call(this, metadata); // Define event set and update settings that depend on event set.
-
-        metadata.event = event.call(this);
-        updateEventDependentSettings.call(this, metadata); // Define orbit set.
-
-        metadata.orbit = orbit.call(this, metadata); // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
-
-        coordinates.call(this, metadata); // Define strata set.
-
-        metadata.strata = strata.call(this, metadata); // Define shape set.
-
-        metadata.shape = shape.call(this, metadata); // Define color scale.
-
-        this.scales = scales.call(this, metadata); // Define the offset of each stratum as function of the focus coordinates, the stratum
-        // sequence, and theta.
-
-        focus.call(this, metadata); // Calculate frequencies and percentages to populate annotation foci and frequency table.
-
-        this.data.freqTable = freqTable.call(this, metadata);
-        return metadata;
-    }
-
     function display() {
         var main = this;
         var container = this.controls.container.append('div').classed('fdg-control--display', true);
@@ -2385,10 +1849,10 @@
                       return event.key === _this.settings.eventCentral;
                   }),
               ];
-        fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
-        fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
-        fadeOut.call(this, this.containers.sequenceOverlay.background.event);
-        fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+        fadeOut.call(this, this.layout.sequenceOverlay.background.sequence);
+        fadeOut.call(this, this.layout.sequenceOverlay.foreground.sequence);
+        fadeOut.call(this, this.layout.sequenceOverlay.background.event);
+        fadeOut.call(this, this.layout.sequenceOverlay.foreground.event);
         return sequence;
     }
 
@@ -3368,20 +2832,20 @@
     }
 
     function circle(d) {
-        this.containers.canvas.context.moveTo(d.x + d.size, d.y);
-        this.containers.canvas.context.arc(d.x, d.y, d.value.size, 0, 2 * Math.PI);
+        this.layout.canvas.context.moveTo(d.x + d.size, d.y);
+        this.layout.canvas.context.arc(d.x, d.y, d.value.size, 0, 2 * Math.PI);
 
         if (this.settings.fill) {
-            this.containers.canvas.context.fillStyle = d.value.fill;
-            this.containers.canvas.context.fill();
+            this.layout.canvas.context.fillStyle = d.value.fill;
+            this.layout.canvas.context.fill();
         }
 
-        this.containers.canvas.context.strokeStyle = d.value.stroke;
-        this.containers.canvas.context.stroke();
+        this.layout.canvas.context.strokeStyle = d.value.stroke;
+        this.layout.canvas.context.stroke();
     }
 
     function square(d) {
-        this.containers.canvas.context.rect(
+        this.layout.canvas.context.rect(
             d.x - d.value.size,
             d.y - d.value.size,
             d.value.size * 2,
@@ -3389,17 +2853,17 @@
         );
 
         if (this.settings.fill) {
-            this.containers.canvas.context.fillStyle = d.value.fill;
-            this.containers.canvas.context.fill();
+            this.layout.canvas.context.fillStyle = d.value.fill;
+            this.layout.canvas.context.fill();
         }
 
-        this.containers.canvas.context.strokeStyle = d.value.stroke;
-        this.containers.canvas.context.stroke();
+        this.layout.canvas.context.strokeStyle = d.value.stroke;
+        this.layout.canvas.context.stroke();
     }
 
     // TODO: use some kind of cos/sin shit to make a perfect equilateral triangle
     function triangle(d) {
-        var ctx = this.containers.canvas.context;
+        var ctx = this.layout.canvas.context;
         var side = d.value.size * 2; // * Math.sqrt(3)/6;
 
         var dist = side / Math.sqrt(3);
@@ -3413,16 +2877,16 @@
         ctx.lineTo.apply(ctx, top);
 
         if (this.settings.fill) {
-            this.containers.canvas.context.fillStyle = d.value.fill;
-            this.containers.canvas.context.fill();
+            this.layout.canvas.context.fillStyle = d.value.fill;
+            this.layout.canvas.context.fill();
         }
 
-        this.containers.canvas.context.strokeStyle = d.value.stroke;
-        this.containers.canvas.context.stroke();
+        this.layout.canvas.context.strokeStyle = d.value.stroke;
+        this.layout.canvas.context.stroke();
     }
 
     function diamond(d) {
-        var ctx = this.containers.canvas.context;
+        var ctx = this.layout.canvas.context;
         var halfWidth = d.value.size * Math.sqrt(2);
         ctx.moveTo(d.x, d.y - halfWidth);
         ctx.lineTo(d.x + halfWidth, d.y);
@@ -3431,16 +2895,16 @@
         ctx.lineTo(d.x, d.y - halfWidth);
 
         if (this.settings.fill) {
-            this.containers.canvas.context.fillStyle = d.value.fill;
-            this.containers.canvas.context.fill();
+            this.layout.canvas.context.fillStyle = d.value.fill;
+            this.layout.canvas.context.fill();
         }
 
-        this.containers.canvas.context.strokeStyle = d.value.stroke;
-        this.containers.canvas.context.stroke();
+        this.layout.canvas.context.strokeStyle = d.value.stroke;
+        this.layout.canvas.context.stroke();
     }
 
     function star(d) {
-        var ctx = this.containers.canvas.context;
+        var ctx = this.layout.canvas.context;
         var spikes = 5;
         var step = Math.PI / spikes;
         var innerRadius = d.value.size * 0.75;
@@ -3473,7 +2937,7 @@
 
     // TODO: use some kind of cos/sin shit to make a perfect equilateral triangle
     function triangle$1(d) {
-        var ctx = this.containers.canvas.context;
+        var ctx = this.layout.canvas.context;
         var side = d.value.size * 2; // * Math.sqrt(3)/6;
 
         var dist = side / Math.sqrt(3);
@@ -3487,25 +2951,30 @@
         ctx.lineTo.apply(ctx, top);
 
         if (this.settings.fill) {
-            this.containers.canvas.context.fillStyle = d.value.fill;
-            this.containers.canvas.context.fill();
+            this.layout.canvas.context.fillStyle = d.value.fill;
+            this.layout.canvas.context.fill();
         }
 
-        this.containers.canvas.context.strokeStyle = d.value.stroke;
-        this.containers.canvas.context.stroke();
+        this.layout.canvas.context.strokeStyle = d.value.stroke;
+        this.layout.canvas.context.stroke();
     }
 
     function tick(data) {
         var _this = this;
 
-        this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
-        this.containers.canvas.context.save();
+        this.layout.canvas.context.clearRect(
+            0,
+            0,
+            this.settings.width.canvas,
+            this.settings.height.main
+        );
+        this.layout.canvas.context.save();
         data.nested
             .sort(function (a, b) {
                 return a.value.stateChanges - b.value.stateChanges;
             }) // draw bubbles with more state changes last
             .forEach(function (d, i) {
-                _this.containers.canvas.context.beginPath();
+                _this.layout.canvas.context.beginPath();
 
                 switch (d.value.shape) {
                     case 'circle':
@@ -3536,7 +3005,7 @@
                         circle.call(_this, d);
                 }
             });
-        this.containers.canvas.context.restore();
+        this.layout.canvas.context.restore();
     }
 
     // forces (d3.forceX and d3.forceY) instead of the centering force (d3.forceCenter). The
@@ -3559,7 +3028,7 @@
             .velocityDecay(0.9)
             .force(
                 'center',
-                d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)
+                d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height.main / 2)
             ) // cleared after first interval
             .force(
                 'x',
@@ -3601,7 +3070,7 @@
 
     function progress() {
         // Update timepoint.
-        this.containers.timepoint.text(
+        this.layout.timepoint.text(
             ''
                 .concat(this.settings.timepoint, ' ')
                 .concat(
@@ -3611,41 +3080,27 @@
                 )
         ); // Update timer.
 
-        this.containers.progress.attr(
+        this.layout.progress.attr(
             'title',
             'The animation is '
                 .concat(d3.format('.1%')(this.settings.progress), ' complete with ')
                 .concat(this.settings.duration - this.settings.timepoint, ' ')
                 .concat(this.settings.timeUnit.split(' ')[0], ' to go.')
         );
-        this.containers.timer.foreground
+        this.layout.timer.foreground
             .transition()
             .duration(this.settings.speed)
             .attrTween(
                 'd',
-                this.util.arcTween(this.settings.progress * Math.PI * 2, this.containers.timer.arc)
+                this.util.arcTween(this.settings.progress * Math.PI * 2, this.layout.timer.arc)
             );
-        this.containers.timer.percentComplete.text(
+        this.layout.timer.percentComplete.text(
             this.settings.progress < 0.0095
                 ? d3.format('.1%')(this.settings.progress)
                 : d3.format('.0%')(this.settings.progress)
         ); // Update timepoint control.
 
-        this.controls.timepoint.inputs.property('value', this.settings.timepoint); // Update progress bar.
-
-        this.containers.progressBar.style('width', ''.concat(this.settings.progress * 100, '%'));
-        this.containers.progressTimepoint
-            .style('right', ''.concat(100 - this.settings.progress * 100, '%'))
-            .text(
-                ''
-                    .concat(
-                        this.settings.timeUnit.replace(/^(.)/, function (letter) {
-                            return letter.toUpperCase();
-                        }),
-                        ' '
-                    )
-                    .concat(this.settings.timepoint)
-            );
+        this.controls.timepoint.inputs.property('value', this.settings.timepoint);
     }
 
     function legends(data) {
@@ -3660,16 +3115,13 @@
                     return group.length;
                 })
                 .entries(data.nested);
-            this.containers.legends
-                .selectAll('.fdg-legend--color')
-                .selectAll('text')
-                .text(function (d) {
-                    var colorCount = colorCounts.find(function (di) {
-                        return di.key === d;
-                    });
-                    var value = colorCount ? colorCount.value : 0;
-                    return ''.concat(d, ' (n=').concat(d3.format(',d')(value), ')');
+            this.legends.color.counts.text(function (d) {
+                var colorCount = colorCounts.find(function (di) {
+                    return di.key === d;
                 });
+                var value = colorCount ? colorCount.value : 0;
+                return d3.format(',d')(value);
+            });
         } // shape legend
 
         if (this.settings.shapeBy.type === 'categorical') {
@@ -3682,16 +3134,13 @@
                     return group.length;
                 })
                 .entries(data.nested);
-            this.containers.legends
-                .selectAll('.fdg-legend--shape')
-                .selectAll('text')
-                .text(function (d) {
-                    var shapeCount = shapeCounts.find(function (di) {
-                        return di.key === d;
-                    });
-                    var value = shapeCount ? shapeCount.value : 0;
-                    return ''.concat(d, ' (n=').concat(d3.format(',d')(value), ')');
+            this.legends.shape.counts.text(function (d) {
+                var shapeCount = shapeCounts.find(function (di) {
+                    return di.key === d;
                 });
+                var value = shapeCount ? shapeCount.value : 0;
+                return d3.format(',d')(value);
+            });
         }
     }
 
@@ -3720,10 +3169,10 @@
     // Update frequency table.
     function freqTable$1() {
         var main = this;
-        var maxProportion = d3.max(this.containers.freqTable.tr.data(), function (d) {
+        var maxProportion = d3.max(this.layout.freqTable.tr.data(), function (d) {
             return d.freqs.idProportion;
         });
-        this.containers.freqTable.tr.each(function (d) {
+        this.layout.freqTable.tr.each(function (d) {
             var relativeProportion = d.freqs.idProportion / maxProportion;
             var relativeProportionFmt = d3.format('.1%')(relativeProportion);
             var tr = d3.select(this);
@@ -3775,26 +3224,26 @@
                 this.prevEvent === undefined ||
                 this.currEvent.orbitLabel !== this.prevEvent.orbitLabel
             ) {
-                this.containers.sequenceOverlay.background.sequence
+                this.layout.sequenceOverlay.background.sequence
                     .style('opacity', 1)
                     .transition()
                     .duration(this.settings.modalSpeed / 5)
                     .style('opacity', 0)
                     .on('end', function () {
-                        _this.containers.sequenceOverlay.background.sequence
+                        _this.layout.sequenceOverlay.background.sequence
                             .html(_this.currEvent.orbitLabel || _this.currEvent.key)
                             .style('opacity', 0)
                             .transition()
                             .duration(_this.settings.modalSpeed / 5)
                             .style('opacity', 1);
                     });
-                this.containers.sequenceOverlay.foreground.sequence
+                this.layout.sequenceOverlay.foreground.sequence
                     .style('opacity', 1)
                     .transition()
                     .duration(this.settings.modalSpeed / 5)
                     .style('opacity', 0)
                     .on('end', function () {
-                        _this.containers.sequenceOverlay.foreground.sequence
+                        _this.layout.sequenceOverlay.foreground.sequence
                             .html(_this.currEvent.orbitLabel || _this.currEvent.key)
                             .style('opacity', 0)
                             .transition()
@@ -3804,26 +3253,26 @@
             }
 
             if (this.currEvent.orbitLabel && this.currEvent.key) {
-                this.containers.sequenceOverlay.background.event
+                this.layout.sequenceOverlay.background.event
                     .style('opacity', 1)
                     .transition()
                     .duration(this.settings.modalSpeed / 5)
                     .style('opacity', 0)
                     .on('end', function () {
-                        _this.containers.sequenceOverlay.background.event
+                        _this.layout.sequenceOverlay.background.event
                             .html(_this.currEvent.key)
                             .style('opacity', 0)
                             .transition()
                             .duration(_this.settings.modalSpeed / 5)
                             .style('opacity', 1);
                     });
-                this.containers.sequenceOverlay.foreground.event
+                this.layout.sequenceOverlay.foreground.event
                     .style('opacity', 1)
                     .transition()
                     .duration(this.settings.modalSpeed / 5)
                     .style('opacity', 0)
                     .on('end', function () {
-                        _this.containers.sequenceOverlay.foreground.event
+                        _this.layout.sequenceOverlay.foreground.event
                             .html(_this.currEvent.key)
                             .style('opacity', 0)
                             .transition()
@@ -3832,37 +3281,37 @@
                     });
             }
         } else {
-            this.containers.sequenceOverlay.background.sequence
+            this.layout.sequenceOverlay.background.sequence
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', function () {
-                    return _this.containers.sequenceOverlay.background.sequence.html(null);
+                    return _this.layout.sequenceOverlay.background.sequence.html(null);
                 });
-            this.containers.sequenceOverlay.foreground.sequence
+            this.layout.sequenceOverlay.foreground.sequence
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', function () {
-                    return _this.containers.sequenceOverlay.foreground.sequence.html(null);
+                    return _this.layout.sequenceOverlay.foreground.sequence.html(null);
                 });
-            this.containers.sequenceOverlay.background.event
+            this.layout.sequenceOverlay.background.event
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', function () {
-                    return _this.containers.sequenceOverlay.background.event.html(null);
+                    return _this.layout.sequenceOverlay.background.event.html(null);
                 });
-            this.containers.sequenceOverlay.foreground.event
+            this.layout.sequenceOverlay.foreground.event
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', function () {
-                    return _this.containers.sequenceOverlay.foreground.event.html(null);
+                    return _this.layout.sequenceOverlay.foreground.event.html(null);
                 });
         }
     }
@@ -3942,15 +3391,13 @@
         var _this = this;
 
         var counter = this.settings.resetDelay / 1000 - 1;
-        this.containers.countdown
-            .classed('fdg-invisible', false)
-            .classed('fdg-hidden', function (d) {
-                return d !== counter;
-            });
+        this.layout.countdown.classed('fdg-invisible', false).classed('fdg-hidden', function (d) {
+            return d !== counter;
+        });
         var interval = d3.interval(function () {
             counter--;
 
-            _this.containers.countdown.classed('fdg-hidden', function (d) {
+            _this.layout.countdown.classed('fdg-hidden', function (d) {
                 return d !== counter;
             });
         }, 1000);
@@ -4015,18 +3462,18 @@
         if (this.settings.modalIndex === this.settings.text.length - 1 && this.modal)
             this.modal.stop(); // Update modal text.
 
-        this.containers.modal.html(this.modalText).call(fadeIn$1, this.settings.modalSpeed); // Highlight referenced component.
+        this.layout.modal.html(this.modalText).call(fadeIn$1, this.settings.modalSpeed); // Highlight referenced component.
 
         switch (true) {
             case /time/i.test(this.modalText):
-                emphasizeComponent.call(this, this.containers.progress); //emphasizeComponent.call(this, this.focusAnnotations);
+                emphasizeComponent.call(this, this.layout.progress); //emphasizeComponent.call(this, this.focusAnnotations);
 
                 break;
 
             case /annotations/i.test(this.modalText):
                 emphasizeComponent.call(
                     this,
-                    this.containers.focusAnnotations.selectAll('.fdg-focus-annotation__event-count')
+                    this.layout.focusAnnotations.selectAll('.fdg-focus-annotation__event-count')
                 );
                 break;
 
@@ -4042,7 +3489,7 @@
                 // Style static bubbles differently than components.
                 emphasizeComponent.call(
                     this,
-                    this.containers.svgBackground.selectAll('.fdg-static__mark'),
+                    this.layout.svgBackground.selectAll('.fdg-static__mark'),
                     'stroke',
                     'rgba(215,25,28,0)',
                     'rgba(215,25,28,.5)',
@@ -4054,7 +3501,10 @@
                 if (this.settings.hideControls === false)
                     emphasizeComponent.call(
                         this,
-                        this.containers.controls.classed('fdg-hidden', this.settings.hideControls)
+                        this.layout.controlsContainer.classed(
+                            'fdg-hidden',
+                            this.settings.hideControls
+                        )
                     );
                 break;
         }
@@ -4127,7 +3577,7 @@
             countdown.stop();
             timeout.stop();
 
-            _this.containers.countdown
+            _this.layout.countdown
                 .classed('fdg-invisible', function (d) {
                     return d === _this.settings.resetDelay / 1000 - 1;
                 })
@@ -4157,16 +3607,16 @@
         var event = this.sequence.events.find(function (event, i) {
             return i === _this.sequence.eventIndex;
         });
-        fadeOut.call(this, this.containers.sequenceOverlay.background.event);
-        fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+        fadeOut.call(this, this.layout.sequenceOverlay.background.event);
+        fadeOut.call(this, this.layout.sequenceOverlay.foreground.event);
         return event;
     }
 
     function fadeOutAll() {
-        fadeOut.call(this, this.containers.sequenceOverlay.background.sequence);
-        fadeOut.call(this, this.containers.sequenceOverlay.foreground.sequence);
-        fadeOut.call(this, this.containers.sequenceOverlay.background.event);
-        fadeOut.call(this, this.containers.sequenceOverlay.foreground.event);
+        fadeOut.call(this, this.layout.sequenceOverlay.background.sequence);
+        fadeOut.call(this, this.layout.sequenceOverlay.foreground.sequence);
+        fadeOut.call(this, this.layout.sequenceOverlay.background.event);
+        fadeOut.call(this, this.layout.sequenceOverlay.foreground.event);
     }
 
     function runNextSequence() {
@@ -4228,29 +3678,27 @@
         }); // Update progress text.
 
         this.settings.timepoint = 0;
-        this.containers.timepoint.html('0 days');
-        this.containers.timer.percentComplete.html('0%'); // TODO: transition text in and out
+        this.layout.timepoint.html('0 days');
+        this.layout.timer.percentComplete.html('0%'); // TODO: transition text in and out
 
         if (this.sequence.eventIndex === 0) {
-            this.containers.timeRelative.html(
-                this.sequence.timeRelative || this.settings.timeRelative
-            ); // fade in
+            this.layout.timeRelative.html(this.sequence.timeRelative || this.settings.timeRelative); // fade in
 
             this.sequence.backgroundSequence = fadeIn.call(
                 this,
-                this.containers.sequenceOverlay.background.sequence,
+                this.layout.sequenceOverlay.background.sequence,
                 this.sequence.label
             );
             this.sequence.foregroundSequence = fadeIn.call(
                 this,
-                this.containers.sequenceOverlay.foreground.sequence,
+                this.layout.sequenceOverlay.foreground.sequence,
                 this.sequence.label
             );
         } // fade in
 
         this.sequence.backgroundEvent = fadeIn.call(
             this,
-            this.containers.sequenceOverlay.background.event,
+            this.layout.sequenceOverlay.background.event,
             ''
                 .concat(
                     this.settings.individualUnit.replace(/^(.)/, function (_char) {
@@ -4262,7 +3710,7 @@
         );
         this.sequence.foregroundEvent = fadeIn.call(
             this,
-            this.containers.sequenceOverlay.foreground.event,
+            this.layout.sequenceOverlay.foreground.event,
             ''
                 .concat(
                     this.settings.individualUnit.replace(/^(.)/, function (_char2) {
@@ -4367,9 +3815,8 @@
     function sequence(d) {
         var _this = this;
 
-        console.log(d.label);
         this.settings.animationTrack = 'sequence';
-        this.containers.sequenceOverlay.classed('fdg-hidden', false);
+        this.layout.sequenceOverlay.classed('fdg-hidden', false);
         this.settings.sequenceIndex = this.settings.sequences.findIndex(function (sequence) {
             return sequence === d;
         });
@@ -4434,8 +3881,8 @@
         this.settings.duration = this.settings_initial.duration;
         this.settings.loop = this.settings_initial.loop; // Update text.
 
-        this.containers.sequenceOverlay.classed('fdg-hidden', true);
-        this.containers.timeRelative.html(this.settings_initial.timeRelative); // Stop current interval and force simulation.
+        this.layout.sequenceOverlay.classed('fdg-hidden', true);
+        this.layout.timeRelative.html(this.settings_initial.timeRelative); // Stop current interval and force simulation.
 
         if (this.interval) this.interval.stop();
         if (this.forceSimulation) this.forceSimulation.stop(); // Restart force simulation.
@@ -4457,7 +3904,7 @@
         if (!!this.settings.sequences) {
             var main = this;
             var container = this.util
-                .addElement('sequences', this.containers.controls)
+                .addElement('sequences', this.layout.controls)
                 .classed('fdg-control fdg-control--sequences', true);
             var inputs = container
                 .selectAll('div')
@@ -4505,7 +3952,7 @@
     function stepSequences() {
         if (!!this.settings.sequences) {
             var container = this.util
-                .addElement('sequences', this.containers.controls)
+                .addElement('sequences', this.layout.controls)
                 .classed('fdg-control fdg-control--step-sequences', true);
             var inputs = container
                 .selectAll('div')
@@ -4813,7 +4260,7 @@
 
     function addControls() {
         this.controls = {
-            container: this.containers.controls,
+            container: this.layout.controlsContainer,
         };
         this.controls.display = display.call(this);
         this.controls.playPause = playPause$1.call(this);
@@ -5026,52 +4473,73 @@
         return container;
     }
 
+    function legendTable(label, domain) {
+        var container = this.legends.container.append('div'); // Add table element.
+
+        container.table = container.append('table'); // Add header row.
+
+        container.header = container.table
+            .append('thead')
+            .append('tr')
+            .selectAll('th')
+            .data([label, 'n'])
+            .join('th')
+            .attr('class', function (d, i) {
+                return i === 0 ? 'fdg-sidebar__label fdg-legend__label' : null;
+            })
+            .attr('colspan', function (d, i) {
+                return i === 0 ? 2 : null;
+            })
+            .style('text-align', function (d, i) {
+                return i === 0 ? 'left' : 'right';
+            })
+            .html(function (d) {
+                return d;
+            }); // Add body rows.
+
+        container.rows = container.table.append('tbody').selectAll('tr').data(domain).join('tr'); // Add SVG elements to first cell of each row.
+
+        container.symbols = container.rows
+            .append('td')
+            .append('svg')
+            .style('width', this.legends.svgWidth)
+            .style('height', this.legends.svgHeight)
+            .append('g')
+            .attr('transform', 'translate(0,2)'); // Add labels to second cell of each row.
+
+        container.labels = container.rows.append('td').html(function (d) {
+            return d;
+        }); // Add counts to third cell of each row.
+
+        container.counts = container.rows.append('td');
+        return container;
+    }
+
     function categorical() {
         var _this = this;
 
-        var container = this.legends.container.append('div');
-        container
-            .append('div')
-            .classed('fdg-sidebar__label fdg-legend__label', true)
-            .html(this.settings.colorBy.label);
-        var legendItems = container
-            .append('svg')
-            .attr('width', 200)
-            .attr('height', 20 * this.scales.color.domain().length)
-            .selectAll('g')
-            .data(this.scales.color.domain())
-            .join('g')
-            .attr('transform', 'translate(20,0)');
-        legendItems
+        var container = legendTable.call(
+            this,
+            this.settings.colorBy.label,
+            this.scales.color.domain()
+        ); // Draw symbols
+
+        container.symbols
             .append('circle')
-            .classed('fdg-legend__symbol', true)
-            .attr('cx', 20)
-            .attr('cy', function (d, i) {
-                return i * 20 + 10;
-            })
-            .attr('r', 7)
+            .attr('cx', this.legends.svgWidth / 2)
+            .attr('cy', this.legends.svgHeight / 2)
+            .attr('r', this.legends.radius)
             .attr('fill', function (d) {
                 return _this.scales.color(d);
-            });
-        legendItems
-            .append('text')
-            .classed('fdg-legend__label', true)
-            .attr('font-size', '1rem')
-            .attr('x', 35)
-            .attr('y', function (d, i) {
-                return i * 20 + 12;
-            })
-            .attr('alignment-baseline', 'middle')
-            .html(function (d) {
-                return ''.concat(d, ' (n=').concat(
-                    d3.format(',d')(
-                        _this.metadata.id.filter(function (di) {
-                            return di.colorStratum === d;
-                        }).length
-                    ),
-                    ')'
-                );
-            });
+            }); // Update counts.
+
+        container.counts.text(function (d) {
+            return d3.format(',d')(
+                _this.metadata.id.filter(function (di) {
+                    return di.colorStratum === d;
+                }).length
+            );
+        });
         return container;
     }
 
@@ -5327,35 +4795,48 @@
         return container;
     }
 
-    function circle$1(legendItem, i, spacing, radius) {
+    function circle$1(legendItem) {
+        var area = Math.PI * Math.pow(this.legends.radius, 2);
+        console.log('circle: ', Math.round(area));
         return legendItem
             .append('circle')
-            .attr('cx', spacing)
-            .attr('cy', i * spacing + 10)
-            .attr('r', radius - 1)
+            .attr('cx', this.legends.svgWidth / 2)
+            .attr('cy', this.legends.svgHeight / 2)
+            .attr('r', this.legends.radius)
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
 
-    function square$1(legendItem, i, spacing, radius) {
+    function square$1(legendItem) {
+        var side = Math.sqrt(Math.PI) * this.legends.radius;
+        var area = Math.pow(side, 2);
+        console.log('square: ', Math.round(area));
         return legendItem
             .append('rect')
-            .attr('x', spacing - radius + 1.5)
-            .attr('y', i * spacing + radius / 2 + 1)
-            .attr('width', radius * 1.5)
-            .attr('height', radius * 1.5)
+            .attr('x', this.legends.svgWidth / 2 - side / 2)
+            .attr('y', this.legends.svgHeight / 2 - side / 2)
+            .attr('width', side)
+            .attr('height', side)
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
 
-    function triangle$2(legendItem, i, spacing, radius) {
-        var side = radius * 1.5;
-        var dist = side / Math.sqrt(3);
-        var x = spacing;
-        var y = i * spacing + dist + 3;
-        var top = [x, y - dist];
-        var left = [x - dist, y + dist];
-        var right = [x + dist, y + dist];
+    function triangle$2(legendItem) {
+        var side = this.legends.radius * 2.69; // side length
+
+        var height = (side * Math.sqrt(3)) / 2; // height of triangle
+
+        var x = this.legends.svgWidth / 2; // horizontal centerpoint
+
+        var y = height / 2; // vertical centerpoint
+
+        var area = (1 / 2) * side * height; // 1/2 * base * height
+
+        console.log('triangle: ', Math.round(area)); // vertices
+
+        var top = [x, y - height / 2];
+        var left = [x - height / 2, y + height / 2];
+        var right = [x + height / 2, y + height / 2];
         return legendItem
             .append('polygon')
             .attr('points', [top, left, right])
@@ -5363,16 +4844,17 @@
             .attr('stroke', '#444');
     }
 
-    function diamond$1(legendItem, i, spacing, radius) {
-        var x = spacing;
-        var y = i * spacing;
+    function diamond$1(legendItem) {
+        var side = Math.sqrt(Math.PI) * this.legends.radius;
+        var x = this.legends.svgWidth / 2;
+        var y = this.legends.svgHeight / 2;
         return legendItem
             .append('rect')
             .attr('transform', 'rotate(45 '.concat(x, ' ').concat(y, ')'))
             .attr('x', x)
             .attr('y', y)
-            .attr('width', radius * 1.5)
-            .attr('height', radius * 1.5)
+            .attr('width', side)
+            .attr('height', side)
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
@@ -5381,19 +4863,19 @@
     //  <polygon points="100,10 40,198 190,78 10,78 160,198"
     //  style="fill:lime;stroke:purple;stroke-width:5;fill-rule:nonzero;" />
     //</svg>
-    function star$1(legendItem, i, spacing, radius) {
+    function star$1(legendItem) {
         var spikes = 5;
         var step = Math.PI / spikes;
-        var innerRadius = radius * 0.6;
-        var outerRadius = radius * 1.2;
-        var dist = (radius * 2) / Math.sqrt(3);
+        var innerRadius = this.legends.radius * 0.6;
+        var outerRadius = this.legends.radius * 1.2;
+        var dist = (this.legends.radius * 2) / Math.sqrt(3);
         var rot = (Math.PI / 2) * 3;
-        var x = spacing;
-        var y = i * spacing + dist;
+        var x = this.legends.svgWidth / 2;
+        var y = this.legends.svgHeight / 2 + dist;
         var centroid = [x, y];
         var coordinates = [];
 
-        for (var _i = 0; _i < spikes; _i++) {
+        for (var i = 0; i < spikes; i++) {
             x = centroid[0] + Math.cos(rot) * outerRadius;
             y = centroid[1] + Math.sin(rot) * outerRadius;
             coordinates.push([x, y]);
@@ -5411,95 +4893,72 @@
             .attr('stroke', '#444');
     }
 
-    function triangleDown(legendItem, i, spacing, radius) {
-        var side = radius * 1.5;
-        var dist = side / Math.sqrt(3);
-        var x = spacing;
-        var y = i * spacing + dist + 3;
-        var top = [x, y + dist];
-        var left = [x - dist, y - dist];
-        var right = [x + dist, y - dist];
+    function triangleDown(legendItem) {
+        var side = this.legends.radius * 2.69; // side length
+
+        var height = (side * Math.sqrt(3)) / 2; // height of triangle
+
+        var x = this.legends.svgWidth / 2; // horizontal centerpoint
+
+        var y = height / 2; // vertical centerpoint
+        // vertices
+
+        var left = [x - height / 2, y - height / 2];
+        var right = [x + height / 2, y - height / 2];
+        var bottom = [x, y + height / 2];
         return legendItem
             .append('polygon')
-            .attr('points', [top, left, right])
+            .attr('points', [left, right, bottom])
             .attr('fill', 'none')
             .attr('stroke', '#444');
     }
 
-    function shape$2() {
+    function shape$1() {
         var _this = this;
 
-        var container;
+        var main = this;
+        var container = legendTable
+            .call(this, this.settings.shapeBy.label, this.scales.shape.domain())
+            .classed(
+                'fdg-legend fdg-legend--shape fdg-legend--'.concat(this.settings.shapeBy.type),
+                true
+            ); // Draw symbols
 
-        if (this.settings.shapify) {
-            var main = this;
-            var shapes = {
-                circle: circle$1,
-                square: square$1,
-                triangle: triangle$2,
-                diamond: diamond$1,
-                star: star$1,
-                triangleDown: triangleDown,
-            };
-            container = this.legends.container
-                .append('div')
-                .classed(
-                    'fdg-legend fdg-legend--shape fdg-legend--'.concat(this.settings.shapeBy.type),
-                    true
-                );
-            container
-                .append('div')
-                .classed('fdg-sidebar__label fdg-legend__label', true)
-                .html(this.settings.shapeBy.label);
-            var legendItems = container
-                .append('svg')
-                .attr('width', 200)
-                .attr('height', 20 * this.scales.shape.domain().length)
-                .selectAll('g')
-                .data(this.scales.shape.domain())
-                .join('g')
-                .attr('transform', 'translate(20,0)');
-            var radius = 7;
-            var spacing = 20;
-            legendItems.each(function (value, i) {
-                var shape = shapes[main.scales.shape(value)]
-                    .call(main, d3.select(this), i, spacing, radius)
-                    .classed('fdg-legend__shape', true)
-                    .classed('fdg-legend__symbol', true);
-            });
-            legendItems
-                .append('text')
-                .classed('fdg-legend__label', true)
-                .attr('font-size', '1rem')
-                .attr('x', 35)
-                .attr('y', function (d, i) {
-                    return i * 20 + 12;
-                })
-                .attr('dy', 0)
-                .attr('alignment-baseline', 'middle')
-                .html(function (d) {
-                    return ''.concat(d, ' (n=').concat(
-                        _this.metadata.id.filter(function (di) {
-                            return di.shapeStratum === d;
-                        }).length,
-                        ')'
-                    );
-                }); //.each(function(d) {
-            //    const text = d3.select(this);
-            //    main.util.wrap(text, 100);
-            //});
-        }
+        var shapes = {
+            circle: circle$1,
+            square: square$1,
+            triangle: triangle$2,
+            diamond: diamond$1,
+            star: star$1,
+            triangleDown: triangleDown,
+        };
+        container.symbols.each(function (value, i) {
+            var shape = shapes[main.scales.shape(value)]
+                .call(main, d3.select(this))
+                .classed('fdg-legend__shape', true)
+                .classed('fdg-legend__symbol', true);
+        }); // Update counts.
 
+        container.counts.text(function (d) {
+            return d3.format(',d')(
+                _this.metadata.id.filter(function (di) {
+                    return di.shapeStratum === d;
+                }).length
+            );
+        });
         return container;
     }
 
     function addLegends() {
         this.legends = {
-            container: this.containers.legends,
+            container: this.layout.legends,
+            svgWidth: 40,
         };
+        this.legends.svgHeight = this.legends.svgWidth / 2;
+        this.legends.radius = this.legends.svgHeight / 2 - 3;
         this.legends.color = color$2.call(this);
         this.legends.size = size$2.call(this);
-        this.legends.shape = shape$2.call(this);
+        this.legends.shape = shape$1.call(this);
     }
 
     function addFreqTable() {
@@ -5507,7 +4966,7 @@
 
         var main = this;
         var freqTable = {
-            container: this.containers.freqTable
+            container: this.layout.freqTable
                 .classed('fdg-hidden', this.settings.freqTable.display === false)
                 .classed(
                     'fdg-freq-table--vertical',
@@ -5629,10 +5088,10 @@
     }
 
     function addOrbits() {
-        var g = this.containers.svgBackground
+        var g = this.layout.svgBackground
             .append('g')
             .classed('fdg-g fdg-g--orbits', true)
-            .attr('transform', 'translate('.concat(this.settings.widthDiff, ',0)'));
+            .attr('transform', 'translate('.concat(this.settings.width.sidebar, ',0)'));
         var shadows = g
             .append('defs')
             .selectAll('filter')
@@ -5749,10 +5208,10 @@
         }
     }
 
-    function annotateFoci() {
+    function addFocusAnnotations() {
         var _this = this;
 
-        var fociLabels = this.containers.focusAnnotations
+        var fociLabels = this.layout.focusAnnotations
             .selectAll('g.fdg-focus-annotation')
             .data(this.metadata.event)
             .join('g')
@@ -5782,7 +5241,7 @@
 
         if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
             this.metadata.event.forEach(function (event) {
-                event.fociLabels = _this.containers.focusAnnotations
+                event.fociLabels = _this.layout.focusAnnotations
                     .append('g')
                     .classed('fdg-focus-annotation fdg-focus-annotation--categorical', true);
                 ['background', 'foreground'].forEach(function (pos) {
@@ -5818,7 +5277,7 @@
         return fociLabels;
     }
 
-    function annotateCustom() {
+    function addCustomAnnotations() {
         var _this = this;
 
         var annotations;
@@ -5839,7 +5298,7 @@
                           annotation.radius * // number of orbit radii from the center
                               Math.sin(annotation.theta); // y-position of the along the given orbit at which the focus circle at the
             });
-            annotations = this.containers.customAnnotations
+            annotations = this.layout.customAnnotations
                 .selectAll('g.fdg-custom-annotation')
                 .data(this.settings.annotations)
                 .join('g')
@@ -5877,18 +5336,585 @@
         return annotations;
     }
 
-    function dataDrivenLayout() {
+    function dataDriven() {
         // controls
         addControls.call(this); // sidebar
 
         addLegends.call(this);
-        this.containers.freqTable = addFreqTable.call(this); // Draw concentric circles.
+        this.layout.freqTable = addFreqTable.call(this); // Draw concentric circles.
 
         this.orbits = addOrbits.call(this); // Annotate foci.
 
-        this.focusAnnotations = annotateFoci.call(this); // Add custom annotations.
+        this.focusAnnotations = addFocusAnnotations.call(this); // Add custom annotations.
 
-        this.customAnnotations = annotateCustom.call(this);
+        this.customAnnotations = addCustomAnnotations.call(this);
+    }
+
+    function layout() {
+        var main = this.util.addElement('main', d3.select(this.element)).datum(this);
+        this.settings.width = {
+            main: main.node().clientWidth,
+        };
+        this.settings.height = {
+            main: main.node().clientHeight,
+        };
+
+        for (var prop in this.settings.root) {
+            document
+                .querySelector(':root')
+                .style.setProperty('--'.concat(prop), this.settings.root[prop]);
+        } // controls positioned absolutely
+
+        var controlsLayout = controls.call(this, main); // sidebar to the left
+
+        var sidebarLayout = sidebar.call(this, main); // animation to the right
+
+        var canvasLayout = canvas.call(this, main); // add resize event
+
+        window.addEventListener('resize', resize.bind(this));
+        return _objectSpread2(
+            _objectSpread2(
+                _objectSpread2(
+                    _objectSpread2(
+                        {
+                            main: main,
+                        },
+                        controlsLayout
+                    ),
+                    sidebarLayout
+                ),
+                canvasLayout
+            ),
+            {},
+            {
+                dataDriven: dataDriven,
+            }
+        );
+    }
+
+    function id() {
+        var _this = this;
+
+        var nest = d3
+            .nest()
+            .key(function (d) {
+                return d.id;
+            })
+            .rollup(function (group) {
+                return {
+                    duration: d3.sum(group, function (d) {
+                        return +d.duration;
+                    }),
+                    static: group.length === 1,
+                    colorStratum:
+                        _this.settings.colorBy.type === 'categorical'
+                            ? group[0][_this.settings.colorBy.variable]
+                            : null,
+                    shapeStratum:
+                        _this.settings.shapeBy.type === 'categorical'
+                            ? group[0][_this.settings.shapeBy.variable]
+                            : null,
+                };
+            })
+            .entries(this.data);
+        nest.forEach(function (d, i) {
+            Object.assign(d, d.value);
+        });
+        return nest;
+    }
+
+    function updateIdDependentSettings(metadata) {
+        var _this = this;
+
+        this.settings.duration =
+            this.settings.duration ||
+            d3.max(metadata.id, function (id) {
+                return id.duration;
+            });
+        this.settings.text = this.settings.text
+            .filter(function (text) {
+                return (
+                    // Remove if:
+                    //   - text contains static
+                    //   - there are no static IDs
+                    //   - static IDs are drawn separately
+                    !(
+                        /static/i.test(text) &&
+                        (metadata.id.every(function (id) {
+                            return id['static'] === false;
+                        }) ||
+                            _this.settings.drawStaticSeparately === false)
+                    )
+                );
+            })
+            .map(function (text) {
+                return text.replace('[duration]', d3.format(',d')(_this.settings.duration));
+            });
+        this.settings.minRadius =
+            this.settings.minRadius ||
+            Math.max(
+                Math.min(
+                    3000 /
+                        metadata.id.filter(function (d) {
+                            return !(_this.settings.drawStaticSeparately && d['static']);
+                        }).length,
+                    this.settings.maxRadius
+                ),
+                1
+            );
+        this.settings.staticRadius =
+            this.settings.staticRadius || Math.max(3000 / metadata.id.length, 1);
+        this.settings.maxRadius = this.settings.minRadius + this.settings.colorBy.nColors;
+        this.settings.chargeStrength = -(
+            2000 /
+            metadata.id.filter(function (d) {
+                return !(_this.settings.drawStaticSeparately && d['static']);
+            }).length
+        );
+        this.settings.staticChargeStrength = -(2000 / metadata.id.length);
+        this.settings.fill = this.settings.fill || metadata.id.length <= 2500;
+    }
+
+    function event() {
+        // Group data by event.
+        var nest = d3
+            .nest()
+            .key(function (d) {
+                return d.event;
+            })
+            .rollup(function (group) {
+                var datum = group[0];
+                var order = parseInt(datum.event_order);
+                var position = datum.hasOwnProperty('event_position')
+                    ? parseInt(datum.event_position)
+                    : null;
+                return {
+                    order: order,
+                    position: position,
+                    ids: new Set(),
+                    // individuals in the state currently
+                    nIds: 0,
+                    // number of individuals in the state currently
+                    nIdsPrevious: 0,
+                    idsCumulative: new Set(),
+                    // individuals that have ever been in the state
+                    nIdsCumulative: 0,
+                    // number of individuals that have ever been in the state
+                    nEvents: 0,
+                    // number of times any individual has been in the state up to the current timepoint, i.e. the total number of events that have occurred so far
+                    nEventsTotal: group.length,
+                    // total number of events
+                    allIds: _toConsumableArray(
+                        new Set(
+                            group.map(function (d) {
+                                return d.id;
+                            })
+                        ).values()
+                    ).sort(),
+                };
+            })
+            .entries(this.data)
+            .sort(function (a, b) {
+                return a.value.order - b.value.order || a.value.position - b.value.position;
+            });
+        var event = nest.map(function (event, i) {
+            Object.assign(event, event.value); // remove nesting
+
+            delete event.value;
+            event.start_timepoint = i === 0 ? 1 : nest[i - 1].end_timepoint + 1;
+            event.end_timepoint = event.start_timepoint + event.allIds.length - 1;
+            event.rank = i;
+            return event;
+        });
+        return event;
+    }
+
+    function updateEventDependentSettings(metadata) {
+        this.settings.eventCentral = this.settings.eventCentral || metadata.event[0].key;
+        this.settings.eventChangeCount =
+            this.settings.eventChangeCount ||
+            metadata.event.slice(1).map(function (event) {
+                return event.key;
+            });
+    }
+
+    function orbit(metadata) {
+        var _this = this;
+
+        var nest = d3
+            .nest()
+            .key(function (d) {
+                return d.order;
+            })
+            .entries(
+                metadata.event.filter(function (event) {
+                    return event.key !== _this.settings.eventCentral;
+                })
+            );
+        nest.forEach(function (orbit, i) {
+            orbit.label =
+                Array.isArray(_this.settings.orbitLabels) &&
+                _this.settings.orbitLabels.length === nest.length
+                    ? _this.settings.orbitLabels[i]
+                    : 'Orbit '.concat(i + 1);
+            orbit.values
+                .sort(function (a, b) {
+                    return a.position - b.position;
+                })
+                .forEach(function (event) {
+                    event.orbitLabel = orbit.label;
+                });
+        });
+        return nest;
+    }
+
+    function strata(metadata) {
+        var _this = this;
+
+        var nest;
+
+        if (this.settings.stratify) {
+            nest = d3
+                .nest()
+                .key(function (d) {
+                    return d[_this.settings.colorBy.variable];
+                })
+                .entries(this.data)
+                .sort(function (a, b) {
+                    var aOrder = Array.isArray(_this.settings.colorBy.order)
+                        ? _this.settings.colorBy.order.indexOf(a.key)
+                        : null;
+                    var bOrder = Array.isArray(_this.settings.colorBy.order)
+                        ? _this.settings.colorBy.order.indexOf(b.key)
+                        : null;
+                    var orderSort = aOrder - bOrder;
+                    var alphaSort = a.key < b.key ? -1 : 1;
+                    return orderSort ? orderSort : alphaSort;
+                });
+            this.settings.colorBy.nStrata = nest.length;
+            this.settings.colorBy.theta = (2 * Math.PI) / this.settings.colorBy.nStrata;
+            nest.forEach(function (stratum, i) {
+                //ids: new Set(), // individuals in the state currently
+                //nIds: 0, // number of individuals in the state currently
+                //idsCumulative: new Set(), // individuals that have ever been in the state
+                //nIdsCumulative: 0, // number of individuals that have ever been in the state
+                //nEvents: 0, // number of times any individual has been in the state up to the current timepoint, i.e. the total number of events that have occurred so far
+                //nEventsTotal: group.length, // total number of events
+                var colorScheme = _this.settings.colorBy.colorSchemes[i];
+                stratum.colorScheme =
+                    d3[
+                        'scheme'
+                            .concat(colorScheme.substring(0, 1).toUpperCase())
+                            .concat(colorScheme.substring(1), 's')
+                    ]; // domain: number of recurrent events
+                //  range: sequential, single-hue color scheme of the same length
+
+                stratum.colorScale = d3
+                    .scaleLinear()
+                    .domain(d3.range(_this.settings.nColors))
+                    .range(
+                        stratum.colorScheme[9].reverse().slice(0, _this.settings.nColors).reverse()
+                    )
+                    .clamp(true);
+                stratum.individuals = metadata.id.filter(function (d) {
+                    return d.colorStratum === stratum.key;
+                });
+                stratum.duration = d3.max(stratum.individuals, function (d) {
+                    return d.duration;
+                });
+                stratum.nIndividuals = stratum.individuals.length;
+                stratum.nEvents = stratum.values.length; // TODO: figure out how to shift the foci to match the order in the legend
+
+                stratum.angle =
+                    _this.settings.colorBy.nStrata % 2
+                        ? (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta
+                        : (_this.settings.colorBy.nStrata - i - 1) * _this.settings.colorBy.theta +
+                          Math.PI / _this.settings.colorBy.nStrata;
+            });
+        }
+
+        return nest;
+    }
+
+    function shape$2(metadata) {
+        var _this = this;
+
+        var nest;
+
+        if (this.settings.shapify) {
+            nest = d3
+                .nest()
+                .key(function (d) {
+                    return d[_this.settings.shapeBy.variable];
+                })
+                .entries(this.data)
+                .sort(function (a, b) {
+                    var aOrder = Array.isArray(_this.settings.shapeBy.order)
+                        ? _this.settings.shapeBy.order.indexOf(a.key)
+                        : null;
+                    var bOrder = Array.isArray(_this.settings.shapeBy.order)
+                        ? _this.settings.shapeBy.order.indexOf(b.key)
+                        : null;
+                    var orderSort = aOrder - bOrder;
+                    var alphaSort = a.key < b.key ? -1 : 1;
+                    return orderSort ? orderSort : alphaSort;
+                });
+        }
+
+        return nest;
+    }
+
+    function color$3(metadata) {
+        var scale;
+
+        if (this.settings.colorify) {
+            var colorBy = this.settings.colorBy; // scale domain
+
+            var domain =
+                colorBy.type === 'frequency'
+                    ? d3.range(colorBy.nColors)
+                    : colorBy.type === 'continuous'
+                    ? d3.extent(this.data, function (d) {
+                          return d[colorBy.variable];
+                      })
+                    : colorBy.type === 'categorical'
+                    ? metadata.strata.map(function (d) {
+                          return d.key;
+                      })
+                    : null; // scale
+
+            var range;
+
+            switch (colorBy.type) {
+                case 'frequency':
+                    range = colorBy.mirror
+                        ? d3['scheme'.concat(colorBy.colorScheme)][colorBy.nColors].reverse()
+                        : d3['scheme'.concat(colorBy.colorScheme)][colorBy.nColors];
+                    scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+                    break;
+
+                case 'continuous':
+                    scale = d3
+                        .scaleSequential(d3['interpolate'.concat(colorBy.colorScheme)])
+                        .domain(domain); // Invert color scale.
+
+                    if (colorBy.mirror) {
+                        var interpolator = scale.interpolator(); // read the color scale's interpolator
+
+                        var mirror = function mirror(t) {
+                            return interpolator(1 - t);
+                        }; // returns the mirror image of the interpolator
+
+                        scale.interpolator(mirror); // updates the scale's interpolator
+                    }
+
+                    break;
+
+                case 'categorical':
+                    var scheme = d3['scheme'.concat(colorBy.colorScheme)];
+                    range = scheme.every(function (el) {
+                        return typeof el === 'string';
+                    })
+                        ? scheme
+                        : scheme[Math.min(Math.max(3, domain.length), 9)];
+                    scale = d3
+                        .scaleOrdinal()
+                        .domain(domain)
+                        .range(
+                            range.map(function (color) {
+                                return d3.rgb(color) + '';
+                            })
+                        );
+                    break;
+
+                default:
+                    scale = null;
+            }
+        }
+
+        return scale;
+    }
+
+    function size$3(metadata) {
+        var scale;
+
+        if (this.settings.sizify) {
+            var sizeBy = this.settings.sizeBy; // scale domain
+
+            var domain =
+                sizeBy.type === 'frequency'
+                    ? [0, this.settings.colorBy.nColors]
+                    : sizeBy.type === 'continuous'
+                    ? d3.extent(this.data, function (d) {
+                          return d[sizeBy.variable];
+                      })
+                    : null; // scale range
+
+            var range = [this.settings.minRadius, this.settings.maxRadius]; // scale
+
+            scale = d3.scaleLinear().domain(domain).range(range).clamp(true);
+        }
+
+        return scale;
+    }
+
+    function shape$3(metadata) {
+        var scale;
+
+        if (this.settings.shapify) {
+            var shapeBy = this.settings.shapeBy; // scale domain
+
+            var domain =
+                shapeBy.type === 'categorical'
+                    ? metadata.shape.map(function (d) {
+                          return d.key;
+                      })
+                    : null; // scale range
+
+            var range = shapeBy.shapes; // scale
+
+            scale = d3.scaleOrdinal().domain(domain).range(range);
+        }
+
+        return scale;
+    }
+
+    function scales(metadata) {
+        var color = color$3.call(this, metadata);
+        var size = size$3.call(this, metadata);
+        var shape = shape$3.call(this, metadata);
+        return {
+            color: color,
+            size: size,
+            shape: shape,
+        };
+    }
+
+    function focus(metadata) {
+        var _this = this;
+
+        // Stratify only when the color aesthetic is categorical.
+        if (this.settings.colorBy.type === 'categorical') {
+            // Define a consistent arc length when positioning strata along orbit.
+            if (this.settings.stratificationPositioning === 'orbital') {
+                this.settings.arcLength = this.settings.orbitRadius / 200;
+                this.settings.offsets =
+                    this.settings.stratificationPositioning === 'orbital'
+                        ? metadata.strata.length % 2
+                            ? d3.range(
+                                  -Math.floor(metadata.strata.length / 2),
+                                  Math.floor(metadata.strata.length / 2) + 1
+                              )
+                            : d3.range(
+                                  -metadata.strata.length / 2 + 0.5,
+                                  metadata.strata.length / 2 + 0.5
+                              )
+                        : null;
+            } // Define coordinates of stratified foci as a function of event coordinates.
+
+            metadata.event.forEach(function (event, i) {
+                event.foci = metadata.strata.map(function (stratum, j) {
+                    var focus = _objectSpread2(
+                        _objectSpread2({}, stratum),
+                        {},
+                        {
+                            x: event.x + 50 * Math.cos(stratum.angle),
+                            dx: event.x + (i === 0 ? 75 : 50) * Math.cos(stratum.angle),
+                            y: event.y + 50 * Math.sin(stratum.angle),
+                            dy: event.y + (i === 0 ? 75 : 50) * Math.sin(stratum.angle),
+                            ids: new Set(),
+                            nIds: 0,
+                            nIdsPrevious: 0,
+                            idsCumulative: new Set(),
+                            nIdsCumulative: 0,
+                            nEvents: 0,
+                        }
+                    ); // Position stratum foci along orbits rather than on a circle at event focus.
+
+                    if (_this.settings.stratificationPositioning === 'orbital') {
+                        focus.theta =
+                            event.theta +
+                            ((_this.settings.arcLength * _this.settings.offsets[j]) /
+                                (2 * Math.PI * event.radius)) *
+                                360; // Define position along orbit on which the stratum focus will appear.
+
+                        focus.x =
+                            event.order === 0
+                                ? focus.x
+                                : _this.settings.center.x +
+                                  event.radius * // number of orbit radii from the center
+                                      Math.cos(focus.theta); // position along the circle at the given orbit along which
+
+                        focus.dx = focus.x;
+                        focus.y =
+                            event.order === 0
+                                ? focus.y
+                                : _this.settings.center.y +
+                                  event.radius * // number of orbit radii from the center
+                                      Math.sin(focus.theta); // y-position of the along the given orbit at which the focus circle at the
+
+                        focus.dy = focus.y;
+                    }
+
+                    return focus;
+                });
+            });
+        }
+    }
+
+    function freqTable$2(metadata) {
+        var _this = this;
+
+        var freqTable = d3.merge(
+            metadata.event.map(function (event) {
+                // One row per event per focus plus an overall event record.
+                var rowGroup =
+                    _this.settings.colorBy.type === 'categorical'
+                        ? [event].concat(_toConsumableArray(event.foci))
+                        : [event]; // For each row calculate numerators, denominators, and proportions.
+
+                rowGroup.forEach(function (d) {
+                    d.state = event.key; // state
+
+                    d.label = d.key; // state or stratum
+
+                    d.freqs = getFreqs.call(_this, d, event, metadata);
+                    d.fmt = formatValues.call(_this, d);
+                });
+                return rowGroup;
+            })
+        ); // Define an array of values to populate the frequency table.
+
+        freqTable.forEach(function (d) {
+            d.cells = defineCellValues.call(_this, d);
+        });
+        return freqTable;
+    }
+
+    function defineMetadata() {
+        var metadata = {}; // Define ID set and update settings that depend on the ID set.
+
+        metadata.id = id.call(this);
+        updateIdDependentSettings.call(this, metadata); // Define event set and update settings that depend on event set.
+
+        metadata.event = event.call(this);
+        updateEventDependentSettings.call(this, metadata); // Define orbit set.
+
+        metadata.orbit = orbit.call(this, metadata); // Determine the dimensions of the canvas, the position of the foci, and the size of the orbits.
+
+        coordinates.call(this, metadata); // Define strata set.
+
+        metadata.strata = strata.call(this, metadata); // Define shape set.
+
+        metadata.shape = shape$2.call(this, metadata); // Define color scale.
+
+        this.scales = scales.call(this, metadata); // Define the offset of each stratum as function of the focus coordinates, the stratum
+        // sequence, and theta.
+
+        focus.call(this, metadata); // Calculate frequencies and percentages to populate annotation foci and frequency table.
+
+        this.data.freqTable = freqTable$2.call(this, metadata);
+        return metadata;
     }
 
     function hasVariables() {
@@ -6097,7 +6123,7 @@
         sort.call(this, has);
     }
 
-    function dataManipulation() {
+    function data$1() {
         var _this = this;
 
         mutateData.call(this);
@@ -6140,24 +6166,26 @@
             );
     }
 
-    function forceDirectedGraph(data) {
-        var element = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'body';
-        var settings$1 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    function forceDirectedGraph(_data_) {
+        var _element_ = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'body';
+
+        var _settings_ = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
         var fdg = {
-            data: data,
-            element: element,
-            settings: util.mergeDeep(settings, settings$1),
+            data: _data_,
+            element: _element_,
+            settings: util.mergeDeep(settings, _settings_),
             util: util,
         };
         settings.update.call(fdg); // Update settings object.
 
-        fdg.containers = layout.call(fdg); // add elements to DOM
+        fdg.layout = layout.call(fdg); // add elements to DOM
 
         fdg.metadata = defineMetadata.call(fdg); // calculate characteristics of variables in data
 
-        dataDrivenLayout.call(fdg); // update the DOM
+        fdg.layout.dataDriven.call(fdg); // update the DOM
 
-        dataManipulation.call(fdg); // mutate and structure data
+        data$1.call(fdg); // mutate and structure data
 
         init.call(fdg); // run the simulation
 

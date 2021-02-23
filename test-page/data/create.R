@@ -19,9 +19,9 @@ state1 <- state0 %>%
         event_order = 1,
         event = sample(c('Mild', 'Moderate', 'Severe'), n, T),
         event_position = case_when(
-            event == 'Mild' ~ -45,
+            event == 'Mild' ~ -20,
             event == 'Moderate' ~ 0,
-            event == 'Severe' ~ 45,
+            event == 'Severe' ~ 20,
             TRUE ~ NaN
         ),
         stdy = endy,
@@ -39,9 +39,9 @@ state2 <- state1 %>%
         event_order = 2,
         event = sample(c('Not Treated', 'Standard of Care', 'Rescue Meds'), n, T),
         event_position = case_when(
-            event == 'Not Treated' ~ -15,
+            event == 'Not Treated' ~ -20,
             event == 'Standard of Care' ~ 0,
-            event == 'Rescue Meds' ~ 15,
+            event == 'Rescue Meds' ~ 20,
             TRUE ~ NaN
         ),
         stdy = endy,
@@ -68,10 +68,10 @@ state4 <- state3 %>%
         event_order = 4,
         event = sample(c('Major Gain', 'Minor Gain', 'Minor Loss', 'Major Loss'), n, T),
         event_position = case_when(
-            event == 'Major Gain' ~ -15,
-            event == 'Minor Gain' ~ -5,
-            event == 'Minor Loss' ~ 5,
-            event == 'Major Loss' ~ 15,
+            event == 'Major Gain' ~ -20,
+            event == 'Minor Gain' ~ -20/3,
+            event == 'Minor Loss' ~ 20/3,
+            event == 'Major Loss' ~ 20,
             TRUE ~ NaN
         ),
         stdy = endy,

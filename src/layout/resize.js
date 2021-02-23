@@ -5,40 +5,41 @@ import updateData from '../init/startInterval/update/data';
 
 // TODO: modularize this function with declaritive subfunctions
 export default function resize() {
-    this.settings.fullWidth = this.containers.main.node().clientWidth;
-    const node = this.containers.animation.node();
-    this.settings.width = node.clientWidth;
-    this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
-    this.settings.height = this.containers.animation.node().clientHeight;
+    this.settings.width.main = this.layout.main.node().clientWidth;
+    this.settings.height.main = this.layout.main.node().clientHeight;
+    this.settings.width.sidebar = this.layout.sidebarContainer.node().clientWidth;
+    this.settings.width.canvas = this.layout.canvasContainer.node().clientWidth;
 
     // timer
-    this.containers.timer.width = this.containers.timer.node().clientWidth;
-    this.containers.timer.svg
-        .attr('width', this.containers.timer.width)
-        .attr('height', this.containers.timer.width);
-    this.containers.timer.arc
-        .innerRadius(this.containers.timer.width / 2.25)
-        .outerRadius(this.containers.timer.width / 2);
-    this.containers.timer.g.attr(
+    this.layout.timer.width = this.layout.timer.node().clientWidth;
+    this.layout.timer.svg
+        .attr('width', this.layout.timer.width)
+        .attr('height', this.layout.timer.width);
+    this.layout.timer.arc
+        .innerRadius(this.layout.timer.width / 2.25)
+        .outerRadius(this.layout.timer.width / 2);
+    this.layout.timer.g.attr(
         'transform',
-        `translate(${this.containers.timer.width / 2},${this.containers.timer.width / 2})`
+        `translate(${this.layout.timer.width / 2},${this.layout.timer.width / 2})`
     );
-    this.containers.timer.background.attr('d', this.containers.timer.arc);
-    this.containers.timer.foreground.attr('d', this.containers.timer.arc);
+    this.layout.timer.background.attr('d', this.layout.timer.arc);
+    this.layout.timer.foreground.attr('d', this.layout.timer.arc);
 
     // background SVG
-    this.containers.svgBackground
-        .attr('width', this.settings.fullWidth)
-        .attr('height', this.settings.height)
-        .style('left', -this.settings.widthDiff);
+    this.layout.svgBackground
+        .attr('width', this.settings.width.main)
+        .attr('height', this.settings.height.main)
+        .style('left', -this.settings.width.sidebar);
 
     // canvas
-    this.containers.canvas.attr('width', this.settings.width).attr('height', this.settings.height);
+    this.layout.canvas
+        .attr('width', this.settings.width.canvas)
+        .attr('height', this.settings.height.main);
 
     // SVG
-    this.containers.svgForeground
-        .attr('width', this.settings.width)
-        .attr('height', this.settings.height);
+    this.layout.svgForeground
+        .attr('width', this.settings.width.canvas)
+        .attr('height', this.settings.height.main);
 
     coordinates.call(this, this.metadata);
 
@@ -47,9 +48,9 @@ export default function resize() {
         .attr('cx', (d) => d.cx)
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r);
-    this.containers.svgBackground
+    this.layout.svgBackground
         .select('g.fdg-g--orbits')
-        .attr('transform', `translate(${this.settings.widthDiff},0)`);
+        .attr('transform', `translate(${this.settings.width.sidebar},0)`);
 
     // focus coordinates
     if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {

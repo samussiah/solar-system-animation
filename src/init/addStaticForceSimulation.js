@@ -3,7 +3,7 @@ import draw from './addStaticForceSimulation/draw';
 
 export default function addStaticForceSimulation() {
     if (this.settings.drawStaticSeparately) {
-        this.containers.svgBackground.selectAll('.fdg-static').remove();
+        this.layout.svgBackground.selectAll('.fdg-static').remove();
 
         // Capture individuals without state change.
         const noStateChange = this.data.nested

@@ -2,14 +2,16 @@ import addTimer from './sidebar/addTimer';
 import addCountdown from './sidebar/addCountdown';
 
 export default function sidebar(main) {
-    const sidebar = this.util.addElement('sidebar', main);
-    const events = this.util.addElement('events', sidebar).html(this.settings.individualLabel);
-    const legends = this.util.addElement('legends', sidebar);
-    const progress = this.util.addElement('progress', sidebar);
+    const container = this.util.addElement('sidebar', main);
+    this.settings.width.sidebar = container.node().clientWidth;
+    const events = this.util.addElement('events', container).html(this.settings.individualLabel);
+    const legends = this.util.addElement('legends', container);
+    const progress = this.util
+        .addElement('progress', container)
+        .classed('fdg-hidden', !this.settings.displayProgress);
     const timepoint = this.util
         .addElement('timepoint', progress)
         .classed('fdg-sidebar__label', true)
-        .classed('fdg-hidden', !this.settings.displayTiming)
         .html(
             `${this.settings.timepoint} ${
                 this.settings.timepoint !== 1
@@ -20,14 +22,13 @@ export default function sidebar(main) {
     const timeRelative = this.util
         .addElement('time-relative', progress)
         .classed('fdg-sidebar__sub-label', true)
-        .classed('fdg-hidden', !this.settings.displayTiming)
         .html(this.settings.timeRelative);
     const timer = addTimer.call(this, progress);
     const countdown = addCountdown.call(this, progress);
-    const freqTable = this.util.addElement('freq-table', sidebar);
+    const freqTable = this.util.addElement('freq-table', container);
 
     return {
-        sidebar,
+        sidebarContainer: container,
         events,
         legends,
         progress,

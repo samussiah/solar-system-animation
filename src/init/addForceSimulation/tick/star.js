@@ -1,5 +1,5 @@
 export default function star(d) {
-    const ctx = this.containers.canvas.context;
+    const ctx = this.layout.canvas.context;
 
     const spikes = 5;
     const step = Math.PI / spikes;

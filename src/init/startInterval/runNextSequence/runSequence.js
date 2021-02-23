@@ -1,5 +1,5 @@
 import fadeIn from './runSequence/fadeIn';
-import nestData from '../../../dataManipulation/nestData';
+import nestData from '../../../data/nestData';
 import addForceSimulation from '../../addForceSimulation';
 import updateData from '../update/data';
 import updateText from '../update/text';
@@ -23,22 +23,22 @@ export default function runSequence() {
 
     // Update progress text.
     this.settings.timepoint = 0;
-    this.containers.timepoint.html('0 days');
-    this.containers.timer.percentComplete.html('0%');
+    this.layout.timepoint.html('0 days');
+    this.layout.timer.percentComplete.html('0%');
 
     // TODO: transition text in and out
     if (this.sequence.eventIndex === 0) {
-        this.containers.timeRelative.html(this.sequence.timeRelative || this.settings.timeRelative);
+        this.layout.timeRelative.html(this.sequence.timeRelative || this.settings.timeRelative);
 
         // fade in
         this.sequence.backgroundSequence = fadeIn.call(
             this,
-            this.containers.sequenceOverlay.background.sequence,
+            this.layout.sequenceOverlay.background.sequence,
             this.sequence.label
         );
         this.sequence.foregroundSequence = fadeIn.call(
             this,
-            this.containers.sequenceOverlay.foreground.sequence,
+            this.layout.sequenceOverlay.foreground.sequence,
             this.sequence.label
         );
     }
@@ -46,14 +46,14 @@ export default function runSequence() {
     // fade in
     this.sequence.backgroundEvent = fadeIn.call(
         this,
-        this.containers.sequenceOverlay.background.event,
+        this.layout.sequenceOverlay.background.event,
         `${this.settings.individualUnit.replace(/^(.)/, (char) => char.toUpperCase())}s: ${
             this.sequence.event.key
         }`
     );
     this.sequence.foregroundEvent = fadeIn.call(
         this,
-        this.containers.sequenceOverlay.foreground.event,
+        this.layout.sequenceOverlay.foreground.event,
         `${this.settings.individualUnit.replace(/^(.)/, (char) => char.toUpperCase())}s: ${
             this.sequence.event.key
         }`

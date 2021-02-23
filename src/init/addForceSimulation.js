@@ -19,7 +19,10 @@ export default function addForceSimulation(data) {
         )
         .alphaDecay(0.01)
         .velocityDecay(0.9)
-        .force('center', d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height / 2)) // cleared after first interval
+        .force(
+            'center',
+            d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height.main / 2)
+        ) // cleared after first interval
         .force(
             'x',
             d3

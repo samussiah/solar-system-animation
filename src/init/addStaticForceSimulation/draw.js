@@ -3,8 +3,8 @@ export default function draw(worker, color) {
 
     worker.onmessage = function (event) {
         const className = `fdg-static--${event.data.id.replace(/[^0-9_a-z]/gi, '-')}`;
-        main.containers.svgBackground.selectAll(`.${className}`).remove();
-        const g = main.containers.svgBackground
+        main.layout.svgBackground.selectAll(`.${className}`).remove();
+        const g = main.layout.svgBackground
             .insert('g', ':first-child')
             .classed(`fdg-static ${className}`, true)
             .attr('transform', `translate(${main.settings.widthDiff},0)`);

@@ -1,11 +1,11 @@
 export default function coordinates(metadata) {
     // Dimensions of canvas.
-    this.settings.orbitRadius = this.settings.width / (metadata.orbit.length + 1);
+    this.settings.orbitRadius = this.settings.width.canvas / (metadata.orbit.length + 1);
 
     // Calculate coordinates of event focus.
     this.settings.center = {
         x: this.settings.orbitRadius / 2,
-        y: this.settings.height / 2,
+        y: this.settings.height.main / 2,
     };
     metadata.event.forEach((event, i) => {
         // Define radius of the orbit on which the event focus will appear.

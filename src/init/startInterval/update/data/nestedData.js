@@ -1,8 +1,8 @@
-import getState from '../../../../dataManipulation/nestData/getState';
-import getAestheticValues from '../../../../dataManipulation/nestData/getAestheticValues';
-import getCoordinates from '../../../../dataManipulation/nestData/getCoordinates';
-import getColorScale from '../../../../dataManipulation/nestData/getColorScale';
-import getAesthetics from '../../../../dataManipulation/nestData/getAesthetics';
+import getState from '../../../../data/nestData/getState';
+import getAestheticValues from '../../../../data/nestData/getAestheticValues';
+import getCoordinates from '../../../../data/nestData/getCoordinates';
+import getColorScale from '../../../../data/nestData/getColorScale';
+import getAesthetics from '../../../../data/nestData/getAesthetics';
 
 export default function nestedData(data) {
     data.nested.forEach((d, i) => {

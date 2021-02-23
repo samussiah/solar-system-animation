@@ -4,7 +4,7 @@ export default function triangle(legendItem) {
     const x = this.legends.svgWidth / 2; // horizontal centerpoint
     const y = height / 2; // vertical centerpoint
     const area = (1 / 2) * side * height; // 1/2 * base * height
-    console.log('triangle: ', Math.round(area));
+    //console.log('triangle: ', Math.round(area));
 
     // vertices
     const top = [x, y - height / 2];

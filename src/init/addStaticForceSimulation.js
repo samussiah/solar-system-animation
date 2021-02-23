@@ -35,7 +35,7 @@ export default function addStaticForceSimulation() {
                 this,
                 noStateChange,
                 this.settings.orbitRadius / 2,
-                this.settings.height / 2,
+                this.settings.height.main / 2,
                 'main'
             );
 

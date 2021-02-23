@@ -960,9 +960,9 @@
       worker.onmessage = function (event) {
         var className = "fdg-static--".concat(event.data.id.replace(/[^0-9_a-z]/gi, '-'));
         main.layout.svgBackground.selectAll(".".concat(className)).remove();
-        var g = main.layout.svgBackground.insert('g', ':first-child').classed("fdg-static ".concat(className), true).attr('transform', "translate(".concat(main.settings.widthDiff, ",0)")); // translate to the central focus
+        var g = main.layout.svgBackground.insert('g', ':first-child').classed("fdg-static ".concat(className), true).attr('transform', "translate(".concat(main.settings.width.sidebar, ",0)")); // translate to the central focus
 
-        if (main.settings.staticLayout == 'radial') g.attr('transform', "translate(".concat(main.settings.widthDiff + main.settings.orbitRadius / 2, ",").concat(main.settings.height / 2, ")"));
+        if (main.settings.staticLayout == 'radial') g.attr('transform', "translate(".concat(main.settings.width.sidebar + main.settings.orbitRadius / 2, ",").concat(main.settings.height / 2, ")"));
         var marks = g.selectAll('.fdg-static__mark').data(event.data.nodes).join(main.settings.shape === 'circle' ? 'circle' : 'rect').classed('fdg-static__mark', true).attr('fill', function (d) {
           return d.color;
         }).attr('fill-opacity', 0.25);
@@ -1007,7 +1007,7 @@
         } // Simulate and render force layout for all individuals.
         else {
             // Pass data, coordinates, and color to web worker.
-            var worker = simulate.call(this, noStateChange, this.settings.orbitRadius / 2, this.settings.height / 2, 'main'); // Pass web worker to draw function.
+            var worker = simulate.call(this, noStateChange, this.settings.orbitRadius / 2, this.settings.height.main / 2, 'main'); // Pass web worker to draw function.
 
             draw.call(this, worker);
           }
@@ -2496,7 +2496,7 @@
 
     function legends(data) {
       // color legend
-      if (this.settings.colorBy.type === 'categorical') {
+      if (this.settings.colorify && this.settings.colorBy.type === 'categorical') {
         var colorCounts = d3.nest().key(function (d) {
           return d.value.colorValue;
         }).rollup(function (group) {
@@ -2512,7 +2512,7 @@
       } // shape legend
 
 
-      if (this.settings.shapeBy.type === 'categorical') {
+      if (this.settings.shapify && this.settings.shapeBy.type === 'categorical') {
         var shapeCounts = d3.nest().key(function (d) {
           return d.value.shapeValue;
         }).rollup(function (group) {
@@ -3594,15 +3594,14 @@
     }
 
     function circle$1(legendItem) {
-      var area = Math.PI * Math.pow(this.legends.radius, 2);
-      console.log('circle: ', Math.round(area));
+      var area = Math.PI * Math.pow(this.legends.radius, 2); //console.log('circle: ', Math.round(area));
+
       return legendItem.append('circle').attr('cx', this.legends.svgWidth / 2).attr('cy', this.legends.svgHeight / 2).attr('r', this.legends.radius).attr('fill', 'none').attr('stroke', '#444');
     }
 
     function square$1(legendItem) {
       var side = Math.sqrt(Math.PI) * this.legends.radius;
-      var area = Math.pow(side, 2);
-      console.log('square: ', Math.round(area));
+
       return legendItem.append('rect').attr('x', this.legends.svgWidth / 2 - side / 2).attr('y', this.legends.svgHeight / 2 - side / 2).attr('width', side).attr('height', side).attr('fill', 'none').attr('stroke', '#444');
     }
 
@@ -3614,10 +3613,8 @@
       var x = this.legends.svgWidth / 2; // horizontal centerpoint
 
       var y = height / 2; // vertical centerpoint
-
-      var area = 1 / 2 * side * height; // 1/2 * base * height
-
-      console.log('triangle: ', Math.round(area)); // vertices
+      //console.log('triangle: ', Math.round(area));
+      // vertices
 
       var top = [x, y - height / 2];
       var left = [x - height / 2, y + height / 2];

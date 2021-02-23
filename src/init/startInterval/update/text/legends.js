@@ -1,6 +1,6 @@
 export default function legends(data) {
     // color legend
-    if (this.settings.colorBy.type === 'categorical') {
+    if (this.settings.colorify && this.settings.colorBy.type === 'categorical') {
         const colorCounts = d3
             .nest()
             .key((d) => d.value.colorValue)
@@ -14,7 +14,7 @@ export default function legends(data) {
     }
 
     // shape legend
-    if (this.settings.shapeBy.type === 'categorical') {
+    if (this.settings.shapify && this.settings.shapeBy.type === 'categorical') {
         const shapeCounts = d3
             .nest()
             .key((d) => d.value.shapeValue)

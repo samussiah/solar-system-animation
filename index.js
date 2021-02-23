@@ -3682,25 +3682,30 @@
       var _this = this;
 
       var main = this;
-      var container = legendTable.call(this, this.settings.shapeBy.label, this.scales.shape.domain()).classed("fdg-legend fdg-legend--shape fdg-legend--".concat(this.settings.shapeBy.type), true); // Draw symbols
+      var container;
 
-      var shapes = {
-        circle: circle$1,
-        square: square$1,
-        triangle: triangle$2,
-        diamond: diamond$1,
-        star: star$1,
-        triangleDown: triangleDown
-      };
-      container.symbols.each(function (value, i) {
-        var shape = shapes[main.scales.shape(value)].call(main, d3.select(this)).classed('fdg-legend__shape', true).classed('fdg-legend__symbol', true);
-      }); // Update counts.
+      if (this.settings.shapify) {
+        container = legendTable.call(this, this.settings.shapeBy.label, this.scales.shape.domain()).classed("fdg-legend fdg-legend--shape fdg-legend--".concat(this.settings.shapeBy.type), true); // Draw symbols
 
-      container.counts.text(function (d) {
-        return d3.format(',d')(_this.metadata.id.filter(function (di) {
-          return di.shapeStratum === d;
-        }).length);
-      });
+        var shapes = {
+          circle: circle$1,
+          square: square$1,
+          triangle: triangle$2,
+          diamond: diamond$1,
+          star: star$1,
+          triangleDown: triangleDown
+        };
+        container.symbols.each(function (value, i) {
+          var shape = shapes[main.scales.shape(value)].call(main, d3.select(this)).classed('fdg-legend__shape', true).classed('fdg-legend__symbol', true);
+        }); // Update counts.
+
+        container.counts.text(function (d) {
+          return d3.format(',d')(_this.metadata.id.filter(function (di) {
+            return di.shapeStratum === d;
+          }).length);
+        });
+      }
+
       return container;
     }
 

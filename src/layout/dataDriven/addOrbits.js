@@ -19,14 +19,15 @@ export default function addOrbits() {
         .attr('flood-color', 'black');
 
     const orbits = g
-        .selectAll('circle.orbit')
+        .selectAll('.fdg-orbit')
         .data(this.metadata.orbit)
-        .enter()
-        .append('circle')
-        .classed('orbit', true)
+        .join(this.settings.orbitShape)
+        .classed('fdg-orbit', true)
         .attr('cx', (d) => d.cx)
         .attr('cy', (d) => d.cy)
         .attr('r', (d) => d.r)
+        .attr('rx', (d) => d.rx)
+        .attr('ry', (d) => d.ry)
         .attr('fill', 'none')
         .attr('stroke', '#aaa')
         .attr('stroke-width', '.5')

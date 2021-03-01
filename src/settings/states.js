@@ -7,5 +7,9 @@ export default function states() {
         eventCount: true, // display [ n (%) ] beneath focus labels?
         eventCountType: 'current-id', // ['current-id', 'cumulative-id', 'cumulative-event']
         eventChangeCount: null, // defined in ./defineMetadata/updateEventDependentSettings
+        eventLabelFontWeight: 'bold',
+        eventLabelFontSize: '1.5rem',
+        eventCountFontWeight: 'bold',
+        eventCountFontSize: '1rem',
     };
 }

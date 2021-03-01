@@ -651,8 +651,12 @@
         // display [ n (%) ] beneath focus labels?
         eventCountType: 'current-id',
         // ['current-id', 'cumulative-id', 'cumulative-event']
-        eventChangeCount: null // defined in ./defineMetadata/updateEventDependentSettings
-
+        eventChangeCount: null,
+        // defined in ./defineMetadata/updateEventDependentSettings
+        eventLabelFontWeight: 'bold',
+        eventLabelFontSize: '1.5rem',
+        eventCountFontWeight: 'bold',
+        eventCountFontSize: '1rem'
       };
     }
 
@@ -660,17 +664,20 @@
       return {
         hideControls: false,
         focusOffset: 'heuristic',
-        // ['heuristic', 'none']
+        // ['heuristic', 'none', 'above', 'below']
         stratificationPositioning: 'circular',
         // ['circular', 'orbital']
         annotations: null,
         stateChange: 'chronological',
         // ['chronological', 'ordered']
+        stateChangeAnnotation: true,
         displayProgress: true,
         footnotes: [],
         root: {
           'left-margin': '25%'
-        }
+        },
+        orbitShape: 'circle' // ['circle', 'ellipse']
+
       };
     }
 
@@ -820,7 +827,7 @@
       canvas.context = canvas.node().getContext('2d'); // foreground SVG - annotations
 
       var svgForeground = this.util.addElement('svg--foreground', container, 'svg').attr('width', this.settings.width.canvas).attr('height', this.settings.height.main);
-      var sequenceOverlay = this.util.addElement('sequence-overlay', svgForeground, 'g').classed('fdg-focus-annotation', true).attr('transform', 'translate(20,20)');
+      var sequenceOverlay = this.util.addElement('sequence-overlay', svgForeground, 'g').classed('fdg-focus-annotation', true).classed('fdg-hidden', !this.settings.stateChangeAnnotation).attr('transform', 'translate(20,20)');
       sequenceOverlay.background = this.util.addElement('sequence-overlay__background', sequenceOverlay, 'text').classed('fdg-focus-annotation__background fdg-focus-annotation__text', true).attr('alignment-baseline', 'hanging');
       sequenceOverlay.background.sequence = this.util.addElement('sequence-overlay__background__sequence', sequenceOverlay.background, 'tspan').classed('fdg-focus-annotation__label', true).attr('x', 0).attr('y', 0).attr('alignment-baseline', 'hanging');
       sequenceOverlay.background.event = this.util.addElement('sequence-overlay__background__event', sequenceOverlay.background, 'tspan').classed('fdg-focus-annotation__event-count', true).attr('x', 0).attr('y', 30).attr('alignment-baseline', 'hanging');
@@ -863,26 +870,33 @@
       this.settings.center = {
         x: this.settings.orbitRadius / 2,
         y: this.settings.height.main / 2
-      };
-      metadata.event.forEach(function (event, i) {
-        // Define radius of the orbit on which the event focus will appear.
-        event.radius = event.order * _this.settings.orbitRadius; // Define angle of event focus.
-
-        event.theta = 2 * Math.PI * event.position / 360; // Define position along orbit on which the event focus will appear.
-
-        event.x = event.order === 0 ? _this.settings.center.x : _this.settings.center.x + event.radius * // number of orbit radii from the center
-        Math.cos(event.theta); // position along the circle at the given orbit along which
-
-        event.y = event.order === 0 ? _this.settings.center.y : _this.settings.center.y + event.radius * // number of orbit radii from the center
-        Math.sin(event.theta); // y-position of the along the given orbit at which the focus circle at the
-      }); // Calculate dimensions of orbits.
+      }; // Calculate dimensions of orbits.
 
       metadata.orbit.forEach(function (d, i) {
         d.cx = _this.settings.center.x;
         d.cy = _this.settings.center.y;
         d.r = (i + 1) * _this.settings.orbitRadius;
+        d.rx = d.r;
+        d.ry = d.r - d.r * i / (i + 2);
         d.rAdj = d.r;
         d.rAdjPrev = d.r;
+      });
+      metadata.event.forEach(function (event, i) {
+        // Define radius of the orbit on which the event focus will appear.
+        event.radius = event.order * _this.settings.orbitRadius;
+        event.rx = event.radius;
+        var orbit = metadata.orbit.findIndex(function (orbit) {
+          return orbit.values.includes(event);
+        });
+        event.ry = _this.settings.orbitShape === 'circle' || i === 0 ? event.radius : event.radius - event.radius * orbit / (orbit + 2); // Define angle of event focus.
+
+        event.theta = 2 * Math.PI * event.position / 360; // Define position along orbit on which the event focus will appear.
+
+        event.x = event.order === 0 ? _this.settings.center.x : _this.settings.center.x + event.rx * // number of orbit radii from the center
+        Math.cos(event.theta); // position along the circle at the given orbit along which
+
+        event.y = event.order === 0 ? _this.settings.center.y : _this.settings.center.y + event.ry * // number of orbit radii from the center
+        Math.sin(event.theta); // y-position of the along the given orbit at which the focus circle at the
       });
     }
 
@@ -2624,10 +2638,11 @@
 
         if (this.settings.timepoint === ((_this$currEvent = this.currEvent) === null || _this$currEvent === void 0 ? void 0 : _this$currEvent.start_timepoint)) {
           this.interval.stop();
-          updateText.call(this);
-          this.timeout = d3.timeout(function () {
+          updateText.call(this); // Skip timeout before first state.
+
+          if (this.prevEvent !== undefined) this.timeout = d3.timeout(function () {
             _this.interval = startInterval.call(_this, _this.data);
-          }, this.settings.modalSpeed);
+          }, this.settings.modalSpeed);else this.interval = startInterval.call(this, this.data);
         }
       }
     }
@@ -3776,12 +3791,16 @@
         return "orbit--".concat(i);
       });
       shadows.append('feDropShadow').attr('dx', 0).attr('dy', 0).attr('stdDeviation', 5).attr('flood-color', 'black');
-      var orbits = g.selectAll('circle.orbit').data(this.metadata.orbit).enter().append('circle').classed('orbit', true).attr('cx', function (d) {
+      var orbits = g.selectAll('.fdg-orbit').data(this.metadata.orbit).join(this.settings.orbitShape).classed('fdg-orbit', true).attr('cx', function (d) {
         return d.cx;
       }).attr('cy', function (d) {
         return d.cy;
       }).attr('r', function (d) {
         return d.r;
+      }).attr('rx', function (d) {
+        return d.rx;
+      }).attr('ry', function (d) {
+        return d.ry;
       }).attr('fill', 'none').attr('stroke', '#aaa').attr('stroke-width', '.5').style('filter', function (d, i) {
         return "url(#orbit--".concat(i, ")");
       });
@@ -3789,29 +3808,47 @@
     }
 
     function isCenter(d) {
-      return Math.round(d.y) === Math.round(this.settings.height / 2);
+      return Math.round(d.x) === Math.round(this.settings.orbitRadius / 2);
     }
 
     function isLessThanCenter(d) {
-      return Math.round(d.y) < Math.round(this.settings.height / 2);
+      return d.order === 1 || Math.round(d.x) < Math.round(this.settings.width.canvas / 2);
+    }
+
+    function getRelative(d) {
+      var centered = d.key === this.settings.eventCentral || this.settings.focusOffset === 'none' || this.settings.focusOffset === 'heuristic' && isCenter.call(this, d);
+      var above = this.settings.focusOffset === 'above' || this.settings.focusOffset === 'heuristic' && isLessThanCenter.call(this, d) === true;
+      var below = this.settings.focusOffset === 'below' || this.settings.focusOffset === 'heuristic' && isLessThanCenter.call(this, d) === false;
+      return d.key === this.settings.eventCentral || this.settings.focusOffset === 'none' ? 0 : this.settings.focusOffset === 'heuristic' && d.position === 0 ? Math.round(this.settings.orbitRadius / 4) : 0;
+    }
+
+    function isCenter$1(d) {
+      return Math.round(d.y) === Math.round(this.settings.height.main / 2);
+    }
+
+    function isLessThanCenter$1(d) {
+      return Math.round(d.y) < Math.round(this.settings.height.main / 2);
     }
 
     function getPosition(d) {
       var reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var position = isCenter.call(this, d) ? 'middle' : isLessThanCenter.call(this, d) ? 'hanging' : 'baseline';
+      var position = isCenter$1.call(this, d) ? 'middle' : isLessThanCenter$1.call(this, d) ? 'hanging' : 'baseline';
       if (reverse) position = position === 'hanging' ? 'baseline' : position === 'baseline' ? 'hanging' : position;
       return position;
     }
 
-    function getRelative(d) {
-      return d.key === this.settings.eventCentral ? 0 : isLessThanCenter.call(this, d) ? '-2.5em' : '2.5em';
+    function getRelative$1(d) {
+      var centered = d.key === this.settings.eventCentral || this.settings.focusOffset === 'none' || this.settings.focusOffset === 'heuristic' && isCenter$1.call(this, d);
+      var above = this.settings.focusOffset === 'above' || this.settings.focusOffset === 'heuristic' && isLessThanCenter$1.call(this, d) === true;
+      var below = this.settings.focusOffset === 'below' || this.settings.focusOffset === 'heuristic' && isLessThanCenter$1.call(this, d) === false;
+      return centered ? 0 : above ? -Math.round(this.settings.height.main / 12) : below ? Math.round(this.settings.height.main / 12) : 0;
     }
 
     function addLabel(text) {
       var _this = this;
 
       var label = text.append('tspan').classed('fdg-focus-annotation__label', true).attr('x', 0) //.attr('text-anchor', (d) => getTextAnchor.call(this, d))
-      .attr('text-anchor', 'middle').attr('alignment-baseline', 'middle').text(function (d) {
+      .attr('text-anchor', 'middle').attr('alignment-baseline', 'middle').style('font-size', this.settings.eventLabelFontSize).style('font-weight', this.settings.eventLabelFontWeight).text(function (d) {
         return d.key;
       });
       if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) label.attr('alignment-baseline', function (d) {
@@ -3822,7 +3859,7 @@
 
     function addEventCount(text) {
       var eventCount = text.append('tspan').classed('fdg-focus-annotation__event-count', true).classed('fdg-hidden', this.settings.eventCount === false).attr('x', 0).attr('dy', '1.3em') //.attr('text-anchor', (d) => getTextAnchor.call(this, d));
-      .attr('text-anchor', 'middle').attr('alignment-baseline', 'middle');
+      .attr('text-anchor', 'middle').attr('alignment-baseline', 'middle').style('font-size', this.settings.eventCountFontSize).style('font-weight', this.settings.eventCountFontWeight);
       return eventCount;
     }
 
@@ -3831,7 +3868,7 @@
 
       if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
         text.style('transform', function (d) {
-          return "translate(".concat(isCenter.call(_this, d) ? '-5em,0' : '0,-5em', ")");
+          return "translate(".concat(isCenter$1.call(_this, d) ? '-5em,0' : '0,-5em', ")");
         });
         label.attr('text-anchor', function (d) {
           return d.key === _this.settings.eventCentral ? 'start' : 'middle';
@@ -3843,30 +3880,47 @@
     function addFocusAnnotations() {
       var _this = this;
 
+      var main = this; // Define a radial gradient background to emphasize annotation text.
+      //const radialGradient = this.layout.focusAnnotations
+      //    .append('defs')
+      //    .append('radialGradient')
+      //    .attr('id', 'radial-gradient');
+      //radialGradient.append('stop')
+      //    .attr('offset', '0%')
+      //    .attr('stop-color', '#aaa')
+      //    .attr('stop-opacity', 1);
+      //radialGradient.append('stop')
+      //    .attr('offset', '100%')
+      //    .attr('stop-color', 'white')
+      //    .attr('stop-opacity', 0);
+
       var fociLabels = this.layout.focusAnnotations.selectAll('g.fdg-focus-annotation').data(this.metadata.event).join('g').classed('fdg-focus-annotation', true).attr('transform', function (d) {
         return "translate(".concat(d.x, ",").concat(d.y, ")");
       }); // background - white annotation highlight
       // foreground - black annotation text
 
       ['background', 'foreground'].forEach(function (pos) {
-        var text = fociLabels.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true) //.style('transform', (d) => `translate(${getDx.call(this, d)},${getDy.call(this, d)})`);
-        .style('transform', function (d) {
-          return _this.settings.focusOffset === 'heuristic' ? "translate(0,".concat(getRelative.call(_this, d), ")") : null;
+        var texts = fociLabels.append('text').classed("fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true);
+        texts.each(function (d, i) {
+          var text = d3.select(this);
+          text.attr('transform', function (d) {
+            return "translate(".concat(getRelative.call(main, d), ",").concat(getRelative$1.call(main, d), ")");
+          });
         });
-        var label = addLabel.call(_this, text).attr('y', 0).attr('dy', 0);
+        var label = addLabel.call(_this, texts).attr('y', 0).attr('dy', 0);
 
         _this.util.wrap(label, _this.settings.orbitRadius);
 
-        var eventCount = addEventCount.call(_this, text); // Position annotations differently in categorical layout.
+        var eventCount = addEventCount.call(_this, texts); // Position annotations differently in categorical layout.
 
-        categoricallyReposition.call(_this, text, label, eventCount);
+        categoricallyReposition.call(_this, texts, label, eventCount);
       }); // Annotate strata at each focus.
 
       if (this.settings.colorBy.type === 'categorical' && this.settings.colorBy.stratify) {
         this.metadata.event.forEach(function (event) {
           event.fociLabels = _this.layout.focusAnnotations.append('g').classed('fdg-focus-annotation fdg-focus-annotation--categorical', true);
           ['background', 'foreground'].forEach(function (pos) {
-            var text = event.fociLabels.selectAll("text.fdg-focus-annotation__".concat(pos)).data(event.foci).join('text').classed("fdg-focus-annotation__event-count fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true).attr('x', function (d) {
+            var texts = event.fociLabels.selectAll("text.fdg-focus-annotation__".concat(pos)).data(event.foci).join('text').classed("fdg-focus-annotation__event-count fdg-focus-annotation__text fdg-focus-annotation__".concat(pos), true).attr('x', function (d) {
               return d.dx;
             }).attr('dx', function (d) {
               return event.key === _this.settings.eventCentral ? null : '-1em';
@@ -3879,7 +3933,21 @@
             });
           });
         });
-      }
+      } // Add a radial gradient behind annotations to make text easier to read.
+      //const offset = 50;
+      //fociLabels.each(function(d) {
+      //    const g = d3.select(this);
+      //    const dimensions = this.getBBox();
+      //    const rect = g
+      //        .insert('rect', ':first-child')
+      //        .attr('x', dimensions.x - offset)
+      //        .attr('y', dimensions.y - offset)
+      //        .attr('width', dimensions.width + offset*2)
+      //        .attr('height', dimensions.height + offset*2)
+      //        .attr('fill', 'url(#radial-gradient)')
+      //        //.attr('transform', text.attr('transform'));
+      //});
+
 
       return fociLabels;
     }
@@ -3955,7 +4023,7 @@
       };
 
       for (var prop in this.settings.root) {
-        document.querySelector(':root').style.setProperty("--".concat(prop), this.settings.root[prop]);
+        document.querySelector(':root').style.setProperty("--".concat(prop), this.settings.root[prop], 'important');
       } // controls positioned absolutely
 
 

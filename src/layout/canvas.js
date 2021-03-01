@@ -26,6 +26,7 @@ export default function canvas(main) {
     const sequenceOverlay = this.util
         .addElement('sequence-overlay', svgForeground, 'g')
         .classed('fdg-focus-annotation', true)
+        .classed('fdg-hidden', !this.settings.stateChangeAnnotation)
         .attr('transform', 'translate(20,20)');
     sequenceOverlay.background = this.util
         .addElement('sequence-overlay__background', sequenceOverlay, 'text')

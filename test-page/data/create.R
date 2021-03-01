@@ -2,6 +2,7 @@ library(tidyverse)
 
 set.seed(8675309)
 n <- 100
+angle <- 45
 
 state0 <- tibble(
     id = 1:n,
@@ -19,9 +20,9 @@ state1 <- state0 %>%
         event_order = 1,
         event = sample(c('Mild', 'Moderate', 'Severe'), n, T),
         event_position = case_when(
-            event == 'Mild' ~ -20,
+            event == 'Mild' ~ -angle,
             event == 'Moderate' ~ 0,
-            event == 'Severe' ~ 20,
+            event == 'Severe' ~ angle,
             TRUE ~ NaN
         ),
         stdy = endy,
@@ -39,9 +40,9 @@ state2 <- state1 %>%
         event_order = 2,
         event = sample(c('Not Treated', 'Standard of Care', 'Rescue Meds'), n, T),
         event_position = case_when(
-            event == 'Not Treated' ~ -20,
+            event == 'Not Treated' ~ -(angle - 5),
             event == 'Standard of Care' ~ 0,
-            event == 'Rescue Meds' ~ 20,
+            event == 'Rescue Meds' ~ (angle - 5),
             TRUE ~ NaN
         ),
         stdy = endy,
@@ -54,9 +55,9 @@ state3 <- state2 %>%
         event_order = 3,
         event = sample(c('Resolved', 'Recovered / Resolved with Sequelae', 'Not Resolved'), n, T),
         event_position = case_when(
-            event == 'Resolved' ~ -20,
+            event == 'Resolved' ~ -(angle - 10),
             event == 'Recovered / Resolved with Sequelae' ~ 0,
-            event == 'Not Resolved' ~ 20,
+            event == 'Not Resolved' ~ (angle - 10),
             TRUE ~ NaN
         ),
         stdy = endy,
@@ -68,10 +69,10 @@ state4 <- state3 %>%
         event_order = 4,
         event = sample(c('Major Gain', 'Minor Gain', 'Minor Loss', 'Major Loss'), n, T),
         event_position = case_when(
-            event == 'Major Gain' ~ -20,
-            event == 'Minor Gain' ~ -20/3,
-            event == 'Minor Loss' ~ 20/3,
-            event == 'Major Loss' ~ 20,
+            event == 'Major Gain' ~ -(angle - 15),
+            event == 'Minor Gain' ~ -(angle - 15)/3,
+            event == 'Minor Loss' ~ (angle - 15)/3,
+            event == 'Major Loss' ~ (angle - 15),
             TRUE ~ NaN
         ),
         stdy = endy,
@@ -80,9 +81,9 @@ state4 <- state3 %>%
 
 states <- state0 %>%
     bind_rows(state1) %>%
-    bind_rows(state2) %>% #filter(event != 'Not Treated')) %>%
+    bind_rows(state2) %>%
     bind_rows(state3) %>%
-    bind_rows(state4) %>%
+    #bind_rows(state4) %>%
     arrange(id, event_order) %>%
     mutate(
         duration = endy - stdy + 1

@@ -9,7 +9,9 @@ export default function addEventCount(text) {
         .attr('dy', '1.3em')
         //.attr('text-anchor', (d) => getTextAnchor.call(this, d));
         .attr('text-anchor', 'middle')
-        .attr('alignment-baseline', 'middle');
+        .attr('alignment-baseline', 'middle')
+        .style('font-size', this.settings.eventCountFontSize)
+        .style('font-weight', this.settings.eventCountFontWeight);
 
     return eventCount;
 }

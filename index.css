@@ -1,8 +1,5 @@
-body {
-    overflow-x: hidden;
-}
 :root {
-    --left-margin: 25%;
+    --left-margin: 25%; /* controls the width of the sidebar */
     --background-lightest: rgba(248,248,255,.5);
     --background-lightest-opaque: rgba(248,248,255,1);
     --background-lighter: rgba(232,232,239,.5);
@@ -17,10 +14,14 @@ body {
     --background-darker-opaque: rgba(170,170,175,1);
     --background-darkest: rgba(155,155,159,.5);
     --background-darkest-opaque: rgba(155,155,159,1);
-    --text-color--blue: #003366;
-    --text-color--red: #660000;
+    --text-color--primary: #003366;
+    --text-color--secondary: #660000;
     --border: 1px solid var(--background-darkest);
     --color-emphasis: rgba(215,25,28,0.5);
+    --font-family: 'Comic Sans';
+}
+body {
+    overflow-x: hidden;
 }
 
 /*------------------------------------------------------------------------------------------------\
@@ -31,6 +32,7 @@ body {
         width: 100%;
         height: calc(100vh - 16px);
         position: relative;
+        font-family: var(--font-family);
     }
     .fdg-hidden {
         display: none !important;
@@ -67,7 +69,7 @@ body {
             justify-content: center;
             flex-direction: column;
             background: var(--background-darker);
-            color: var(--text-color--blue);
+            color: var(--text-color--primary);
         }
         .fdg-sidebar > div {
             width: calc(100% - 20px);
@@ -86,7 +88,7 @@ body {
 
             div.fdg-events {
                 font-size: 1.75rem;
-                color: var(--text-color--red);
+                color: var(--text-color--secondary);
             }
 
         /* legends */
@@ -100,8 +102,8 @@ body {
             .fdg-legend > * {
             }
             text.fdg-legend__label {
-                fill: var(--text-color--blue);
-                stroke: var(--text-color--blue);
+                fill: var(--text-color--primary);
+                stroke: var(--text-color--primary);
                 stroke-width: .3;
             }
             .fdg-legend svg {
@@ -109,7 +111,7 @@ body {
             }
             .fdg-legend__shape {
                 fill: var(--background-light);
-                stroke: var(--text-color--blue);
+                stroke: var(--text-color--primary);
                 stroke-width: 2px;
             }
             .fdg-legend table {
@@ -151,7 +153,7 @@ body {
                 fill: var(--background--lightest);
             }
             .fdg-timer__path--foreground {
-                fill: var(--text-color--blue);
+                fill: var(--text-color--primary);
                 stroke: none;
                 stroke-width: 0.5;
             }
@@ -260,7 +262,7 @@ body {
                 bottom: 6px;
                 right: 0;
                 white-space: nowrap;
-                color: var(--text-color--blue);
+                color: var(--text-color--primary);
             }
             .fdg-progress-bar {
                 position: absolute;
@@ -306,19 +308,17 @@ body {
                 text-rendering: optimizeLegibility;
             }
             .fdg-focus-annotation__foreground {
-                fill: var(--text-color--blue);
+                fill: var(--text-color--primary);
             }
             .fdg-focus-annotation__background {
                 stroke: var(--background-lightest-opaque);
             }
             .fdg-focus-annotation__label {
                 stroke-width: 4px;
-                font-weight: bold;
             }
             .fdg-focus-annotation__event-count {
                 stroke-width: 3px;
                 font-size: 1rem;
-                font-weight: bold;
             }
             .fdg-custom-annotation {
                 font-size: 3rem;
@@ -326,10 +326,10 @@ body {
                 stroke-width: 4px;
             }
             .fdg-custom-annotation .fdg-focus-annotation__foreground {
-                fill: var(--text-color--red);
+                fill: var(--text-color--secondary);
             }
             .fdg-custom-annotation__line {
-                stroke: var(--text-color--red);
+                stroke: var(--text-color--secondary);
             }
 
         /* modal */
@@ -338,7 +338,7 @@ body {
                 position: absolute;
                 padding: 2%;
                 font-size: 2rem;
-                text-shadow: var(--text-color--blue) 0px 0px 10px;
+                text-shadow: var(--text-color--primary) 0px 0px 10px;
             }
             .fdg-modal--center {
                 text-align: center;
@@ -439,7 +439,7 @@ body {
             .fdg-button:not(:last-child) {
             }
             .fdg-button--current {
-                color: var(--text-color--blue);
+                color: var(--text-color--primary);
                 background: var(--background-darker);
                 border: 1px solid var(--background-darkest);
                 font-weight: bold;

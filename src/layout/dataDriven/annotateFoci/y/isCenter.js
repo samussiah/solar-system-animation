@@ -1,3 +1,3 @@
 export default function isCenter(d) {
-    return Math.round(d.y) === Math.round(this.settings.height / 2);
+    return Math.round(d.y) === Math.round(this.settings.height.main / 2);
 }

@@ -3,6 +3,8 @@ export default function states() {
         events: null, // defined in ./defineMetadata
         individualUnit: 'individual',
         individualLabel: 'Individuals',
+        eventUnit: 'event',
+        eventLabel: 'Events',
         eventCentral: null, // defined in ./defineMetadata/updateEventDependentSettings
         eventCount: true, // display [ n (%) ] beneath focus labels?
         eventCountType: 'current-id', // ['current-id', 'cumulative-id', 'cumulative-event']

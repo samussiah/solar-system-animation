@@ -645,6 +645,8 @@
         // defined in ./defineMetadata
         individualUnit: 'individual',
         individualLabel: 'Individuals',
+        eventUnit: 'event',
+        eventLabel: 'Events',
         eventCentral: null,
         // defined in ./defineMetadata/updateEventDependentSettings
         eventCount: true,
@@ -668,6 +670,7 @@
         stratificationPositioning: 'circular',
         // ['circular', 'orbital']
         annotations: null,
+        enforceFocusVicinity: false,
         stateChange: 'chronological',
         // ['chronological', 'ordered']
         stateChangeAnnotation: true,
@@ -1061,17 +1064,7 @@
             return d.start_timepoint <= _this.settings.timepoint;
           });
           break;
-      } //const state =
-      //    index !== undefined
-      //        : this.settings.timepoint >= maxTimepoint // last state
-      //        ? group[group.length - 1]
-      //        : this.settings.timepoint < minTimepoint // first state
-      //        ? group[0]
-      //        : group.find((d, i) =>
-      //                d.start_timepoint <= this.settings.timepoint &&
-      //                this.settings.timepoint <= d.end_timepoint
-      //          ); // first (and hopefully only) state that overlaps the current timepoint
-
+      }
 
       return state;
     }
@@ -1159,10 +1152,10 @@
       var _this = this;
 
       data.nested.forEach(function (d, i) {
-        // Update individual to next event.
-        var currentState = getState.call(_this, d.value.group);
+        // Capture next state.
+        var currentState = getState.call(_this, d.value.group); // When state changes update current and previous state objects of individual.
 
-        if (d.value.state !== currentState && !d.value.locked) {
+        if (d.value.state !== currentState && (_this.settings.enforceFocusVicinity === false || d.value.inVicinityOfFocus === true || d.value.state.event === _this.settings.eventCentral)) {
           d.value.statePrevious = d.value.state;
           d.value.state = currentState;
         }
@@ -1170,6 +1163,8 @@
         var aestheticValues = getAestheticValues.call(_this, d.value.group, d.value.state);
         d.value.coordinates = getCoordinates.call(_this, d.value.state, aestheticValues.colorValue);
         d.value.distance = Math.sqrt(Math.pow(d.x - _this.settings.center.x, 2) + Math.pow(d.y - _this.settings.center.y, 2));
+        d.value.distanceFromFocus = Math.sqrt(Math.pow(d.x - d.value.coordinates.x, 2) + Math.pow(d.y - d.value.coordinates.y, 2));
+        d.value.inVicinityOfFocus = d.value.distanceFromFocus < _this.settings.orbitRadius / 8;
         d.value.colorScale = getColorScale.call(_this, aestheticValues.colorValue);
         var aesthetics = getAesthetics.call(_this, aestheticValues, d.value.colorScale);
         Object.assign(d.value, aestheticValues, aesthetics);
@@ -1474,8 +1469,7 @@
         var duration = d3.sum(group, function (d) {
           return d.duration;
         });
-        var noStateChange = group.length === 1;
-        // state-level values - calculated once per timepoint
+        var noStateChange = group.length === 1 && group[0].event === _this.settings.eventCentral; // state-level values - calculated once per timepoint
 
         var state = getState.call(_this, group, 0);
         var aestheticValues = getAestheticValues.call(_this, group, state);

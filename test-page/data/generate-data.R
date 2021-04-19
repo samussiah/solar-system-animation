@@ -5,14 +5,14 @@ generateData <- function(
     states = list(
         list(
             value = 'Home',
-            probability = .75,
+            probability = .7,
             duration = 0,
             recurrence = TRUE,
             final = FALSE
         ),
         list(
             value = 'Hospitalization',
-            probability = .15,
+            probability = .2,
             duration = 28,
             recurrence = TRUE,
             final = FALSE
@@ -71,12 +71,19 @@ generateData <- function(
             j = j + 1
 
             # Randomly sample a state.
-            random_number <- runif(1)
-            state <- states %>%
-                filter(
-                    probability_lower <= random_number &
-                    random_number < probability_upper
-                )
+            if (j == 1) {
+                state <- states %>%
+                    filter(
+                        row_number() == 1
+                    )
+            } else {
+                random_number <- runif(1)
+                state <- states %>%
+                    filter(
+                        probability_lower <= random_number &
+                        random_number < probability_upper
+                    )
+            }
             
             if (!is.null(strata))
                 for (stratum in strata_sampled)
@@ -127,7 +134,6 @@ generateData <- function(
 
 data <- generateData(
     10000,
-    821,
     strata = list(
         list(
             key = 'arm',

@@ -1,6 +1,7 @@
 import simulate from './addStaticForceSimulation/simulate';
 import draw from './addStaticForceSimulation/draw';
 
+// TODO: add one static force simulation per state rather than only at the central state
 export default function addStaticForceSimulation() {
     if (this.settings.drawStaticSeparately) {
         this.layout.svgBackground.selectAll('.fdg-static').remove();

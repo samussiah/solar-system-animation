@@ -4,6 +4,7 @@ export default function miscellaneous() {
         focusOffset: 'heuristic', // ['heuristic', 'none', 'above', 'below']
         stratificationPositioning: 'circular', // ['circular', 'orbital']
         annotations: null,
+        enforceFocusVicinity: false,
         stateChange: 'chronological', // ['chronological', 'ordered']
         stateChangeAnnotation: true,
         displayProgress: true,

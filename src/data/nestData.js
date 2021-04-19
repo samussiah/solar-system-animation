@@ -22,8 +22,7 @@ export default function nestData(data) {
         .rollup((group) => {
             // individual-level values - calculated once
             const duration = d3.sum(group, (d) => d.duration);
-            const noStateChange = group.length === 1;
-            const locked = false; // used to anchor individuals at a focus
+            const noStateChange = group.length === 1 && group[0].event === this.settings.eventCentral;
 
             // state-level values - calculated once per timepoint
             const state = getState.call(this, group, 0);

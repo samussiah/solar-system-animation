@@ -4,7 +4,7 @@ import getCoordinates from './nestData/getCoordinates';
 import getColorScale from './nestData/getColorScale';
 import getAesthetics from './nestData/getAesthetics';
 
-export default function nestData(data) {
+export default function structure(data) {
     // sequenced animation (vs timed animation)
     // one interval per state
     // each interval is offset by the position of the ID in the full set of IDs:
@@ -16,13 +16,14 @@ export default function nestData(data) {
     // - at timepoint 1 ID 001 moves to s1
     // - at timepoint 2 ID 001 moves to s2 and ID 002 moves to s1
     // - ...
-    const nestedData = d3
+    const grouped = d3
         .nest()
         .key((d) => d.id)
         .rollup((group) => {
             // individual-level values - calculated once
             const duration = d3.sum(group, (d) => d.duration);
-            const noStateChange = group.length === 1 && group[0].event === this.settings.eventCentral;
+            const noStateChange =
+                group.length === 1 && group[0].event === this.settings.eventCentral;
 
             // state-level values - calculated once per timepoint
             const state = getState.call(this, group, 0);
@@ -51,5 +52,5 @@ export default function nestData(data) {
         })
         .entries(data);
 
-    return nestedData;
+    return grouped;
 }

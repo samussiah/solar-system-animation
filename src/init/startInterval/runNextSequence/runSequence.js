@@ -1,5 +1,5 @@
 import fadeIn from './runSequence/fadeIn';
-import nestData from '../../../data/nestData';
+import structure from '../../../data/structure';
 import addForceSimulation from '../../addForceSimulation';
 import updateData from '../update/data';
 import updateText from '../update/text';
@@ -106,7 +106,7 @@ export default function runSequence() {
     // TODO: define a function to maintain state of nodes through animation, e.g. when changing
     // animation track between full animation and sequences or resetting the animation
     if (this.sequence.eventIndex === 0) {
-        this.sequence.data.nested = nestData.call(this, this.sequence.data);
+        this.sequence.data.nested = structure.call(this, this.sequence.data);
         this.sequence.data.nested.forEach((d) => {
             const node = this.nodes.find((node) => node.key === d.key);
             for (const prop in node)

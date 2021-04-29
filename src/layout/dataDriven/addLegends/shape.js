@@ -14,7 +14,10 @@ export default function shape() {
     if (this.settings.shapify) {
         container = legendTable
             .call(this, this.settings.shapeBy.label, this.scales.shape.domain())
-            .classed(`fdg-legend fdg-legend--shape fdg-legend--${this.settings.shapeBy.type}`, true);
+            .classed(
+                `fdg-legend fdg-legend--shape fdg-legend--${this.settings.shapeBy.type}`,
+                true
+            );
 
         // Draw symbols
         const shapes = {

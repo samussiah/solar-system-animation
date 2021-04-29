@@ -38,7 +38,7 @@ export default function addFocusAnnotations() {
             .append('text')
             .classed(`fdg-focus-annotation__text fdg-focus-annotation__${pos}`, true);
 
-        texts.each(function(d,i) {
+        texts.each(function (d, i) {
             const text = d3.select(this);
             text.attr(
                 'transform',

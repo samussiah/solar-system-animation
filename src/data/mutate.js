@@ -4,7 +4,7 @@ import addVariables from './mutateData/addVariables';
 import orderByState from './mutateData/orderByState';
 import sort from './mutateData/sort';
 
-export default function mutateData() {
+export default function mutate() {
     // Check for existence of variables.
     const has = hasVariables.call(this);
 

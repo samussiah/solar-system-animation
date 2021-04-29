@@ -20,8 +20,7 @@ export default function timeoutBetweenStates() {
                 this.timeout = d3.timeout(() => {
                     this.interval = startInterval.call(this, this.data);
                 }, this.settings.modalSpeed);
-            else
-                this.interval = startInterval.call(this, this.data);
+            else this.interval = startInterval.call(this, this.data);
         }
     }
 }

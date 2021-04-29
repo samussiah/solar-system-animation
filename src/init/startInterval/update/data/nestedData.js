@@ -11,14 +11,10 @@ export default function nestedData(data) {
 
         // When state changes update current and previous state objects of individual.
         if (
-            d.value.state !== currentState
-            && (
-                this.settings.enforceFocusVicinity === false ||
-                (
-                    d.value.inVicinityOfFocus === true
-                    || d.value.state.event === this.settings.eventCentral
-                )
-            )
+            d.value.state !== currentState &&
+            (this.settings.enforceFocusVicinity === false ||
+                d.value.inVicinityOfFocus === true ||
+                d.value.state.event === this.settings.eventCentral)
         ) {
             d.value.statePrevious = d.value.state;
             d.value.state = currentState;
@@ -32,7 +28,7 @@ export default function nestedData(data) {
         d.value.distanceFromFocus = Math.sqrt(
             (d.x - d.value.coordinates.x) ** 2 + (d.y - d.value.coordinates.y) ** 2
         );
-        d.value.inVicinityOfFocus = d.value.distanceFromFocus < this.settings.orbitRadius/8;
+        d.value.inVicinityOfFocus = d.value.distanceFromFocus < this.settings.orbitRadius / 8;
         d.value.colorScale = getColorScale.call(this, aestheticValues.colorValue);
         const aesthetics = getAesthetics.call(this, aestheticValues, d.value.colorScale);
 

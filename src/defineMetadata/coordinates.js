@@ -14,7 +14,7 @@ export default function coordinates(metadata) {
         d.cy = this.settings.center.y;
         d.r = (i + 1) * this.settings.orbitRadius;
         d.rx = d.r;
-        d.ry = d.r - d.r * i / (i + 2);
+        d.ry = d.r - (d.r * i) / (i + 2);
         d.rAdj = d.r;
         d.rAdjPrev = d.r;
     });
@@ -23,11 +23,11 @@ export default function coordinates(metadata) {
         // Define radius of the orbit on which the event focus will appear.
         event.radius = event.order * this.settings.orbitRadius;
         event.rx = event.radius;
-        const orbit = metadata.orbit
-            .findIndex(orbit => orbit.values.includes(event));
-        event.ry = this.settings.orbitShape === 'circle' || i === 0
-            ? event.radius
-            : event.radius - event.radius * orbit / (orbit + 2);
+        const orbit = metadata.orbit.findIndex((orbit) => orbit.values.includes(event));
+        event.ry =
+            this.settings.orbitShape === 'circle' || i === 0
+                ? event.radius
+                : event.radius - (event.radius * orbit) / (orbit + 2);
 
         // Define angle of event focus.
         event.theta = (2 * Math.PI * event.position) / 360;

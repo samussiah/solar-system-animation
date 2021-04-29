@@ -4,10 +4,7 @@ fetch('./data/2e4.csv')
     .then(text => d3.csvParse(text))
     .then(data => {
         data.forEach(d => {
-            //if (d.event === 'ICU') {
-            //    d.duration = Math.ceil(Math.random() * 5);
-            //    d.endy = d.stdy + d.duration - 1;
-            //}
+            delete d.duration;
         });
         const fdg = forceDirectedGraph(
             data,

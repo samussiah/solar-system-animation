@@ -9,6 +9,11 @@ import startInterval from './init/startInterval';
 export default function init() {
     this.settings_initial = { ...this.settings };
 
+    // Update metadata.
+    this.metadata.event.forEach((event) => {
+        event.data = this.data.nested.filter((d) => d.value.state.event === event.key);
+    });
+
     // Cycle through text that displays over animation.
     runModal.call(this);
 
@@ -27,16 +32,13 @@ export default function init() {
 
     // Start the animation.
     if (this.settings.playPause === 'play')
-        this.timeout = d3.timeout(
-            () => {
-                // Run first sequence.
-                if (this.settings.runSequences === true) {
-                    this.sequence = getNextSequence.call(this, false);
-                    runSequence.call(this); // calls startInterval
-                }
-                // Run full animation.
-                else this.interval = startInterval.call(this, this.data);
-            },
-            this.settings.delay
-        );
+        this.timeout = d3.timeout(() => {
+            // Run first sequence.
+            if (this.settings.runSequences === true) {
+                this.sequence = getNextSequence.call(this, false);
+                runSequence.call(this); // calls startInterval
+            }
+            // Run full animation.
+            else this.interval = startInterval.call(this, this.data);
+        }, this.settings.delay);
 }

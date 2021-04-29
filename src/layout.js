@@ -14,7 +14,9 @@ export default function layout() {
     };
 
     for (const prop in this.settings.root) {
-        document.querySelector(':root').style.setProperty(`--${prop}`, this.settings.root[prop]);
+        document
+            .querySelector(':root')
+            .style.setProperty(`--${prop}`, this.settings.root[prop], 'important');
     }
 
     // controls positioned absolutely

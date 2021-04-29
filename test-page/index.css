@@ -1,10 +1,10 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);
-* {
+html {
     padding: 0;
     margin: 0;
     font-family: 'Bookman';
 }
-body > * {
+body > div {
     width: 96%;
     margin: .75rem 2%;
 }

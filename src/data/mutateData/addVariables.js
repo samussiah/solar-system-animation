@@ -27,7 +27,7 @@ export default function addVariables(has) {
 
                 // Define duration when only timepoints exist.
                 if (!has.duration && has.start_timepoint && has.end_timepoint) {
-                    d.duration = d.start_timepoint - d.end_timepoint + 1;
+                    d.duration = d.end_timepoint - d.start_timepoint + 1;
                 }
             });
 

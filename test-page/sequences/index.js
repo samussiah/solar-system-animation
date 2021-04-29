@@ -52,23 +52,33 @@ fetch('../data/adverse-event-outcome.csv')
                 //    fast: 25,
                 //},
                 speed: 'fast',
-                delay: 15000,
+                delay: 0,//15000,
                 //playPause: 'pause',
                 //modalSpeed: 2500,
                 modalPosition: 'bottom-right',
+                stateChangeAnnotation: false,
+                //minRadius: 5,
                 eventCountType: 'cumulative-id',
                 collisionPadding: 3,
                 manyBody: 'forceManyBody',
-                focusOffset: 'none',
+                focusOffset: 'below',
                 stateChange: 'ordered',
                 footnotes: [
                     '<sup>1</sup> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                     '<sup>2</sup> Proin sagittis nisl rhoncus mattis rhoncus urna neque viverra.',
                     '<sup>3</sup> Quam id leo in vitae.',
                 ],
+                orbitShape: 'ellipse',
                 root: {
                     'left-margin': '17%',
-                }
+                    'text-color--primary': 'black',
+                    'text-color--secondary': 'black',
+                    'font-family': 'Arial',
+                },
+                eventLabelFontWeight: 'normal',
+                eventLabelFontSize: '1.75rem',
+                eventCountFontWeight: 'bold',
+                eventCountFontSize: '1.5rem',
             }
         );
     });

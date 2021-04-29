@@ -15,9 +15,12 @@ export default function timeoutBetweenStates() {
 
             updateText.call(this);
 
-            this.timeout = d3.timeout(() => {
-                this.interval = startInterval.call(this, this.data);
-            }, this.settings.modalSpeed);
+            // Skip timeout before first state.
+            if (this.prevEvent !== undefined)
+                this.timeout = d3.timeout(() => {
+                    this.interval = startInterval.call(this, this.data);
+                }, this.settings.modalSpeed);
+            else this.interval = startInterval.call(this, this.data);
         }
     }
 }

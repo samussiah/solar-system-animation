@@ -22,7 +22,8 @@ export default function addFreqTable() {
                 : `Number of ${this.settings.eventLabel}`
         );
     freqTable.table = freqTable.container.append('table').classed('fdg-freq-table__table', true);
-    freqTable.thead = freqTable.table.append('thead')
+    freqTable.thead = freqTable.table
+        .append('thead')
         .classed('fdg-freq-table__thead', true)
         .classed('fdg-hidden', this.settings.freqTable.header === false);
 
@@ -43,7 +44,15 @@ export default function addFreqTable() {
                 }`
         )
         .classed('fdg-freq-table__th', true)
-        .text((d) => d === 'label' ? '' : d === 'id' ? this.settings.individualLabel : d === 'event' ? this.settings.eventLabel : d);
+        .text((d) =>
+            d === 'label'
+                ? ''
+                : d === 'id'
+                ? this.settings.individualLabel
+                : d === 'event'
+                ? this.settings.eventLabel
+                : d
+        );
 
     // Add info icon explaining bars.
     if (this.settings.freqTable.bars)

@@ -103,6 +103,9 @@ body {
             }
             .fdg-legend > * {
             }
+            .fdg-legend__label {
+                font-weight: bold;
+            }
             text.fdg-legend__label {
                 fill: var(--text-color--primary);
                 stroke: var(--text-color--primary);
@@ -124,6 +127,10 @@ body {
             }
             .fdg-legend td:first-child svg {
                 width: 20px;
+            }
+            .fdg-legend td:nth-child(2) {
+                font-weight: lighter;
+                font-size: 1rem;
             }
             .fdg-legend td:last-child {
                 text-align: right;

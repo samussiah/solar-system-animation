@@ -1,4 +1,4 @@
-fetch('./data/1e5.csv')
+fetch('./data/2e4.csv')
     .then(response => response.text())
     .then(text => d3.csvParse(text))
     .then(data => {
@@ -18,8 +18,8 @@ fetch('./data/1e5.csv')
                 drawStaticSeparately: true,
                 shapeBy: {
                     type: 'categorical',
-                    label: 'Sex',
-                    variable: 'sex'
+                    label: 'Arm',
+                    variable: 'arm'
                 },
                 minRadius: 3,
                 fill: true,

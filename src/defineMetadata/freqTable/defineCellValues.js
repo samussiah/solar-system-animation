@@ -1,23 +1,25 @@
 export default function defineCellValues(d) {
-    const cells = [{
-        key: 'label',
-        label: '',
-        value: d.label
-    }];
+    const cells = [
+        {
+            key: 'label',
+            label: '',
+            value: d.label,
+        },
+    ];
 
     if (this.settings.freqTable.structure === 'vertical') {
-        this.settings.freqTable.columns.forEach(column => {
+        this.settings.freqTable.columns.forEach((column) => {
             if (column === 'id')
                 cells.push({
                     key: 'id',
                     label: this.settings.individualLabel,
-                    value: d.fmt.idNumeratorPercent
+                    value: d.fmt.idNumeratorPercent,
                 });
             if (column === 'event')
                 cells.push({
                     key: 'event',
                     label: this.settings.evetLabel,
-                    value: d.fmt.eventNumerator
+                    value: d.fmt.eventNumerator,
                 });
         });
     }
@@ -33,11 +35,11 @@ export default function defineCellValues(d) {
             cells.push({
                 key: 'event',
                 label: this.settings.eventLabel,
-                value: d.fmt.eventNumerator
+                value: d.fmt.eventNumerator,
             });
 
         if (d.foci)
-            d.foci.forEach(focus => {
+            d.foci.forEach((focus) => {
                 if (this.settings.freqTable.countType === 'id')
                     cells.push({
                         key: `id--${focus.key}`,

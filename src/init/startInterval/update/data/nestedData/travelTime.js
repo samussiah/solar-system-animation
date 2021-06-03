@@ -14,7 +14,9 @@ export default function travelTime(d) {
     const destination = d.value.state;
     const duration = d.value.state.duration;
     const transitTime = this.settings.timepoint - d.value.state.start_timepoint;
-    const transitThreshold = d.value.state.event_order*100/Math.ceil(Math.sqrt(this.settings.speeds[this.settings.speed]));
+    const transitThreshold =
+        (d.value.state.event_order * 100) /
+        Math.ceil(Math.sqrt(this.settings.speeds[this.settings.speed]));
 
     //if (
     //    !(

@@ -11,9 +11,7 @@ export default function nestedData(data) {
         const currentState = getState.call(this, d.value.group);
 
         // On state change update current and previous state objects of individual.
-        if (
-            d.value.state !== currentState
-        ) {
+        if (d.value.state !== currentState) {
             d.value.statePrevious = d.value.state;
             d.value.state = currentState;
         }
@@ -35,15 +33,20 @@ export default function nestedData(data) {
         // Update coordinates once node reaches vicinity of destination or when time since
         // previous state crosses some threshold.
         d.value.transitTime++;
-        const transitThreshold = 500/Math.ceil(Math.sqrt(this.settings.speeds[this.settings.speed]));
+        const transitThreshold =
+            500 / Math.ceil(Math.sqrt(this.settings.speeds[this.settings.speed]));
         if (
-            this.settings.enforceFocusVicinity === false
-            || d.value.inVicinityOfFocus
-            || d.value.statePrevious?.event === this.settings.eventCentral
-            || d.value.transitTime > transitThreshold
+            this.settings.enforceFocusVicinity === false ||
+            d.value.inVicinityOfFocus ||
+            d.value.statePrevious?.event === this.settings.eventCentral ||
+            d.value.transitTime > transitThreshold
         ) {
             d.value.transitTime = 0;
-            d.value.coordinates = getCoordinates.call(this, d.value.state, aestheticValues.colorValue);
+            d.value.coordinates = getCoordinates.call(
+                this,
+                d.value.state,
+                aestheticValues.colorValue
+            );
         }
 
         Object.assign(d.value, aestheticValues, aesthetics);

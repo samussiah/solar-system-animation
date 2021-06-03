@@ -5,17 +5,6 @@ import getColorScale from './nestData/getColorScale';
 import getAesthetics from './nestData/getAesthetics';
 
 export default function structure(data) {
-    // sequenced animation (vs timed animation)
-    // one interval per state
-    // each interval is offset by the position of the ID in the full set of IDs:
-    // - ID 001 begins at timepoint 1
-    // - ID 002 begins at timepoint 2
-    // - ...
-    // the full duration of each ID is the number of times they change states
-    // - at timepoint 0 all IDs are at s0
-    // - at timepoint 1 ID 001 moves to s1
-    // - at timepoint 2 ID 001 moves to s2 and ID 002 moves to s1
-    // - ...
     const grouped = d3
         .nest()
         .key((d) => d.id)
@@ -43,6 +32,7 @@ export default function structure(data) {
                 noStateChange, // boolean: did individual ever change state?
                 stateprevious: null, // object: datum at previous timepoint
                 state, // object: datum at current timepoint
+                transitTime: 0, // number: time since changing states
                 ...aestheticValues, // number/string, number, string: colorValue, sizeValue, shapeValue
                 coordinates, // object: { x, y }
                 distance,

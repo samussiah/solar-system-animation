@@ -10,10 +10,10 @@ export default function freqTable() {
             .data(d.cells)
             .join('td')
             .style('background', (di, i) =>
-                i === 1 && main.settings.freqTable.bars
+                di.key === 'id' && main.settings.freqTable.bars
                     ? `linear-gradient(to right, var(--background-darkest) 0, var(--background-darkest) ${relativeProportionFmt}, transparent ${relativeProportionFmt})`
                     : null
             )
-            .text((d) => d);
+            .text((d) => d.value);
     });
 }

@@ -11,9 +11,10 @@ export default function makeLegend(type) {
         .append('div')
         .classed('fdg-sidebar__label fdg-legend__label', true)
         .html(
-            `Number of <span class = "fdg-measure">${this.util.csv(
-                this.settings.eventChangeCount
-            )}</span> events`
+            `Number of events`
+            //`Number of <span class = "fdg-measure">${this.util.csv(
+            //    this.settings.eventChangeCount
+            //)}</span> events`
         );
 
     // svg
@@ -22,7 +23,7 @@ export default function makeLegend(type) {
         .attr('width', legendDimensions[0])
         .attr('height', legendDimensions[1])
         .append('g')
-        .attr('transform', 'translate(23,0)');
+        .attr('transform', `translate(${this.legends.svgWidth / 2 - this.legends.radius - 6},0)`);
 
     // marks
     const marks = makeLegendMarks[type].call(this, svg, legendDimensions);

@@ -19,6 +19,11 @@ export default function legendTable(label, domain) {
     // Add body rows.
     container.rows = container.table.append('tbody').selectAll('tr').data(domain).join('tr');
 
+    // Add labels to second cell of each row.
+    container.labels = container.rows.append('td')
+        .style('padding-left', `${this.legends.svgWidth / 2 - this.legends.radius}px`)
+        .html((d) => d);
+
     // Add SVG elements to first cell of each row.
     container.symbols = container.rows
         .append('td')
@@ -27,9 +32,6 @@ export default function legendTable(label, domain) {
         .style('height', this.legends.svgHeight)
         .append('g')
         .attr('transform', 'translate(0,2)');
-
-    // Add labels to second cell of each row.
-    container.labels = container.rows.append('td').html((d) => d);
 
     // Add counts to third cell of each row.
     container.counts = container.rows.append('td');

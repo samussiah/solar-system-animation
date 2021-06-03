@@ -18,7 +18,7 @@
     --text-color--secondary: #660000;
     --border: 1px solid var(--background-darkest);
     --color-emphasis: rgba(215,25,28,0.5);
-    --font-family: 'Comic Sans';
+    --font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Arial, "Trebuchet MS", Verdana, sans-serif;
 }
 body {
     overflow-x: hidden;
@@ -76,18 +76,20 @@ body {
             padding: 10px;
             background-clip: padding-box;
         }
-        .fdg-events,
         .fdg-sidebar__label {
-            padding-bottom: 8px;
-            font-size: 1.75rem;
-            font-weight: 600;
+            padding-bottom: 2px;
+            font-size: 1.25rem;
+            font-weight: 300;
             text-align: left;
         }
 
         /* events */
 
             div.fdg-events {
-                font-size: 1.75rem;
+                padding-bottom: 2px;
+                font-size: 2.5rem;
+                font-weight: lighter;
+                text-align: left;
                 color: var(--text-color--secondary);
             }
 
@@ -125,6 +127,8 @@ body {
             }
             .fdg-legend td:last-child {
                 text-align: right;
+                font-weight: bold;
+                font-variant-numeric: tabular-nums;
             }
 
         /* progress */
@@ -164,8 +168,8 @@ body {
                 font-size: 2.25rem;
                 top: 3rem;
                 position: absolute;
-                fill: #660000;
-                stroke: #660000;
+                fill: var(--text-color--secondary);
+                stroke: var(--text-color--secondary);
                 margin-left: 4px;
             }
             .fdg-countdown {
@@ -181,6 +185,9 @@ body {
                 background: var(--background-lightest);
                 overflow-x: auto;
             }
+            .fdg-freq-table__title {
+                font-weight: bold;
+            }
             .fdg-freq-table__table {
                 width: 100%;
                 white-space: nowrap;
@@ -195,6 +202,8 @@ body {
             .fdg-freq-table__th:first-child,
             .fdg-freq-table__td:first-child {
                 padding-left: 0;
+                font-weight: lighter;
+                font-size: 1rem;
             }
             .fdg-freq-table__th:last-child,
             .fdg-freq-table__td:last-child {
@@ -213,26 +222,30 @@ body {
 
             /* vertical table structure */
 
-            .fdg-freq-table__th--individual {
+            .fdg-freq-table__th--id {
                 direction: rtl;
             }
             .fdg-freq-table__tr--subgroup .fdg-freq-table__td--label {
                 padding-left: 1rem;
             }
-            .fdg-freq-table__td--individual {
+            .fdg-freq-table__td--id {
                 text-align: right;
                 position: relative;
                 border: 1px solid var(--background-darkest);
                 padding: 0 4px;
+                font-variant-numeric: tabular-nums;
             }
             .fdg-freq-table__td--event {
                 text-align: right;
+                font-weight: bold;
+                font-variant-numeric: tabular-nums;
             }
 
             /* horizontal table structure */
 
             .fdg-freq-table__td--freq {
                 text-align: right;
+                font-variant-numeric: tabular-nums;
             }
 
     /**-------------------------------------------------------------------------------------------\

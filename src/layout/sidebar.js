@@ -4,7 +4,8 @@ import addCountdown from './sidebar/addCountdown';
 export default function sidebar(main) {
     const container = this.util.addElement('sidebar', main);
     this.settings.width.sidebar = container.node().clientWidth;
-    const events = this.util.addElement('events', container).html(this.settings.individualLabel);
+    const events = this.util.addElement('events', container)
+        .html(this.settings.eventLabel);
     const legends = this.util.addElement('legends', container);
     const progress = this.util
         .addElement('progress', container)

@@ -4,9 +4,9 @@ export default function timing() {
         delay: 5000,
         speed: 'medium',
         speeds: {
-            slow: 1000,
-            medium: 500,
-            fast: 100,
+            slow: Math.pow(2, 10),
+            medium: Math.pow(2, 8),
+            fast: Math.pow(2, 6),
         },
         timepoint: 0, // initial timepoint
         timeUnit: 'day', // time unit that appears in labels

@@ -7,8 +7,8 @@ export default function display() {
         .append('div')
         .classed('fdg-display-controls', true)
         .datum({
-            state: true,
-            symbol: '-',
+            state: !this.settings.minimizeControls,
+            symbol: this.settings.minimizeControls ? '+' : '-',
         })
         .html((d) => `Controls <span class = 'fdg-expand'>${d.symbol}</span>`)
         .attr('title', (d) => (d.state ? 'Hide controls.' : 'Display controls.'));

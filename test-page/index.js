@@ -11,37 +11,21 @@ fetch('./data/2e4.csv')
             '#container',
             {
                 individualUnit: 'patient',
-                individualLabel: 'Patients with Heart Failure',
+                individualLabel: 'Patients',
                 eventUnit: 'event',
                 eventLabel: 'HFrEF events',
                 timeRelative: 'since randomization',
-                drawStaticSeparately: true,
-                shapeBy: {
-                    type: 'categorical',
-                    label: 'Arm',
-                    variable: 'arm'
-                },
                 minRadius: 3,
                 fill: true,
                 eventChangeCount: [
                     'Hospitalization',
                     'ICU',
                 ],
-                freqTable: {
-                    title: 'Cumulative Number of Events',
-                    columns: ['label', 'event'],
-                    header: false,
-                },
-                delay: 5000,
-                timepoint: 700,
-                speed: 'medium',
-                loop: false,
-                enforceFocusVicinity: true,
-                manyBody: 'forceManyBodySampled', // ['forceManyBody', 'forceManyBodyReuse', 'forceManyBodySampled']
+                minimizeControls: true,
                 root: {
                     'text-color--secondary': 'rgb(224, 1, 63)',
                     'text-color--primary': '#14385d',
-                    'left-margin': '20%',
+                    'left-margin': '25%',
                 },
             }
         );

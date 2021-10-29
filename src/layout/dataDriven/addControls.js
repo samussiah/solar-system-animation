@@ -42,4 +42,8 @@ export default function addControls() {
             if (this.classList.contains('fdg-button--clicked'))
                 this.classList.toggle('fdg-button--clicked');
         });
+
+    this.controls.containers.each(function () {
+        this.classList.toggle('fdg-control--collapsed');
+    });
 }

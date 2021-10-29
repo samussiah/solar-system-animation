@@ -1879,8 +1879,8 @@
             .append('div')
             .classed('fdg-display-controls', true)
             .datum({
-                state: true,
-                symbol: '-',
+                state: !this.settings.minimizeControls,
+                symbol: this.settings.minimizeControls ? '+' : '-',
             })
             .html(function (d) {
                 return "Controls <span class = 'fdg-expand'>".concat(d.symbol, '</span>');
@@ -4389,6 +4389,9 @@
                 if (this.classList.contains('fdg-button--clicked'))
                     this.classList.toggle('fdg-button--clicked');
             });
+        this.controls.containers.each(function () {
+            this.classList.toggle('fdg-control--collapsed');
+        });
     }
 
     function color$1(svg, legendDimensions) {

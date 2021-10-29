@@ -30,7 +30,7 @@ export default function addOrbits() {
         .attr('ry', (d) => d.ry)
         .attr('fill', 'none')
         .attr('stroke', '#aaa')
-        .attr('stroke-width', '.5')
+        .attr('stroke-width', '2.5')
         .style('filter', (d, i) => `url(#orbit--${i})`);
 
     return orbits;

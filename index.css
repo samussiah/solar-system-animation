@@ -397,10 +397,11 @@ body {
         /* container */
 
             .fdg-controls {
-                width: 5%;
+                width: 7.5%;
                 position: absolute;
                 right: 0;
-                top: 0;
+                top: 50%;
+                transform: translateY(-50%);
                 padding: 10px;
                 display: flex;
                 justify-content: center;

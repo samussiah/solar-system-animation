@@ -8,6 +8,7 @@ export default function timing() {
             medium: Math.pow(2, 8),
             fast: Math.pow(2, 6),
         },
+        speedChange: null,
         timepoint: 0, // initial timepoint
         timeUnit: 'day', // time unit that appears in labels
         timeRelative: null, // e.g. "from baseline"

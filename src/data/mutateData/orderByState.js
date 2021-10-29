@@ -1,6 +1,6 @@
 // Generates an alternative state progression by orbit, state, and ID.
 export default function orderByState() {
-    if (this.settings.stateChange === 'ordered') {
+    if (this.settings.stateChange === 'ordered' && this.metadata) {
         // start timepoint
         // - first state: 1
         // - subsequent states: position of ID in ID list of previous state
@@ -9,6 +9,7 @@ export default function orderByState() {
         // - first state: position of ID in ID list of current state
         // - subsequent states: start timepoint of current state + position of ID in ID list of current state
 
+        console.log(this.metadata);
         d3.nest()
             .key((d) => d.id)
             .rollup((group) => {

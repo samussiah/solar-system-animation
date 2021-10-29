@@ -51,8 +51,8 @@ fetch('../data/adverse-event-outcome.csv')
                 //speeds: {
                 //    fast: 25,
                 //},
-                speed: 'fast',
-                delay: 0,//15000,
+                speed: 'slow',
+                delay: 1000,//15000,
                 //playPause: 'pause',
                 //modalSpeed: 2500,
                 modalPosition: 'bottom-right',

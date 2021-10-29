@@ -8,6 +8,18 @@ export const increment = function (data, increment) {
     // Increment timepoint.
     this.settings.timepoint += !!increment;
 
+    // Update speed.
+    if (
+        Array.isArray(this.settings.speedChange) &&
+        this.settings.speedChange.map((speed) => speed.timepoint).includes(this.settings.timepoint)
+    ) {
+        this.settings.speed = this.settings.speedChange.find(
+            (speed) => speed.timepoint === this.settings.timepoint
+        ).speed;
+        if (!!this.interval) this.interval.stop();
+        this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
+    }
+
     timeoutBetweenStates.call(this);
 
     // Update animation if current timepoint is less than full duration of animation.

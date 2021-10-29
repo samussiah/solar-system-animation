@@ -4,6 +4,7 @@ import addForceSimulation from './init/addForceSimulation';
 import { increment } from './init/startInterval';
 import getNextSequence from './init/startInterval/runNextSequence/getNextSequence';
 import runSequence from './init/startInterval/runNextSequence/runSequence';
+import update from './init/startInterval/update';
 import startInterval from './init/startInterval';
 
 export default function init() {
@@ -20,6 +21,8 @@ export default function init() {
     // Add a static force layout in the background for individuals that never change state (improves
     // performance by reducing the number of nodes in the simulation).
     addStaticForceSimulation.call(this);
+
+    update.call(this, this.data);
 
     // Add a dynamic force layout in the middleground.
     this.forceSimulation = addForceSimulation.call(this, this.data);

@@ -21,7 +21,10 @@ export default function addForceSimulation(data) {
         .velocityDecay(0.9)
         .force(
             'center',
-            d3.forceCenter(this.settings.orbitRadius / 2, this.settings.height.main / 2)
+            d3.forceCenter(
+                d3.mean(data.nested, (d) => d.value.coordinates.x),
+                d3.mean(data.nested, (d) => d.value.coordinates.y)
+            )
         ) // cleared after first interval
         .force(
             'x',

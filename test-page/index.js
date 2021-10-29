@@ -33,7 +33,7 @@ fetch('./data/2e4.csv')
                     header: false,
                 },
                 delay: 5000,
-                timepoint: 25,
+                timepoint: 700,
                 speed: 'medium',
                 loop: false,
                 enforceFocusVicinity: true,

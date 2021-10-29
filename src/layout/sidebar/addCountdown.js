@@ -1,9 +1,8 @@
-import addElement from '../addElement';
-
 export default function addCountdown(progress) {
     const resetDelay = this.settings.resetDelay / 1000;
 
-    return addElement('countdown', progress)
+    return this.util
+        .addElement('countdown', progress)
         .classed('fdg-sidebar__label', true)
         .selectAll('div')
         .data(d3.range(-1, resetDelay))

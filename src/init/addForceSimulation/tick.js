@@ -6,13 +6,18 @@ import drawStar from './tick/star';
 import drawTriangleDown from './tick/triangleDown';
 
 export default function tick(data) {
-    this.containers.canvas.context.clearRect(0, 0, this.settings.width, this.settings.height);
-    this.containers.canvas.context.save();
+    this.layout.canvas.context.clearRect(
+        0,
+        0,
+        this.settings.width.canvas,
+        this.settings.height.main
+    );
+    this.layout.canvas.context.save();
 
     data.nested
         .sort((a, b) => a.value.stateChanges - b.value.stateChanges) // draw bubbles with more state changes last
         .forEach((d, i) => {
-            this.containers.canvas.context.beginPath();
+            this.layout.canvas.context.beginPath();
 
             switch (d.value.shape) {
                 case 'circle':
@@ -38,5 +43,5 @@ export default function tick(data) {
             }
         });
 
-    this.containers.canvas.context.restore();
+    this.layout.canvas.context.restore();
 }

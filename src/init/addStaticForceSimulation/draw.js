@@ -3,17 +3,17 @@ export default function draw(worker, color) {
 
     worker.onmessage = function (event) {
         const className = `fdg-static--${event.data.id.replace(/[^0-9_a-z]/gi, '-')}`;
-        main.containers.svgBackground.selectAll(`.${className}`).remove();
-        const g = main.containers.svgBackground
+        main.layout.svgBackground.selectAll(`.${className}`).remove();
+        const g = main.layout.svgBackground
             .insert('g', ':first-child')
             .classed(`fdg-static ${className}`, true)
-            .attr('transform', `translate(${main.settings.widthDiff},0)`);
+            .attr('transform', `translate(${main.settings.width.sidebar},0)`);
 
         // translate to the central focus
         if (main.settings.staticLayout == 'radial')
             g.attr(
                 'transform',
-                `translate(${main.settings.widthDiff + main.settings.orbitRadius / 2},${
+                `translate(${main.settings.width.sidebar + main.settings.orbitRadius / 2},${
                     main.settings.height / 2
                 })`
             );

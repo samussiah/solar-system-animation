@@ -1,11 +1,11 @@
 export default function controls(main) {
-    const controls = this.util
+    const container = this.util
         .addElement('controls', main)
         .classed('fdg-hidden', this.settings.hideControls);
-    const hide = this.util.addElement('hide', controls, 'span');
+    const hide = this.util.addElement('hide', container, 'span');
 
     return {
-        controls,
+        controlsContainer: container,
         hide,
     };
 }

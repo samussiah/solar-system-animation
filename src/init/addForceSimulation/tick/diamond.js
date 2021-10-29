@@ -1,5 +1,5 @@
 export default function diamond(d) {
-    const ctx = this.containers.canvas.context;
+    const ctx = this.layout.canvas.context;
 
     const halfWidth = d.value.size * Math.sqrt(2);
 
@@ -10,10 +10,10 @@ export default function diamond(d) {
     ctx.lineTo(d.x, d.y - halfWidth);
 
     if (this.settings.fill) {
-        this.containers.canvas.context.fillStyle = d.value.fill;
-        this.containers.canvas.context.fill();
+        this.layout.canvas.context.fillStyle = d.value.fill;
+        this.layout.canvas.context.fill();
     }
 
-    this.containers.canvas.context.strokeStyle = d.value.stroke;
-    this.containers.canvas.context.stroke();
+    this.layout.canvas.context.strokeStyle = d.value.stroke;
+    this.layout.canvas.context.stroke();
 }

@@ -16,6 +16,11 @@ fetch('../../data/data_1000.csv')
                 sizeBy: {
                     type: null,
                 },
+                freqTable: {
+                    structure: 'horizontal',
+                },
+                individualUnit: 'participant',
+                individualLabel: 'Participants',
             }
         );
     });

@@ -4,10 +4,16 @@ import addForceSimulation from './init/addForceSimulation';
 import { increment } from './init/startInterval';
 import getNextSequence from './init/startInterval/runNextSequence/getNextSequence';
 import runSequence from './init/startInterval/runNextSequence/runSequence';
+import update from './init/startInterval/update';
 import startInterval from './init/startInterval';
 
 export default function init() {
     this.settings_initial = { ...this.settings };
+
+    // Update metadata.
+    this.metadata.event.forEach((event) => {
+        event.data = this.data.nested.filter((d) => d.value.state.event === event.key);
+    });
 
     // Cycle through text that displays over animation.
     runModal.call(this);
@@ -15,6 +21,8 @@ export default function init() {
     // Add a static force layout in the background for individuals that never change state (improves
     // performance by reducing the number of nodes in the simulation).
     addStaticForceSimulation.call(this);
+
+    update.call(this, this.data);
 
     // Add a dynamic force layout in the middleground.
     this.forceSimulation = addForceSimulation.call(this, this.data);
@@ -27,16 +35,13 @@ export default function init() {
 
     // Start the animation.
     if (this.settings.playPause === 'play')
-        this.timeout = d3.timeout(
-            () => {
-                // Run first sequence.
-                if (this.settings.runSequences === true) {
-                    this.sequence = getNextSequence.call(this, false);
-                    runSequence.call(this); // calls startInterval
-                }
-                // Run full animation.
-                else this.interval = startInterval.call(this, this.data);
-            },
-            this.settings.delay ? this.settings.modalSpeed : 0
-        );
+        this.timeout = d3.timeout(() => {
+            // Run first sequence.
+            if (this.settings.runSequences === true) {
+                this.sequence = getNextSequence.call(this, false);
+                runSequence.call(this); // calls startInterval
+            }
+            // Run full animation.
+            else this.interval = startInterval.call(this, this.data);
+        }, this.settings.delay);
 }

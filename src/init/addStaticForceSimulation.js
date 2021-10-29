@@ -1,9 +1,10 @@
 import simulate from './addStaticForceSimulation/simulate';
 import draw from './addStaticForceSimulation/draw';
 
+// TODO: add one static force simulation per state rather than only at the central state
 export default function addStaticForceSimulation() {
     if (this.settings.drawStaticSeparately) {
-        this.containers.svgBackground.selectAll('.fdg-static').remove();
+        this.layout.svgBackground.selectAll('.fdg-static').remove();
 
         // Capture individuals without state change.
         const noStateChange = this.data.nested
@@ -35,7 +36,7 @@ export default function addStaticForceSimulation() {
                 this,
                 noStateChange,
                 this.settings.orbitRadius / 2,
-                this.settings.height / 2,
+                this.settings.height.main / 2,
                 'main'
             );
 

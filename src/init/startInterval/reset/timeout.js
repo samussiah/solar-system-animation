@@ -10,7 +10,7 @@ export default function timeout(data, countdown) {
         updateProgress.call(this);
         countdown.stop();
         timeout.stop();
-        this.containers.countdown
+        this.layout.countdown
             .classed('fdg-invisible', (d) => d === this.settings.resetDelay / 1000 - 1)
             .classed('fdg-hidden', (d) => d !== this.settings.resetDelay / 1000 - 1);
         this.interval = startInterval.call(this, data);

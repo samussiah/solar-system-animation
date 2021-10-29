@@ -90,6 +90,6 @@ export default function update() {
         this.settings.animationTrack = 'full';
     }
 
-    // timing
-    if (this.settings.stateChange === 'ordered') this.settings.displayTiming = false;
+    // progress
+    if (this.settings.stateChange === 'ordered') this.settings.displayProgress = false;
 }

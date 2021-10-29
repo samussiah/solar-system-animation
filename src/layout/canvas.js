@@ -1,42 +1,32 @@
 export default function canvas(main) {
-    this.settings.fullWidth = main.node().clientWidth;
-    const animation = this.util.addElement('animation', main).style('position', 'relative');
-    this.settings.width = animation.node().clientWidth;
-    this.settings.widthDiff = this.settings.fullWidth - this.settings.width;
-    this.settings.height = animation.node().clientHeight;
-
-    // progress bar
-    const progressBar = this.util
-        .addElement('progress-bar', animation)
-        .classed('fdg-hidden', !this.settings.displayProgressBar);
-    const progressTimepoint = this.util
-        .addElement('progress-timepoint', animation)
-        .classed('fdg-hidden', !this.settings.displayProgressBar);
+    const container = this.util.addElement('animation', main);
+    this.settings.width.canvas = container.node().clientWidth;
 
     // background SVG - orbits
     const svgBackground = this.util
-        .addElement('svg--background', animation, 'svg')
-        .attr('width', main.node().clientWidth)
-        .attr('height', this.settings.height)
+        .addElement('svg--background', container, 'svg')
+        .attr('width', this.settings.width.main)
+        .attr('height', this.settings.height.main)
         .style('position', 'absolute')
-        .style('left', -this.settings.widthDiff)
+        .style('left', -this.settings.width.sidebar)
         .style('top', 0);
 
     // canvas - bubbles
     const canvas = this.util
-        .addElement('canvas', animation, 'canvas')
-        .attr('width', this.settings.width)
-        .attr('height', this.settings.height);
+        .addElement('canvas', container, 'canvas')
+        .attr('width', this.settings.width.canvas)
+        .attr('height', this.settings.height.main);
     canvas.context = canvas.node().getContext('2d');
 
     // foreground SVG - annotations
     const svgForeground = this.util
-        .addElement('svg--foreground', animation, 'svg')
-        .attr('width', this.settings.width)
-        .attr('height', this.settings.height);
+        .addElement('svg--foreground', container, 'svg')
+        .attr('width', this.settings.width.canvas)
+        .attr('height', this.settings.height.main);
     const sequenceOverlay = this.util
         .addElement('sequence-overlay', svgForeground, 'g')
         .classed('fdg-focus-annotation', true)
+        .classed('fdg-hidden', !this.settings.stateChangeAnnotation)
         .attr('transform', 'translate(20,20)');
     sequenceOverlay.background = this.util
         .addElement('sequence-overlay__background', sequenceOverlay, 'text')
@@ -75,7 +65,7 @@ export default function canvas(main) {
 
     // modal
     const modalContainer = this.util
-        .addElement('modal', animation)
+        .addElement('modal', container)
         .attr(
             'class',
             (d) =>
@@ -84,13 +74,15 @@ export default function canvas(main) {
                     .map((position) => `fdg-modal--${position}`)
                     .join(' ')} fdg-modal--${this.settings.modalPosition}`
         )
+        .classed('fdg-hidden', this.settings.text.length === 0)
         .style(
             'width',
             /^\d{1,3}%$/.test(this.settings.modalWidth) ? this.settings.modalWidth : '50%'
         );
     const modal = this.util.addElement('modal__text', modalContainer);
 
-    const footnotes = this.util.addElement('footnotes', animation);
+    // footnotes
+    const footnotes = this.util.addElement('footnotes', container);
     footnotes
         .selectAll('div.fdg-footnote')
         .data(this.settings.footnotes)
@@ -99,9 +91,7 @@ export default function canvas(main) {
         .html((d) => d);
 
     return {
-        animation,
-        progressBar,
-        progressTimepoint,
+        canvasContainer: container,
         svgBackground,
         canvas,
         svgForeground,

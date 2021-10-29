@@ -4,13 +4,13 @@ export default function updateText() {
             this.prevEvent === undefined ||
             this.currEvent.orbitLabel !== this.prevEvent.orbitLabel
         ) {
-            this.containers.sequenceOverlay.background.sequence
+            this.layout.sequenceOverlay.background.sequence
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', () => {
-                    this.containers.sequenceOverlay.background.sequence
+                    this.layout.sequenceOverlay.background.sequence
                         .html(this.currEvent.orbitLabel || this.currEvent.key)
                         .style('opacity', 0)
                         .transition()
@@ -18,13 +18,13 @@ export default function updateText() {
                         .style('opacity', 1);
                 });
 
-            this.containers.sequenceOverlay.foreground.sequence
+            this.layout.sequenceOverlay.foreground.sequence
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', () => {
-                    this.containers.sequenceOverlay.foreground.sequence
+                    this.layout.sequenceOverlay.foreground.sequence
                         .html(this.currEvent.orbitLabel || this.currEvent.key)
                         .style('opacity', 0)
                         .transition()
@@ -34,13 +34,13 @@ export default function updateText() {
         }
 
         if (this.currEvent.orbitLabel && this.currEvent.key) {
-            this.containers.sequenceOverlay.background.event
+            this.layout.sequenceOverlay.background.event
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', () => {
-                    this.containers.sequenceOverlay.background.event
+                    this.layout.sequenceOverlay.background.event
                         .html(this.currEvent.key)
                         .style('opacity', 0)
                         .transition()
@@ -48,13 +48,13 @@ export default function updateText() {
                         .style('opacity', 1);
                 });
 
-            this.containers.sequenceOverlay.foreground.event
+            this.layout.sequenceOverlay.foreground.event
                 .style('opacity', 1)
                 .transition()
                 .duration(this.settings.modalSpeed / 5)
                 .style('opacity', 0)
                 .on('end', () => {
-                    this.containers.sequenceOverlay.foreground.event
+                    this.layout.sequenceOverlay.foreground.event
                         .html(this.currEvent.key)
                         .style('opacity', 0)
                         .transition()
@@ -63,29 +63,29 @@ export default function updateText() {
                 });
         }
     } else {
-        this.containers.sequenceOverlay.background.sequence
+        this.layout.sequenceOverlay.background.sequence
             .style('opacity', 1)
             .transition()
             .duration(this.settings.modalSpeed / 5)
             .style('opacity', 0)
-            .on('end', () => this.containers.sequenceOverlay.background.sequence.html(null));
-        this.containers.sequenceOverlay.foreground.sequence
+            .on('end', () => this.layout.sequenceOverlay.background.sequence.html(null));
+        this.layout.sequenceOverlay.foreground.sequence
             .style('opacity', 1)
             .transition()
             .duration(this.settings.modalSpeed / 5)
             .style('opacity', 0)
-            .on('end', () => this.containers.sequenceOverlay.foreground.sequence.html(null));
-        this.containers.sequenceOverlay.background.event
+            .on('end', () => this.layout.sequenceOverlay.foreground.sequence.html(null));
+        this.layout.sequenceOverlay.background.event
             .style('opacity', 1)
             .transition()
             .duration(this.settings.modalSpeed / 5)
             .style('opacity', 0)
-            .on('end', () => this.containers.sequenceOverlay.background.event.html(null));
-        this.containers.sequenceOverlay.foreground.event
+            .on('end', () => this.layout.sequenceOverlay.background.event.html(null));
+        this.layout.sequenceOverlay.foreground.event
             .style('opacity', 1)
             .transition()
             .duration(this.settings.modalSpeed / 5)
             .style('opacity', 0)
-            .on('end', () => this.containers.sequenceOverlay.foreground.event.html(null));
+            .on('end', () => this.layout.sequenceOverlay.foreground.event.html(null));
     }
 }

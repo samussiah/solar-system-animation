@@ -1,8 +1,5 @@
-body {
-    overflow-x: hidden;
-}
 :root {
-    --left-margin: 25%;
+    --left-margin: 25%; /* controls the width of the sidebar */
     --background-lightest: rgba(248,248,255,.5);
     --background-lightest-opaque: rgba(248,248,255,1);
     --background-lighter: rgba(232,232,239,.5);
@@ -17,10 +14,14 @@ body {
     --background-darker-opaque: rgba(170,170,175,1);
     --background-darkest: rgba(155,155,159,.5);
     --background-darkest-opaque: rgba(155,155,159,1);
-    --text-color--blue: #003366;
-    --text-color--red: #660000;
+    --text-color--primary: #003366;
+    --text-color--secondary: #660000;
     --border: 1px solid var(--background-darkest);
     --color-emphasis: rgba(215,25,28,0.5);
+    --font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Arial, "Trebuchet MS", Verdana, sans-serif;
+}
+body {
+    overflow-x: hidden;
 }
 
 /*------------------------------------------------------------------------------------------------\
@@ -31,6 +32,7 @@ body {
         width: 100%;
         height: calc(100vh - 16px);
         position: relative;
+        font-family: var(--font-family);
     }
     .fdg-hidden {
         display: none !important;
@@ -67,26 +69,28 @@ body {
             justify-content: center;
             flex-direction: column;
             background: var(--background-darker);
-            color: var(--text-color--blue);
+            color: var(--text-color--primary);
         }
         .fdg-sidebar > div {
             width: calc(100% - 20px);
             padding: 10px;
             background-clip: padding-box;
         }
-        .fdg-events,
         .fdg-sidebar__label {
-            padding-bottom: 8px;
-            font-size: 1.5rem;
-            font-weight: 500;
+            padding-bottom: 2px;
+            font-size: 1.25rem;
+            font-weight: 300;
             text-align: left;
         }
 
         /* events */
 
             div.fdg-events {
-                font-size: 1.75rem;
-                color: var(--text-color--red);
+                padding-bottom: 2px;
+                font-size: 2.5rem;
+                font-weight: lighter;
+                text-align: left;
+                color: var(--text-color--secondary);
             }
 
         /* legends */
@@ -99,9 +103,12 @@ body {
             }
             .fdg-legend > * {
             }
+            .fdg-legend__label {
+                font-weight: bold;
+            }
             text.fdg-legend__label {
-                fill: var(--text-color--blue);
-                stroke: var(--text-color--blue);
+                fill: var(--text-color--primary);
+                stroke: var(--text-color--primary);
                 stroke-width: .3;
             }
             .fdg-legend svg {
@@ -109,8 +116,26 @@ body {
             }
             .fdg-legend__shape {
                 fill: var(--background-light);
-                stroke: var(--text-color--blue);
+                stroke: var(--text-color--primary);
                 stroke-width: 2px;
+            }
+            .fdg-legend table {
+                width: 100%;
+            }
+            .fdg-legend td:first-child {
+                width: 20px;
+            }
+            .fdg-legend td:first-child svg {
+                width: 20px;
+            }
+            .fdg-legend td:nth-child(2) {
+                font-weight: lighter;
+                font-size: 1rem;
+            }
+            .fdg-legend td:last-child {
+                text-align: right;
+                font-weight: bold;
+                font-variant-numeric: tabular-nums;
             }
 
         /* progress */
@@ -139,7 +164,7 @@ body {
                 fill: var(--background--lightest);
             }
             .fdg-timer__path--foreground {
-                fill: var(--text-color--blue);
+                fill: var(--text-color--primary);
                 stroke: none;
                 stroke-width: 0.5;
             }
@@ -150,8 +175,8 @@ body {
                 font-size: 2.25rem;
                 top: 3rem;
                 position: absolute;
-                fill: #660000;
-                stroke: #660000;
+                fill: var(--text-color--secondary);
+                stroke: var(--text-color--secondary);
                 margin-left: 4px;
             }
             .fdg-countdown {
@@ -167,6 +192,9 @@ body {
                 background: var(--background-lightest);
                 overflow-x: auto;
             }
+            .fdg-freq-table__title {
+                font-weight: bold;
+            }
             .fdg-freq-table__table {
                 width: 100%;
                 white-space: nowrap;
@@ -181,6 +209,8 @@ body {
             .fdg-freq-table__th:first-child,
             .fdg-freq-table__td:first-child {
                 padding-left: 0;
+                font-weight: lighter;
+                font-size: 1rem;
             }
             .fdg-freq-table__th:last-child,
             .fdg-freq-table__td:last-child {
@@ -199,26 +229,30 @@ body {
 
             /* vertical table structure */
 
-            .fdg-freq-table__th--individual {
+            .fdg-freq-table__th--id {
                 direction: rtl;
             }
             .fdg-freq-table__tr--subgroup .fdg-freq-table__td--label {
                 padding-left: 1rem;
             }
-            .fdg-freq-table__td--individual {
+            .fdg-freq-table__td--id {
                 text-align: right;
                 position: relative;
                 border: 1px solid var(--background-darkest);
                 padding: 0 4px;
+                font-variant-numeric: tabular-nums;
             }
             .fdg-freq-table__td--event {
                 text-align: right;
+                font-weight: bold;
+                font-variant-numeric: tabular-nums;
             }
 
             /* horizontal table structure */
 
             .fdg-freq-table__td--freq {
                 text-align: right;
+                font-variant-numeric: tabular-nums;
             }
 
     /**-------------------------------------------------------------------------------------------\
@@ -248,7 +282,7 @@ body {
                 bottom: 6px;
                 right: 0;
                 white-space: nowrap;
-                color: var(--text-color--blue);
+                color: var(--text-color--primary);
             }
             .fdg-progress-bar {
                 position: absolute;
@@ -294,19 +328,17 @@ body {
                 text-rendering: optimizeLegibility;
             }
             .fdg-focus-annotation__foreground {
-                fill: var(--text-color--blue);
+                fill: var(--text-color--primary);
             }
             .fdg-focus-annotation__background {
                 stroke: var(--background-lightest-opaque);
             }
             .fdg-focus-annotation__label {
                 stroke-width: 4px;
-                font-weight: bold;
             }
             .fdg-focus-annotation__event-count {
                 stroke-width: 3px;
                 font-size: 1rem;
-                font-weight: bold;
             }
             .fdg-custom-annotation {
                 font-size: 3rem;
@@ -314,10 +346,10 @@ body {
                 stroke-width: 4px;
             }
             .fdg-custom-annotation .fdg-focus-annotation__foreground {
-                fill: var(--text-color--red);
+                fill: var(--text-color--secondary);
             }
             .fdg-custom-annotation__line {
-                stroke: var(--text-color--red);
+                stroke: var(--text-color--secondary);
             }
 
         /* modal */
@@ -326,7 +358,7 @@ body {
                 position: absolute;
                 padding: 2%;
                 font-size: 2rem;
-                text-shadow: var(--text-color--blue) 0px 0px 10px;
+                text-shadow: var(--text-color--primary) 0px 0px 10px;
             }
             .fdg-modal--center {
                 text-align: center;
@@ -352,6 +384,7 @@ body {
         /* footnotes */
 
             .fdg-footnotes {
+                font-size: .8rem;
                 position: absolute;
                 bottom: 1rem;
                 left: 1rem;
@@ -364,10 +397,11 @@ body {
         /* container */
 
             .fdg-controls {
-                width: 5%;
+                width: 7.5%;
                 position: absolute;
                 right: 0;
-                top: 0;
+                top: 50%;
+                transform: translateY(-50%);
                 padding: 10px;
                 display: flex;
                 justify-content: center;
@@ -426,7 +460,7 @@ body {
             .fdg-button:not(:last-child) {
             }
             .fdg-button--current {
-                color: var(--text-color--blue);
+                color: var(--text-color--primary);
                 background: var(--background-darker);
                 border: 1px solid var(--background-darkest);
                 font-weight: bold;

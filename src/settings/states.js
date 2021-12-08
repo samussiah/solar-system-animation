@@ -13,5 +13,6 @@ export default function states() {
         eventLabelFontSize: '1.5rem',
         eventCountFontWeight: 'bold',
         eventCountFontSize: '1rem',
+        eventFocusLabelChange: null, // array of objects with old label, new label, and timepoint
     };
 }

@@ -1,8 +1,8 @@
-import getState from './nestData/getState';
-import getAestheticValues from './nestData/getAestheticValues';
-import getCoordinates from './nestData/getCoordinates';
-import getColorScale from './nestData/getColorScale';
-import getAesthetics from './nestData/getAesthetics';
+import getState from './structure/getState';
+import getAestheticValues from './structure/getAestheticValues';
+import getCoordinates from './structure/getCoordinates';
+import getColorScale from './structure/getColorScale';
+import getAesthetics from './structure/getAesthetics';
 
 export default function structure(data) {
     const grouped = d3
@@ -24,6 +24,8 @@ export default function structure(data) {
             );
             const colorScale = getColorScale.call(this, aestheticValues.colorValue);
             const aesthetics = getAesthetics.call(this, aestheticValues, colorScale);
+
+            const queue = [state];
 
             return {
                 index: this.metadata.id.findIndex((id) => id.key === state.id),

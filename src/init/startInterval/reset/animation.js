@@ -1,9 +1,9 @@
 import getNextSequence from '../runNextSequence/getNextSequence';
-import getState from '../../../data/nestData/getState';
-import getAestheticValues from '../../../data/nestData/getAestheticValues';
-import getCoordinates from '../../../data/nestData/getCoordinates';
-import getColorScale from '../../../data/nestData/getColorScale';
-import getAesthetics from '../../../data/nestData/getAesthetics';
+import getState from '../../../data/structure/getState';
+import getAestheticValues from '../../../data/structure/getAestheticValues';
+import getCoordinates from '../../../data/structure/getCoordinates';
+import getColorScale from '../../../data/structure/getColorScale';
+import getAesthetics from '../../../data/structure/getAesthetics';
 import runModal from '../../runModal';
 
 export default function resetAnimation(data) {

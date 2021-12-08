@@ -1180,6 +1180,7 @@
         d.value.inVicinityOfFocus = d.value.distanceFromFocus < _this.settings.orbitRadius / 16; // Update coordinates once node reaches vicinity of destination or when time since
         // previous state crosses some threshold.
 
+        d.value.state.transitTime++;
         d.value.transitTime++;
         var transitThreshold = 500 / Math.ceil(Math.sqrt(_this.settings.speeds[_this.settings.speed]));
 
@@ -4577,7 +4578,10 @@
 
           if (!has.duration && has.start_timepoint && has.end_timepoint) {
             d.duration = d.end_timepoint - d.start_timepoint + 1;
-          }
+          } // Track transit time of node during each state.
+
+
+          d.transitTime = 0;
         }); // Define sequence
 
         group.sort(function (a, b) {

@@ -29,6 +29,9 @@ export default function addVariables(has) {
                 if (!has.duration && has.start_timepoint && has.end_timepoint) {
                     d.duration = d.end_timepoint - d.start_timepoint + 1;
                 }
+
+                // Track transit time of node during each state.
+                d.transitTime = 0;
             });
 
             // Define sequence

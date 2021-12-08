@@ -1,8 +1,8 @@
-import getState from '../../../../data/nestData/getState';
-import getAestheticValues from '../../../../data/nestData/getAestheticValues';
-import getCoordinates from '../../../../data/nestData/getCoordinates';
-import getColorScale from '../../../../data/nestData/getColorScale';
-import getAesthetics from '../../../../data/nestData/getAesthetics';
+import getState from '../../../../data/structure/getState';
+import getAestheticValues from '../../../../data/structure/getAestheticValues';
+import getCoordinates from '../../../../data/structure/getCoordinates';
+import getColorScale from '../../../../data/structure/getColorScale';
+import getAesthetics from '../../../../data/structure/getAesthetics';
 import travelTime from './nestedData/travelTime';
 
 export default function nestedData(data) {
@@ -32,6 +32,7 @@ export default function nestedData(data) {
 
         // Update coordinates once node reaches vicinity of destination or when time since
         // previous state crosses some threshold.
+        d.value.state.transitTime++;
         d.value.transitTime++;
         const transitThreshold =
             500 / Math.ceil(Math.sqrt(this.settings.speeds[this.settings.speed]));

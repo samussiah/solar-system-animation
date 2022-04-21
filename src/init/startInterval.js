@@ -20,6 +20,19 @@ export const increment = function (data, increment) {
         this.interval = startInterval.call(this, this.sequence ? this.sequence.data : this.data);
     }
 
+    // Update focus label.
+    if (
+        Array.isArray(this.settings.eventFocusLabelChange) &&
+        this.settings.eventFocusLabelChange.map((change) => change.timepoint).includes(this.settings.timepoint)
+    ) {
+        const eventFocusLabelChange = this.settings.eventFocusLabelChange
+            .find((change) => change.timepoint === this.settings.timepoint);
+        const focusAnnotation = this.focusAnnotations
+            .filter(d => d.key === eventFocusLabelChange.old_label)
+            .selectAll('.fdg-focus-annotation__label tspan')
+            .text(eventFocusLabelChange.new_label);
+    }
+
     timeoutBetweenStates.call(this);
 
     // Update animation if current timepoint is less than full duration of animation.

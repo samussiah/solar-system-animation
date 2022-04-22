@@ -1,13 +1,13 @@
 {
   "TODO": "",
-  "name": "force-directed-graph",
+  "name": "solar-system-animation",
   "version": "2.1.1",
   "description": "a force-directed graph layout of participants with congestive heart failure over time",
   "module": "./src/index.js",
   "main": "./index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/samussiah/force-directed-graph.git"
+    "url": "https://github.com/samussiah/solar-system-animation.git"
   },
   "scripts": {
     "build": "npm audit fix && npm run bundle && npm run format && npm run minify",

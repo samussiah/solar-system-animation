@@ -1,0 +1,10 @@
+ dependencies:
+  - name: d3
+    version: 5.16.0
+    src: htmlwidgets/lib/d3
+    script: d3.min.js
+  - name: solar-system-animation
+    version: 2.1.1
+    src: htmlwidgets/lib/solar-system-animation
+    script: index.min.js
+    stylesheet: index.min.css

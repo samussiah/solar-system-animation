@@ -5,7 +5,7 @@ fetch('../data/adverse-event-outcome.csv')
         data.forEach(d => {
         });
 
-        const fdg = forceDirectedGraph(
+        const fdg = solarSystemAnimation(
             data,
             '#container',
             {

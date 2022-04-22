@@ -23,12 +23,15 @@ export const increment = function (data, increment) {
     // Update focus label.
     if (
         Array.isArray(this.settings.eventFocusLabelChange) &&
-        this.settings.eventFocusLabelChange.map((change) => change.timepoint).includes(this.settings.timepoint)
+        this.settings.eventFocusLabelChange
+            .map((change) => change.timepoint)
+            .includes(this.settings.timepoint)
     ) {
-        const eventFocusLabelChange = this.settings.eventFocusLabelChange
-            .find((change) => change.timepoint === this.settings.timepoint);
+        const eventFocusLabelChange = this.settings.eventFocusLabelChange.find(
+            (change) => change.timepoint === this.settings.timepoint
+        );
         const focusAnnotation = this.focusAnnotations
-            .filter(d => d.key === eventFocusLabelChange.old_label)
+            .filter((d) => d.key === eventFocusLabelChange.old_label)
             .selectAll('.fdg-focus-annotation__label tspan')
             .text(eventFocusLabelChange.new_label);
     }

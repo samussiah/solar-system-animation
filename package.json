@@ -32,7 +32,7 @@
     "d3-force-sampled": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.4",
+    "@babel/core": "^7.29.6",
     "@babel/preset-env": "^7.10.4",
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
